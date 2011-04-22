@@ -13,8 +13,8 @@ Dependencies:
 
 Libamqp has a dependency on UnitTest++ (see: http://unittest-cpp.sourceforge.net/).
 Details on the licensing of UnitTest++ are in: 3rd-party/UnitTest++/README, and
-3rd-party/UnitTest++/COPYING. UnitTest++ is required by the libamqp build does not
-introduce a dependency on code linking with libamqp.
+3rd-party/UnitTest++/COPYING. UnitTest++ is required by the libamqp build and does
+not introduce a dependency on code linking with libamqp.
 
 
 See src/?? for usage.
