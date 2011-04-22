@@ -1,0 +1,35 @@
+libamqp readme.
+
+libamqp is Copyright 2011 StormMQ Limited.
+
+libamqp is licensed under the Apache License, Version 2.0 (the "License");
+you may not use libamqp except in compliance with the License. A copy of
+the License can be found in the file LICENSE distributed with this
+package, or you may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Dependencies:
+
+Libamqp has a dependency on UnitTest++ (see: http://unittest-cpp.sourceforge.net/).
+Details on the licensing of UnitTest++ are in: 3rd-party/UnitTest++/README, and
+3rd-party/UnitTest++/COPYING. UnitTest++ is required by the libamqp build does not
+introduce a dependency on code linking with libamqp.
+
+
+See src/?? for usage.
+
+Authors:
+Eamon Walshe <eamon.walshe@stormmq.com>
+
+Contributors:
+
+
+StormMQ Limited UK Office:
+Gateshead int'l Business Centre, Mulgrave Terrace, Gateshead, NE8 1AN, United Kingdom
+Telephone: +44 845 3712 567
+
+StormMQ Limited registered office:
+78 Broomfield Road, Chelmsford, Essex, CM1 1SS, United Kingdom
+StormMQ Limited is Registered in England and Wales under Company Number 07175657
+StormMQ.com
