@@ -1,0 +1,2 @@
+scrub: 
+	find . -name \*.[aodsi] -print | xargs rm -f

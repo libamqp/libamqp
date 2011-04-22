@@ -1,0 +1,149 @@
+
+
+int amqp_type_method_null_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_boolean_true_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_boolean_false_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_ubyte_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_byte_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_ushort_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_short_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_uint_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_int_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_small_uint_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_small_int_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_float_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_char_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_decimal32_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_ulong_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_long_%%(amqp_type_t *type)
+{
+}
+int amqp_type_method_small_ulong_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_small_long_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_double_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_timestamp_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_decimal64_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_uuid_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_binary_vbin8_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_binary_vbin32_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_symbol_sym8_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_symbol_sym32_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_string_str8_utf8_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_string_str32_utf8_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_string_str8_utf16_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_string_str32_utf16_%%(amqp_type_t *type)
+{
+
+}
+
+int amqp_type_method_list_8_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_map_8_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_list_32_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_map_32_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_array_8_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_array_32_%%(amqp_type_t *type)
+{
+}
+
+int amqp_type_method_extension_type_%%(amqp_type_t *type)
+{
+}

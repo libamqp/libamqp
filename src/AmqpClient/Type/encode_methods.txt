@@ -1,0 +1,127 @@
+
+
+int amqp_type_%%_null(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_boolean(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_ubyte(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_byte(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_ushort(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_short(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_uint(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_int(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_small_uint(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_small_int(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_float(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_char(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_decimal32(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_ulong(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_long(amqp_context_t *context)
+{
+    abort();
+}
+int amqp_type_%%_small_ulong(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_small_long(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_double(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_timestamp(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_decimal64(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_uuid(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_binary(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_symbol(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_string_utf8(amqp_context_t *context)
+{
+    abort();
+}
+
+int amqp_type_%%_string_utf16(amqp_context_t *context)
+{
+
+    abort();
+
+

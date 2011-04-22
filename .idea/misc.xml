@@ -35,7 +35,7 @@
     <option name="PROJECT_PROFILE" />
     <option name="USE_PROJECT_LEVEL_SETTINGS" value="false" />
   </component>
-  <component name="CppTools.Loader" reportImplicitCastToBool="false" reportNameReferencedOnce="false" reportUnneededBraces="true" warnedAboutFileOutOfSourceRoot="true" version="3" lastBuildAction="check" additionalCommandLineBuildParameters="" currentProject="$PROJECT_DIR$/Makefile" additionalPreprocessorDefs="" compilerSelect="GCC">
+  <component name="CppTools.Loader" reportImplicitCastToBool="false" reportNameReferencedOnce="false" reportUnneededBraces="true" warnedAboutFileOutOfSourceRoot="true" version="3" lastBuildAction="check" additionalCommandLineBuildParameters="" currentProject="$PROJECT_DIR$/3rd-party/UnitTest++/Makefile" additionalPreprocessorDefs="" compilerSelect="GCC">
     <include-dir path="$PROJECT_DIR$/src/AmqpClient" />
   </component>
   <component name="Cvs2Configuration">
