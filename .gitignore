@@ -1,0 +1,15 @@
+.DS_Store
+.hg
+.idea/workspace.xml
+
+*.o
+*.a
+*.d
+*.i
+*.s
+*.orig
+
+src/DequeTest
+src/test
+src/decode-demo
+src/decode-demo.tar.gz

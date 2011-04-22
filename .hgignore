@@ -1,0 +1,17 @@
+syntax: glob
+.DS_Store
+.git
+*.o
+*.a
+*.d
+*.i
+*.s
+*.orig
+.idea/workspace.xml
+src/DequeTest
+src/test
+src/UnitTestHarness
+workspace/
+src/decode-demo
+src/decode-demo.tar.gz
+external/amqp
