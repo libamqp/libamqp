@@ -1,39 +1,27 @@
 #
-#   Copyright 2011 StormMQ Limited
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-#
 # For details on how this Malkefile works see the paper "Recursive Make Considered Harmful"
 # by Peter Miller (http://aegis.sourceforge.net/auug97.pdf)
 #
 
 MODULES := \
-	AmqpClient/Buffer \
-	AmqpClient/Codec \
-	AmqpClient/Context \
-	AmqpClient/ErrorHandling \
+	LibAmqp \
+	LibAmqp/Memory \
+	LibAmqp/Buffer \
+	LibAmqp/Context \
+	LibAmqp/TestData \
+	LibAmqp/Codec \
+	../3rd-party/UnitTest++/src  \
+	Test
+
+
+OLD_MODULES := \
 	AmqpClient/Frame \
 	AmqpClient/SaslFrame \
 	AmqpClient/Network \
-	AmqpClient/Memory \
 	AmqpClient/Stream \
-	AmqpClient/Type \
 	AmqpClient/types/binary \
 	AmqpClient/types/map \
 	AmqpClient/types/string \
-	AmqpClient \
-	CustomCppUnitLite/Deque \
-	CustomCppUnitLite/TestHarness \
 	DecodeDemo
 
 CC=gcc
@@ -41,53 +29,66 @@ LIBS :=
 SRC :=
 INCLUDES :=
 TEST_SRC :=
+TEST_HARNESS_SRC :=
+TEST_HARNESS_INCLUDES :=
 
 .PHONY:	all trace libs tests check debug targets
-all:	trace libs tests targets 
+all:	trace libs targets tests
+targets::
 
-CPPFLAGS = -I. $(patsubst %,-I%, $(INCLUDES))
-CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic
+CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES))
+# CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic
+CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic
 CXXFLAGS = -g -Wall
 
-OBJ = $(patsubst %.c,%.o,$(SRC))
-TEST_OBJ = $(patsubst %.cpp,%.o,$(TEST_SRC))
+LIBAMQP_LIB := libamqp.a
+LIBS += $(LIBAMQP_LIB)
 
 include $(patsubst %,%/module.mk,$(MODULES))
 
-targets::
-tests::	test
-test:	$(TEST_OBJ) $(OBJ) $(LIBS)
-	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) -o $@
+OBJ = $(patsubst %.c,%.o,$(SRC))
+TEST_OBJ = $(patsubst %.cpp,%.o,$(TEST_SRC))
+DEP_SRC += $(TEST_SRC)
+
+libs::	$(LIBAMQP_LIB)
+$(LIBAMQP_LIB): $(patsubst %.o,$(LIBAMQP_LIB)(%.o), $(OBJ))
+	@ranlib $@
+
+tests::	TestRunner
 
 debug:	all
-	gdb ./test
+	gdb ./TestRunner
 	
 check::	all
-	{ trap "" 6; ./test; }
+	./TestRunner
 	
-print:	
+TestRunner:	$(TEST_OBJ) $(OBJ) $(LIBS)
+	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) -o $@
+
+print:
+	@echo TEST_HARNESS_INCLUDES=$(TEST_HARNESS_INCLUDES)
 	@echo INCLUDES=$(INCLUDES)
 	@echo SRC=$(SRC)
 	@echo OBJ=$(OBJ)
 	@echo TEST_SRC=$(TEST_SRC)
 	@echo TEST_OBJ=$(TEST_OBJ)
-	@echo DEP_SRC=$(DEP)
+	@echo DEP_SRC=$(DEP_SRC)
 	@echo DEP=$(DEP)
 	@echo LIBS=$(LIBS)
 	@echo CFLAGS=$(CFLAGS)
+	@echo CXXFLAGS=$(CXXFLAGS)
 
-DEP = $(OBJ:.o=.d) \
-	$(TEST_OBJ:.o=.d) \
+DEP = $(OBJ:.o=.d) $(TEST_OBJ:.o=.d) \
 	$(patsubst %.cpp,%.d,$(filter %.cpp,$(DEP_SRC))) \
-	$(patsubst %.c,%.d,$(filter %.c,$(DEP_SRC))) 
+	$(patsubst %.c,%.d,$(filter %.c,$(DEP_SRC)))
 
 include $(DEP)
 
 %.d: %.cpp
-	./depend.sh `dirname $*` $(CPPFLAGS) $*.cpp > $@
+	@./depend.sh `dirname $*` $(CPPFLAGS) $*.cpp > $@
 
 %.d: %.c
-	./depend.sh `dirname $*` $(CPPFLAGS) $*.c > $@
+	@./depend.sh `dirname $*` $(CPPFLAGS) $*.c > $@
 
 CPP_OUT := \
 	$(OBJ:.o=.i) \
@@ -103,7 +104,6 @@ cpp-out:	$(CPP_OUT)
 %.i: %.c
 	$(CC) -E $(CPPFLAGS) $*.c -o $@
 
-
 ASM_OUT := \
 	$(OBJ:.o=.s) \
 	$(TEST_OBJ:.o=.s) \
@@ -118,13 +118,15 @@ asm-out:	$(ASM_OUT)
 %.s: %.c
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $*.c -o $@
 
-.PHONY:	clean veryclean
+.PHONY:	clean scrub
 clean::
-	rm -f $(OBJ) 
-	rm -f $(TEST_OBJ) 
+	rm -f $(OBJ)
+	rm -f $(TEST_OBJ)
 	rm -f $(CPP_OUT)
 	rm -f $(ASM_OUT)
+	rm -f $(LIBAMQP_LIB)
+	rm -f TestRunner
 
-veryclean::     clean
-	find . -name \*.[odsi] -print | xargs rm -f
+scrub::
+	$(MAKE) -f Makefile.util scrub
 

@@ -13,31 +13,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#include <stdio.h>
 
-#include "Memory/Memory.h"
-#include "Buffer/Buffer.h"
-#include "Codec/Decode/Decode.h"
-#include "Codec/Type/TypePrint.h"
-#include "Context/Context.h"
+#ifndef LIBAMQP_TEST_TRACE_REPORTER
+#define LIBAMQP_TEST_TRACE_REPORTER
 
+#include <TestReporter.h>
 
-int main(int argc, char *argv[])
+class TraceReporter : public UnitTest::TestReporter
 {
-    int c;
-    amqp_type_t *type;
-    amqp_context_t *context = amqp_create_context();
+private:
+    virtual void ReportTestStart(UnitTest::TestDetails const& test);
+    virtual void ReportFailure(UnitTest::TestDetails const& test, char const* failure);
+    virtual void ReportTestFinish(UnitTest::TestDetails const& test, float secondsElapsed);
+    virtual void ReportSummary(int totalTestCount, int failedTestCount, int failureCount, float secondsElapsed);
+};
 
-    while ((c = getc(stdin)) != -1)
-    {
-        amqp_buffer_putc(context->decode.buffer, c);
-    }
-
-    type = amqp_decode(context);
-    amqp_type_print_formatted(type);
-
-    amqp_destroy_context(context);
-
-    // TODO - leaking type
-    return 0;
-}
+#endif

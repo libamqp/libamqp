@@ -29,7 +29,7 @@ DEP_SRC += $(DEMO_SRC)
 
 targets::	decode-demo
 
-decode-demo:	$(DEMO_OBJ) $(CLIENT_LIB)
-	$(CC) $(DEMO_OBJ) -L. $(patsubst lib%.a,-l%,$(CLIENT_LIB)) -o $@
+decode-demo:	$(DEMO_OBJ) $(LIBAMQP_LIB)
+	$(CC) $(DEMO_OBJ) -L. $(patsubst lib%.a,-l%,$(LIBAMQP_LIB)) -o $@
 
 

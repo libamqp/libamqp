@@ -13,31 +13,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#include <stdio.h>
 
-#include "Memory/Memory.h"
-#include "Buffer/Buffer.h"
-#include "Codec/Decode/Decode.h"
-#include "Codec/Type/TypePrint.h"
-#include "Context/Context.h"
-
-
-int main(int argc, char *argv[])
+void break_one()
 {
-    int c;
-    amqp_type_t *type;
-    amqp_context_t *context = amqp_create_context();
-
-    while ((c = getc(stdin)) != -1)
-    {
-        amqp_buffer_putc(context->decode.buffer, c);
-    }
-
-    type = amqp_decode(context);
-    amqp_type_print_formatted(type);
-
-    amqp_destroy_context(context);
-
-    // TODO - leaking type
-    return 0;
+}
+void break_two()
+{
 }

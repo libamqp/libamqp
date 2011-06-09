@@ -1,6 +1,7 @@
 #!/bin/sh
 #
-# See: http://aegis.sourceforge.net/auug97.pdf
+# See the paper "Recursive Make Considered Harmful"
+# by Peter Miller (http://aegis.sourceforge.net/auug97.pdf)
 #
 
 DIR="$1"

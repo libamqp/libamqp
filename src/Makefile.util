@@ -1,2 +1,4 @@
 scrub: 
-	find . -name \*.[aodsi] -print | xargs rm -f
+	find . \( -name \*.[aodsi] -or -name \*.orig \) -print | xargs rm -f
+	find ../3rd-party -name \*.[aodsi] -print | xargs rm -f
+

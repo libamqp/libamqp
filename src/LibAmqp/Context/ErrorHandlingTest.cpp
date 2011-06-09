@@ -13,31 +13,27 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#include <stdio.h>
 
-#include "Memory/Memory.h"
-#include "Buffer/Buffer.h"
-#include "Codec/Decode/Decode.h"
-#include "Codec/Type/TypePrint.h"
-#include "Context/Context.h"
+#include <UnitTest++.h>
+#include "Context/ContextTestSupport.h"
+#include "Context/ErrorHandling.h"
 
 
-int main(int argc, char *argv[])
+SUITE(Context)
 {
-    int c;
-    amqp_type_t *type;
-    amqp_context_t *context = amqp_create_context();
-
-    while ((c = getc(stdin)) != -1)
+    TEST(amqp_error_code_range)
     {
-        amqp_buffer_putc(context->decode.buffer, c);
+        CHECK(AMQP_ERROR_CODE_BASE > sys_nerr);
     }
 
-    type = amqp_decode(context);
-    amqp_type_print_formatted(type);
+    TEST(spike)
+    {
+    //    const char *s = strerror(1000);
+    //    SOUTS(s);
+    //    SOUTV(sys_nerr);
+    //
+    //    read(4, 0, 0);
+    //    amqp_io_error(context, "ooops");
+    }
 
-    amqp_destroy_context(context);
-
-    // TODO - leaking type
-    return 0;
 }

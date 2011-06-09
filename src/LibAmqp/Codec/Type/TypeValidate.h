@@ -13,31 +13,25 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#include <stdio.h>
 
-#include "Memory/Memory.h"
-#include "Buffer/Buffer.h"
-#include "Codec/Decode/Decode.h"
-#include "Codec/Type/TypePrint.h"
+#ifndef LIBAMQP_TYPE_TYPE_VALIDATE_H
+#define LIBAMQP_TYPE_TYPE_VALIDATE_H
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "libamqp_common.h"
 #include "Context/Context.h"
+#include "Codec/Type/Type.h"
 
-
-int main(int argc, char *argv[])
+inline static int amqp_validate_char(wchar_t c)
 {
-    int c;
-    amqp_type_t *type;
-    amqp_context_t *context = amqp_create_context();
-
-    while ((c = getc(stdin)) != -1)
-    {
-        amqp_buffer_putc(context->decode.buffer, c);
-    }
-
-    type = amqp_decode(context);
-    amqp_type_print_formatted(type);
-
-    amqp_destroy_context(context);
-
-    // TODO - leaking type
-    return 0;
+    return c < 0x000d800 || (c > 0x0000dfff && c <= 0x0010ffff);
 }
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+
+

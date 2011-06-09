@@ -1,5 +1,7 @@
 .DS_Store
 .hg
+.hgtags
+.hgignore
 .idea/workspace.xml
 
 *.o
@@ -9,7 +11,10 @@
 *.s
 *.orig
 
-src/DequeTest
-src/test
+3rd-party/UnitTest++/TestUnitTest++
+Documentation/amqp.pdf
+src/TestRunner
 src/decode-demo
 src/decode-demo.tar.gz
+src/t.c
+src/t

@@ -13,31 +13,25 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#include <stdio.h>
 
-#include "Memory/Memory.h"
-#include "Buffer/Buffer.h"
-#include "Codec/Decode/Decode.h"
-#include "Codec/Type/TypePrint.h"
-#include "Context/Context.h"
+#include <UnitTest++.h>
+#include "Codec/Type/TypeValidate.h"
 
-
-int main(int argc, char *argv[])
+SUITE(TypeValidate)
 {
-    int c;
-    amqp_type_t *type;
-    amqp_context_t *context = amqp_create_context();
-
-    while ((c = getc(stdin)) != -1)
+    TEST(validate_utf32_characters_should_be_accepted)
     {
-        amqp_buffer_putc(context->decode.buffer, c);
+        CHECK(amqp_validate_char(0x00000020));
+        CHECK(amqp_validate_char(0x0000d7ff));
+        CHECK(amqp_validate_char(0x0000e000));
+        CHECK(amqp_validate_char(0x0010ffff));
     }
 
-    type = amqp_decode(context);
-    amqp_type_print_formatted(type);
-
-    amqp_destroy_context(context);
-
-    // TODO - leaking type
-    return 0;
+    TEST(invalidate_utf32_characters_should_be_rejected)
+    {
+        CHECK(!amqp_validate_char(0x000d800));
+        CHECK(!amqp_validate_char(0x0000dfff));
+        CHECK(!amqp_validate_char(0x0011ffff));
+    }
 }
+

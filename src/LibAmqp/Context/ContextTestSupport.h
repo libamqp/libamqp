@@ -13,31 +13,30 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#include <stdio.h>
 
-#include "Memory/Memory.h"
-#include "Buffer/Buffer.h"
-#include "Codec/Decode/Decode.h"
-#include "Codec/Type/TypePrint.h"
+#ifndef LIBAMQP_CONTEXT_TEST_SUPPORT_H
+#define LIBAMQP_CONTEXT_TEST_SUPPORT_H
+
+#include <stdlib.h>
+
+#include "Memory/MemoryTestSupport.h"
 #include "Context/Context.h"
+#include "TestData/TestData.h"
 
-
-int main(int argc, char *argv[])
+namespace SuiteContext
 {
-    int c;
-    amqp_type_t *type;
-    amqp_context_t *context = amqp_create_context();
-
-    while ((c = getc(stdin)) != -1)
+    class ContextFixture : public SuiteMemory::MemoryFixture
     {
-        amqp_buffer_putc(context->decode.buffer, c);
-    }
+    public:
+        ContextFixture();
+        ~ContextFixture();
 
-    type = amqp_decode(context);
-    amqp_type_print_formatted(type);
+        void load_decode_buffer(test_data::TestData &data);
 
-    amqp_destroy_context(context);
-
-    // TODO - leaking type
-    return 0;
+    public:
+        amqp_context_t *context;
+    };
 }
+
+#endif
+

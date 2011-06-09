@@ -13,31 +13,24 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#include <stdio.h>
 
-#include "Memory/Memory.h"
-#include "Buffer/Buffer.h"
-#include "Codec/Decode/Decode.h"
-#include "Codec/Type/TypePrint.h"
-#include "Context/Context.h"
+#include <UnitTest++.h>
+#include "ExtraChecks.h"
 
+#include "Context/ContextTestSupport.h"
 
-int main(int argc, char *argv[])
+SUITE(Context)
 {
-    int c;
-    amqp_type_t *type;
-    amqp_context_t *context = amqp_create_context();
-
-    while ((c = getc(stdin)) != -1)
+    TEST_FIXTURE(ContextFixture, fixture_should_have_a_usable_decode_buffer)
     {
-        amqp_buffer_putc(context->decode.buffer, c);
+        static unsigned char bytes[] = { 0x01, 0xa5, 0x03 };
+        test_data::TestData test_bytes(bytes, sizeof(bytes));
+
+        load_decode_buffer(test_bytes);
+
+        CHECK_EQUAL(1, context->decode.buffer->bytes[0]);
+        CHECK_EQUAL(0xa5, context->decode.buffer->bytes[1]);
+        CHECK_EQUAL(0x03, context->decode.buffer->bytes[2]);
     }
-
-    type = amqp_decode(context);
-    amqp_type_print_formatted(type);
-
-    amqp_destroy_context(context);
-
-    // TODO - leaking type
-    return 0;
 }
+

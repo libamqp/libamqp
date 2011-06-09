@@ -7,11 +7,12 @@ syntax: glob
 *.i
 *.s
 *.orig
+*.swp
 .idea/workspace.xml
 src/DequeTest
-src/test
-src/UnitTestHarness
+src/TestRunner
 workspace/
 src/decode-demo
 src/decode-demo.tar.gz
 external/amqp
+3rd-party/UnitTest++/TestUnitTest++
