@@ -26,7 +26,7 @@ extern "C" {
 #include "Codec/Type/Type.h"
 #include "Codec/Convert.h"
 
-#include "types/binary/binary.h"
+//#include "types/binary/binary.h"
 
 #ifndef LIBAMQP_CONTEXT_TYPE
 #define LIBAMQP_CONTEXT_TYPE
