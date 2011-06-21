@@ -19,6 +19,8 @@
 
 #include "debug_helper.h"
 
+#ifndef DISABLE_MEMORY_POOL
+
 SUITE(Pool)
 {
     TEST_FIXTURE(PoolFixture, a_test)
@@ -292,3 +294,4 @@ SUITE(Pool)
         CHECK_EQUAL('Z', t->important_stuff[25]);
     }
 }
+#endif

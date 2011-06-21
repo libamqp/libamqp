@@ -21,6 +21,9 @@
 #include "Memory/Memory.h"
 #include "Memory/Pool.h"
 
+/* declared in Codec/Type/Type.h */
+extern void amqp_type_initialize_pool(amqp_memory_pool_t *pool);
+
 int amqp_context_default_debug_putc(int c)
 {
     return fputc(c, stdout);
@@ -37,7 +40,7 @@ amqp_create_context()
     result->debug.level = 10;
 
     amqp_buffer_initialize_pool(&result->pools.amqp_buffer_t_pool);
-    amqp_buffer_initialize_pool(&result->pools.amqp_type_t_pool);
+    amqp_type_initialize_pool(&result->pools.amqp_type_t_pool); 
 
     result->decode.buffer = (amqp_buffer_t *) amqp_allocate(&result->pools.amqp_buffer_t_pool);
     result->encode.buffer = (amqp_buffer_t *) amqp_allocate(&result->pools.amqp_buffer_t_pool);
@@ -49,7 +52,7 @@ amqp_create_context()
 // amqp_destroy_context
 void amqp_destroy_context(amqp_context_t *context)
 {
-    if (context)
+    if (context != 0)
     {
         amqp_deallocate(&context->pools.amqp_buffer_t_pool, context->encode.buffer);
         amqp_deallocate(&context->pools.amqp_buffer_t_pool, context->decode.buffer);

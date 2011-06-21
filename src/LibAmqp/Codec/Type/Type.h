@@ -117,6 +117,7 @@ extern amqp_type_t **amqp_realloc_amqp_type_t_array(amqp_type_t **elements, size
 extern int amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs);
 extern void amqp_mark_type_invalid(amqp_type_t *type, int cause);
 extern void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type);
+
 extern amqp_type_t *amqp_allocate_type(amqp_context_t *context);
 
 static inline

@@ -21,7 +21,6 @@
 #include "Codec/Type/TypePrint.h"
 #include "Context/Context.h"
 
-
 int main(int argc, char *argv[])
 {
     int c;

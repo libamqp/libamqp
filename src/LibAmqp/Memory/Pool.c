@@ -26,6 +26,7 @@
 
 #include "debug_helper.h"
 
+#ifndef DISABLE_MEMORY_POOL
 
 static
 amqp_memory_block_t *find_block_with_free_space(amqp_memory_block_t *block_list)
@@ -122,32 +123,40 @@ void *allocate_object(amqp_memory_pool_t *pool)
 
     assert(free_allocation->header.block == block_with_free_space);
 
-    pool->stats.outstanding_allocations++;
-    pool->stats.total_allocation_calls++;
 
     return  &free_allocation->data[pool->allocation_data_padding];
 }
+#endif
 
 void *amqp_allocate(amqp_memory_pool_t *pool)
 {
     void *result;
 
-    if (pool == null || pool->object_size == 0)
-    {
-        return  (void *) 0;
-    }
+    assert(pool != null);
+    assert(pool->object_size != 0);
+    assert(pool->initializer_callback != null);
 
+ #ifdef DISABLE_MEMORY_POOL
+    result = amqp_malloc(pool->object_size TRACE_ARGS);
+ #else
     result = allocate_object(pool);
+ #endif
+
     (*pool->initializer_callback)(pool, result);
+
+     pool->stats.outstanding_allocations++;
+     pool->stats.total_allocation_calls++;
+
     return result;
 }
+
+#ifndef DISABLE_MEMORY_POOL
 
 static
 amqp_memory_allocation_t *calculate_allocation_ptr_from_object_ptr(amqp_memory_pool_t *pool, void *pooled_object)
 {
     return (amqp_memory_allocation_t *) ((unsigned char *) pooled_object - sizeof(amqp_memory_allocation_header_t) - pool->allocation_data_padding);
 }
-
 
 static
 void delete_object(amqp_memory_pool_t *pool, void *pooled_object)
@@ -176,15 +185,23 @@ void delete_object(amqp_memory_pool_t *pool, void *pooled_object)
         }
         amqp_free(block);
     }
-    pool->stats.outstanding_allocations--;
 }
+#endif
 
 void amqp_deallocate(amqp_memory_pool_t *pool, void *pooled_object)
 {
+    assert(pool != null);
+    assert(pool->destroyer_callback != null);
+
     if (pooled_object != 0)
     {
         (*pool->destroyer_callback)(pool, pooled_object);
+ #ifdef DISABLE_MEMORY_POOL
+        amqp_free(pooled_object TRACE_ARGS);
+ #else
         delete_object(pool, pooled_object);
+ #endif
+        pool->stats.outstanding_allocations--;
     }
 }
 

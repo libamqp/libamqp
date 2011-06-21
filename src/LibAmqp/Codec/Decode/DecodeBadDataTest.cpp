@@ -30,7 +30,6 @@ SUITE(BadDataDecoder)
     public:
         DecodeFixture() {}
         ~DecodeFixture() { }
-
     public:
     };
     
@@ -38,7 +37,6 @@ SUITE(BadDataDecoder)
     {
         load_decode_buffer(test_data::empty_buffer);
         type = amqp_decode(context);
-
         CHECK_NULL(type);
     }
 
@@ -46,7 +44,6 @@ SUITE(BadDataDecoder)
     {
         load_decode_buffer(test_data::bad_format_code);
         type = amqp_decode_supress_messages(context);
-
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_UNKNOWN_FORMAT_CODE, type->invalid_cause);
     }
@@ -232,5 +229,4 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(1U, type->flags.is_invalid);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
-
 }

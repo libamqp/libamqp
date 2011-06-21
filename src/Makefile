@@ -13,15 +13,11 @@ MODULES := \
 	../3rd-party/UnitTest++/src  \
 	Test
 
-
 OLD_MODULES := \
 	AmqpClient/Frame \
 	AmqpClient/SaslFrame \
 	AmqpClient/Network \
 	AmqpClient/Stream \
-	AmqpClient/types/binary \
-	AmqpClient/types/map \
-	AmqpClient/types/string \
 	DecodeDemo
 
 CC=gcc
@@ -37,6 +33,8 @@ all:	trace libs targets tests
 targets::
 
 CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES))
+CPPFLAGS +=  -DDISABLE_MEMORY_POOL
+# CPPFLAGS +=  -DTRACE_ALLOCATIONS
 # CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic
 CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic
 CXXFLAGS = -g -Wall

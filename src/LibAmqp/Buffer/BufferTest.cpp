@@ -214,5 +214,4 @@ SUITE(Buffer)
 
         CHECK_EQUAL(-1U, amqp_buffer_read_size(buffer, 4));
     }
-
 }

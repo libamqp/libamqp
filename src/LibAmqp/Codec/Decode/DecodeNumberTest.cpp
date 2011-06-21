@@ -42,7 +42,7 @@ SUITE(NumericDecode)
         type = amqp_decode(context);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(123.456f, type->value.b4._float);
+        CHECK_CLOSE(123.456f, type->value.b4._float, 0.00005);
     }
 
     TEST_FIXTURE(DecodeFixture, Double)
@@ -52,6 +52,6 @@ SUITE(NumericDecode)
         type = amqp_decode(context);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(123.456, type->value.b8._double);
+        CHECK_CLOSE(123.456, type->value.b8._double, 0.00005);
     }
 }

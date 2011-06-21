@@ -69,7 +69,7 @@ amqp_type_t ** amqp_realloc_amqp_type_t_array(amqp_type_t **elements, size_t cou
 
     if (new_n > old_n)
     {
-        elements = amqp_realloc(elements, new_n * sizeof(amqp_type_t *));
+        elements = amqp_realloc(elements, new_n * sizeof(amqp_type_t *) TRACE_ARGS);
     }
     return elements;
 }

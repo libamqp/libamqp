@@ -71,8 +71,6 @@ namespace t
     int compare_buffers(const unsigned char *lhs, size_t lhs_size, const unsigned char *rhs, size_t rhs_size);
 }
 
-
-
 #define ASSERT_VALID(type)  \
     CHECK_NOT_NULL(type); \
     CHECK(amqp_type_is_valid(type))
