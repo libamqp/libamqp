@@ -87,7 +87,7 @@ SUITE(CompoundTypeDecode)
 
         e  = amqp_list_element(type, 1);
         CHECK_EQUAL(0x82, e->format_code);
-        CHECK_EQUAL(123.456, e->value.b8._double);
+        CHECK_CLOSE(123.456, e->value.b8._double, 0.0001);
 
         e  = amqp_list_element(type, 2);
         CHECK_EQUAL(0xa1, e->format_code);

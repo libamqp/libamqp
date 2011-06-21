@@ -199,7 +199,7 @@ SUITE(FixedWidthEncoding)
         result = amqp_decode(context);
         CHECK_NOT_NULL(result);
         ASSERT_VALID(result);
-        CHECK_EQUAL(123.456f, result->value.b4._float);
+        CHECK_CLOSE(123.456f, result->value.b4._float, 0.00001);
     }
 
     TEST_FIXTURE(EncodeFixture, Double)
@@ -217,7 +217,7 @@ SUITE(FixedWidthEncoding)
         result = amqp_decode(context);
         CHECK_NOT_NULL(result);
         ASSERT_VALID(result);
-        CHECK_EQUAL(123.456, result->value.b8._double);
+        CHECK_CLOSE(123.456, result->value.b8._double, 0.00001);
     }
 
     TEST_FIXTURE(EncodeFixture, uuid)
