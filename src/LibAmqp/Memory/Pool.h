@@ -18,7 +18,7 @@
 #define LIBAMQP_MEMORY_POOL_H
 
 #include <stdlib.h>
-#include <limits.h>
+#include "limits.h"
 #include "Memory/Memory.h"
 
 #ifdef __cplusplus
