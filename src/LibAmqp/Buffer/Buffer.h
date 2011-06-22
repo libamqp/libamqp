@@ -37,8 +37,8 @@ typedef struct amqp_buffer_t amqp_buffer_t;
 typedef struct amqp_stream_t amqp_stream_t;
 #endif
 
-#ifndef LIBAMQP_CONTEXT_TYPE 
-#define LIBAMQP_CONTEXT_TYPE
+#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
+#define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
 #endif
 

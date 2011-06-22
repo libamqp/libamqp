@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TYPE_PRINT_H
-#define LIBAMQP_TYPE_PRINT_H
+#ifndef LIBAMQP_CODEC_TYPE_TYPE_PRINT_H
+#define LIBAMQP_CODEC_TYPE_TYPE_PRINT_H
 #ifdef __cplusplus
 extern "C" {
 #endif

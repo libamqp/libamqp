@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TYPE_H
-#define LIBAMQP_TYPE_H
+#ifndef LIBAMQP_CODEC_TYPE_TYPE_H
+#define LIBAMQP_CODEC_TYPE_TYPE_H
 
 #include "libamqp_common.h"
 #include "Codec/Type/TypeMetaData.h"
@@ -30,8 +30,8 @@ extern "C" {
 typedef struct amqp_type_t amqp_type_t;
 #endif
 
-#ifndef LIBAMQP_CONTEXT_TYPE
-#define LIBAMQP_CONTEXT_TYPE
+#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
+#define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
 #endif
 
@@ -118,13 +118,7 @@ extern int amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs);
 extern void amqp_mark_type_invalid(amqp_type_t *type, int cause);
 extern void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type);
 
-extern amqp_type_t *amqp_allocate_type(amqp_context_t *context);
-
-static inline
-amqp_buffer_t *amqp_type_convert_buffer(amqp_type_t *type)
-{
-    return type->flags.is_encoded ? type->context->encode.buffer : type->context->decode.buffer;
-}
+extern amqp_buffer_t *amqp_type_convert_buffer(amqp_type_t *type);
 
 static inline
 bool amqp_type_is_compound(amqp_type_t *type)

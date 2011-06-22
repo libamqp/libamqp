@@ -13,13 +13,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#include <stdio.h>
+#include <assert.h>
+//#include <stdio.h>
 
-#include "Memory/Memory.h"
-#include "Buffer/Buffer.h"
-#include "Codec/Decode/Decode.h"
-#include "Codec/Type/TypePrint.h"
-#include "Context/Context.h"
+#include "Codec/Codec.h"
 
 int main(int argc, char *argv[])
 {
@@ -35,8 +32,10 @@ int main(int argc, char *argv[])
     type = amqp_decode(context);
     amqp_type_print_formatted(type);
 
+    amqp_deallocate_type(context, type);
     amqp_destroy_context(context);
 
-    // TODO - leaking type
+    assert(amqp_assert_that_calls_to_free_match_calls_to_malloc());
+
     return 0;
 }

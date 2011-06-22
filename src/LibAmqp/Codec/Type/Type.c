@@ -110,7 +110,7 @@ void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type)
     }
 }
 
-amqp_type_t *amqp_allocate_type(amqp_context_t *context)
+amqp_buffer_t *amqp_type_convert_buffer(amqp_type_t *type)
 {
-    return (amqp_type_t *) amqp_allocate(&context->pools.amqp_type_t_pool);
+    return type->flags.is_encoded ? type->context->encode.buffer : type->context->decode.buffer;
 }

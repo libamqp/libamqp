@@ -14,23 +14,16 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_CODEC_ENCODE_ENCODE_FRAMING_TYPES_H
-#define LIBAMQP_CODEC_ENCODE_ENCODE_FRAMING_TYPES_H
+#ifndef LIBAMQP_CODEC_CODEC_H
+#define LIBAMQP_CODEC_CODEC_H
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "Codec/Encode/Encode.h"
-#include "Codec/Type/TypeEncodeMetaData.h"
-
-static inline
-amqp_type_t *amqp_encode_seconds(amqp_context_t *context, uint32_t seconds)
-{
-    return amqp_encode_uint(context, seconds);
-}
-
-amqp_type_t *amqp_encode_multiple_true_va(amqp_context_t *context, amqp_type_encode_meta_data_t *mata_data, ...);
-#define amqp_encode_multiple_true(c, ...) amqp_encode_multiple_true_va(c, __VA_ARGS__, 0);
+#include "Context/Context.h"
+#include "Codec/Type/Type.h"
+#include "Codec/Decode/Decode.h"
+#include "Codec/Type/TypePrint.h"
 
 #ifdef __cplusplus
 }

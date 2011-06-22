@@ -45,7 +45,6 @@ amqp_create_context()
     result->decode.buffer = (amqp_buffer_t *) amqp_allocate(&result->pools.amqp_buffer_t_pool);
     result->encode.buffer = (amqp_buffer_t *) amqp_allocate(&result->pools.amqp_buffer_t_pool);
 
-    result->convert_buffer = result->decode.buffer; // TODO - stop using an alias
     return result;
 }
 
@@ -71,4 +70,14 @@ amqp_context_define_putc_function(amqp_context_t *context, amqp_debug_print_c_t 
 int amqp_context_putc(amqp_context_t *context, int c)
 {
     return (*context->config.putc)(c);
+}
+
+amqp_type_t *amqp_allocate_type(amqp_context_t *context)
+{
+    return (amqp_type_t *) amqp_allocate(&context->pools.amqp_type_t_pool);
+}
+
+void amqp_deallocate_type(amqp_context_t *context, amqp_type_t *type)
+{
+    amqp_deallocate(&context->pools.amqp_type_t_pool, type);
 }

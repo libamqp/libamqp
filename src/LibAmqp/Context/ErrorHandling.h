@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_ERROR_HANDLING_H
-#define LIBAMQP_ERROR_HANDLING_H
+#ifndef LIBAMQP_CONTEXT_ERROR_HANDLING_H
+#define LIBAMQP_CONTEXT_ERROR_HANDLING_H
 
 #include <assert.h>
 #include <stdio.h>
@@ -24,8 +24,8 @@
 extern "C" {
 #endif
 
-#ifndef LIBAMQP_CONTEXT_TYPE
-#define LIBAMQP_CONTEXT_TYPE
+#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
+#define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
 #endif
 

@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_ENCODE_H
-#define LIBAMQP_ENCODE_H
+#ifndef LIBAMQP_CODEC_ENCODE_ENCODE_H
+#define LIBAMQP_CODEC_ENCODE_ENCODE_H
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,8 +28,8 @@ extern "C" {
 
 //#include "types/binary/binary.h"
 
-#ifndef LIBAMQP_CONTEXT_TYPE
-#define LIBAMQP_CONTEXT_TYPE
+#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
+#define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
 #endif
 

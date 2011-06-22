@@ -24,7 +24,7 @@
 char *amqp_convert_bytes_to_cstr(amqp_type_t *type)
 {
     char *result = amqp_malloc(type->position.size + 1 TRACE_ARGS);
-    strncpy(result, (const char *) &type->context->convert_buffer->bytes[type->position.index], type->position.size);
+    strncpy(result, (const char *) &amqp_type_convert_buffer(type)->bytes[type->position.index], type->position.size);
     return result;
 }
 

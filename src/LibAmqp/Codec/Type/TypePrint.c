@@ -52,7 +52,7 @@ static int amqp_type_print_ascii(amqp_context_t *context, amqp_type_t *type)
     size_t i;
     for (i = 0; i < type->position.size; i++)
     {
-        int c = amqp_unchecked_getc_at(context->convert_buffer, type->position.index + i);
+        int c = amqp_unchecked_getc_at(amqp_type_convert_buffer(type), type->position.index + i);
         amqp_context_putc(context, isprint(c) ? c : '?');
     }
 
@@ -64,7 +64,7 @@ static int amqp_type_print_raw_data(amqp_context_t *context, amqp_type_t *type)
     size_t i;
     for (i = 0; i < type->position.size; i++)
     {
-        int c = amqp_unchecked_getc_at(context->convert_buffer, type->position.index + i);
+        int c = amqp_unchecked_getc_at(amqp_type_convert_buffer(type), type->position.index + i);
         amqp_context_putc(context, to_hex(c >> 4));
         amqp_context_putc(context, to_hex(c & 0x0f));
     }
@@ -111,11 +111,9 @@ static void amqp_type_print_formatted_leader(amqp_type_t *type)
     }
 }
 
+
 void amqp_type_print(amqp_type_t *type)
 {
-    amqp_buffer_t *old_convert_buffer = type->context->convert_buffer;
-    type->context->convert_buffer = amqp_type_convert_buffer(type);
-
     amqp_type_print_formatted_leader(type);
 
     amqp_nested_type_print(type);
@@ -124,8 +122,6 @@ void amqp_type_print(amqp_type_t *type)
     {
         amqp_context_putc(type->context, ';');
     }
-
-    type->context->convert_buffer = old_convert_buffer;
 }
 
 void amqp_type_print_formatted(amqp_type_t *type)
@@ -269,7 +265,7 @@ void amqp_type_method_uuid_print(amqp_context_t *context, amqp_type_t *type)
     size_t i;
     for (i = 0; i < type->position.size; i++)
     {
-        int c = amqp_unchecked_getc_at(context->convert_buffer, type->position.index + i);
+        int c = amqp_unchecked_getc_at(amqp_type_convert_buffer(type), type->position.index + i);
         amqp_context_putc(context, to_hex(c >> 4));
         amqp_context_putc(context, to_hex(c & 0x0f));
         if ((c = separator[i]) != 0)

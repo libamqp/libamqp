@@ -52,6 +52,7 @@ namespace SuiteCodec
         
         void deallocate_type(amqp_type_t *type)
         {
+
             amqp_deallocate(type_pool(), type);
         }
 
