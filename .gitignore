@@ -18,3 +18,4 @@ src/decode-demo
 src/decode-demo.tar.gz
 src/t.c
 src/t
+decode-demo.out.txt
