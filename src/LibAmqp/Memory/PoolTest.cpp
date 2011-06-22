@@ -23,16 +23,6 @@
 
 SUITE(Pool)
 {
-    TEST_FIXTURE(PoolFixture, a_test)
-    {
-    }
-
-    TEST_FIXTURE(PoolFixture, allocation_with_unitialized_pool_should_fail)
-    {
-        void *p = amqp_allocate(&pool);
-        CHECK_NULL(p);
-    }
-
     TEST_FIXTURE(PoolFixture, pool_initialization)
     {
         amqp_initialize_pool(&pool, sizeof(test_type_t));

@@ -123,7 +123,6 @@ void *allocate_object(amqp_memory_pool_t *pool)
 
     assert(free_allocation->header.block == block_with_free_space);
 
-
     return  &free_allocation->data[pool->allocation_data_padding];
 }
 #endif
@@ -133,6 +132,7 @@ void *amqp_allocate(amqp_memory_pool_t *pool)
     void *result;
 
     assert(pool != null);
+    assert(pool->initialized);
     assert(pool->object_size != 0);
     assert(pool->initializer_callback != null);
 

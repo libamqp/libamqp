@@ -29,7 +29,6 @@ SUITE(FixedWidthEncoding)
         EncodeFixture() : result(0) {}
         ~EncodeFixture()
         {
-            AMQP_FREE(result);
             deallocate_type(result);
         }
 
