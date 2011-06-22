@@ -14,6 +14,8 @@
    limitations under the License.
  */
 
+#include <stdio.h>
+
 #include <TraceReporter.h>
 #include <TestDetails.h>
 #include <iostream>

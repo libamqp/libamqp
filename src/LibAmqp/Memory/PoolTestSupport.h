@@ -30,7 +30,7 @@ namespace SuitePool
     typedef struct test_type_t
     {
         char important_stuff[32];
-    };
+    } test_type_t;
 
     class PoolAllocator
     {

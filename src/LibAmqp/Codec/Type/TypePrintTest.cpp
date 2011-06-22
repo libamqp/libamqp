@@ -26,6 +26,9 @@
 
 #include "Codec/Type/TypePrint.h"
 
+#ifdef putc
+#undef putc
+#endif
 
 SUITE(TypePrint)
 {
