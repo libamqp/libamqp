@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_MEMORY_H
-#define LIBAMQP_MEMORY_H
+#ifndef LIBAMQP_MEMORY_MEMORY_H
+#define LIBAMQP_MEMORY_MEMORY_H
 #ifdef __cplusplus
 extern "C" {
 #endif
