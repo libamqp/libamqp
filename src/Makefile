@@ -37,7 +37,7 @@ CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLU
 CPPFLAGS +=  -DDISABLE_MEMORY_POOL
 # CPPFLAGS +=  -DTRACE_ALLOCATIONS
 # CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic
-CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic
+CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L 
 CXXFLAGS = -g -Wall
 
 LIBAMQP_LIB := libamqp.a
@@ -63,6 +63,8 @@ check::	all
 	
 TestRunner:	$(TEST_OBJ) $(OBJ) $(LIBS)
 	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) -o $@
+
+$(OBJ) $(TEST_OBJ): Makefile
 
 print:
 	@echo TEST_HARNESS_INCLUDES=$(TEST_HARNESS_INCLUDES)
@@ -116,6 +118,7 @@ asm-out:	$(ASM_OUT)
 
 %.s: %.c
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $*.c -o $@
+
 
 .PHONY:	clean scrub
 clean::
