@@ -21,10 +21,10 @@
 
 SUITE(Context)
 {
-    TEST(amqp_error_code_range)
-    {
-        CHECK(AMQP_ERROR_CODE_BASE > sys_nerr);
-    }
+    //TEST(amqp_error_code_range)
+    //{
+    //    CHECK(AMQP_ERROR_CODE_BASE > sys_nerr);
+    //}
 
     TEST(spike)
     {
