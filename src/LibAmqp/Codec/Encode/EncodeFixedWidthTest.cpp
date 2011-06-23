@@ -38,7 +38,7 @@ SUITE(FixedWidthEncoding)
     
     TEST_FIXTURE(EncodeFixture, DecodeULong)
     {
-        type = amqp_encode_ulong(context, 18446744073709551614UL);
+        type = amqp_encode_ulong(context, 18446744073709551614ULL);
 
         CHECK_NOT_NULL(type);
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::ulong_8);
@@ -164,7 +164,7 @@ SUITE(FixedWidthEncoding)
 
     TEST_FIXTURE(EncodeFixture, TimeStamp)
     {
-        type = amqp_encode_timestamp(context, 1291654800000);
+        type = amqp_encode_timestamp(context, 1291654800000LL);
 
         CHECK_NOT_NULL(type);
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::timestamp_8);
@@ -175,7 +175,7 @@ SUITE(FixedWidthEncoding)
 
     TEST_FIXTURE(EncodeFixture, TimeStamp2)
     {
-        type = amqp_encode_timestamp(context, -1864105200000L);
+        type = amqp_encode_timestamp(context, -1864105200000LL);
 
         CHECK_NOT_NULL(type);
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::timestamp_before_epoc_8);
