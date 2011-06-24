@@ -143,7 +143,7 @@ SUITE(Buffer)
         load_buffer(data, sizeof(data));
 
         v = amqp_ntoh_64(buffer, 0)._ulong;
-        CHECK_EQUAL(0x0102040810204080UL, v);
+        CHECK_EQUAL(0x0102040810204080ULL, v);
     }
 
     TEST_FIXTURE(BufferFixture,  amqp_hton_16)

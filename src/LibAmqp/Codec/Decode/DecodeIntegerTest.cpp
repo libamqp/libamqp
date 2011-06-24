@@ -43,7 +43,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(1154895135052768677UL, type->value.b8._ulong);
+        CHECK_EQUAL(1154895135052768677ULL, type->value.b8._ulong);
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeULong)
@@ -52,7 +52,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(18446744073709551614UL, type->value.b8._ulong);
+        CHECK_EQUAL(18446744073709551614ULL, type->value.b8._ulong);
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeUInt)
@@ -160,7 +160,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(1291654800000L, type->value.b8._timestamp);
+        CHECK_EQUAL(1291654800000LL, type->value.b8._timestamp);
     }
 
     TEST_FIXTURE(DecodeFixture, TimeStamp2)
@@ -169,7 +169,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(-1864105200000L, type->value.b8._timestamp);
+        CHECK_EQUAL(-1864105200000LL, type->value.b8._timestamp);
     }
 
     TEST_FIXTURE(DecodeFixture, wchar)
