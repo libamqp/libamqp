@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include "libamqp_common.h"
-#include <UnitTest++.h>
+#include <TestHarness.h>
 #include "Memory/MemoryTestSupport.h"
 #include "Memory/Pool.h"
 #include "Memory/PoolInternal.h"

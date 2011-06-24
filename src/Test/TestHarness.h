@@ -14,21 +14,18 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_MEMORY_MEMORY_TEST_SUPPORT_H
-#define LIBAMQP_MEMORY_MEMORY_TEST_SUPPORT_H
+#ifndef LIBAMQP_TEST_HARNESS_H
+#define LIBAMQP_TEST_HARNESS_H
 
-#include <stdlib.h>
-#include <TestHarness.h>
-#include "Memory/Memory.h"
-#include <iostream>
+#include <UnitTest++.h>
+#include "ExtraChecks.h"
 
-namespace SuiteMemory {
-    class MemoryFixture
-    {
-    public:
-        MemoryFixture();
-        ~MemoryFixture();
-    };
-}
+// UnitTest++ traps signals and throws an exception. Don't always want this behaviour.
+#ifdef NO_UNIT_TEST_SIGNAL_TRAP
+#ifdef UNITTEST_THROW_SIGNALS
+#undef UNITTEST_THROW_SIGNALS
+#endif
+#define UNITTEST_THROW_SIGNALS
 #endif
 
+#endif

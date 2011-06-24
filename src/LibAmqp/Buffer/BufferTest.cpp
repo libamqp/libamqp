@@ -14,8 +14,7 @@
    limitations under the License.
  */
 
-#include <UnitTest++.h>
-#include "ExtraChecks.h"
+#include <TestHarness.h>
 
 #include "Memory/PoolTestSupport.h"
 #include "Buffer/Buffer.h"

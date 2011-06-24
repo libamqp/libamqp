@@ -15,7 +15,6 @@
  */
 
 #include "Memory/PoolTestSupport.h"
-#include "ExtraChecks.h"
 
 #include "debug_helper.h"
 

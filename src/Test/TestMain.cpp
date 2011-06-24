@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-#include <UnitTest++.h>
+#include <TestHarness.h>
 #include <TestReporterStdout.h>
 #include <TraceReporter.h>
 #include <iostream>

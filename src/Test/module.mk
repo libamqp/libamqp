@@ -1,5 +1,4 @@
 
 MODULE = Test
-INCLUDES += $(MODULE)
-
+TEST_HARNESS_INCLUDES += $(MODULE)
 TEST_SRC += $(wildcard $(MODULE)/*.cpp)

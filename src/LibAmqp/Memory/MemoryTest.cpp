@@ -16,7 +16,6 @@
 
 
 #include "Memory/MemoryTestSupport.h"
-#include "ExtraChecks.h"
 
 SUITE(Memory)
 {

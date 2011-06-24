@@ -14,8 +14,7 @@
    limitations under the License.
  */
 
-#include <UnitTest++.h>
-#include "ExtraChecks.h"
+#include <TestHarness.h>
 
 #include "Context/ContextTestSupport.h"
 
