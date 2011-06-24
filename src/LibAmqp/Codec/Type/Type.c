@@ -44,6 +44,9 @@ void amqp_dealloc_amqp_type_t(amqp_memory_pool_t *pool, amqp_type_t *type)
     assert(pool != 0);
     assert(type != 0);
 
+    assert((type->flags.structure.is_compound == 0 && type->value.compound.elements == 0) ||  
+    		(type->flags.structure.is_compound != 0 && type->value.compound.elements != 0));
+
     if (type->value.compound.elements)
     {
         amqp_deallocate_amqp_type_t_array(pool, type->value.compound.elements, type->value.compound.count);
