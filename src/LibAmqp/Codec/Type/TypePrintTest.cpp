@@ -16,7 +16,7 @@
 
 #include <stdio.h>
 
-#include <UnitTest++.h>
+#include <TestHarness.h>
 
 #include "Context/ErrorHandling.h"
 

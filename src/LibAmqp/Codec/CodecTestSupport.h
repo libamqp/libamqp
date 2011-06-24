@@ -19,8 +19,7 @@
 
 #include <string.h>
 
-#include <UnitTest++.h>
-#include "ExtraChecks.h"
+#include <TestHarness.h>
 
 #include "Codec/Decode/Decode.h"
 #include "Codec/Encode/Encode.h"

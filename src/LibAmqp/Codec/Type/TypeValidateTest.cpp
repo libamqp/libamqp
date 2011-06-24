@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-#include <UnitTest++.h>
+#include <TestHarness.h>
 #include "Codec/Type/TypeValidate.h"
 
 SUITE(TypeValidate)

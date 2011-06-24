@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TEST_EXTRA_CHECKS
-#define LIBAMQP_TEST_EXTRA_CHECKS
+#ifndef LIBAMQP_TEST_EXTRA_CHECKS_H
+#define LIBAMQP_TEST_EXTRA_CHECKS_H
 
 #include <CheckMacros.h>
 

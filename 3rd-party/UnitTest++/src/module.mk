@@ -1,9 +1,7 @@
 
 MODULE = ../3rd-party/UnitTest++/src
 
-# TODO put test only include into a separate macro
-INCLUDES += $(MODULE)
-
+TEST_HARNESS_INCLUDES += $(MODULE)
 TEST_HARNESS_LIB := libUnitTest++.a
 TEST_HARNESS_SRC := \
 	$(wildcard $(MODULE)/*.cpp) \
