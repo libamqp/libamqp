@@ -16,34 +16,13 @@
 
 #include <TestHarness.h>
 
-#include "Memory/PoolTestSupport.h"
-#include "Buffer/Buffer.h"
+#include "Buffer/BufferTestSupport.h"
 #include "Context/ErrorHandling.h"
 
 SUITE(Buffer)
 {
     unsigned char simple_test_data[] = {
         0x70, 0x10, 0x07, 0x03, 0x01
-    };
-
-    class BufferFixture : public SuitePool::PoolFixture
-    {
-    public:
-        BufferFixture()
-        {
-            amqp_buffer_initialize_pool(&pool);
-            buffer = (amqp_buffer_t *) amqp_allocate(&pool);
-        }
-        ~BufferFixture()
-        {
-            amqp_deallocate(&pool, buffer);
-        }
-        void load_buffer(unsigned char *p, size_t n)
-        {
-            amqp_buffer_puts(buffer, p, n);
-        }
-    public:
-        amqp_buffer_t *buffer;
     };
 
     class LoadedBufferFixture : public BufferFixture
@@ -59,7 +38,6 @@ SUITE(Buffer)
 
     public:
     };
-
 
     TEST_FIXTURE(BufferFixture, allocation)
     {
@@ -136,13 +114,13 @@ SUITE(Buffer)
 
     TEST_FIXTURE(BufferFixture, amqp_ntoh_64)
     {
-        uint64_t v;
         unsigned char data[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
         load_buffer(data, sizeof(data));
 
-        v = amqp_ntoh_64(buffer, 0)._ulong;
-        CHECK_EQUAL(0x0102040810204080ULL, v);
+        amqp_eight_byte_t v;
+        amqp_ntoh_64(&v, buffer, 0);
+        CHECK_EQUAL(0x0102040810204080ULL, v._ulong);
     }
 
     TEST_FIXTURE(BufferFixture,  amqp_hton_16)
@@ -181,7 +159,9 @@ SUITE(Buffer)
         CHECK_EQUAL((size_t) 8, buffer->limit.size);
         CHECK_EQUAL(0xfe, buffer->bytes[7]);
 
-        CHECK_EQUAL(-2, amqp_ntoh_64(buffer, 0)._long);
+        amqp_eight_byte_t verify;
+        amqp_ntoh_64(&verify, buffer, 0);
+        CHECK_EQUAL(-2, verify._long);
     }
 
     TEST_FIXTURE(BufferFixture, amqp_buffer_read_size_one)

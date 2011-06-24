@@ -167,7 +167,7 @@ int amqp_unchecked_getc_at(amqp_buffer_t *buffer, size_t index)
 static inline amqp_one_byte_t amqp_ntoh_8(amqp_buffer_t *buffer, size_t offset) __attribute__((always_inline));
 static inline amqp_two_byte_t amqp_ntoh_16(amqp_buffer_t *buffer, size_t offset) __attribute__((always_inline));
 static inline amqp_four_byte_t amqp_ntoh_32(amqp_buffer_t *buffer, size_t offset) __attribute__((always_inline));
-static inline amqp_eight_byte_t amqp_ntoh_64(amqp_buffer_t *buffer, size_t offset) __attribute__((always_inline));
+static inline void amqp_ntoh_64(amqp_eight_byte_t *value, amqp_buffer_t *buffer, size_t offset);
 static inline void amqp_hton_16(amqp_buffer_t *buffer, amqp_two_byte_t value) __attribute__((always_inline));
 static inline void amqp_hton_32(amqp_buffer_t *buffer, amqp_four_byte_t value) __attribute__((always_inline));
 static inline void amqp_hton_64(amqp_buffer_t *buffer, amqp_eight_byte_t value) __attribute__((always_inline));
@@ -200,19 +200,16 @@ static inline amqp_four_byte_t amqp_ntoh_32(amqp_buffer_t *buffer, size_t offset
 // static inline
 uint32_t amqp_buffer_read_size(amqp_buffer_t *buffer, size_t width);
 
-static inline amqp_eight_byte_t amqp_ntoh_64(amqp_buffer_t *buffer, size_t offset)
+static inline void amqp_ntoh_64(amqp_eight_byte_t *value, amqp_buffer_t *buffer, size_t offset)
 {
-// FIXME - not working on 32-bit linux. Returning a 64-bit union just does not work
-    amqp_eight_byte_t result;
-    result.b[7] = amqp_unchecked_getc_at(buffer, offset++);
-    result.b[6] = amqp_unchecked_getc_at(buffer, offset++);
-    result.b[5] = amqp_unchecked_getc_at(buffer, offset++);
-    result.b[4] = amqp_unchecked_getc_at(buffer, offset++);
-    result.b[3] = amqp_unchecked_getc_at(buffer, offset++);
-    result.b[2] = amqp_unchecked_getc_at(buffer, offset++);
-    result.b[1] = amqp_unchecked_getc_at(buffer, offset++);
-    result.b[0] = amqp_unchecked_getc_at(buffer, offset);
-    return result;
+    value->b[7] = amqp_unchecked_getc_at(buffer, offset++);
+    value->b[6] = amqp_unchecked_getc_at(buffer, offset++);
+    value->b[5] = amqp_unchecked_getc_at(buffer, offset++);
+    value->b[4] = amqp_unchecked_getc_at(buffer, offset++);
+    value->b[3] = amqp_unchecked_getc_at(buffer, offset++);
+    value->b[2] = amqp_unchecked_getc_at(buffer, offset++);
+    value->b[1] = amqp_unchecked_getc_at(buffer, offset++);
+    value->b[0] = amqp_unchecked_getc_at(buffer, offset);
 }
 
 static inline void amqp_hton_16(amqp_buffer_t *buffer, amqp_two_byte_t value)

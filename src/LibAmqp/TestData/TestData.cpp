@@ -46,10 +46,7 @@ namespace test_data
     test_data_def(foo_symbol_8,
         0xa3, 3, 'F', 'o', 'o'
     );
-}
 
-namespace test_data
-{
     test_data_def(bad_symbol,
         0xa3, 3, 'B', '\xe1', 'r'
     );

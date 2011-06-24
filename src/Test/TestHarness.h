@@ -20,12 +20,4 @@
 #include <UnitTest++.h>
 #include "ExtraChecks.h"
 
-// UnitTest++ traps signals and throws an exception. Don't always want this behaviour.
-#ifdef NO_UNIT_TEST_SIGNAL_TRAP
-#ifdef UNITTEST_THROW_SIGNALS
-#undef UNITTEST_THROW_SIGNALS
-#endif
-#define UNITTEST_THROW_SIGNALS
-#endif
-
 #endif
