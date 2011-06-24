@@ -106,7 +106,7 @@ int amqp_decode_fixed_width(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
             type->value.b4 = amqp_ntoh_32(type->context->decode.buffer, type->position.index);
             break;
         case 8:
-            type->value.b8 = amqp_ntoh_64(type->context->decode.buffer, type->position.index);
+            amqp_ntoh_64(&type->value.b8, type->context->decode.buffer, type->position.index);
             break;
         case 16:
             type->value.uuid = amqp_buffer_pointer(type->context->decode.buffer, type->position.index);
