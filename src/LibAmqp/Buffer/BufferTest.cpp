@@ -16,34 +16,13 @@
 
 #include <TestHarness.h>
 
-#include "Memory/PoolTestSupport.h"
-#include "Buffer/Buffer.h"
+#include "Buffer/BufferTestSupport.h"
 #include "Context/ErrorHandling.h"
 
 SUITE(Buffer)
 {
     unsigned char simple_test_data[] = {
         0x70, 0x10, 0x07, 0x03, 0x01
-    };
-
-    class BufferFixture : public SuitePool::PoolFixture
-    {
-    public:
-        BufferFixture()
-        {
-            amqp_buffer_initialize_pool(&pool);
-            buffer = (amqp_buffer_t *) amqp_allocate(&pool);
-        }
-        ~BufferFixture()
-        {
-            amqp_deallocate(&pool, buffer);
-        }
-        void load_buffer(unsigned char *p, size_t n)
-        {
-            amqp_buffer_puts(buffer, p, n);
-        }
-    public:
-        amqp_buffer_t *buffer;
     };
 
     class LoadedBufferFixture : public BufferFixture
@@ -59,7 +38,6 @@ SUITE(Buffer)
 
     public:
     };
-
 
     TEST_FIXTURE(BufferFixture, allocation)
     {
