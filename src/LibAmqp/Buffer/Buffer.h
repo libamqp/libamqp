@@ -202,6 +202,7 @@ uint32_t amqp_buffer_read_size(amqp_buffer_t *buffer, size_t width);
 
 static inline amqp_eight_byte_t amqp_ntoh_64(amqp_buffer_t *buffer, size_t offset)
 {
+// FIXME - not working on 32-bit linux. Returning a 64-bit union just does not work
     amqp_eight_byte_t result;
     result.b[7] = amqp_unchecked_getc_at(buffer, offset++);
     result.b[6] = amqp_unchecked_getc_at(buffer, offset++);
