@@ -420,7 +420,7 @@ amqp_type_meta_data_t amqp_type_meta_data_array_8 = {
     1,
     amqp_decode_array_8,
     &amqp_methods_array_8,
-    "list",
+    "array",
     "array8",
     AMQP_TYPE_CATEGORY_ARRAY,
 };
@@ -438,7 +438,7 @@ amqp_type_meta_data_t amqp_type_meta_data_array_32 = {
     4,
     amqp_decode_array_32,
     &amqp_methods_array_32,
-    "list",
+    "array",
     "array32",
     AMQP_TYPE_CATEGORY_ARRAY,
 };
