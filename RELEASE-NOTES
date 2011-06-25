@@ -1,6 +1,14 @@
 libamqp release notes:
+
+Version 0.1.1
 --------------
+Decoder tests passing on:
+* Mac OS X 10.6 with gcc 4.4.2,
+* 64-bit Ubuntu Lucid, and
+* 32-bit Ubuntu Lucid
+
 Version 0.1.0
+--------------
 AMQP 1.0 Codec passing tests on Mac OS with gcc 4.4.2 and on 64-bit Ubuntu Lucid with gcc 4.4.3.
 The project compiles without any warnings on 32-bit Ubuntu but 19/193 tests are failing.
 The Codec does not fully comply with the June 20, 2011 version of the draft AMQP 1.0 specification.
