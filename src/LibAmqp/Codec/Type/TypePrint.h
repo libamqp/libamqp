@@ -56,8 +56,6 @@ extern void amqp_type_method_symbol_sym8_print(amqp_context_t *context, amqp_typ
 extern void amqp_type_method_symbol_sym32_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_string_str8_utf8_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_string_str32_utf8_print(amqp_context_t *context, amqp_type_t *type);
-extern void amqp_type_method_string_str8_utf16_print(amqp_context_t *context, amqp_type_t *type);
-extern void amqp_type_method_string_str32_utf16_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_list_8_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_map_8_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_list_32_print(amqp_context_t *context, amqp_type_t *type);

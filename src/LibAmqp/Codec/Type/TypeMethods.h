@@ -53,11 +53,9 @@ extern amqp_type_methods_t amqp_methods_uuid;
 
 extern amqp_type_methods_t amqp_methods_binary_vbin8;
 extern amqp_type_methods_t amqp_methods_string_str8_utf8;
-extern amqp_type_methods_t amqp_methods_string_str8_utf16;
 extern amqp_type_methods_t amqp_methods_symbol_sym8;
 extern amqp_type_methods_t amqp_methods_binary_vbin32;
 extern amqp_type_methods_t amqp_methods_string_str32_utf8;
-extern amqp_type_methods_t amqp_methods_string_str32_utf16;
 extern amqp_type_methods_t amqp_methods_symbol_sym32;
 extern amqp_type_methods_t amqp_methods_list_8;
 extern amqp_type_methods_t amqp_methods_map_8;

@@ -307,15 +307,6 @@ amqp_type_meta_data_t amqp_type_meta_data_string_str8_utf8 = {
     "str8-utf8",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
-amqp_type_meta_data_t amqp_type_meta_data_string_str8_utf16 = {
-    0xA2,
-    1,
-    amqp_decode_string_str8_utf16,
-    &amqp_methods_string_str8_utf16,
-    "string",
-    "str8-utf16",
-    AMQP_TYPE_CATEGORY_VARIABLE,
-};
 amqp_type_meta_data_t amqp_type_meta_data_symbol_sym8 = {
     0xA3,
     1,
@@ -350,15 +341,6 @@ amqp_type_meta_data_t amqp_type_meta_data_string_str32_utf8 = {
     &amqp_methods_string_str32_utf8,
     "string",
     "str32-utf8",
-    AMQP_TYPE_CATEGORY_VARIABLE,
-};
-amqp_type_meta_data_t amqp_type_meta_data_string_str32_utf16 = {
-    0xB2,
-    4,
-    amqp_decode_string_str32_utf16,
-    &amqp_methods_string_str32_utf16,
-    "string",
-    "str32-utf16",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
 amqp_type_meta_data_t amqp_type_meta_data_symbol_sym32 = {
@@ -502,12 +484,10 @@ amqp_type_meta_data_t *type_lookup_table[] = {
     &amqp_type_meta_data_extension_fixed_16,
     &amqp_type_meta_data_binary_vbin8,
     &amqp_type_meta_data_string_str8_utf8,
-    &amqp_type_meta_data_string_str8_utf16,
     &amqp_type_meta_data_symbol_sym8,
     &amqp_type_meta_data_extension_variable_1,
     &amqp_type_meta_data_binary_vbin32,
     &amqp_type_meta_data_string_str32_utf8,
-    &amqp_type_meta_data_string_str32_utf16,
     &amqp_type_meta_data_symbol_sym32,
     &amqp_type_meta_data_extension_variable_4,
     &amqp_type_meta_data_list_8,

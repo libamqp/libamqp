@@ -364,38 +364,6 @@ int amqp_decode_string_str32_utf8(amqp_type_meta_data_t *meta_data, amqp_type_t 
 }
 
 static
-int amqp_decode_string_utf16(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
-{
-    int rc = amqp_construct_variable_type(meta_data, type);
-    if (rc)
-    {
-        size_t i;
-        for (i = 0; i < type->position.size; i++)
-        {
-            int c = amqp_unchecked_getc_at(type->context->decode.buffer, type->position.index + i);
-            // TODO - 16bit characters into correct byte order
-            // TODO - verify that characters are valid utf16
-            if (c == 0)
-            {
-                decode_error(type, AMQP_ERROR_INVALID_UTF16_CHARACTER, "utf-16 string contains an invalid character");
-                return 0;
-            }
-        }
-    }
-    return rc;
-}
-
-int amqp_decode_string_str8_utf16(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
-{
-     return amqp_decode_string_utf16(meta_data, type);
-}
-
-int amqp_decode_string_str32_utf16(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
-{
-     return amqp_decode_string_utf16(meta_data, type);
-}
-
-static
 int amqp_construct_container_type(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
     uint32_t size = get_variable_type_size(meta_data, type);

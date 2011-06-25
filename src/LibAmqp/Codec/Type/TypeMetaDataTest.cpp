@@ -247,15 +247,6 @@ SUITE(TypeMetaData)
         CHECK_EQUAL("string", meta_data->name);
         CHECK_EQUAL("str8-utf8", meta_data->encoding_name);
     }
-    TEST_FIXTURE(TypeMetaDataFixture, lookup_string_str8_utf16)
-    {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xa2);
-        CHECK_NOT_NULL(meta_data);
-        CHECK_EQUAL(0xa2, meta_data->format_code);
-        CHECK_EQUAL(1, meta_data->width);
-        CHECK_EQUAL("string", meta_data->name);
-        CHECK_EQUAL("str8-utf16", meta_data->encoding_name);
-    }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_symbol_sym8)
     {
         amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xa3);
@@ -282,15 +273,6 @@ SUITE(TypeMetaData)
         CHECK_EQUAL(4, meta_data->width);
         CHECK_EQUAL("string", meta_data->name);
         CHECK_EQUAL("str32-utf8", meta_data->encoding_name);
-    }
-    TEST_FIXTURE(TypeMetaDataFixture, lookup_string_str32_utf16)
-    {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xb2);
-        CHECK_NOT_NULL(meta_data);
-        CHECK_EQUAL(0xb2, meta_data->format_code);
-        CHECK_EQUAL(4, meta_data->width);
-        CHECK_EQUAL("string", meta_data->name);
-        CHECK_EQUAL("str32-utf16", meta_data->encoding_name);
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_symbol_sym32)
     {

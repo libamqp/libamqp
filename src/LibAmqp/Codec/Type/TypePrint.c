@@ -305,21 +305,6 @@ void amqp_type_method_string_str32_utf8_print(amqp_context_t *context, amqp_type
     amqp_type_print_ascii(context, type);
 }
 
-static void amqp_type_method_string_utf16_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_print_raw_data(context, type);
-}
-
-void amqp_type_method_string_str8_utf16_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_method_string_utf16_print(context, type);
-}
-
-void amqp_type_method_string_str32_utf16_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_method_string_utf16_print(context, type);
-}
-
 static void amqp_type_method_list_print(amqp_context_t *context, amqp_type_t *type)
 {
     size_t i;

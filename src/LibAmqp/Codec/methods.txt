@@ -111,15 +111,6 @@ int amqp_type_method_string_str32_utf8_%%(amqp_type_t *type)
 {
 }
 
-int amqp_type_method_string_str8_utf16_%%(amqp_type_t *type)
-{
-}
-
-int amqp_type_method_string_str32_utf16_%%(amqp_type_t *type)
-{
-
-}
-
 int amqp_type_method_list_8_%%(amqp_type_t *type)
 {
 }

@@ -78,9 +78,6 @@ amqp_type_t *amqp_encode_symbol_sym32n(amqp_context_t *context, const char *valu
 amqp_type_t *amqp_encode_string_utf8(amqp_context_t *context, const char *value);
 amqp_type_t *amqp_encode_string_utf8n(amqp_context_t *context, const char *value, size_t size);
 
-amqp_type_t *amqp_encode_string_utf16(amqp_context_t *context);
-amqp_type_t *amqp_encode_string_utf16n(amqp_context_t *context, size_t size);
-
 amqp_type_t *amqp_encode_list_8(amqp_context_t *context);
 amqp_type_t *amqp_encode_list_32(amqp_context_t *context);
 

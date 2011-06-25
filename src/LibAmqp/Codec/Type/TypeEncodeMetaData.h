@@ -52,7 +52,6 @@ extern amqp_type_encode_meta_data_t ampq_encode_meta_data_uuid;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_binary;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_symbol;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_string_utf8;
-extern amqp_type_encode_meta_data_t ampq_encode_meta_data_string_utf16;
 
 #define amqp_type_d(t)  (&ampq_encode_meta_data_ ## t)
 

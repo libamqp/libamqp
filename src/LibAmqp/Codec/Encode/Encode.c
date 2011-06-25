@@ -462,17 +462,6 @@ amqp_type_t *amqp_encode_string_utf8n(amqp_context_t *context, const char *value
    return encode_string_utf8(context, value, size);
 }
 
-
-amqp_type_t *amqp_encode_string_utf16(amqp_context_t *context)
-{
-    not_implemented();
-}
-
-amqp_type_t *amqp_encode_string_utf16n(amqp_context_t *context, size_t size)
-{
-    not_implemented();
-}
-
 amqp_type_t *amqp_encode_list_8(amqp_context_t *context)
 {
     amqp_type_type_flags_t type_flags = {0};
