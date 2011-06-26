@@ -74,11 +74,20 @@ SUITE(IntegerDecode)
 
     TEST_FIXTURE(DecodeFixture, DecodeSmallUInt)
     {
-        load_decode_buffer(test_data::uint_1);
+        load_decode_buffer(test_data::uint_small);
         type = amqp_decode(context);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(254U, type->value.b4._uint);
+    }
+    
+    TEST_FIXTURE(DecodeFixture, DecodeUintZero)
+    {
+        load_decode_buffer(test_data::uint_zero);
+        type = amqp_decode(context);
+
+        ASSERT_VALID(type);
+        CHECK_EQUAL(0U, type->value.b4._uint);
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeUShort)

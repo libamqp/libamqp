@@ -42,6 +42,7 @@ amqp_type_t *amqp_encode_byte(amqp_context_t *context, int8_t value);
 amqp_type_t *amqp_encode_ushort(amqp_context_t *context, uint16_t value);
 amqp_type_t *amqp_encode_short(amqp_context_t *context, int16_t value);
 
+amqp_type_t *amqp_encode_uint0(amqp_context_t *context);
 amqp_type_t *amqp_encode_uint(amqp_context_t *context, uint32_t value);
 amqp_type_t *amqp_encode_int(amqp_context_t *context, int32_t value);
 

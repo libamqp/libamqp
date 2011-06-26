@@ -90,9 +90,17 @@ namespace test_data
         0xfe
     );
 
-    test_data_def(uint_1,
+    test_data_def(uint_small,
         0x52,
         0xfe
+    );
+    test_data_def(uint_small_zero,
+        0x52,
+        0
+    );
+
+    test_data_def(uint_zero,
+        0x43,
     );
 
     test_data_def(ushort_2,

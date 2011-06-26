@@ -64,6 +64,16 @@ amqp_type_meta_data_t amqp_type_meta_data_boolean_false = {
     "false",
     AMQP_TYPE_CATEGORY_FIXED,
 };
+// encoding name="uint0" code="0x43" category="fixed" width="0"/>
+amqp_type_meta_data_t amqp_type_meta_data_uint_uint0 = {
+    0x43,
+    0,
+    amqp_decode_uint0,
+    &amqp_methods_uint0,
+    "uint",
+    "uint0",
+    AMQP_TYPE_CATEGORY_FIXED,
+};
 amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_0 = {
     0x4F,
     0,
@@ -457,6 +467,7 @@ amqp_type_meta_data_t *type_lookup_table[] = {
     &amqp_type_meta_data_null,
     &amqp_type_meta_data_boolean_true,
     &amqp_type_meta_data_boolean_false,
+    &amqp_type_meta_data_uint_uint0,
     &amqp_type_meta_data_extension_fixed_0,
     &amqp_type_meta_data_ubyte,
     &amqp_type_meta_data_byte,

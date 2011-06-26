@@ -72,4 +72,5 @@ SUITE(ZereoByteEncoding)
         CHECK_EQUAL((size_t) 0x00, type->position.size);
         CHECK_EQUAL(0U, type->flags.is_null);
     }
+
 }

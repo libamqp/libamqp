@@ -37,7 +37,6 @@ SUITE(TypeMetaData)
     {
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x3e));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x3f));
-        CHECK_NULL(amqp_type_meta_data_lookup(context, 0x43));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x4e));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x56));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x5e));
@@ -325,7 +324,7 @@ SUITE(TypeMetaData)
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xe0, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
-        CHECK_EQUAL("list", meta_data->name);
+        CHECK_EQUAL("array", meta_data->name);
         CHECK_EQUAL("array8", meta_data->encoding_name);
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_array_32)
@@ -334,7 +333,7 @@ SUITE(TypeMetaData)
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xf0, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
-        CHECK_EQUAL("list", meta_data->name);
+        CHECK_EQUAL("array", meta_data->name);
         CHECK_EQUAL("array32", meta_data->encoding_name);
     }
 

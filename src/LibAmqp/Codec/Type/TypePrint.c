@@ -185,6 +185,11 @@ void amqp_type_method_uint_print(amqp_context_t *context, amqp_type_t *type)
     printf_type_value(context, "%u", type->value.b4._uint);
 }
 
+void amqp_type_method_uint0_print(amqp_context_t *context, amqp_type_t *type)
+{
+    amqp_type_method_uint_print(context, type);
+}
+
 void amqp_type_method_int_print(amqp_context_t *context, amqp_type_t *type)
 {
     printf_type_value(context, "%d", type->value.b4._int);

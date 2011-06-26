@@ -33,7 +33,7 @@ int amqp_decode_null(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
     return true;
 }
 
-static int amqp_decode_boolean(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+static int amqp_decode_fixed_zero_width(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
     type->position.index = amqp_buffer_index(type->context->decode.buffer);
     type->position.size = 0;
@@ -42,12 +42,12 @@ static int amqp_decode_boolean(amqp_type_meta_data_t *meta_data, amqp_type_t *ty
 
 int amqp_decode_boolean_true(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
-    return amqp_decode_boolean(meta_data, type);
+    return amqp_decode_fixed_zero_width(meta_data, type);
 }
 
 int amqp_decode_boolean_false(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
-    return amqp_decode_boolean(meta_data, type);
+    return amqp_decode_fixed_zero_width(meta_data, type);
 }
 
 #define decode_error(type, code, ...) _decode_error(type, 1, __FILE__, __LINE__, #code, code, ""  __VA_ARGS__)
@@ -143,6 +143,16 @@ int amqp_decode_uint(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
+
+int amqp_decode_uint0(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+{
+     int rc =  amqp_decode_fixed_zero_width(meta_data, type);
+     if (rc)
+     {
+        type->value.b4._uint = 0U;
+     }
+     return rc;
+ }
 
 int amqp_decode_int(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {

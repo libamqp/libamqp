@@ -24,6 +24,7 @@
     &amqp_type_meta_data_null,
     &amqp_type_meta_data_boolean_true,
     &amqp_type_meta_data_boolean_false,
+    &amqp_type_meta_data_uint_uint0,
     &amqp_type_meta_data_extension_fixed_0,
     &amqp_type_meta_data_ubyte,
     &amqp_type_meta_data_byte,
@@ -319,6 +320,7 @@ amqp_type_t *amqp_call_encode_string_utf8(amqp_context_t *context, amqp_type_des
 amqp_type_encode_meta_data_t ampq_encode_meta_data_null = { amqp_type_describe_null,  amqp_call_encode_null,  };
 amqp_type_encode_meta_data_t ampq_encode_meta_data_boolean = { amqp_type_describe_boolean,  amqp_call_encode_boolean,  };
 amqp_type_encode_meta_data_t ampq_encode_meta_data_ubyte = { amqp_type_describe_ubyte,  amqp_call_encode_ubyte,  };
+// TODO uint0 here
 amqp_type_encode_meta_data_t ampq_encode_meta_data_byte = { amqp_type_describe_byte,  amqp_call_encode_byte,  };
 amqp_type_encode_meta_data_t ampq_encode_meta_data_ushort = { amqp_type_describe_ushort,  amqp_call_encode_ushort,  };
 amqp_type_encode_meta_data_t ampq_encode_meta_data_short = { amqp_type_describe_short,  amqp_call_encode_short,  };

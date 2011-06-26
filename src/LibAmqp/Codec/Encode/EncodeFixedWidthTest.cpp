@@ -35,7 +35,7 @@ SUITE(FixedWidthEncoding)
         amqp_type_t *result;
     };
     
-    TEST_FIXTURE(EncodeFixture, DecodeULong)
+    TEST_FIXTURE(EncodeFixture, EncodeULong)
     {
         type = amqp_encode_ulong(context, 18446744073709551614ULL);
 
@@ -46,7 +46,7 @@ SUITE(FixedWidthEncoding)
         CHECK_EQUAL((size_t) 0x08, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, DecodeLong)
+    TEST_FIXTURE(EncodeFixture, EncodeLong)
     {
         type = amqp_encode_long(context, -2);
 
@@ -57,7 +57,7 @@ SUITE(FixedWidthEncoding)
         CHECK_EQUAL((size_t) 0x08, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, DecodeUInt)
+    TEST_FIXTURE(EncodeFixture, EncodeUInt)
     {
         type = amqp_encode_uint(context, 4294967294U);
 
@@ -68,7 +68,7 @@ SUITE(FixedWidthEncoding)
         CHECK_EQUAL((size_t) 0x04, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, DecodeSmallULong)
+    TEST_FIXTURE(EncodeFixture, EncodeSmallULong)
     {
         type = amqp_encode_small_ulong(context, 254UL);
 
@@ -78,17 +78,53 @@ SUITE(FixedWidthEncoding)
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::ulong_1);
     }
 
-    TEST_FIXTURE(EncodeFixture, DecodeSmallUInt)
+    TEST_FIXTURE(EncodeFixture, ExplicitEncodeUintZero)
+    {
+        type = amqp_encode_uint0(context);
+
+        CHECK_NOT_NULL(type);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::uint_zero);
+
+        CHECK_EQUAL(0x43, type->format_code);
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x00, type->position.size);
+    }
+
+    TEST_FIXTURE(EncodeFixture, EncodeUIntWithZeroValueShouldEncodeUIntZero)
+    {
+        type = amqp_encode_uint(context, 0U);
+
+        CHECK_NOT_NULL(type);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::uint_zero);
+
+        CHECK_EQUAL(0x43, type->format_code);
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x00, type->position.size);
+    }
+
+    TEST_FIXTURE(EncodeFixture, EncodeSmallUInt)
     {
         type = amqp_encode_small_uint(context, 254U);
 
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::uint_1);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::uint_small);
     }
 
-    TEST_FIXTURE(EncodeFixture, DecodeUShort)
+    TEST_FIXTURE(EncodeFixture, EncodeSmallUIntWithZeroValue)
+    {
+        type = amqp_encode_small_uint(context, 0U);
+
+        CHECK_NOT_NULL(type);
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x01, type->position.size);
+
+        // TODO - should encode a small unint with value = 0 actually incode a small uint or a unit0
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::uint_small_zero);
+    }
+
+    TEST_FIXTURE(EncodeFixture, EncodeUShort)
     {
         type = amqp_encode_ushort(context, 65534);
 
@@ -98,7 +134,7 @@ SUITE(FixedWidthEncoding)
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::ushort_2);
     }
 
-    TEST_FIXTURE(EncodeFixture, DecodeShort)
+    TEST_FIXTURE(EncodeFixture, EncodeShort)
     {
         type = amqp_encode_short(context, -2);
 
@@ -108,7 +144,7 @@ SUITE(FixedWidthEncoding)
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::short_2);
     }
 
-    TEST_FIXTURE(EncodeFixture, DecodeUByte)
+    TEST_FIXTURE(EncodeFixture, EncodeUByte)
     {
         type = amqp_encode_ubyte(context, 254);
 
@@ -118,7 +154,7 @@ SUITE(FixedWidthEncoding)
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::ubyte_1);
     }
 
-    TEST_FIXTURE(EncodeFixture, DecodeByte)
+    TEST_FIXTURE(EncodeFixture, EncodeByte)
     {
         type = amqp_encode_byte(context, -2);
 
@@ -128,7 +164,7 @@ SUITE(FixedWidthEncoding)
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::byte_1);
     }
 
-    TEST_FIXTURE(EncodeFixture, DecodeInt)
+    TEST_FIXTURE(EncodeFixture, EncodeInt)
     {
         type = amqp_encode_int(context, -2);
 
@@ -139,7 +175,7 @@ SUITE(FixedWidthEncoding)
         CHECK_EQUAL((size_t) 0x04, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, DecodeSmallLong)
+    TEST_FIXTURE(EncodeFixture, EncodeSmallLong)
     {
         type = amqp_encode_small_long(context, -4);
 
@@ -150,7 +186,7 @@ SUITE(FixedWidthEncoding)
         CHECK_EQUAL((size_t) 0x01, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, DecodeSmallInt)
+    TEST_FIXTURE(EncodeFixture, EncodeSmallInt)
     {
         type = amqp_encode_small_int(context, -3);
 
