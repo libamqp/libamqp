@@ -31,6 +31,7 @@ extern void amqp_type_method_described_print(amqp_context_t *context, amqp_type_
 extern void amqp_type_method_null_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_boolean_true_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_boolean_false_print(amqp_context_t *context, amqp_type_t *type);
+extern void amqp_type_method_boolean_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_ubyte_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_byte_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_ushort_print(amqp_context_t *context, amqp_type_t *type);

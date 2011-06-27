@@ -208,6 +208,14 @@ namespace test_data
         0x42
     );
 
+    test_data_def(true_1,
+        0x56, 0x00
+    );
+
+    test_data_def(false_1,
+        0x56, 0x01
+    );
+
     test_data_def(array_shorts,
         0xe0,
         0x0c,           // size

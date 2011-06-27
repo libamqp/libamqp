@@ -119,6 +119,11 @@ int amqp_decode_fixed_width(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
     return rc;
 }
 
+int amqp_decode_boolean(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+{
+     return amqp_decode_fixed_width(meta_data, type);
+}
+
 int amqp_decode_ubyte(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);

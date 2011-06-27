@@ -160,6 +160,13 @@ void amqp_type_method_boolean_false_print(amqp_context_t *context, amqp_type_t *
     str_print(context, "false");
 }
 
+void amqp_type_method_boolean_print(amqp_context_t *context, amqp_type_t *type)
+{
+    type->value.b1._unsigned == 0x00 ?
+            amqp_type_method_boolean_true_print(context, type) :
+            amqp_type_method_boolean_false_print(context, type);
+}
+
 void amqp_type_method_ubyte_print(amqp_context_t *context, amqp_type_t *type)
 {
     printf_type_value(context, "%u", type->value.b1._unsigned);

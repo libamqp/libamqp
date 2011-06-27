@@ -22,6 +22,7 @@ amqp_type_methods_t amqp_methods_described = { amqp_type_method_described_print 
 amqp_type_methods_t amqp_methods_null = { amqp_type_method_null_print };
 amqp_type_methods_t amqp_methods_boolean_true = { amqp_type_method_boolean_true_print };
 amqp_type_methods_t amqp_methods_boolean_false = { amqp_type_method_boolean_false_print };
+amqp_type_methods_t amqp_methods_boolean = { amqp_type_method_boolean_print };
 amqp_type_methods_t amqp_methods_ubyte = { amqp_type_method_ubyte_print };
 amqp_type_methods_t amqp_methods_byte = { amqp_type_method_byte_print };
 amqp_type_methods_t amqp_methods_ushort = { amqp_type_method_ushort_print };

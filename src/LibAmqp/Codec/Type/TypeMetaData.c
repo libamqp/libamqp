@@ -147,6 +147,15 @@ amqp_type_meta_data_t amqp_type_meta_data_long_small_long = {
     "smalllong",
     AMQP_TYPE_CATEGORY_FIXED,
 };
+amqp_type_meta_data_t amqp_type_meta_data_boolean = {
+    0x56,
+    1,
+    amqp_decode_boolean,
+    &amqp_methods_boolean,
+    "boolean",
+    "",
+    AMQP_TYPE_CATEGORY_FIXED,
+};
 amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_1 = {
     0x5F,
     1,
@@ -486,6 +495,7 @@ amqp_type_meta_data_t *amqp__type_lookup_table[] = {
     &amqp_type_meta_data_ulong_small_ulong,
     &amqp_type_meta_data_int_small_int,
     &amqp_type_meta_data_long_small_long,
+    &amqp_type_meta_data_boolean,
     &amqp_type_meta_data_extension_fixed_1,
     &amqp_type_meta_data_ushort,
     &amqp_type_meta_data_short,

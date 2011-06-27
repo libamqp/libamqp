@@ -52,7 +52,7 @@ SUITE(TypeMetaData)
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x3f));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x45));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x4e));
-        CHECK_NULL(amqp_type_meta_data_lookup(context, 0x56));
+        CHECK_NULL(amqp_type_meta_data_lookup(context, 0x57));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x5e));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x62));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x6e));
@@ -141,6 +141,51 @@ SUITE(TypeMetaData)
         CHECK_EQUAL(0x51, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
         CHECK_EQUAL("byte", meta_data->name);
+        CHECK_EQUAL("", meta_data->encoding_name);
+    }
+    TEST_FIXTURE(TypeMetaDataFixture, lookup_small_uint)
+    {
+        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x52);
+        CHECK_NOT_NULL(meta_data);
+        CHECK_EQUAL(0x52, meta_data->format_code);
+        CHECK_EQUAL(1, meta_data->width);
+        CHECK_EQUAL("uint", meta_data->name);
+        CHECK_EQUAL("smalluint", meta_data->encoding_name);
+    }
+    TEST_FIXTURE(TypeMetaDataFixture, lookup_small_ulong)
+    {
+        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x53);
+        CHECK_NOT_NULL(meta_data);
+        CHECK_EQUAL(0x53, meta_data->format_code);
+        CHECK_EQUAL(1, meta_data->width);
+        CHECK_EQUAL("ulong", meta_data->name);
+        CHECK_EQUAL("smallulong", meta_data->encoding_name);
+    }
+    TEST_FIXTURE(TypeMetaDataFixture, lookup_small_int)
+    {
+        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x54);
+        CHECK_NOT_NULL(meta_data);
+        CHECK_EQUAL(0x54, meta_data->format_code);
+        CHECK_EQUAL(1, meta_data->width);
+        CHECK_EQUAL("int", meta_data->name);
+        CHECK_EQUAL("smallint", meta_data->encoding_name);
+    }
+    TEST_FIXTURE(TypeMetaDataFixture, lookup_small_long)
+    {
+        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x55);
+        CHECK_NOT_NULL(meta_data);
+        CHECK_EQUAL(0x55, meta_data->format_code);
+        CHECK_EQUAL(1, meta_data->width);
+        CHECK_EQUAL("long", meta_data->name);
+        CHECK_EQUAL("smalllong", meta_data->encoding_name);
+    }
+    TEST_FIXTURE(TypeMetaDataFixture, lookup_boolean)
+    {
+        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x56);
+        CHECK_NOT_NULL(meta_data);
+        CHECK_EQUAL(0x56, meta_data->format_code);
+        CHECK_EQUAL(1, meta_data->width);
+        CHECK_EQUAL("boolean", meta_data->name);
         CHECK_EQUAL("", meta_data->encoding_name);
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_ushort_)

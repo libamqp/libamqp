@@ -101,6 +101,8 @@ namespace test_data
     extern TestData null_0;
     extern TestData true_0;
     extern TestData false_0;
+    extern TestData true_1;
+    extern TestData false_1;
 
     extern TestData array_shorts;
     extern TestData single_element_array;

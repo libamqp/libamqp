@@ -22,7 +22,7 @@
 
 SUITE(CodecDecode)
 {
-    TEST_FIXTURE(DecodeFixture, True)
+    TEST_FIXTURE(DecodeFixture, ZeroByteTrue)
     {
         load_decode_buffer(test_data::true_0);
         type = amqp_decode(context);
@@ -36,7 +36,7 @@ SUITE(CodecDecode)
         CHECK(amqp_convert_to_boolean(type));
     }
 
-    TEST_FIXTURE(DecodeFixture, False)
+    TEST_FIXTURE(DecodeFixture, ZeroByteFalse)
     {
         load_decode_buffer(test_data::false_0);
         type = amqp_decode(context);
@@ -45,6 +45,34 @@ SUITE(CodecDecode)
         CHECK_EQUAL(0x42, type->format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x00, type->position.size);
+        CHECK_EQUAL(0U, type->flags.is_null);
+
+        CHECK(!amqp_convert_to_boolean(type));
+    }
+
+    TEST_FIXTURE(DecodeFixture, SingleByteTrue)
+    {
+        load_decode_buffer(test_data::true_1);
+        type = amqp_decode(context);
+
+        CHECK_NOT_NULL(type);
+        CHECK_EQUAL(0x56, type->format_code);
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x01, type->position.size);
+        CHECK_EQUAL(0U, type->flags.is_null);
+
+        CHECK(amqp_convert_to_boolean(type));
+    }
+
+    TEST_FIXTURE(DecodeFixture, SingleByteFalse)
+    {
+        load_decode_buffer(test_data::false_1);
+        type = amqp_decode(context);
+
+        CHECK_NOT_NULL(type);
+        CHECK_EQUAL(0x56, type->format_code);
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x01, type->position.size);
         CHECK_EQUAL(0U, type->flags.is_null);
 
         CHECK(!amqp_convert_to_boolean(type));

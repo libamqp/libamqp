@@ -27,6 +27,7 @@ extern amqp_type_methods_t amqp_methods_described;
 extern amqp_type_methods_t amqp_methods_null;
 extern amqp_type_methods_t amqp_methods_boolean_true;
 extern amqp_type_methods_t amqp_methods_boolean_false;
+extern amqp_type_methods_t amqp_methods_boolean;
 extern amqp_type_methods_t amqp_methods_ubyte;
 extern amqp_type_methods_t amqp_methods_byte;
 extern amqp_type_methods_t amqp_methods_ushort;

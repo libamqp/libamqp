@@ -36,6 +36,7 @@ int amqp_decode_described_type(amqp_type_meta_data_t *meta_data, amqp_type_t *ty
 int amqp_decode_null(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_boolean_true(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_boolean_false(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
+int amqp_decode_boolean(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_ubyte(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_byte(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_ushort(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
