@@ -64,7 +64,7 @@ amqp_type_meta_data_t amqp_type_meta_data_boolean_false = {
     "false",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-// encoding name="uint0" code="0x43" category="fixed" width="0"/>
+// <encoding name="uint0" code="0x43" category="fixed" width="0"/>
 amqp_type_meta_data_t amqp_type_meta_data_uint_uint0 = {
     0x43,
     0,
@@ -72,6 +72,16 @@ amqp_type_meta_data_t amqp_type_meta_data_uint_uint0 = {
     &amqp_methods_uint0,
     "uint",
     "uint0",
+    AMQP_TYPE_CATEGORY_FIXED,
+};
+// <encoding name="ulong0" code="0x44" category="fixed" width="0"/>
+amqp_type_meta_data_t amqp_type_meta_data_ulong_ulong0 = {
+    0x44,
+    0,
+    amqp_decode_ulong0,
+    &amqp_methods_ulong0,
+    "ulong",
+    "ulong0",
     AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_0 = {
@@ -462,12 +472,13 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_array_4 = {
     AMQP_TYPE_CATEGORY_ARRAY,
 };
 
-amqp_type_meta_data_t *type_lookup_table[] = {
+amqp_type_meta_data_t *amqp__type_lookup_table[] = {
     &amqp_type_meta_data_described,
     &amqp_type_meta_data_null,
     &amqp_type_meta_data_boolean_true,
     &amqp_type_meta_data_boolean_false,
     &amqp_type_meta_data_uint_uint0,
+    &amqp_type_meta_data_ulong_ulong0,
     &amqp_type_meta_data_extension_fixed_0,
     &amqp_type_meta_data_ubyte,
     &amqp_type_meta_data_byte,
@@ -513,7 +524,8 @@ amqp_type_meta_data_t *type_lookup_table[] = {
     &amqp_type_meta_data_extension_array_4
 };
 
-static const int ntypes = sizeof(type_lookup_table) / sizeof(amqp_type_meta_data_t *);
+
+int amqp__type_lookup_table_ntypes = sizeof(amqp__type_lookup_table) / sizeof(amqp_type_meta_data_t *);
 
 
 // TODO - this binary search can take 5 compares to find a value, do lookup table for fast version
@@ -521,7 +533,7 @@ amqp_type_meta_data_t *
 amqp_type_meta_data_lookup(amqp_context_t *context, int format_code)
 {
     int s = 0;
-    int e = ntypes;
+    int e = amqp__type_lookup_table_ntypes;
     int m;
     amqp_type_meta_data_t *candidate;
 
@@ -529,7 +541,7 @@ amqp_type_meta_data_lookup(amqp_context_t *context, int format_code)
     {
         m = s + (e - s) / 2;
 
-        candidate = type_lookup_table[m];
+        candidate = amqp__type_lookup_table[m];
 
         if (candidate->format_code == format_code)
         {

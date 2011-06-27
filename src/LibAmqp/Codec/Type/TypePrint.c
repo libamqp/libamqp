@@ -200,6 +200,11 @@ void amqp_type_method_ulong_print(amqp_context_t *context, amqp_type_t *type)
     printf_type_value(context, "%lu", type->value.b8._ulong);
 }
 
+void amqp_type_method_ulong0_print(amqp_context_t *context, amqp_type_t *type)
+{
+    amqp_type_method_ulong_print(context, type);
+}
+
 void amqp_type_method_long_print(amqp_context_t *context, amqp_type_t *type)
 {
     printf_type_value(context, "%ld", type->value.b8._long);

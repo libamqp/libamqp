@@ -75,7 +75,7 @@ SUITE(FixedWidthEncoding)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::ulong_1);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::ulong_small);
     }
 
     TEST_FIXTURE(EncodeFixture, ExplicitEncodeUintZero)
@@ -180,7 +180,7 @@ SUITE(FixedWidthEncoding)
         type = amqp_encode_small_long(context, -4);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::long_1);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::long_small);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);

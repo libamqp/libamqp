@@ -41,6 +41,7 @@ extern amqp_type_methods_t amqp_methods_small_int;
 extern amqp_type_methods_t amqp_methods_float;
 extern amqp_type_methods_t amqp_methods_char;
 extern amqp_type_methods_t amqp_methods_decimal32;
+extern amqp_type_methods_t amqp_methods_ulong0;
 extern amqp_type_methods_t amqp_methods_ulong;
 extern amqp_type_methods_t amqp_methods_long;
 

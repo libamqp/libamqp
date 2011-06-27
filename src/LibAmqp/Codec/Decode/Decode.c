@@ -203,6 +203,16 @@ int amqp_decode_decimal32(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
      return amqp_decode_fixed_width(meta_data, type);
 }
 
+int amqp_decode_ulong0(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+{
+     int rc =  amqp_decode_fixed_zero_width(meta_data, type);
+     if (rc)
+     {
+        type->value.b8._ulong = 0U;
+     }
+     return rc;
+ }
+
 int amqp_decode_ulong(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);

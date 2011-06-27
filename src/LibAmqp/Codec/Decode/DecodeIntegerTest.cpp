@@ -65,7 +65,7 @@ SUITE(IntegerDecode)
 
     TEST_FIXTURE(DecodeFixture, DecodeSmallULong)
     {
-        load_decode_buffer(test_data::ulong_1);
+        load_decode_buffer(test_data::ulong_small);
         type = amqp_decode(context);
 
         ASSERT_VALID(type);
@@ -88,6 +88,15 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0U, type->value.b4._uint);
+    }
+
+    TEST_FIXTURE(DecodeFixture, DecodeULongZero)
+    {
+        load_decode_buffer(test_data::ulong_zero);
+        type = amqp_decode(context);
+
+        ASSERT_VALID(type);
+        CHECK_EQUAL(0UL, type->value.b8._ulong);
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeUShort)
@@ -128,7 +137,7 @@ SUITE(IntegerDecode)
 
     TEST_FIXTURE(DecodeFixture, DecodeSmallLong)
     {
-        load_decode_buffer(test_data::long_1);
+        load_decode_buffer(test_data::long_small);
         type = amqp_decode(context);
 
         ASSERT_VALID(type);

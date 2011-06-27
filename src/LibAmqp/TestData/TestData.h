@@ -71,8 +71,9 @@ namespace test_data
 
     extern TestData varied_ulong_8;
     extern TestData ulong_8;
+    extern TestData ulong_zero;
+    extern TestData ulong_small;
     extern TestData uint_4;
-    extern TestData ulong_1;
     extern TestData uint_small;
     extern TestData uint_small_zero;
     extern TestData uint_zero;
@@ -82,7 +83,7 @@ namespace test_data
 
     extern TestData long_8;
     extern TestData int_4;
-    extern TestData long_1;
+    extern TestData long_small;
     extern TestData int_1;
     extern TestData short_2;
     extern TestData byte_1;

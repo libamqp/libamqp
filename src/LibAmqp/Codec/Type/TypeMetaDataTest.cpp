@@ -21,6 +21,8 @@
 #include "Type.h"
 #include "Codec/Type/TypeMetaData.h"
 
+extern amqp_type_meta_data_t *amqp__type_lookup_table[];
+extern const int amqp__type_lookup_table_ntypes;
 
 SUITE(TypeMetaData)
 {
@@ -32,11 +34,23 @@ SUITE(TypeMetaData)
 
     public:
     };
+
+    TEST(type_look_table_should_be_sorted_by_format_code)
+    {
+        unsigned char format_code = amqp__type_lookup_table[0]->format_code;
+
+        for (int i = 0; i < amqp__type_lookup_table_ntypes; i++)
+        {
+            CHECK(amqp__type_lookup_table[i]->format_code >= format_code);
+            format_code = amqp__type_lookup_table[i]->format_code;
+        }
+    }
     
     TEST_FIXTURE(TypeMetaDataFixture, lookup_invalid_codes)
     {
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x3e));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x3f));
+        CHECK_NULL(amqp_type_meta_data_lookup(context, 0x45));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x4e));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x56));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x5e));
@@ -92,6 +106,24 @@ SUITE(TypeMetaData)
         CHECK_EQUAL(0, meta_data->width);
         CHECK_EQUAL("boolean", meta_data->name);
         CHECK_EQUAL("false", meta_data->encoding_name);
+    }
+    TEST_FIXTURE(TypeMetaDataFixture, lookup_uint_zero)
+    {
+        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x43);
+        CHECK_NOT_NULL(meta_data);
+        CHECK_EQUAL(0x43, meta_data->format_code);
+        CHECK_EQUAL(0, meta_data->width);
+        CHECK_EQUAL("uint", meta_data->name);
+        CHECK_EQUAL("uint0", meta_data->encoding_name);
+    }
+    TEST_FIXTURE(TypeMetaDataFixture, lookup_ulong_zero)
+    {
+        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x44);
+        CHECK_NOT_NULL(meta_data);
+        CHECK_EQUAL(0x44, meta_data->format_code);
+        CHECK_EQUAL(0, meta_data->width);
+        CHECK_EQUAL("ulong", meta_data->name);
+        CHECK_EQUAL("ulong0", meta_data->encoding_name);
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_ubyte_)
     {

@@ -84,8 +84,7 @@ namespace test_data
         0xff, 0xff, 0xff, 0xfe
     );
 
-    // 18446744073709551613
-    test_data_def(ulong_1,
+    test_data_def(ulong_small,
         0x53,
         0xfe
     );
@@ -94,6 +93,8 @@ namespace test_data
         0x52,
         0xfe
     );
+
+
     test_data_def(uint_small_zero,
         0x52,
         0
@@ -101,6 +102,10 @@ namespace test_data
 
     test_data_def(uint_zero,
         0x43,
+    );
+
+    test_data_def(ulong_zero,
+        0x44,
     );
 
     test_data_def(ushort_2,
@@ -127,7 +132,7 @@ namespace test_data
         0xff, 0xff, 0xff, 0xfe
     );
 
-    test_data_def(long_1,
+    test_data_def(long_small,
         0x55,
         0xfc
     );

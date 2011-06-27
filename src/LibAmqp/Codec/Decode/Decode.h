@@ -31,7 +31,6 @@ typedef struct amqp_context_t amqp_context_t;
 extern amqp_type_t *amqp_decode(amqp_context_t *);
 extern amqp_type_t *amqp_decode_supress_messages(amqp_context_t *context);
 
-
 // validate functions
 int amqp_decode_described_type(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_null(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
@@ -49,6 +48,7 @@ int amqp_decode_small_int(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_float(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_char(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_decimal32(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
+int amqp_decode_ulong0(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_ulong(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_long(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_small_ulong(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
@@ -71,7 +71,6 @@ int amqp_decode_array_8(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_array_32(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
 
 int amqp_decode_extension_type(amqp_type_meta_data_t *meta_data, amqp_type_t *type);
-
 
 extern amqp_type_t *amqp_list_element(amqp_type_t *type, int index);
 extern amqp_type_t *amqp_map_element(amqp_type_t *type, int index);

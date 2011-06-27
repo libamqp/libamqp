@@ -44,6 +44,7 @@ extern void amqp_type_method_float_print(amqp_context_t *context, amqp_type_t *t
 extern void amqp_type_method_char_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_decimal32_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_ulong_print(amqp_context_t *context, amqp_type_t *type);
+extern void amqp_type_method_ulong0_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_long_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_small_ulong_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_small_long_print(amqp_context_t *context, amqp_type_t *type);
