@@ -17,36 +17,11 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/CodecTestSupport.h"
+#include "Codec/Decode/DecodeTestSupport.h"
 #include "Codec/Type/Type.h"
 
-SUITE(ZeroByteTypeDecode)
+SUITE(CodecDecode)
 {
-    class DecodeFixture : public SuiteCodec::CodecFixture
-    {
-    public:
-        DecodeFixture() : result(0) {}
-        ~DecodeFixture()
-        {
-            AMQP_FREE(result);
-        }
-
-    public:
-        char *result;
-    };
-
-    TEST_FIXTURE(DecodeFixture, Null)
-    {
-        load_decode_buffer(test_data::null_0);
-        type = amqp_decode(context);
-
-        CHECK_NOT_NULL(type);
-        CHECK_EQUAL(0x40, type->format_code);
-        CHECK_EQUAL((size_t) 0x01, type->position.index);
-        CHECK_EQUAL((size_t) 0x00, type->position.size);
-        CHECK_EQUAL(1U, type->flags.is_null);
-    }
-
     TEST_FIXTURE(DecodeFixture, True)
     {
         load_decode_buffer(test_data::true_0);
@@ -58,7 +33,7 @@ SUITE(ZeroByteTypeDecode)
         CHECK_EQUAL((size_t) 0x00, type->position.size);
         CHECK_EQUAL(0U, type->flags.is_null);
 
-        CHECK(amqp_convert_bytes_to_boolean(type));
+        CHECK(amqp_convert_to_boolean(type));
     }
 
     TEST_FIXTURE(DecodeFixture, False)
@@ -72,6 +47,6 @@ SUITE(ZeroByteTypeDecode)
         CHECK_EQUAL((size_t) 0x00, type->position.size);
         CHECK_EQUAL(0U, type->flags.is_null);
 
-        CHECK(!amqp_convert_bytes_to_boolean(type));
+        CHECK(!amqp_convert_to_boolean(type));
     }
 }

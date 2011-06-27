@@ -26,7 +26,7 @@ extern "C" {
 
 extern char *amqp_convert_bytes_to_cstr(amqp_type_t *);
 
-inline static int amqp_convert_bytes_to_boolean(amqp_type_t *type)
+inline static int amqp_convert_to_boolean(amqp_type_t *type)
 {
     return type->format_code == 0x41;
 }
