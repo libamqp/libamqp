@@ -83,11 +83,13 @@ namespace test_data
     extern TestData neg_ubyte_1;
 
     extern TestData long_8;
-    extern TestData long_8_just;
+    extern TestData long_8_minus_129;
     extern TestData int_4;
+    extern TestData int_4_minus_129;
     extern TestData long_small;
     extern TestData long_small_zero;
     extern TestData int_1;
+    extern TestData int_1_zero;
     extern TestData short_2;
     extern TestData byte_1;
 

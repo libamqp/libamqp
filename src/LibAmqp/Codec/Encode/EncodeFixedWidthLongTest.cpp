@@ -27,7 +27,7 @@ SUITE(CodecEncode)
         type = amqp_encode_long(context, -129);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::long_8_just);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::long_8_minus_129);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x08, type->position.size);

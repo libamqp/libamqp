@@ -300,9 +300,16 @@ amqp_type_t *amqp_encode_small_int(amqp_context_t *context, int32_t value)
 
 amqp_type_t *amqp_encode_int(amqp_context_t *context, int32_t value)
 {
-    amqp_four_byte_t v;
-    v._int = value;
-    return amqp_encode_fixed_four_byte(context, &amqp_type_meta_data_int, v);
+    if (value == (signed char) (value & 0xff))
+    {
+        return amqp_encode_small_int(context, value);
+    }
+    else
+    {
+        amqp_four_byte_t v;
+        v._int = value;
+        return amqp_encode_fixed_four_byte(context, &amqp_type_meta_data_int, v);
+    }
 }
 
 amqp_type_t *amqp_encode_small_uint(amqp_context_t *context, uint32_t value)
@@ -333,7 +340,6 @@ amqp_type_t *amqp_encode_uint(amqp_context_t *context, uint32_t value)
         return amqp_encode_fixed_four_byte(context, &amqp_type_meta_data_uint, v);
     }
 }
-
 
 static amqp_type_t *amqp_encode_fixed_eight_byte(amqp_context_t *context, amqp_type_meta_data_t *meta_data, amqp_eight_byte_t value)
 {

@@ -133,7 +133,7 @@ namespace test_data
     );
 
     // -129
-    test_data_def(long_8_just,
+    test_data_def(long_8_minus_129,
         0x81,
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f
     );
@@ -141,6 +141,12 @@ namespace test_data
     test_data_def(int_4,
         0x71,
         0xff, 0xff, 0xff, 0xfe
+    );
+
+    // - 129
+    test_data_def(int_4_minus_129,
+        0x71,
+        0xff, 0xff, 0xff, 0x7f
     );
 
     // -4
@@ -157,6 +163,11 @@ namespace test_data
     test_data_def(int_1,
         0x54,
         0xfd
+    );
+
+    test_data_def(int_1_zero,
+        0x54,
+        0
     );
 
     test_data_def(short_2,

@@ -24,13 +24,35 @@ SUITE(CodecEncode)
 {
     TEST_FIXTURE(EncodeFixture, EncodeInt)
     {
-        type = amqp_encode_int(context, -2);
+        type = amqp_encode_int(context, -129);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::int_4);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::int_4_minus_129);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x04, type->position.size);
+    }
+
+    TEST_FIXTURE(EncodeFixture, EncodeIntWithSmallValueShouldEncodeSmallInt)
+    {
+        type = amqp_encode_int(context, -3);
+
+        CHECK_NOT_NULL(type);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::int_1);
+
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x01, type->position.size);
+    }
+
+    TEST_FIXTURE(EncodeFixture, EncodeIntWithZeroValueShouldEncodeShortIntWithZeroValue)
+    {
+        type = amqp_encode_int(context, 0);
+
+        CHECK_NOT_NULL(type);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::int_1_zero);
+
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x01, type->position.size);
     }
 
     TEST_FIXTURE(EncodeFixture, EncodeSmallInt)
@@ -44,4 +66,14 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x01, type->position.size);
     }
 
+    TEST_FIXTURE(EncodeFixture, explicit_encode_small_int_with_zero_value_should_encode_small_int)
+    {
+        type = amqp_encode_small_int(context, 0U);
+
+        CHECK_NOT_NULL(type);
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x01, type->position.size);
+
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::int_1_zero);
+    }
 }
