@@ -17,25 +17,12 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/CodecTestSupport.h"
+#include "Codec/Encode/EncodeTestSupport.h"
 
-SUITE(ZereoByteEncoding)
+
+SUITE(CodecEncode)
 {
-    class EncodeFixture : public SuiteCodec::CodecFixture
-    {
-    public:
-        EncodeFixture() : result(0) {}
-        ~EncodeFixture()
-        {
-            AMQP_FREE(result);
-            deallocate_type(result);
-        }
-
-    public:
-        amqp_type_t *result;
-    };
-    
-    TEST_FIXTURE(EncodeFixture, Null)
+    TEST_FIXTURE(EncodeFixture, EncodeNullValue)
     {
         type = amqp_encode_null(context);
         CHECK_NOT_NULL(type);
@@ -47,7 +34,7 @@ SUITE(ZereoByteEncoding)
         CHECK_EQUAL(1U, type->flags.is_null);
     }
 
-    TEST_FIXTURE(EncodeFixture, True)
+    TEST_FIXTURE(EncodeFixture, EncodeTrue)
     {
         type = amqp_encode_boolean(context, 1);
 
@@ -60,7 +47,7 @@ SUITE(ZereoByteEncoding)
         CHECK_EQUAL(0U, type->flags.is_null);
     }
 
-    TEST_FIXTURE(EncodeFixture, False)
+    TEST_FIXTURE(EncodeFixture, EncodeFalse)
     {
         type = amqp_encode_boolean(context, 0);
 
