@@ -22,18 +22,6 @@
 
 SUITE(CodecEncode)
 {
-    TEST_FIXTURE(EncodeFixture, EncodeNullValue)
-    {
-        type = amqp_encode_null(context);
-        CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::null_0);
-
-        CHECK_EQUAL(0x40, type->format_code);
-        CHECK_EQUAL((size_t) 0x01, type->position.index);
-        CHECK_EQUAL((size_t) 0x00, type->position.size);
-        CHECK_EQUAL(1U, type->flags.is_null);
-    }
-
     TEST_FIXTURE(EncodeFixture, EncodeTrue)
     {
         type = amqp_encode_boolean(context, 1);
