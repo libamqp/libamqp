@@ -33,6 +33,40 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x08, type->position.size);
     }
 
+    TEST_FIXTURE(EncodeFixture, EncodeULongWithZeroValueShouldEncodeULongZero)
+    {
+        type = amqp_encode_ulong(context, 0U);
+
+        CHECK_NOT_NULL(type);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::ulong_zero);
+
+        CHECK_EQUAL(0x44, type->format_code);
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x00, type->position.size);
+    }
+
+    TEST_FIXTURE(EncodeFixture, EncodeULongWithSmallValueShouldEncodeSmallUlong)
+    {
+        type = amqp_encode_ulong(context, 254U);
+
+        CHECK_NOT_NULL(type);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::ulong_small);
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x01, type->position.size);
+    }
+
+    TEST_FIXTURE(EncodeFixture, ExplicitEncodeUlongZero)
+    {
+        type = amqp_encode_ulong0(context);
+
+        CHECK_NOT_NULL(type);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::ulong_zero);
+
+        CHECK_EQUAL(0x44, type->format_code);
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x00, type->position.size);
+    }
+
     TEST_FIXTURE(EncodeFixture, EncodeSmallULong)
     {
         type = amqp_encode_small_ulong(context, 254UL);
@@ -43,4 +77,14 @@ SUITE(CodecEncode)
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::ulong_small);
     }
 
+    TEST_FIXTURE(EncodeFixture, explicit_encode_small_ulong_with_zero_value_should_encode_small_ulong_not_ulong_zero)
+    {
+        type = amqp_encode_small_ulong(context, 0U);
+
+        CHECK_NOT_NULL(type);
+        CHECK_EQUAL((size_t) 0x01, type->position.index);
+        CHECK_EQUAL((size_t) 0x01, type->position.size);
+
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::ulong_small_zero);
+    }
 }

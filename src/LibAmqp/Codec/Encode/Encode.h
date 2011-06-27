@@ -55,6 +55,7 @@ amqp_type_t *amqp_encode_char(amqp_context_t *context, wchar_t value);
 amqp_type_t *amqp_encode_decimal32(amqp_context_t *context, amqp_decimal32_t value);
 amqp_type_t *amqp_encode_decimal64(amqp_context_t *context, amqp_decimal64_t value);
 
+amqp_type_t *amqp_encode_ulong0(amqp_context_t *context);
 amqp_type_t *amqp_encode_ulong(amqp_context_t *context, uint64_t value);
 amqp_type_t *amqp_encode_long(amqp_context_t *context, int64_t value);
 amqp_type_t *amqp_encode_small_ulong(amqp_context_t *context, uint64_t value);

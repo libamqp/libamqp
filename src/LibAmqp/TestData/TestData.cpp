@@ -89,6 +89,11 @@ namespace test_data
         0xfe
     );
 
+    test_data_def(ulong_small_zero,
+        0x53,
+        0
+    );
+
     test_data_def(uint_small,
         0x52,
         0xfe

@@ -84,6 +84,7 @@ extern amqp_type_meta_data_t amqp_type_meta_data_null;
 extern amqp_type_meta_data_t amqp_type_meta_data_boolean_true;
 extern amqp_type_meta_data_t amqp_type_meta_data_boolean_false;
 extern amqp_type_meta_data_t amqp_type_meta_data_uint_uint0;
+extern amqp_type_meta_data_t amqp_type_meta_data_ulong_ulong0;
 extern amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_0;
 
 extern amqp_type_meta_data_t amqp_type_meta_data_ubyte;

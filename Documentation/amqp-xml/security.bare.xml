@@ -3,11 +3,11 @@
 <!--
 
 Copyright Bank of America, N.A., Barclays Bank PLC, Cisco Systems, Credit
-Suisse, Deutsche Boerse Systems, Envoy Technologies Inc., Goldman Sachs, INETCO
-Systems Limited, JPMorgan Chase Bank Inc. N.A, Microsoft Corporation, Novell,
-Progress Software, Rabbit Technologies Ltd., Red Hat Inc., Solace Systems Inc.,
-Tervela Inc., TWIST Process Innovations Ltd, WS02 Inc. and 29West Inc 2006-2010.
-All rights reserved.
+Suisse, Deutsche Boerse Systems, Goldman Sachs, HCL Technologies Ltd, INETCO
+Systems Limited, Informatica Corporation, JPMorgan Chase Bank Inc. N.A,
+Microsoft Corporation, my-Channels, Novell, Progress Software, Red Hat Inc.,
+Software AG, Solace Systems Inc., StormMQ Ltd., Tervela Inc., TWIST Process
+Innovations Ltd, VMware Inc. and WS02 Inc. 2006-2011. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -36,29 +36,24 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <section name="sasl">
     <type name="sasl-mechanisms" class="composite" source="list" provides="sasl-frame">
       <descriptor name="amqp:sasl-mechanisms:list" code="0x00000000:0x00000040"/>
-      <field name="options" type="options"/>
-      <field name="sasl-server-mechanisms" type="string" mandatory="true" multiple="true"/>
+      <field name="sasl-server-mechanisms" type="symbol" mandatory="true" multiple="true"/>
     </type>
     <type name="sasl-init" class="composite" source="list" provides="sasl-frame">
       <descriptor name="amqp:sasl-init:list" code="0x00000000:0x00000041"/>
-      <field name="options" type="options"/>
-      <field name="mechanism" type="string" mandatory="true"/>
+      <field name="mechanism" type="symbol" mandatory="true"/>
       <field name="initial-response" type="binary"/>
       <field name="hostname" type="string"/>
     </type>
     <type name="sasl-challenge" class="composite" source="list" provides="sasl-frame">
       <descriptor name="amqp:sasl-challenge:list" code="0x00000000:0x00000042"/>
-      <field name="options" type="options"/>
       <field name="challenge" type="binary" mandatory="true"/>
     </type>
     <type name="sasl-response" class="composite" source="list" provides="sasl-frame">
       <descriptor name="amqp:sasl-response:list" code="0x00000000:0x00000043"/>
-      <field name="options" type="options"/>
       <field name="response" type="binary" mandatory="true"/>
     </type>
     <type name="sasl-outcome" class="composite" source="list" provides="sasl-frame">
       <descriptor name="amqp:sasl-outcome:list" code="0x00000000:0x00000044"/>
-      <field name="options" type="options"/>
       <field name="code" type="sasl-code" mandatory="true"/>
       <field name="additional-data" type="binary"/>
     </type>

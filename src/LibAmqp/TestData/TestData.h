@@ -73,6 +73,7 @@ namespace test_data
     extern TestData ulong_8;
     extern TestData ulong_zero;
     extern TestData ulong_small;
+    extern TestData ulong_small_zero;
     extern TestData uint_4;
     extern TestData uint_small;
     extern TestData uint_small_zero;
