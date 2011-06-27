@@ -479,5 +479,4 @@ SUITE(TypeMetaData)
         CHECK_EQUAL("extension", meta_data->name);
         CHECK_EQUAL("array-4", meta_data->encoding_name);
     }
-
 }
