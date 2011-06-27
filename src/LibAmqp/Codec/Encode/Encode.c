@@ -376,17 +376,23 @@ amqp_type_t *amqp_encode_ulong(amqp_context_t *context, uint64_t value)
     }
 }
 
-amqp_type_t *amqp_encode_long(amqp_context_t *context, int64_t value)
-{
-    amqp_eight_byte_t v;
-    v._long = value;
-    return amqp_encode_fixed_eight_byte(context, &amqp_type_meta_data_long, v);
-}
-
-
 amqp_type_t *amqp_encode_small_long(amqp_context_t *context, int64_t value)
 {
     return amqp_encode_fixed_one_byte(context, &amqp_type_meta_data_long_small_long, (unsigned char) (value & 0xff));
+}
+
+amqp_type_t *amqp_encode_long(amqp_context_t *context, int64_t value)
+{
+    if (value == (signed char) (value & 0xff))
+    {
+        return amqp_encode_small_long(context, value);
+    }
+    else
+    {
+        amqp_eight_byte_t v;
+        v._long = value;
+        return amqp_encode_fixed_eight_byte(context, &amqp_type_meta_data_long, v);
+    }
 }
 
 amqp_type_t *amqp_encode_timestamp(amqp_context_t *context, amqp_timestamp_t value)

@@ -251,7 +251,7 @@ SUITE(TypePrint)
         CHECK_MAP(type);
 
         print_type();
-        check_output("{{list:::{1; two; 3.141593; null; false}}, {null::true}, {pi::3.141593}, {two::2}, {one::1}}");
+        check_output("{{list:::{1; two; 3.141593; null; false}}, {null::true}, {pi::3.141593}, {two::2}, {129::129}}");
     }
 
     TEST_FIXTURE(TypePrintFixture, TimeStamp)

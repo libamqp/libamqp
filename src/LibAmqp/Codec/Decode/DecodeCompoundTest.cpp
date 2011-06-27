@@ -132,7 +132,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(0xa1, amqp_map_element(type, 4)->format_code);
         CHECK_EQUAL(0x82, amqp_map_element(type, 5)->format_code);
         CHECK_EQUAL(0xa1, amqp_map_element(type, 6)->format_code);
-        CHECK_EQUAL(0x81, amqp_map_element(type, 7)->format_code);
+        CHECK_EQUAL(0x55, amqp_map_element(type, 7)->format_code);
         CHECK_EQUAL(0xa1, amqp_map_element(type, 8)->format_code);
         CHECK_EQUAL(0x81, amqp_map_element(type, 9)->format_code);
     }
