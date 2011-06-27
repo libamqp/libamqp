@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_DECODE_TEST_SUPPORT_H
-#define LIBAMQP_DECODE_TEST_SUPPORT_H
+#ifndef LIBAMQP_CODEC_CODEC_TEST_SUPPORT_H
+#define LIBAMQP_CODEC_CODEC_TEST_SUPPORT_H
 
 #include <string.h>
 
