@@ -19,6 +19,7 @@
 
 #include "Codec/Encode/EncodeTestSupport.h"
 
+#include "debug_helper.h"
 
 SUITE(CodecEncode)
 {
@@ -33,6 +34,9 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x00, type->position.size);
         CHECK_EQUAL(0U, type->flags.is_null);
+
+        // TODO - initialise value of encoded type
+        CHECK_EQUAL(0U, type->value.b1._unsigned);
     }
 
     TEST_FIXTURE(EncodeFixture, EncodeFalse)
@@ -46,6 +50,35 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x00, type->position.size);
         CHECK_EQUAL(0U, type->flags.is_null);
+
     }
 
+    TEST_FIXTURE(EncodeFixture, EncodeArrayOfBoolean)
+    {
+        type = amqp_encode_array_8(context);
+            amqp_encode_boolean(context, true);
+            amqp_encode_boolean(context, false);
+            amqp_encode_boolean(context, false);
+            amqp_encode_boolean(context, true);
+            amqp_encode_boolean(context, true);
+            amqp_encode_boolean(context, true);
+            amqp_encode_boolean(context, false);
+        CHECK_NOT_NULL(type);
+        amqp_complete_type(context, type);
+        CHECK_EQUAL(0U, type->flags.is_invalid);
+        CHECK_EQUAL(1U, type->flags.container.type.is_array);
+
+        amqp_buffer_put_buffer_contents(context->decode.buffer, context->encode.buffer);
+        deallocate_type(type);
+        type = amqp_decode(context);
+        CHECK(check_valid_array());
+
+        CHECK(amqp_convert_to_boolean(type->value.array.elements[0]));
+        CHECK(!amqp_convert_to_boolean(type->value.array.elements[1]));
+        CHECK(!amqp_convert_to_boolean(type->value.array.elements[2]));
+        CHECK(amqp_convert_to_boolean(type->value.array.elements[3]));
+        CHECK(amqp_convert_to_boolean(type->value.array.elements[4]));
+        CHECK(amqp_convert_to_boolean(type->value.array.elements[5]));
+        CHECK(!amqp_convert_to_boolean(type->value.array.elements[6]));
+    }
 }

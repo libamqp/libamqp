@@ -17,7 +17,28 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "Buffer/Buffer.h"
 #include "TestData/TestData.h"
+
+namespace test_data
+{
+    TestData::TestData(unsigned char * bytes, size_t n) : n_(n)
+    {
+        bytes_ = (unsigned char *) malloc(n);
+        memcpy(bytes_, bytes, n);
+    }
+
+    TestData::~TestData()
+    {
+        free(bytes_);
+    }
+
+    void TestData::transfer_to(amqp_buffer_t *buffer) const
+    {
+        // TODO - throw exception
+        amqp_buffer_puts(buffer, bytes_, n_);
+    }
+}
 
 namespace test_data
 {
@@ -374,6 +395,14 @@ namespace test_data
         0xc0, 0x01, 0x00,
     );
 
+    test_data_def(boolean_array,
+        0xe0,
+        0x04,           // size
+        0x02,           // count
+        0x56,           // member constructor
+        0x00,           // true
+        0x01,           // false
+    );
 
     // TODO - add decode test for this
     test_data_def(multiple_true_symbol_null,
@@ -399,5 +428,5 @@ namespace test_data
                 0xa3, 0x03, 0x46, 0x6f, 0x6f,
                 0xa3, 0x03, 0x46, 0x75, 0x6d,
     );
-
 }
+

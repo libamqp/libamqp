@@ -45,11 +45,7 @@ namespace test_data
     };
 }
 
-namespace t
-{
-    extern void amqp_buffer_dump(amqp_buffer_t *buffer, int (*putc)(int));
-    extern void amqp_buffer_dump_as_byte_array(amqp_buffer_t *buffer, int (*putc)(int));
-}
+
 
 namespace test_data
 {
@@ -126,6 +122,7 @@ namespace test_data
 
     extern TestData empty_map;
     extern TestData empty_list_8;
+    extern TestData boolean_array;
 
     extern TestData multiple_true_symbol_null;
     extern TestData multiple_true_symbol_one_value;
