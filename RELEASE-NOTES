@@ -1,5 +1,10 @@
 libamqp release notes:
 
+Version 0.1.2
+--------------
+* remove UTF-16 encoding
+* add boolean one byte encoding and zero byte encodings for uint and ulong
+
 Version 0.1.1
 --------------
 Decoder tests passing on:
