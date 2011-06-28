@@ -45,11 +45,7 @@ namespace test_data
     };
 }
 
-namespace t
-{
-    extern void amqp_buffer_dump(amqp_buffer_t *buffer, int (*putc)(int));
-    extern void amqp_buffer_dump_as_byte_array(amqp_buffer_t *buffer, int (*putc)(int));
-}
+
 
 namespace test_data
 {
@@ -71,17 +67,25 @@ namespace test_data
 
     extern TestData varied_ulong_8;
     extern TestData ulong_8;
+    extern TestData ulong_zero;
+    extern TestData ulong_small;
+    extern TestData ulong_small_zero;
     extern TestData uint_4;
-    extern TestData ulong_1;
-    extern TestData uint_1;
+    extern TestData uint_small;
+    extern TestData uint_small_zero;
+    extern TestData uint_zero;
     extern TestData ushort_2;
     extern TestData ubyte_1;
     extern TestData neg_ubyte_1;
 
     extern TestData long_8;
+    extern TestData long_8_minus_129;
     extern TestData int_4;
-    extern TestData long_1;
+    extern TestData int_4_minus_129;
+    extern TestData long_small;
+    extern TestData long_small_zero;
     extern TestData int_1;
+    extern TestData int_1_zero;
     extern TestData short_2;
     extern TestData byte_1;
 
@@ -93,6 +97,8 @@ namespace test_data
     extern TestData null_0;
     extern TestData true_0;
     extern TestData false_0;
+    extern TestData true_1;
+    extern TestData false_1;
 
     extern TestData array_shorts;
     extern TestData single_element_array;
@@ -116,6 +122,7 @@ namespace test_data
 
     extern TestData empty_map;
     extern TestData empty_list_8;
+    extern TestData boolean_array;
 
     extern TestData multiple_true_symbol_null;
     extern TestData multiple_true_symbol_one_value;

@@ -251,7 +251,7 @@ SUITE(TypePrint)
         CHECK_MAP(type);
 
         print_type();
-        check_output("{{list:::{1; two; 3.141593; null; false}}, {null::true}, {pi::3.141593}, {two::2}, {one::1}}");
+        check_output("{{list:::{1; two; 3.141593; null; false}}, {null::true}, {pi::3.141593}, {two::2}, {129::129}}");
     }
 
     TEST_FIXTURE(TypePrintFixture, TimeStamp)
@@ -274,5 +274,49 @@ SUITE(TypePrint)
         print_type();
 
         check_output("1910-12-06T17:00:00.000Z");
+    }
+
+    TEST_FIXTURE(TypePrintFixture, BooleanTrue)
+    {
+        load_decode_buffer(test_data::true_0);
+        type = amqp_decode(context);
+
+        ASSERT_VALID(type);
+
+        print_type();
+        check_output("true");
+    }
+
+    TEST_FIXTURE(TypePrintFixture, BooleanFalse)
+    {
+        load_decode_buffer(test_data::false_0);
+        type = amqp_decode(context);
+
+        ASSERT_VALID(type);
+
+        print_type();
+        check_output("false");
+    }
+
+    TEST_FIXTURE(TypePrintFixture, BooleanOneByteEncodingTrueValue)
+    {
+        load_decode_buffer(test_data::true_1);
+        type = amqp_decode(context);
+
+        ASSERT_VALID(type);
+
+        print_type();
+        check_output("true");
+    }
+
+    TEST_FIXTURE(TypePrintFixture, BooleanOneByteEncodingFalseValue)
+    {
+        load_decode_buffer(test_data::false_1);
+        type = amqp_decode(context);
+
+        ASSERT_VALID(type);
+
+        print_type();
+        check_output("false");
     }
 }

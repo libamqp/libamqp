@@ -33,7 +33,7 @@ int amqp_decode_null(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
     return true;
 }
 
-static int amqp_decode_boolean(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+static int amqp_decode_fixed_zero_width(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
     type->position.index = amqp_buffer_index(type->context->decode.buffer);
     type->position.size = 0;
@@ -42,12 +42,12 @@ static int amqp_decode_boolean(amqp_type_meta_data_t *meta_data, amqp_type_t *ty
 
 int amqp_decode_boolean_true(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
-    return amqp_decode_boolean(meta_data, type);
+    return amqp_decode_fixed_zero_width(meta_data, type);
 }
 
 int amqp_decode_boolean_false(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
-    return amqp_decode_boolean(meta_data, type);
+    return amqp_decode_fixed_zero_width(meta_data, type);
 }
 
 #define decode_error(type, code, ...) _decode_error(type, 1, __FILE__, __LINE__, #code, code, ""  __VA_ARGS__)
@@ -119,6 +119,11 @@ int amqp_decode_fixed_width(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
     return rc;
 }
 
+int amqp_decode_boolean(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+{
+     return amqp_decode_fixed_width(meta_data, type);
+}
+
 int amqp_decode_ubyte(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
@@ -143,6 +148,16 @@ int amqp_decode_uint(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
+
+int amqp_decode_uint0(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+{
+     int rc =  amqp_decode_fixed_zero_width(meta_data, type);
+     if (rc)
+     {
+        type->value.b4._uint = 0U;
+     }
+     return rc;
+ }
 
 int amqp_decode_int(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
@@ -192,6 +207,16 @@ int amqp_decode_decimal32(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
+
+int amqp_decode_ulong0(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+{
+     int rc =  amqp_decode_fixed_zero_width(meta_data, type);
+     if (rc)
+     {
+        type->value.b8._ulong = 0U;
+     }
+     return rc;
+ }
 
 int amqp_decode_ulong(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
@@ -364,38 +389,6 @@ int amqp_decode_string_str32_utf8(amqp_type_meta_data_t *meta_data, amqp_type_t 
 }
 
 static
-int amqp_decode_string_utf16(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
-{
-    int rc = amqp_construct_variable_type(meta_data, type);
-    if (rc)
-    {
-        size_t i;
-        for (i = 0; i < type->position.size; i++)
-        {
-            int c = amqp_unchecked_getc_at(type->context->decode.buffer, type->position.index + i);
-            // TODO - 16bit characters into correct byte order
-            // TODO - verify that characters are valid utf16
-            if (c == 0)
-            {
-                decode_error(type, AMQP_ERROR_INVALID_UTF16_CHARACTER, "utf-16 string contains an invalid character");
-                return 0;
-            }
-        }
-    }
-    return rc;
-}
-
-int amqp_decode_string_str8_utf16(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
-{
-     return amqp_decode_string_utf16(meta_data, type);
-}
-
-int amqp_decode_string_str32_utf16(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
-{
-     return amqp_decode_string_utf16(meta_data, type);
-}
-
-static
 int amqp_construct_container_type(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
 {
     uint32_t size = get_variable_type_size(meta_data, type);
@@ -413,7 +406,7 @@ int amqp_decode_described_type(amqp_type_meta_data_t *meta_data, amqp_type_t *ty
 
     type->position.index = amqp_buffer_index(type->context->decode.buffer);
     type->position.size = 0;
-    type->flags.structure.flags.is_described = true;
+    type->flags.container.type.is_described = true;
 
     type->value.described.count = 2;
     type->value.described.elements = amqp_allocate_amqp_type_t_array(2);
@@ -471,7 +464,7 @@ int amqp_decode_list_list(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
             return 0;
         }
 
-        type->flags.structure.flags.is_list = true;
+        type->flags.container.type.is_list = true;
         type->value.list.count = count;
 
         type->value.list.elements = amqp_allocate_amqp_type_t_array(count);
@@ -516,7 +509,7 @@ static int amqp_decode_map_map(amqp_type_meta_data_t *meta_data, amqp_type_t *ty
             return 0;
         }
 
-        type->flags.structure.flags.is_map = true;
+        type->flags.container.type.is_map = true;
         type->value.map.count = count;
 
         type->value.map.entries = amqp_allocate_amqp_type_t_array(count);
@@ -552,7 +545,7 @@ static int amqp_decode_array(amqp_type_meta_data_t *meta_data, amqp_type_t *type
             return 0;
         }
 
-        type->flags.structure.flags.is_array = true;
+        type->flags.container.type.is_array = true;
         type->value.array.count = count;
         type->value.array.elements = amqp_allocate_amqp_type_t_array(count);
 

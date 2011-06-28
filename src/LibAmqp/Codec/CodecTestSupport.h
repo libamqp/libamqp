@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_DECODE_TEST_SUPPORT_H
-#define LIBAMQP_DECODE_TEST_SUPPORT_H
+#ifndef LIBAMQP_CODEC_CODEC_TEST_SUPPORT_H
+#define LIBAMQP_CODEC_CODEC_TEST_SUPPORT_H
 
 #include <string.h>
 
@@ -33,28 +33,14 @@ namespace SuiteCodec
     class CodecFixture : public SuiteContext::ContextFixture
     {
     public:
-        CodecFixture() : type(0) {}
-        ~CodecFixture()
-        {
-            deallocate_type(type);
-        }
-        
-        amqp_memory_pool_t *type_pool()
-        {
-            return &context->pools.amqp_type_t_pool;
-        }
-        
-        amqp_type_t *allocate_type()
-        {
-            return (amqp_type_t *) amqp_allocate(type_pool());
-        }
-        
-        void deallocate_type(amqp_type_t *type)
-        {
+        CodecFixture();
+        ~CodecFixture();
+        amqp_type_t *allocate_type();
+        void deallocate_type(amqp_type_t *type);
+        bool check_valid_array();
 
-            amqp_deallocate(type_pool(), type);
-        }
-
+    protected:
+        amqp_memory_pool_t *type_pool();
     public:
         amqp_type_t *type;
     };
@@ -83,19 +69,19 @@ namespace t
      CHECK(t::compare_buffers(byte_array.bytes(), byte_array.size(), context->bytes, context->limit.size))
 
 #define CHECK_ARRAY(type) \
-    CHECK(amqp_type_is_compound(type)); \
+    CHECK(amqp_type_is_container(type)); \
     CHECK(amqp_type_is_array(type)); \
     CHECK(!amqp_type_is_map(type)); \
     CHECK(!amqp_type_is_list(type))
 
 #define CHECK_LIST(type) \
-    CHECK(amqp_type_is_compound(type)); \
+    CHECK(amqp_type_is_container(type)); \
     CHECK(!amqp_type_is_array(type)); \
     CHECK(!amqp_type_is_map(type)); \
     CHECK(amqp_type_is_list(type))
 
 #define CHECK_MAP(type) \
-    CHECK(amqp_type_is_compound(type)); \
+    CHECK(amqp_type_is_container(type)); \
     CHECK(!amqp_type_is_array(type)); \
     CHECK(amqp_type_is_map(type)); \
     CHECK(!amqp_type_is_list(type))

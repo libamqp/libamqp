@@ -64,6 +64,26 @@ amqp_type_meta_data_t amqp_type_meta_data_boolean_false = {
     "false",
     AMQP_TYPE_CATEGORY_FIXED,
 };
+// <encoding name="uint0" code="0x43" category="fixed" width="0"/>
+amqp_type_meta_data_t amqp_type_meta_data_uint_uint0 = {
+    0x43,
+    0,
+    amqp_decode_uint0,
+    &amqp_methods_uint0,
+    "uint",
+    "uint0",
+    AMQP_TYPE_CATEGORY_FIXED,
+};
+// <encoding name="ulong0" code="0x44" category="fixed" width="0"/>
+amqp_type_meta_data_t amqp_type_meta_data_ulong_ulong0 = {
+    0x44,
+    0,
+    amqp_decode_ulong0,
+    &amqp_methods_ulong0,
+    "ulong",
+    "ulong0",
+    AMQP_TYPE_CATEGORY_FIXED,
+};
 amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_0 = {
     0x4F,
     0,
@@ -125,6 +145,20 @@ amqp_type_meta_data_t amqp_type_meta_data_long_small_long = {
     &amqp_methods_small_long,
     "long",
     "smalllong",
+    AMQP_TYPE_CATEGORY_FIXED,
+};
+/*
+TODO - check the next version of the spec for the value of true
+
+    "boolean with the octect 0x00 being true and octet 0x01 being false"
+*/
+amqp_type_meta_data_t amqp_type_meta_data_boolean = {
+    0x56,
+    1,
+    amqp_decode_boolean,
+    &amqp_methods_boolean,
+    "boolean",
+    "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_1 = {
@@ -307,15 +341,6 @@ amqp_type_meta_data_t amqp_type_meta_data_string_str8_utf8 = {
     "str8-utf8",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
-amqp_type_meta_data_t amqp_type_meta_data_string_str8_utf16 = {
-    0xA2,
-    1,
-    amqp_decode_string_str8_utf16,
-    &amqp_methods_string_str8_utf16,
-    "string",
-    "str8-utf16",
-    AMQP_TYPE_CATEGORY_VARIABLE,
-};
 amqp_type_meta_data_t amqp_type_meta_data_symbol_sym8 = {
     0xA3,
     1,
@@ -350,15 +375,6 @@ amqp_type_meta_data_t amqp_type_meta_data_string_str32_utf8 = {
     &amqp_methods_string_str32_utf8,
     "string",
     "str32-utf8",
-    AMQP_TYPE_CATEGORY_VARIABLE,
-};
-amqp_type_meta_data_t amqp_type_meta_data_string_str32_utf16 = {
-    0xB2,
-    4,
-    amqp_decode_string_str32_utf16,
-    &amqp_methods_string_str32_utf16,
-    "string",
-    "str32-utf16",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
 amqp_type_meta_data_t amqp_type_meta_data_symbol_sym32 = {
@@ -438,7 +454,7 @@ amqp_type_meta_data_t amqp_type_meta_data_array_8 = {
     1,
     amqp_decode_array_8,
     &amqp_methods_array_8,
-    "list",
+    "array",
     "array8",
     AMQP_TYPE_CATEGORY_ARRAY,
 };
@@ -456,7 +472,7 @@ amqp_type_meta_data_t amqp_type_meta_data_array_32 = {
     4,
     amqp_decode_array_32,
     &amqp_methods_array_32,
-    "list",
+    "array",
     "array32",
     AMQP_TYPE_CATEGORY_ARRAY,
 };
@@ -470,11 +486,13 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_array_4 = {
     AMQP_TYPE_CATEGORY_ARRAY,
 };
 
-amqp_type_meta_data_t *type_lookup_table[] = {
+amqp_type_meta_data_t *amqp__type_lookup_table[] = {
     &amqp_type_meta_data_described,
     &amqp_type_meta_data_null,
     &amqp_type_meta_data_boolean_true,
     &amqp_type_meta_data_boolean_false,
+    &amqp_type_meta_data_uint_uint0,
+    &amqp_type_meta_data_ulong_ulong0,
     &amqp_type_meta_data_extension_fixed_0,
     &amqp_type_meta_data_ubyte,
     &amqp_type_meta_data_byte,
@@ -482,6 +500,7 @@ amqp_type_meta_data_t *type_lookup_table[] = {
     &amqp_type_meta_data_ulong_small_ulong,
     &amqp_type_meta_data_int_small_int,
     &amqp_type_meta_data_long_small_long,
+    &amqp_type_meta_data_boolean,
     &amqp_type_meta_data_extension_fixed_1,
     &amqp_type_meta_data_ushort,
     &amqp_type_meta_data_short,
@@ -502,12 +521,10 @@ amqp_type_meta_data_t *type_lookup_table[] = {
     &amqp_type_meta_data_extension_fixed_16,
     &amqp_type_meta_data_binary_vbin8,
     &amqp_type_meta_data_string_str8_utf8,
-    &amqp_type_meta_data_string_str8_utf16,
     &amqp_type_meta_data_symbol_sym8,
     &amqp_type_meta_data_extension_variable_1,
     &amqp_type_meta_data_binary_vbin32,
     &amqp_type_meta_data_string_str32_utf8,
-    &amqp_type_meta_data_string_str32_utf16,
     &amqp_type_meta_data_symbol_sym32,
     &amqp_type_meta_data_extension_variable_4,
     &amqp_type_meta_data_list_8,
@@ -522,7 +539,8 @@ amqp_type_meta_data_t *type_lookup_table[] = {
     &amqp_type_meta_data_extension_array_4
 };
 
-static const int ntypes = sizeof(type_lookup_table) / sizeof(amqp_type_meta_data_t *);
+
+int amqp__type_lookup_table_ntypes = sizeof(amqp__type_lookup_table) / sizeof(amqp_type_meta_data_t *);
 
 
 // TODO - this binary search can take 5 compares to find a value, do lookup table for fast version
@@ -530,7 +548,7 @@ amqp_type_meta_data_t *
 amqp_type_meta_data_lookup(amqp_context_t *context, int format_code)
 {
     int s = 0;
-    int e = ntypes;
+    int e = amqp__type_lookup_table_ntypes;
     int m;
     amqp_type_meta_data_t *candidate;
 
@@ -538,7 +556,7 @@ amqp_type_meta_data_lookup(amqp_context_t *context, int format_code)
     {
         m = s + (e - s) / 2;
 
-        candidate = type_lookup_table[m];
+        candidate = amqp__type_lookup_table[m];
 
         if (candidate->format_code == format_code)
         {

@@ -71,7 +71,7 @@ SUITE(VariableTypesEncoding)
 
         CHECK_NOT_NULL(type);
 
-    //    amqp_buffer_dump_as_byte_array(context->encode.buffer, context->config.putc);
+    //    amqp_buffer_dump(context->encode.buffer, context->config.putc);
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::encoded_lorem_ipsum);
 
         CHECK_EQUAL((size_t) 0x05, type->position.index);

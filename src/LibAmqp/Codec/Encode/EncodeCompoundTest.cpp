@@ -224,7 +224,7 @@ SUITE(CompoundEncoding)
             CHECK_LIST(l);
             CHECK_EQUAL((size_t) 5, (size_t) l->value.list.count);
             CHECK_EQUAL((size_t) 12, l->position.index);
-            CHECK_EQUAL((size_t) 26, l->position.size);
+            CHECK_EQUAL((size_t) 19, l->position.size);
 
 
             amqp_encode_null(context);
@@ -236,8 +236,8 @@ SUITE(CompoundEncoding)
             amqp_encode_string_utf8(context, "two");
             amqp_encode_long(context, 2);
 
-            amqp_encode_string_utf8(context, "one");
-            amqp_encode_long(context, 1);
+            amqp_encode_string_utf8(context, "129");
+            amqp_encode_long(context, 129);
 
         amqp_complete_type(context, type);
         ASSERT_VALID(type);
@@ -247,7 +247,7 @@ SUITE(CompoundEncoding)
 
         CHECK_EQUAL((size_t) 10, (size_t) type->value.map.count);
         CHECK_EQUAL((size_t) 2, type->position.index);
-        CHECK_EQUAL((size_t) 79, type->position.size);
+        CHECK_EQUAL((size_t) 65, type->position.size);
 
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::map);
     }

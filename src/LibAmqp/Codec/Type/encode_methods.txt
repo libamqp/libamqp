@@ -118,10 +118,3 @@ int amqp_type_%%_string_utf8(amqp_context_t *context)
 {
     abort();
 }
-
-int amqp_type_%%_string_utf16(amqp_context_t *context)
-{
-
-    abort();
-
-

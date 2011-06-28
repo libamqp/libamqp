@@ -30,10 +30,11 @@ extern amqp_type_encode_meta_data_t ampq_encode_meta_data_byte;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_ushort;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_short;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_uint;
-extern amqp_type_encode_meta_data_t ampq_encode_meta_data_int;
-
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_small_uint;
+extern amqp_type_encode_meta_data_t ampq_encode_meta_data_uint0;
+extern amqp_type_encode_meta_data_t ampq_encode_meta_data_int;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_small_int;
+
 
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_float;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_char;
@@ -52,7 +53,6 @@ extern amqp_type_encode_meta_data_t ampq_encode_meta_data_uuid;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_binary;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_symbol;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_string_utf8;
-extern amqp_type_encode_meta_data_t ampq_encode_meta_data_string_utf16;
 
 #define amqp_type_d(t)  (&ampq_encode_meta_data_ ## t)
 

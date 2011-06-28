@@ -62,8 +62,8 @@ typedef struct {
     unsigned int has_descriptor:1;
     union {
         unsigned int is_compound;
-        amqp_type_type_flags_t flags;
-    } structure;
+        amqp_type_type_flags_t type;
+    } container;
 } amqp_type_flags_t;
 
 struct amqp_type_t
@@ -121,27 +121,27 @@ extern void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type);
 extern amqp_buffer_t *amqp_type_convert_buffer(amqp_type_t *type);
 
 static inline
-bool amqp_type_is_compound(amqp_type_t *type)
+bool amqp_type_is_container(amqp_type_t *type)
 {
-    return type->flags.structure.is_compound != 0;
+    return type->flags.container.is_compound != 0;
 }
 
 static inline
 bool amqp_type_is_map(amqp_type_t *type)
 {
-    return type->flags.structure.flags.is_map != 0;
+    return type->flags.container.type.is_map != 0;
 }
 
 static inline
 bool amqp_type_is_array(amqp_type_t *type)
 {
-    return type->flags.structure.flags.is_array != 0;
+    return type->flags.container.type.is_array != 0;
 }
 
 static inline
 bool amqp_type_is_list(amqp_type_t *type)
 {
-    return type->flags.structure.flags.is_list != 0;
+    return type->flags.container.type.is_list != 0;
 }
 
 static inline
@@ -159,7 +159,7 @@ bool amqp_type_is_contained(amqp_type_t *type)
 static inline
 bool amqp_type_is_described(amqp_type_t *type)
 {
-    return type->flags.structure.flags.is_described != 0;
+    return type->flags.container.type.is_described != 0;
 }
 
 static inline

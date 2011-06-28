@@ -3,11 +3,11 @@
 <!--
 
 Copyright Bank of America, N.A., Barclays Bank PLC, Cisco Systems, Credit
-Suisse, Deutsche Boerse Systems, Envoy Technologies Inc., Goldman Sachs, INETCO
-Systems Limited, JPMorgan Chase Bank Inc. N.A, Microsoft Corporation, Novell,
-Progress Software, Rabbit Technologies Ltd., Red Hat Inc., Solace Systems Inc.,
-Tervela Inc., TWIST Process Innovations Ltd, WS02 Inc. and 29West Inc 2006-2010.
-All rights reserved.
+Suisse, Deutsche Boerse Systems, Goldman Sachs, HCL Technologies Ltd, INETCO
+Systems Limited, Informatica Corporation, JPMorgan Chase Bank Inc. N.A,
+Microsoft Corporation, my-Channels, Novell, Progress Software, Red Hat Inc.,
+Software AG, Solace Systems Inc., StormMQ Ltd., Tervela Inc., TWIST Process
+Innovations Ltd, VMware Inc. and WS02 Inc. 2006-2011. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -37,7 +37,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <type name="coordinator" class="composite" source="list" provides="target">
       <descriptor name="amqp:coordinator:list" code="0x00000000:0x00000030"/>
       <field name="options" type="options"/>
-      <field name="capabilities" type="symbol" requires="txn-capabilities" multiple="true"/>
+      <field name="capabilities" type="symbol" requires="txn-capability" multiple="true"/>
     </type>
     <type name="declare" class="composite" source="list">
       <descriptor name="amqp:declare:list" code="0x00000000:0x00000031"/>
@@ -47,17 +47,23 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <type name="discharge" class="composite" source="list">
       <descriptor name="amqp:discharge:list" code="0x00000000:0x00000032"/>
       <field name="options" type="options"/>
+      <field name="txn-id" type="*" mandatory="true" requires="txn-id"/>
       <field name="fail" type="boolean"/>
     </type>
-    <type name="txn-capabilities" class="restricted" source="symbol" provides="txn-capabilities">
+    <type name="transaction-id" class="restricted" source="binary" provides="txn-id"/>
+    <type name="declared" class="composite" source="list" provides="outcome">
+      <descriptor name="amqp:declared:list" code="0x00000000:0x00000033"/>
+      <field name="options" type="options"/>
+      <field name="txn-id" type="*" mandatory="true" requires="txn-id"/>
+    </type>
+    <type name="txn-capability" class="restricted" source="symbol" provides="txn-capability">
       <choice name="local-txn" value="amqp:local-transactions"/>
       <choice name="distributed-txn" value="amqp:distributed-transactions"/>
       <choice name="promotable-txn" value="amqp:promotable-transactions"/>
       <choice name="multi-txns-per-ssn" value="amqp:multi-txns-per-ssn"/>
       <choice name="multi-ssns-per-txn" value="amqp:multi-ssns-per-txn"/>
-      <choice name="multi-conns-per-txn" value="amqp:multi-conns-per-txn"/>
     </type>
-    <type name="transaction-errors" class="restricted" source="symbol" provides="error">
+    <type name="transaction-errors" class="restricted" source="symbol" provides="error-condition">
       <choice name="unknown-id" value="amqp:transaction:unknown-id"/>
       <choice name="transaction-rollback" value="amqp:transaction:rollback"/>
       <choice name="transaction-timeout" value="amqp:transaction:timeout"/>
