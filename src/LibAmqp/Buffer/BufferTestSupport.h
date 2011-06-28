@@ -16,9 +16,6 @@
 
 #ifndef LIBAMQP_BUFFER_BUFFER_TEST_SUPPORT_H
 #define LIBAMQP_BUFFER_BUFFER_TEST_SUPPORT_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include "Memory/PoolTestSupport.h"
 #include "Buffer/Buffer.h"
@@ -45,10 +42,12 @@ namespace SuiteBuffer
         amqp_buffer_t *buffer;
     };
 }
-
-#ifdef __cplusplus
+namespace t
+{
+    void amqp_buffer_dump_fragment(amqp_context_t* context, amqp_buffer_t *buffer, size_t start, size_t end);
+    void amqp_buffer_dump(amqp_context_t* context, amqp_buffer_t *buffer);
 }
-#endif
+
 #endif
 
 

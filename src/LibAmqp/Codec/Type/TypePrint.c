@@ -160,6 +160,13 @@ void amqp_type_method_boolean_false_print(amqp_context_t *context, amqp_type_t *
     str_print(context, "false");
 }
 
+void amqp_type_method_boolean_print(amqp_context_t *context, amqp_type_t *type)
+{
+    type->value.b1._unsigned == 0x00 ?
+            amqp_type_method_boolean_true_print(context, type) :
+            amqp_type_method_boolean_false_print(context, type);
+}
+
 void amqp_type_method_ubyte_print(amqp_context_t *context, amqp_type_t *type)
 {
     printf_type_value(context, "%u", type->value.b1._unsigned);
@@ -185,6 +192,11 @@ void amqp_type_method_uint_print(amqp_context_t *context, amqp_type_t *type)
     printf_type_value(context, "%u", type->value.b4._uint);
 }
 
+void amqp_type_method_uint0_print(amqp_context_t *context, amqp_type_t *type)
+{
+    amqp_type_method_uint_print(context, type);
+}
+
 void amqp_type_method_int_print(amqp_context_t *context, amqp_type_t *type)
 {
     printf_type_value(context, "%d", type->value.b4._int);
@@ -193,6 +205,11 @@ void amqp_type_method_int_print(amqp_context_t *context, amqp_type_t *type)
 void amqp_type_method_ulong_print(amqp_context_t *context, amqp_type_t *type)
 {
     printf_type_value(context, "%lu", type->value.b8._ulong);
+}
+
+void amqp_type_method_ulong0_print(amqp_context_t *context, amqp_type_t *type)
+{
+    amqp_type_method_ulong_print(context, type);
 }
 
 void amqp_type_method_long_print(amqp_context_t *context, amqp_type_t *type)
@@ -303,21 +320,6 @@ void amqp_type_method_string_str8_utf8_print(amqp_context_t *context, amqp_type_
 void amqp_type_method_string_str32_utf8_print(amqp_context_t *context, amqp_type_t *type)
 {
     amqp_type_print_ascii(context, type);
-}
-
-static void amqp_type_method_string_utf16_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_print_raw_data(context, type);
-}
-
-void amqp_type_method_string_str8_utf16_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_method_string_utf16_print(context, type);
-}
-
-void amqp_type_method_string_str32_utf16_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_method_string_utf16_print(context, type);
 }
 
 static void amqp_type_method_list_print(amqp_context_t *context, amqp_type_t *type)

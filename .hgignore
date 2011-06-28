@@ -16,3 +16,6 @@ src/decode-demo
 src/decode-demo.tar.gz
 external/amqp
 3rd-party/UnitTest++/TestUnitTest++
+decode-demo.out.txt
+src/t
+src/t.c

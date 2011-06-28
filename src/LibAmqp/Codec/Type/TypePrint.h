@@ -31,11 +31,13 @@ extern void amqp_type_method_described_print(amqp_context_t *context, amqp_type_
 extern void amqp_type_method_null_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_boolean_true_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_boolean_false_print(amqp_context_t *context, amqp_type_t *type);
+extern void amqp_type_method_boolean_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_ubyte_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_byte_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_ushort_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_short_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_uint_print(amqp_context_t *context, amqp_type_t *type);
+extern void amqp_type_method_uint0_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_int_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_small_uint_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_small_int_print(amqp_context_t *context, amqp_type_t *type);
@@ -43,6 +45,7 @@ extern void amqp_type_method_float_print(amqp_context_t *context, amqp_type_t *t
 extern void amqp_type_method_char_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_decimal32_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_ulong_print(amqp_context_t *context, amqp_type_t *type);
+extern void amqp_type_method_ulong0_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_long_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_small_ulong_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_small_long_print(amqp_context_t *context, amqp_type_t *type);
@@ -56,8 +59,6 @@ extern void amqp_type_method_symbol_sym8_print(amqp_context_t *context, amqp_typ
 extern void amqp_type_method_symbol_sym32_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_string_str8_utf8_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_string_str32_utf8_print(amqp_context_t *context, amqp_type_t *type);
-extern void amqp_type_method_string_str8_utf16_print(amqp_context_t *context, amqp_type_t *type);
-extern void amqp_type_method_string_str32_utf16_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_list_8_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_map_8_print(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_type_method_list_32_print(amqp_context_t *context, amqp_type_t *type);

@@ -42,6 +42,7 @@ amqp_type_t *amqp_encode_byte(amqp_context_t *context, int8_t value);
 amqp_type_t *amqp_encode_ushort(amqp_context_t *context, uint16_t value);
 amqp_type_t *amqp_encode_short(amqp_context_t *context, int16_t value);
 
+amqp_type_t *amqp_encode_uint0(amqp_context_t *context);
 amqp_type_t *amqp_encode_uint(amqp_context_t *context, uint32_t value);
 amqp_type_t *amqp_encode_int(amqp_context_t *context, int32_t value);
 
@@ -54,6 +55,7 @@ amqp_type_t *amqp_encode_char(amqp_context_t *context, wchar_t value);
 amqp_type_t *amqp_encode_decimal32(amqp_context_t *context, amqp_decimal32_t value);
 amqp_type_t *amqp_encode_decimal64(amqp_context_t *context, amqp_decimal64_t value);
 
+amqp_type_t *amqp_encode_ulong0(amqp_context_t *context);
 amqp_type_t *amqp_encode_ulong(amqp_context_t *context, uint64_t value);
 amqp_type_t *amqp_encode_long(amqp_context_t *context, int64_t value);
 amqp_type_t *amqp_encode_small_ulong(amqp_context_t *context, uint64_t value);
@@ -77,9 +79,6 @@ amqp_type_t *amqp_encode_symbol_sym32n(amqp_context_t *context, const char *valu
 
 amqp_type_t *amqp_encode_string_utf8(amqp_context_t *context, const char *value);
 amqp_type_t *amqp_encode_string_utf8n(amqp_context_t *context, const char *value, size_t size);
-
-amqp_type_t *amqp_encode_string_utf16(amqp_context_t *context);
-amqp_type_t *amqp_encode_string_utf16n(amqp_context_t *context, size_t size);
 
 amqp_type_t *amqp_encode_list_8(amqp_context_t *context);
 amqp_type_t *amqp_encode_list_32(amqp_context_t *context);

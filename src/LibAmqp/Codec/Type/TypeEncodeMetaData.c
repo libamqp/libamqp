@@ -24,6 +24,7 @@
     &amqp_type_meta_data_null,
     &amqp_type_meta_data_boolean_true,
     &amqp_type_meta_data_boolean_false,
+    &amqp_type_meta_data_uint_uint0,
     &amqp_type_meta_data_extension_fixed_0,
     &amqp_type_meta_data_ubyte,
     &amqp_type_meta_data_byte,
@@ -50,11 +51,9 @@
     &amqp_type_meta_data_uuid,
     &amqp_type_meta_data_extension_fixed_16,
     &amqp_type_meta_data_binary_vbin8,
-    &amqp_type_meta_data_string_str8_utf16,
 
     &amqp_type_meta_data_extension_variable_1,
     &amqp_type_meta_data_binary_vbin32,
-    &amqp_type_meta_data_string_str32_utf16,
     &amqp_type_meta_data_extension_variable_4,
     &amqp_type_meta_data_list_8,
     &amqp_type_meta_data_map_8,
@@ -188,20 +187,12 @@ int amqp_type_describe_symbol(amqp_context_t *context, amqp_type_description_t *
 
 int amqp_type_describe_string_utf8(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-
     const char *p = va_arg(ap, const char *);
     description->size = strlen(p);
-    description->meta_data = description->size > 255 ? &amqp_type_meta_data_string_str32_utf16 : &amqp_type_meta_data_string_str8_utf8;
+    description->meta_data = description->size > 255 ? &amqp_type_meta_data_string_str32_utf8 : &amqp_type_meta_data_string_str8_utf8;
     description->overhead = description->meta_data->width + 1;
     return true;
 }
-
-int amqp_type_describe_string_utf16(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
-{
-
-    abort();
-}
-
 
 amqp_type_t *amqp_call_encode_null(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
@@ -324,16 +315,12 @@ amqp_type_t *amqp_call_encode_string_utf8(amqp_context_t *context, amqp_type_des
     return amqp_encode_string_utf8n(context, p, description != 0 ? description->size : strlen(p));
 }
 
-amqp_type_t *amqp_call_encode_string_utf16(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
-{
-    abort();
-}
-
 // s/^\(.*ampq_encode_meta_data_\)\([^ ]*\) = {/\1\2 = { amqp_type_describe_\2, /
 
 amqp_type_encode_meta_data_t ampq_encode_meta_data_null = { amqp_type_describe_null,  amqp_call_encode_null,  };
 amqp_type_encode_meta_data_t ampq_encode_meta_data_boolean = { amqp_type_describe_boolean,  amqp_call_encode_boolean,  };
 amqp_type_encode_meta_data_t ampq_encode_meta_data_ubyte = { amqp_type_describe_ubyte,  amqp_call_encode_ubyte,  };
+// TODO uint0 here
 amqp_type_encode_meta_data_t ampq_encode_meta_data_byte = { amqp_type_describe_byte,  amqp_call_encode_byte,  };
 amqp_type_encode_meta_data_t ampq_encode_meta_data_ushort = { amqp_type_describe_ushort,  amqp_call_encode_ushort,  };
 amqp_type_encode_meta_data_t ampq_encode_meta_data_short = { amqp_type_describe_short,  amqp_call_encode_short,  };
@@ -360,5 +347,4 @@ amqp_type_encode_meta_data_t ampq_encode_meta_data_uuid = { amqp_type_describe_u
 amqp_type_encode_meta_data_t ampq_encode_meta_data_binary = { amqp_type_describe_binary,  amqp_call_encode_binary,  };
 amqp_type_encode_meta_data_t ampq_encode_meta_data_symbol = { amqp_type_describe_symbol,  amqp_call_encode_symbol,  };
 amqp_type_encode_meta_data_t ampq_encode_meta_data_string_utf8 = { amqp_type_describe_string_utf8,  amqp_call_encode_string_utf8,  };
-amqp_type_encode_meta_data_t ampq_encode_meta_data_string_utf16 = { amqp_type_describe_string_utf16,  amqp_call_encode_string_utf16,  };
 

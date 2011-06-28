@@ -32,7 +32,7 @@ static const amqp_type_type_flags_t not_a_compound_type = {0};
 static inline int emit_constructor(amqp_context_t *context)
 {
     amqp_type_t *type = context->encode.container;
-    return type == 0 || (amqp_type_is_compound(type) && !amqp_type_is_array(type)) || (amqp_type_is_array(type)  && type->value.array.count == 0);
+    return type == 0 || (amqp_type_is_container(type) && !amqp_type_is_array(type)) || (amqp_type_is_array(type)  && type->value.array.count == 0);
 }
 
 static inline amqp_type_t **allocate_elements(amqp_type_t **elements, size_t count)
@@ -55,7 +55,7 @@ static inline void amqp_add_element_to_container(amqp_context_t *context, amqp_t
             // matches the type of the first element in the array
             if (!amqp_type_match(context->encode.container->value.compound.elements[0], type))
             {
-                // marke both the element and container as invalid
+                // mark both the element and container as invalid
                 amqp_mark_type_invalid(type, AMQP_ERROR_ARRAY_ELEMENT_TYPE_INCORRECT);
                 amqp_mark_type_invalid(context->encode.container, AMQP_ERROR_ARRAY_ELEMENT_TYPE_INCORRECT);
             }
@@ -76,6 +76,11 @@ static inline void amqp_add_element_to_container(amqp_context_t *context, amqp_t
         context->encode.container->value.compound.elements = allocate_elements(context->encode.container->value.compound.elements, count + 1);
         context->encode.container->value.compound.elements[count] = type;
     }
+}
+
+static inline bool is_i_contained_within_array(amqp_context_t *context)
+{
+    return context->encode.container && amqp_type_is_array(context->encode.container);
 }
 
 static void push_container(amqp_context_t *context, amqp_type_t *type)
@@ -104,7 +109,7 @@ static amqp_type_t *initialize_type(amqp_context_t *context, const amqp_type_typ
     type->flags.is_encoded = true;
     type->meta_data = meta_data;
 
-    type->flags.structure.flags = type_flags;
+    type->flags.container.type = type_flags;
 
     if (emit_constructor(context))
     {
@@ -113,7 +118,7 @@ static amqp_type_t *initialize_type(amqp_context_t *context, const amqp_type_typ
 
     amqp_add_element_to_container(context, type);
 
-    if (amqp_type_is_compound(type))
+    if (amqp_type_is_container(type))
     {
         push_container(context, type);
     }
@@ -227,12 +232,6 @@ amqp_type_t *amqp_encode_null(amqp_context_t *context)
     return type;
 }
 
-amqp_type_t *amqp_encode_boolean(amqp_context_t *context, int value)
-{
-    amqp_type_meta_data_t *meta_data = value ? &amqp_type_meta_data_boolean_true : &amqp_type_meta_data_boolean_false;
-    return amqp_encode_fixed(context, meta_data);
-}
-
 static amqp_type_t *amqp_encode_fixed_one_byte(amqp_context_t *context, amqp_type_meta_data_t *meta_data, unsigned char b)
 {
     amqp_type_t *type = amqp_encode_fixed(context, meta_data);
@@ -243,6 +242,21 @@ static amqp_type_t *amqp_encode_fixed_one_byte(amqp_context_t *context, amqp_typ
     }
 
     return type;
+}
+
+amqp_type_t *amqp_encode_boolean(amqp_context_t *context, int value)
+{
+    if (is_i_contained_within_array(context))
+    {
+        // TODO - check next spec update
+        unsigned char boolean_value = value != 0 ? 0 : 1;     // True == 0, false == 1
+        return amqp_encode_fixed_one_byte(context, &amqp_type_meta_data_boolean, boolean_value);
+    }
+    else
+    {
+        amqp_type_meta_data_t *meta_data = value ? &amqp_type_meta_data_boolean_true : &amqp_type_meta_data_boolean_false;
+        return amqp_encode_fixed(context, meta_data);
+    }
 }
 
 amqp_type_t *amqp_encode_ubyte(amqp_context_t *context, uint8_t value)
@@ -293,18 +307,23 @@ static amqp_type_t *amqp_encode_fixed_four_byte(amqp_context_t *context, amqp_ty
     return type;
 }
 
-amqp_type_t *amqp_encode_uint(amqp_context_t *context, uint32_t value)
+amqp_type_t *amqp_encode_small_int(amqp_context_t *context, int32_t value)
 {
-    amqp_four_byte_t v;
-    v._uint = value;
-    return amqp_encode_fixed_four_byte(context, &amqp_type_meta_data_uint, v);
+    return amqp_encode_fixed_one_byte(context, &amqp_type_meta_data_int_small_int, (unsigned char) (value & 0xff));
 }
 
 amqp_type_t *amqp_encode_int(amqp_context_t *context, int32_t value)
 {
-    amqp_four_byte_t v;
-    v._int = value;
-    return amqp_encode_fixed_four_byte(context, &amqp_type_meta_data_int, v);
+    if (value == (signed char) (value & 0xff))
+    {
+        return amqp_encode_small_int(context, value);
+    }
+    else
+    {
+        amqp_four_byte_t v;
+        v._int = value;
+        return amqp_encode_fixed_four_byte(context, &amqp_type_meta_data_int, v);
+    }
 }
 
 amqp_type_t *amqp_encode_small_uint(amqp_context_t *context, uint32_t value)
@@ -312,11 +331,29 @@ amqp_type_t *amqp_encode_small_uint(amqp_context_t *context, uint32_t value)
     return amqp_encode_fixed_one_byte(context, &amqp_type_meta_data_uint_small_uint, (unsigned char) (value & 0xff));
 }
 
-amqp_type_t *amqp_encode_small_int(amqp_context_t *context, int32_t value)
+amqp_type_t *amqp_encode_uint0(amqp_context_t *context)
 {
-    return amqp_encode_fixed_one_byte(context, &amqp_type_meta_data_int_small_int, (unsigned char) (value & 0xff));
+    amqp_type_t *type = amqp_encode_fixed(context, &amqp_type_meta_data_uint_uint0);
+    return type;
 }
 
+amqp_type_t *amqp_encode_uint(amqp_context_t *context, uint32_t value)
+{
+    if (value == 0)
+    {
+        return amqp_encode_uint0(context);
+    }
+    else if (value < 255)
+    {
+        return amqp_encode_small_uint(context, value);
+    }
+    else
+    {
+        amqp_four_byte_t v;
+        v._uint = value;
+        return amqp_encode_fixed_four_byte(context, &amqp_type_meta_data_uint, v);
+    }
+}
 
 static amqp_type_t *amqp_encode_fixed_eight_byte(amqp_context_t *context, amqp_type_meta_data_t *meta_data, amqp_eight_byte_t value)
 {
@@ -329,18 +366,11 @@ static amqp_type_t *amqp_encode_fixed_eight_byte(amqp_context_t *context, amqp_t
 
     return type;
 }
-amqp_type_t *amqp_encode_ulong(amqp_context_t *context, uint64_t value)
-{
-    amqp_eight_byte_t v;
-    v._ulong = value;
-    return amqp_encode_fixed_eight_byte(context, &amqp_type_meta_data_ulong, v);
-}
 
-amqp_type_t *amqp_encode_long(amqp_context_t *context, int64_t value)
+amqp_type_t *amqp_encode_ulong0(amqp_context_t *context)
 {
-    amqp_eight_byte_t v;
-    v._long = value;
-    return amqp_encode_fixed_eight_byte(context, &amqp_type_meta_data_long, v);
+    amqp_type_t *type = amqp_encode_fixed(context, &amqp_type_meta_data_ulong_ulong0);
+    return type;
 }
 
 amqp_type_t *amqp_encode_small_ulong(amqp_context_t *context, uint64_t value)
@@ -348,9 +378,41 @@ amqp_type_t *amqp_encode_small_ulong(amqp_context_t *context, uint64_t value)
     return amqp_encode_fixed_one_byte(context, &amqp_type_meta_data_ulong_small_ulong, (unsigned char) (value & 0xff));
 }
 
+amqp_type_t *amqp_encode_ulong(amqp_context_t *context, uint64_t value)
+{
+    if (value == 0)
+    {
+        return amqp_encode_ulong0(context);
+    }
+    else if (value < 255)
+    {
+        return amqp_encode_small_ulong(context, value);
+    }
+    else
+    {
+        amqp_eight_byte_t v;
+        v._ulong = value;
+        return amqp_encode_fixed_eight_byte(context, &amqp_type_meta_data_ulong, v);
+    }
+}
+
 amqp_type_t *amqp_encode_small_long(amqp_context_t *context, int64_t value)
 {
     return amqp_encode_fixed_one_byte(context, &amqp_type_meta_data_long_small_long, (unsigned char) (value & 0xff));
+}
+
+amqp_type_t *amqp_encode_long(amqp_context_t *context, int64_t value)
+{
+    if (value == (signed char) (value & 0xff))
+    {
+        return amqp_encode_small_long(context, value);
+    }
+    else
+    {
+        amqp_eight_byte_t v;
+        v._long = value;
+        return amqp_encode_fixed_eight_byte(context, &amqp_type_meta_data_long, v);
+    }
 }
 
 amqp_type_t *amqp_encode_timestamp(amqp_context_t *context, amqp_timestamp_t value)
@@ -460,17 +522,6 @@ amqp_type_t *amqp_encode_string_utf8(amqp_context_t *context, const char *value)
 amqp_type_t *amqp_encode_string_utf8n(amqp_context_t *context, const char *value, size_t size)
 {
    return encode_string_utf8(context, value, size);
-}
-
-
-amqp_type_t *amqp_encode_string_utf16(amqp_context_t *context)
-{
-    not_implemented();
-}
-
-amqp_type_t *amqp_encode_string_utf16n(amqp_context_t *context, size_t size)
-{
-    not_implemented();
 }
 
 amqp_type_t *amqp_encode_list_8(amqp_context_t *context)

@@ -17,7 +17,28 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "Buffer/Buffer.h"
 #include "TestData/TestData.h"
+
+namespace test_data
+{
+    TestData::TestData(unsigned char * bytes, size_t n) : n_(n)
+    {
+        bytes_ = (unsigned char *) malloc(n);
+        memcpy(bytes_, bytes, n);
+    }
+
+    TestData::~TestData()
+    {
+        free(bytes_);
+    }
+
+    void TestData::transfer_to(amqp_buffer_t *buffer) const
+    {
+        // TODO - throw exception
+        amqp_buffer_puts(buffer, bytes_, n_);
+    }
+}
 
 namespace test_data
 {
@@ -84,15 +105,33 @@ namespace test_data
         0xff, 0xff, 0xff, 0xfe
     );
 
-    // 18446744073709551613
-    test_data_def(ulong_1,
+    test_data_def(ulong_small,
         0x53,
         0xfe
     );
 
-    test_data_def(uint_1,
+    test_data_def(ulong_small_zero,
+        0x53,
+        0
+    );
+
+    test_data_def(uint_small,
         0x52,
         0xfe
+    );
+
+
+    test_data_def(uint_small_zero,
+        0x52,
+        0
+    );
+
+    test_data_def(uint_zero,
+        0x43,
+    );
+
+    test_data_def(ulong_zero,
+        0x44,
     );
 
     test_data_def(ushort_2,
@@ -114,19 +153,42 @@ namespace test_data
         0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe
     );
 
+    // -129
+    test_data_def(long_8_minus_129,
+        0x81,
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x7f
+    );
+
     test_data_def(int_4,
         0x71,
         0xff, 0xff, 0xff, 0xfe
     );
 
-    test_data_def(long_1,
+    // - 129
+    test_data_def(int_4_minus_129,
+        0x71,
+        0xff, 0xff, 0xff, 0x7f
+    );
+
+    // -4
+    test_data_def(long_small,
         0x55,
         0xfc
+    );
+
+    test_data_def(long_small_zero,
+        0x55,
+        0
     );
 
     test_data_def(int_1,
         0x54,
         0xfd
+    );
+
+    test_data_def(int_1_zero,
+        0x54,
+        0
     );
 
     test_data_def(short_2,
@@ -167,6 +229,14 @@ namespace test_data
         0x42
     );
 
+    test_data_def(true_1,
+        0x56, 0x00
+    );
+
+    test_data_def(false_1,
+        0x56, 0x01
+    );
+
     test_data_def(array_shorts,
         0xe0,
         0x0c,           // size
@@ -188,10 +258,10 @@ namespace test_data
     );
 
     test_data_def(map,
-        0xc1, 0x4f, 0x0a,
+        0xc1, 0x41, 0x0a,
         0xa1, 0x05, 0x6c, 0x69, 0x73, 0x74, 0x3a,
-        0xc0, 0x1a, 0x05,
-            0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+        0xc0, 0x13, 0x05,
+            0x55, 0x01,
             0xa1, 0x03, 0x74, 0x77, 0x6f,
             0x82, 0x40, 0x09, 0x21, 0xfb, 0x82, 0xc2, 0xbd, 0x7f,
             0x40,
@@ -204,10 +274,10 @@ namespace test_data
         0x82, 0x40, 0x09, 0x21, 0xfb, 0x82, 0xc2, 0xbd, 0x7f,
 
         0xa1, 0x03, 0x74, 0x77, 0x6f,
-        0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
+        0x55, 0x02,
 
-        0xa1, 0x03, 0x6f, 0x6e, 0x65,
-        0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
+        0xa1, 0x03, 0x31, 0x32, 0x39,
+        0x81, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x81
     );
 
     test_data_def(list_of_shorts,
@@ -325,6 +395,14 @@ namespace test_data
         0xc0, 0x01, 0x00,
     );
 
+    test_data_def(boolean_array,
+        0xe0,
+        0x04,           // size
+        0x02,           // count
+        0x56,           // member constructor
+        0x00,           // true
+        0x01,           // false
+    );
 
     // TODO - add decode test for this
     test_data_def(multiple_true_symbol_null,
@@ -350,5 +428,5 @@ namespace test_data
                 0xa3, 0x03, 0x46, 0x6f, 0x6f,
                 0xa3, 0x03, 0x46, 0x75, 0x6d,
     );
-
 }
+

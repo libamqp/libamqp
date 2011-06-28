@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
+#include <stdarg.h>
 #include <stdio.h>
-
 #include "Context/Context.h"
 
 #include "Memory/Memory.h"
@@ -67,9 +67,54 @@ amqp_context_define_putc_function(amqp_context_t *context, amqp_debug_print_c_t 
     return old_value;
 }
 
+int amqp_context_printf(amqp_context_t *context, const char *format, ...)
+{
+    char buffer[256];
+    int i, n;
+
+    va_list ap;
+    va_start(ap, format);
+    n = vsnprintf(buffer, sizeof(buffer), format, ap);
+    va_end(ap);
+
+    for (i = 0; i < n; i++)
+    {
+        amqp_context_putc(context, buffer[i]);
+    }
+
+    return n;
+}
+static void putc_repeat(amqp_context_t *context, int c, int count)
+{
+    int i;
+    for (i = 0; i < count; i++)
+    {
+        (*context->config.putc)(c);
+    }
+}
 int amqp_context_putc(amqp_context_t *context, int c)
 {
+    if (context->debug.last_char == '\n' && context->debug.indent > 0)
+    {
+        putc_repeat(context, '\t', context->debug.indent / 8);
+        putc_repeat(context, ' ', context->debug.indent % 8);
+    }
+    context->debug.last_char = c;
     return (*context->config.putc)(c);
+}
+
+int amqp_context_increase_print_indent(amqp_context_t *context, int delta)
+{
+    int old_indent = context->debug.indent;
+    context->debug.indent += delta;
+    return old_indent;
+}
+
+int amqp_context_set_print_indent(amqp_context_t *context, int indent)
+{
+    int old_indent = context->debug.indent;
+    context->debug.indent = indent;
+    return old_indent;
 }
 
 amqp_type_t *amqp_allocate_type(amqp_context_t *context)
