@@ -19,7 +19,7 @@
 #include "Context/Context.h"
 
 #include "Framing/Stream/Stream.h"
-#include "Framing/Stream/StreamTestSupport.h"
+#include "Framing/FramingTestSupport.h"
 
 SUITE(StreamTests)
 {
