@@ -18,27 +18,16 @@
 #include <string.h>
 
 #include "TestHarness.h"
-#include "Context/ContextTestSupport.h"
-#include "Buffer/Buffer.h"
-#include "TestData/TestData.h"
+#include "Framing/FramingTestSupport.h"
 
-namespace SuiteContext
+namespace SuiteFraming
 {
-    ContextFixture::ContextFixture()
+    FramingFixture::FramingFixture()
     {
-        context = amqp_create_context();
     }
 
-    ContextFixture::~ContextFixture()
+    FramingFixture::~FramingFixture()
     {
-        int allocations_ok = amqp_destroy_context(context);
-        CHECK(allocations_ok);
-        context = 0;
-    }
-
-    void ContextFixture::load_decode_buffer(test_data::TestData &data)
-    {
-        data.transfer_to(context->decode.buffer);
     }
 }
 

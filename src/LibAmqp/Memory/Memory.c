@@ -41,9 +41,9 @@ static inline size_t calculate_bytes_to_allocate(size_t count)
 }
 static inline void save_guard_mask(size_t *block, size_t count)
 {
-    block[0] = mask ^ count;
-    block[1] = count;
-    block[count + 2] = mask;
+    block[0] = count;
+    block[1] = mask;
+    block[count + 2] = mask ^ count;
 }
 
 void *amqp_malloc(size_t n TRACE_PARAMS)
@@ -73,23 +73,23 @@ static inline size_t *calculate_block_start(void *p)
 {
     return ((size_t *) p) - 2;
 }
-static inline size_t calculate_old_count(size_t *block)
+
+static void assert_leading_guard_correct(size_t *block)
 {
-    return block[0] ^ mask;
-}
-static void assert_guard_mask_correct(size_t *block, size_t count)
-{
-    if (block[1] != count)
+    if (block[1] != mask)
     {
-        printf("Start of block corrupt! Block: %p, count: %lu, block[0]: %lx, block[1]: %lu\n",
-            (void *) block, (unsigned long) count, (unsigned long) block[0], (unsigned long) block[1]);
+        printf("Start of block corrupt! Block: %p, mask: %lu\n",
+            (void *) block, (unsigned long) block[1]);
         abort();
     }
+}
 
-    if (block[count + 2] != mask)
+static void assert_trailing_guard_correct(size_t *block, size_t count)
+{
+    if (block[count + 2] != (mask ^ count))
     {
-        printf("End of block corrupt! Block: %p, count: %lu, block[0]: %lx, block[1]: %lu, block[count + 2]: %lx\n",
-            (void *) block, (unsigned long) count, (unsigned long) block[0], (unsigned long) block[1], (unsigned long) block[count + 2]);
+        printf("End of block corrupt! Block: %p, count: %lu, block[count + 2]: %lx\n",
+            (void *) block, (unsigned long) count, (unsigned long) block[count + 2]);
         abort();
     }
 }
@@ -99,9 +99,10 @@ void *amqp_realloc(void *p, size_t n TRACE_PARAMS)
     size_t old_count, count, *old_block, *block;
 
     old_block = calculate_block_start(p);
-    old_count = calculate_old_count(old_block);
 
-    assert_guard_mask_correct(old_block, old_count);
+    assert_leading_guard_correct(old_block);
+    old_count = block[0];
+    assert_trailing_guard_correct(old_block, old_count);
 
     count = byte_count_rounded_to_size_t_array_size(n);
     if (count <= old_count)
@@ -129,23 +130,24 @@ void *amqp_realloc(void *p, size_t n TRACE_PARAMS)
 
 void amqp_free(void *p TRACE_PARAMS)
 {
-    size_t old_count, *block;
+    size_t count, *block;
 
     if (p)
     {
-        amqp_malloc_stats.outstanding_allocations--;
-
         block = calculate_block_start(p);
-        old_count = calculate_old_count(block);
+
+        assert_leading_guard_correct(block);
+        count = block[0];
+        assert_trailing_guard_correct(block, count);
+
+        amqp_malloc_stats.outstanding_allocations--;
 
 #       ifdef TRACE_ALLOCATIONS
         if (amqp_memory_trace_enabled)
         {
-            printf("%s:%d: trace - amqp_free(%p) called, block=%p, count=%lu\n", fileName, lineNumber, p, (void *) block, (unsigned long) old_count);
+            printf("%s:%d: trace - amqp_free(%p) called, block=%p, count=%lu\n", fileName, lineNumber, p, (void *) block, (unsigned long) count);
         }
 #       endif
-
-        assert_guard_mask_correct(block, old_count);
 
         free(block);
     }

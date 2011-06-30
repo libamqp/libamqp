@@ -30,9 +30,7 @@ namespace SuiteContext
     public:
         ContextFixture();
         ~ContextFixture();
-
         void load_decode_buffer(test_data::TestData &data);
-
     public:
         amqp_context_t *context;
     };

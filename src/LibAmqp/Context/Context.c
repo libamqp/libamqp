@@ -42,21 +42,38 @@ amqp_create_context()
     amqp_buffer_initialize_pool(&result->pools.amqp_buffer_t_pool);
     amqp_type_initialize_pool(&result->pools.amqp_type_t_pool); 
 
-    result->decode.buffer = (amqp_buffer_t *) amqp_allocate(&result->pools.amqp_buffer_t_pool);
-    result->encode.buffer = (amqp_buffer_t *) amqp_allocate(&result->pools.amqp_buffer_t_pool);
+    result->decode.buffer = amqp_allocate_buffer(result);;
+    result->encode.buffer = amqp_allocate_buffer(result);;
 
     return result;
 }
 
-// amqp_destroy_context
-void amqp_destroy_context(amqp_context_t *context)
+#define check_pool(context, pool) check_pool_allocations(context, pool, #pool)
+static int check_pool_allocations(amqp_context_t *context, amqp_memory_pool_t *pool, const char *pool_name)
 {
+    if (pool->stats.outstanding_allocations != 0)
+    {
+        amqp_error(context, AMQP_ERROR_MEMORY_ERROR, "Pool  %s has %d outstanding allocations.", pool_name, pool->stats.outstanding_allocations);
+        return false;
+    }
+    return true;
+}
+
+// amqp_destroy_context
+int  amqp_destroy_context(amqp_context_t *context)
+{
+    int rc = true;
     if (context != 0)
     {
-        amqp_deallocate(&context->pools.amqp_buffer_t_pool, context->encode.buffer);
-        amqp_deallocate(&context->pools.amqp_buffer_t_pool, context->decode.buffer);
+        amqp_deallocate_buffer(context, context->encode.buffer);
+        amqp_deallocate_buffer(context, context->decode.buffer);
+
+        rc = check_pool(context, &context->pools.amqp_buffer_t_pool) &&
+                check_pool(context, &context->pools.amqp_type_t_pool);
+
         AMQP_FREE(context);
     }
+    return rc;
 }
 
 amqp_debug_print_c_t *
@@ -125,4 +142,14 @@ amqp_type_t *amqp_allocate_type(amqp_context_t *context)
 void amqp_deallocate_type(amqp_context_t *context, amqp_type_t *type)
 {
     amqp_deallocate(&context->pools.amqp_type_t_pool, type);
+}
+
+amqp_buffer_t *amqp_allocate_buffer(amqp_context_t *context)
+{
+    return (amqp_buffer_t *) amqp_allocate(&context->pools.amqp_buffer_t_pool);
+}
+
+void amqp_deallocate_buffer(amqp_context_t *context, amqp_buffer_t *buffer)
+{
+    amqp_deallocate(&context->pools.amqp_buffer_t_pool, buffer);
 }

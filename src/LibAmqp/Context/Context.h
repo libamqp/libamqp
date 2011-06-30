@@ -79,13 +79,16 @@ struct amqp_context_t
 };
 
 extern amqp_context_t *amqp_create_context();
-extern void amqp_destroy_context(amqp_context_t *context);
+extern int amqp_destroy_context(amqp_context_t *context);
 
 extern int amqp_context_default_debug_putc(int c);
 extern amqp_debug_print_c_t *amqp_context_define_putc_function(amqp_context_t *context, amqp_debug_print_c_t *putc);
 
 extern amqp_type_t *amqp_allocate_type(amqp_context_t *context);
 extern void amqp_deallocate_type(amqp_context_t *context, amqp_type_t *type);
+
+extern amqp_buffer_t *amqp_allocate_buffer(amqp_context_t *context);
+extern void amqp_deallocate_buffer(amqp_context_t *context, amqp_buffer_t *type);
 
 int amqp_context_printf(amqp_context_t *context, const char *format, ...);
 int amqp_context_putc(amqp_context_t *context, int c);
