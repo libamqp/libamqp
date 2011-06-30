@@ -35,7 +35,6 @@ SUITE(StreamTests)
         {
             amqp_destroy_stream(context, stream);
             amqp_deallocate_buffer(context, buffer);
-//            amqp_destroy_context(context);
         }
     public:
         amqp_buffer_t *buffer;

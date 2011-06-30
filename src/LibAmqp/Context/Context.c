@@ -21,6 +21,14 @@
 #include "Memory/Memory.h"
 #include "Memory/Pool.h"
 
+typedef struct amqp__context_with_guard_t
+{
+    amqp_context_t context;
+    uint64_t multiple_delete_protection;
+} amqp__context_with_guard_t;
+
+static const uint64_t random_sequence = 0xff31620854f9b573;  // generated on random.org
+
 /* declared in Codec/Type/Type.h */
 extern void amqp_type_initialize_pool(amqp_memory_pool_t *pool);
 
@@ -32,20 +40,23 @@ int amqp_context_default_debug_putc(int c)
 amqp_context_t *
 amqp_create_context()
 {
-    amqp_context_t *result = AMQP_MALLOC(amqp_context_t);
-    result->config.putc = amqp_context_default_debug_putc;
+    amqp__context_with_guard_t *result = AMQP_MALLOC(amqp__context_with_guard_t);
+
+    result->context.config.putc = amqp_context_default_debug_putc;
 
     // TODO - should be stderr
-    result->debug.stream = stdout;
-    result->debug.level = 10;
+    result->context.debug.stream = stdout;
+    result->context.debug.level = 10;
 
-    amqp_buffer_initialize_pool(&result->pools.amqp_buffer_t_pool);
-    amqp_type_initialize_pool(&result->pools.amqp_type_t_pool); 
+    amqp_buffer_initialize_pool(&result->context.pools.amqp_buffer_t_pool);
+    amqp_type_initialize_pool(&result->context.pools.amqp_type_t_pool);
 
-    result->decode.buffer = amqp_allocate_buffer(result);;
-    result->encode.buffer = amqp_allocate_buffer(result);;
+    result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
+    result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
 
-    return result;
+    result->multiple_delete_protection = random_sequence;
+
+    return (amqp_context_t *) result;
 }
 
 #define check_pool(context, pool) check_pool_allocations(context, pool, #pool)
@@ -65,6 +76,12 @@ int  amqp_destroy_context(amqp_context_t *context)
     int rc = true;
     if (context != 0)
     {
+        if (((amqp__context_with_guard_t *) context)->multiple_delete_protection != random_sequence)
+        {
+            amqp_fatal_program_error("Attempting to destroy a Context twice.");
+        }
+        ((amqp__context_with_guard_t *) context)->multiple_delete_protection = 0;
+
         amqp_deallocate_buffer(context, context->encode.buffer);
         amqp_deallocate_buffer(context, context->decode.buffer);
 
@@ -101,6 +118,7 @@ int amqp_context_printf(amqp_context_t *context, const char *format, ...)
 
     return n;
 }
+
 static void putc_repeat(amqp_context_t *context, int c, int count)
 {
     int i;

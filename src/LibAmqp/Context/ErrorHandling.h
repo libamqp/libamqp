@@ -75,7 +75,7 @@ extern void _amqp_io_error(amqp_context_t *context, int level, const char * file
 #define unsupported_operation(what)  _TODO(unsupported_operation_ ## what)
 #define not_implemented(what)  _TODO(not_implemented_ ## what)
 
-#define fatal_program_error()   abort()
+extern void amqp_fatal_program_error(const char *message);
 
 #ifdef __cplusplus
 }

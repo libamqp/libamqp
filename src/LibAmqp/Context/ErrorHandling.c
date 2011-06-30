@@ -94,3 +94,10 @@ void _amqp_debug(const amqp_context_t *context, int level, const char * filename
         va_end(args);
     }
 }
+
+void amqp_fatal_program_error(const char *message)
+{
+    fprintf(stderr, "%s\n", message);
+    abort();
+    exit(1);
+}
