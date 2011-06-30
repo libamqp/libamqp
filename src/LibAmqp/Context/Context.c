@@ -27,7 +27,7 @@ typedef struct amqp__context_with_guard_t
     uint64_t multiple_delete_protection;
 } amqp__context_with_guard_t;
 
-static const uint64_t random_sequence = 0xff31620854f9b573;  // generated on random.org
+static const uint64_t random_sequence = 0xff31620854f9b573ULL;  // generated on random.org
 
 /* declared in Codec/Type/Type.h */
 extern void amqp_type_initialize_pool(amqp_memory_pool_t *pool);
