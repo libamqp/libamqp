@@ -29,7 +29,7 @@ extern void break_two();
 
 #define SOUTC(v)    printf("%s:%d: soutc: %s = %c\n" , __FILE__, __LINE__, #v, v);
 #define SOUTV(v)    printf("%s:%d: soutv: %s = %ld\n" , __FILE__, __LINE__, #v, (long) v);
-#define SOUTVP(v)   printf("%s:%d: soutvp: %s = %p\n" , __FILE__, __LINE__, #v, v);
+#define SOUTVP(v)   printf("%s:%d: soutvp: %s = %p\n" , __FILE__, __LINE__, #v, (void *) v);
 #define SOUTVX(v)   printf("%s:%d: soutvx: %s = %lx\n" , __FILE__, __LINE__, #v, (long) v);
 #define SOUTS(v)    printf("%s:%d: souts: %s\n", __FILE__, __LINE__, v);
 

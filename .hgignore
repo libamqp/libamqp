@@ -19,3 +19,4 @@ external/amqp
 decode-demo.out.txt
 src/t
 src/t.c
+src/t.dSYM
