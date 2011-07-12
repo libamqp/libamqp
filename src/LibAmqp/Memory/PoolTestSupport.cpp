@@ -87,15 +87,21 @@ namespace SuitePool
 
     void PoolFixture::initialize_pool(int n)
     {
+        CHECK(n > 128);
         if (!pool.initialized)
         {
-            amqp_initialize_pool_specifing_block_limits(&pool, sizeof(test_type_t), n);
+            amqp_initialize_pool_suggesting_block_size(&pool, sizeof(test_type_t), n);
+//            printf("block_size: %ld, allocations_per_block: %d, allocation_size_in_bytes: %ld, object_size_in_fragments: %ld\n",
+//                    pool.block_size, pool.allocations_per_block, pool.allocation_size_in_bytes, pool.object_size_in_fragments);
         }
     }
 
     void PoolFixture::initialize_pool()
     {
-        initialize_pool(LONG_BIT);
+        if (!pool.initialized)
+        {
+            amqp_initialize_pool(&pool, sizeof(test_type_t));
+        }
     }
 
     test_type_t *PoolFixture::allocate_from_pool(int n)

@@ -26,6 +26,7 @@
 
 volatile int amqp_memory_trace_enabled = 1;
 
+// FIXME - access to these will not work with threads
 amqp_allocation_stats_t amqp_malloc_stats = { 0, 0 };
 
 #define SIZE_T_BYTES (sizeof(size_t))
