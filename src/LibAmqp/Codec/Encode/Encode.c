@@ -248,8 +248,7 @@ amqp_type_t *amqp_encode_boolean(amqp_context_t *context, int value)
 {
     if (is_i_contained_within_array(context))
     {
-        // TODO - check next spec update
-        unsigned char boolean_value = value != 0 ? 0 : 1;     // True == 0, false == 1
+        unsigned char boolean_value = value != 0 ? 1 : 0;     // True == 1, false == 0
         return amqp_encode_fixed_one_byte(context, &amqp_type_meta_data_boolean, boolean_value);
     }
     else

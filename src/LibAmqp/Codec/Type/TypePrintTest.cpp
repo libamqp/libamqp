@@ -306,7 +306,7 @@ SUITE(TypePrint)
         ASSERT_VALID(type);
 
         print_type();
-        check_output("true");
+        check_output("false");
     }
 
     TEST_FIXTURE(TypePrintFixture, BooleanOneByteEncodingFalseValue)
@@ -317,6 +317,6 @@ SUITE(TypePrint)
         ASSERT_VALID(type);
 
         print_type();
-        check_output("false");
+        check_output("true");
     }
 }

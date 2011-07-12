@@ -230,11 +230,11 @@ namespace test_data
     );
 
     test_data_def(true_1,
-        0x56, 0x00
+        0x56, 0x01
     );
 
     test_data_def(false_1,
-        0x56, 0x01
+        0x56, 0x00
     );
 
     test_data_def(array_shorts,
@@ -400,8 +400,8 @@ namespace test_data
         0x04,           // size
         0x02,           // count
         0x56,           // member constructor
-        0x00,           // true
-        0x01,           // false
+        0x01,           // true
+        0x00,           // false
     );
 
     // TODO - add decode test for this

@@ -147,11 +147,6 @@ amqp_type_meta_data_t amqp_type_meta_data_long_small_long = {
     "smalllong",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-/*
-TODO - check the next version of the spec for the value of true
-
-    "boolean with the octect 0x00 being true and octet 0x01 being false"
-*/
 amqp_type_meta_data_t amqp_type_meta_data_boolean = {
     0x56,
     1,

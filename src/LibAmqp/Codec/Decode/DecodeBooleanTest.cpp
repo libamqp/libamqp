@@ -89,9 +89,9 @@ SUITE(CodecDecode)
         CHECK_EQUAL(2U, type->value.array.count);
 //        t::dump_type(type);
         CHECK_EQUAL(2U, type->value.array.count);
-        CHECK_EQUAL(0x00, type->value.array.elements[0]->value.b1._unsigned);
+        CHECK_EQUAL(0x01, type->value.array.elements[0]->value.b1._unsigned);
         CHECK(amqp_convert_to_boolean(type->value.array.elements[0]));
-        CHECK_EQUAL(0x01, type->value.array.elements[1]->value.b1._unsigned);
+        CHECK_EQUAL(0x00, type->value.array.elements[1]->value.b1._unsigned);
         CHECK(!amqp_convert_to_boolean(type->value.array.elements[1]));
     }
 }
