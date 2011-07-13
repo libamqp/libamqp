@@ -347,9 +347,15 @@ SUITE(CompoundEncoding)
 
     static amqp_type_t *encode_list_of_one_short(amqp_context_t *context, short value)
     {
-        amqp_type_t *result;
-        result = amqp_encode_list_8(context);
+        amqp_type_t *result = amqp_encode_list_8(context);
         amqp_encode_short(context, value);
+        amqp_complete_type(context, result);
+        return result;
+    }
+
+    static amqp_type_t *encode_an_empty_list(amqp_context_t *context)
+    {
+        amqp_type_t *result = amqp_encode_list_8(context);
         amqp_complete_type(context, result);
         return result;
     }
@@ -373,8 +379,7 @@ SUITE(CompoundEncoding)
         type = amqp_encode_array_8(context);
             encode_list_of_one_short(context, 7);
             encode_list_of_one_short(context, 11);
-            amqp_type_t *empty_list = amqp_encode_list_8(context);
-            amqp_complete_type(context, empty_list);
+            encode_an_empty_list(context);
         amqp_complete_type(context, type);
 
         ASSERT_VALID(type);
@@ -387,8 +392,7 @@ SUITE(CompoundEncoding)
     TEST_FIXTURE(EncodeFixture, array_of_single_empty_list)
     {
         type = amqp_encode_array_8(context);
-            amqp_type_t *empty_list = amqp_encode_list_8(context);
-            amqp_complete_type(context, empty_list);
+            encode_an_empty_list(context);
         amqp_complete_type(context, type);
 
         ASSERT_VALID(type);
