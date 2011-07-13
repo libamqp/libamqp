@@ -646,7 +646,9 @@ amqp_type_t *amqp_complete_type(amqp_context_t *context, amqp_type_t *type)
         return 0;
     }
 
-    return amqp_type_is_empty_list(type) ? complete_empty_list(context, type) : complete_container_type(context, type);
+    return (is_i_contained_within_array(context) || !amqp_type_is_empty_list(type))
+            ? complete_container_type(context, type)
+            : complete_empty_list(context, type);
 }
 
 amqp_type_t *amqp_encode_list_0(amqp_context_t *context)

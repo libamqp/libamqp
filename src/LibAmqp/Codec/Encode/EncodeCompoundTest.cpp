@@ -344,4 +344,57 @@ SUITE(CompoundEncoding)
         CHECK(amqp_type_is_contained(list->value.list.elements[1]->value.described.elements[0]));
         CHECK(amqp_type_is_contained(list->value.list.elements[1]->value.described.elements[1]));
     }
+
+    static amqp_type_t *encode_list_of_one_short(amqp_context_t *context, short value)
+    {
+        amqp_type_t *result;
+        result = amqp_encode_list_8(context);
+        amqp_encode_short(context, value);
+        amqp_complete_type(context, result);
+        return result;
+    }
+
+    TEST_FIXTURE(EncodeFixture, array_of_lists)
+    {
+        type = amqp_encode_array_8(context);
+            encode_list_of_one_short(context, 7);
+            encode_list_of_one_short(context, 11);
+            encode_list_of_one_short(context, 13);
+        amqp_complete_type(context, type);
+
+        ASSERT_VALID(type);
+        CHECK_ARRAY(type);
+        CHECK_EQUAL((size_t) 3, (size_t) type->value.array.count);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::array_of_lists);
+    }
+
+    TEST_FIXTURE(EncodeFixture, array_of_lists_one_empty)
+    {
+        type = amqp_encode_array_8(context);
+            encode_list_of_one_short(context, 7);
+            encode_list_of_one_short(context, 11);
+            amqp_type_t *empty_list = amqp_encode_list_8(context);
+            amqp_complete_type(context, empty_list);
+        amqp_complete_type(context, type);
+
+        ASSERT_VALID(type);
+        CHECK_ARRAY(type);
+        CHECK_EQUAL((size_t) 3, (size_t) type->value.array.count);
+
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::array_of_lists_one_empty);
+    }
+
+    TEST_FIXTURE(EncodeFixture, array_of_single_empty_list)
+    {
+        type = amqp_encode_array_8(context);
+            amqp_type_t *empty_list = amqp_encode_list_8(context);
+            amqp_complete_type(context, empty_list);
+        amqp_complete_type(context, type);
+
+        ASSERT_VALID(type);
+        CHECK_ARRAY(type);
+        CHECK_EQUAL((size_t) 1, (size_t) type->value.array.count);
+
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::array_of_single_empty_list);
+    }
 }
