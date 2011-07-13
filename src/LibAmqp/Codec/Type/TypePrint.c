@@ -342,11 +342,14 @@ static void amqp_type_method_list_print(amqp_context_t *context, amqp_type_t *ty
     amqp_context_putc(context, '}');
 }
 
+
+// TODO -  remove me
 void amqp_type_method_list_8_print(amqp_context_t *context, amqp_type_t *type)
 {
     amqp_type_method_list_print(context, type);
 }
 
+// TODO -  remove me
 void amqp_type_method_list_32_print(amqp_context_t *context, amqp_type_t *type)
 {
     amqp_type_method_list_print(context, type);

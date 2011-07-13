@@ -466,7 +466,7 @@ int amqp_decode_list_list(amqp_encoding_meta_data_t *meta_data, amqp_type_t *typ
 
         type->flags.container.type.is_list = true;
         type->value.list.count = count;
-
+// TODO - don't allocate array if count is zero
         type->value.list.elements = amqp_allocate_amqp_type_t_array(count);
         for (i = 0; i < count; i++)
         {
@@ -477,6 +477,17 @@ int amqp_decode_list_list(amqp_encoding_meta_data_t *meta_data, amqp_type_t *typ
                 element->flags.is_contained = true;
             }
         }
+    }
+    return rc;
+}
+
+int amqp_decode_list_0(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
+{
+    int rc =  amqp_decode_fixed_zero_width(meta_data, type);
+    if (rc)
+    {
+        type->flags.container.type.is_list = true;
+        type->value.list.count = 0;
     }
     return rc;
 }

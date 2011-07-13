@@ -262,4 +262,26 @@ SUITE(CompoundTypeDecode)
         CHECK_MAP(type);
         CHECK_EQUAL((size_t) 0, type->value.map.count); // number of entries not elements
     }
+
+    TEST_FIXTURE(DecodeFixture, empty_list_8)
+    {
+        load_decode_buffer(test_data::empty_list_8);
+        type = amqp_decode(context);
+        ASSERT_VALID(type);
+
+        CHECK_EQUAL(0xc0, type->format_code);
+        CHECK_LIST(type);
+        CHECK_EQUAL((size_t) 0, type->value.list.count);
+   }
+
+   TEST_FIXTURE(DecodeFixture, empty_list_0)
+   {
+        load_decode_buffer(test_data::empty_list_0);
+        type = amqp_decode(context);
+        ASSERT_VALID(type);
+
+        CHECK_EQUAL(0x45, type->format_code);
+        CHECK_LIST(type);
+        CHECK_EQUAL((size_t) 0, type->value.list.count);
+   }
 }

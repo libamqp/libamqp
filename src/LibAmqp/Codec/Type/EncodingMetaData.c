@@ -84,6 +84,15 @@ amqp_encoding_meta_data_t amqp_type_meta_data_ulong_ulong0 = {
     "ulong0",
     AMQP_TYPE_CATEGORY_FIXED,
 };
+amqp_encoding_meta_data_t amqp_type_meta_data_list_0 = {
+    0x45,
+    0,
+    amqp_decode_list_0,
+    &amqp_methods_list_0,
+    "list",
+    "list0",
+    AMQP_TYPE_CATEGORY_FIXED,
+};
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_0 = {
     0x4F,
     0,
@@ -488,6 +497,7 @@ amqp_encoding_meta_data_t *amqp__type_lookup_table[] = {
     &amqp_type_meta_data_boolean_false,
     &amqp_type_meta_data_uint_uint0,
     &amqp_type_meta_data_ulong_ulong0,
+    &amqp_type_meta_data_list_0,
     &amqp_type_meta_data_extension_fixed_0,
     &amqp_type_meta_data_ubyte,
     &amqp_type_meta_data_byte,

@@ -50,7 +50,7 @@ SUITE(TypeMetaData)
     {
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x3e));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x3f));
-        CHECK_NULL(amqp_type_meta_data_lookup(context, 0x45));
+        CHECK_NULL(amqp_type_meta_data_lookup(context, 0x46));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x4e));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x57));
         CHECK_NULL(amqp_type_meta_data_lookup(context, 0x5e));

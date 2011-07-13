@@ -50,7 +50,7 @@ SUITE(BadDataDecoder)
     TEST_FIXTURE(DecodeFixture, BadFixedFormatCode)
     {
         test_data_def(bad_data, 
-            0x45,
+            0x46,
         );
 
         load_decode_buffer(bad_data);

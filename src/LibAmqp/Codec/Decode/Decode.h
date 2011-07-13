@@ -64,6 +64,7 @@ int amqp_decode_symbol_sym8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *t
 int amqp_decode_binary_vbin32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_string_str32_utf8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_symbol_sym32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
+int amqp_decode_list_0(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_list_8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_map_8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_list_32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
