@@ -68,6 +68,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <field name="source" type="*" requires="source"/>
       <field name="target" type="*" requires="target"/>
       <field name="unsettled" type="map"/>
+      <field name="incomplete-unsettled" type="boolean" default="false"/>
       <field name="initial-delivery-count" type="sequence-no"/>
       <field name="max-message-size" type="ulong"/>
       <field name="offered-capabilities" type="symbol" multiple="true"/>
@@ -91,14 +92,14 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <type name="transfer" class="composite" source="list" provides="frame">
       <descriptor name="amqp:transfer:list" code="0x00000000:0x00000014"/>
       <field name="handle" type="handle" mandatory="true"/>
-      <field name="delivery-id" type="delivery-number" mandatory="true"/>
+      <field name="delivery-id" type="delivery-number"/>
       <field name="delivery-tag" type="delivery-tag"/>
       <field name="message-format" type="message-format"/>
-      <field name="settled" type="boolean" default="false"/>
+      <field name="settled" type="boolean"/>
+      <field name="more" type="boolean" default="false"/>
       <field name="rcv-settle-mode" type="receiver-settle-mode"/>
       <field name="state" type="*" requires="delivery-state"/>
       <field name="resume" type="boolean" default="false"/>
-      <field name="more" type="boolean" default="false"/>
       <field name="aborted" type="boolean" default="false"/>
       <field name="batchable" type="boolean" default="false"/>
     </type>
