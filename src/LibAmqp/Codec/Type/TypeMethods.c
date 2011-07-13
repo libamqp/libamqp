@@ -58,13 +58,15 @@ amqp_type_methods_t amqp_methods_symbol_sym8 = { amqp_type_method_symbol_sym8_pr
 amqp_type_methods_t amqp_methods_binary_vbin32 = { amqp_type_method_binary_vbin32_print };
 amqp_type_methods_t amqp_methods_string_str32_utf8 = { amqp_type_method_string_str32_utf8_print };
 amqp_type_methods_t amqp_methods_symbol_sym32 = { amqp_type_method_symbol_sym32_print };
-// TODO -  don't really need three print functions for list
-amqp_type_methods_t amqp_methods_list_0 = { amqp_type_method_list_8_print };
-amqp_type_methods_t amqp_methods_list_8 = { amqp_type_method_list_8_print };
-amqp_type_methods_t amqp_methods_map_8 = { amqp_type_method_map_8_print };
-amqp_type_methods_t amqp_methods_list_32 = { amqp_type_method_list_32_print };
-amqp_type_methods_t amqp_methods_map_32 = { amqp_type_method_map_32_print };
-amqp_type_methods_t amqp_methods_array_8 = { amqp_type_method_array_8_print };
-amqp_type_methods_t amqp_methods_array_32 = { amqp_type_method_array_32_print };
+
+amqp_type_methods_t amqp_methods_list_0 = { amqp_type_method_list_print };
+amqp_type_methods_t amqp_methods_list_8 = { amqp_type_method_list_print };
+amqp_type_methods_t amqp_methods_list_32 = { amqp_type_method_list_print };
+
+amqp_type_methods_t amqp_methods_map_8 = { amqp_type_method_map_print };
+amqp_type_methods_t amqp_methods_map_32 = { amqp_type_method_map_print };
+
+amqp_type_methods_t amqp_methods_array_8 = { amqp_type_method_array_print };
+amqp_type_methods_t amqp_methods_array_32 = { amqp_type_method_array_print };
 
 amqp_type_methods_t amqp_methods_extension_type = { amqp_type_method_extension_type_print };
