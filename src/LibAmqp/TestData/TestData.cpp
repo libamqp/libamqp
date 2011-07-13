@@ -395,6 +395,10 @@ namespace test_data
         0xc0, 0x01, 0x00,
     );
 
+    test_data_def(empty_list_0,
+        0x45
+    );
+
     test_data_def(boolean_array,
         0xe0,
         0x04,           // size
