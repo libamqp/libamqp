@@ -276,6 +276,11 @@ void amqp_type_method_decimal64_print(amqp_context_t *context, amqp_type_t *type
     amqp_type_print_raw_data(context, type);
 }
 
+void amqp_type_method_decimal128_print(amqp_context_t *context, amqp_type_t *type)
+{
+    amqp_type_print_raw_data(context, type);
+}
+
 void amqp_type_method_uuid_print(amqp_context_t *context, amqp_type_t *type)
 {
     static char separator[16] = {0, 0, 0, '-', 0, '-', 0, '-', 0, '-', 0 };

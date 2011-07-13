@@ -309,6 +309,15 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_8 = {
     "fixed-8",
     AMQP_TYPE_CATEGORY_FIXED,
 };
+amqp_encoding_meta_data_t amqp_type_meta_data_decimal128_ieee_754 = {
+    0x94,
+    16,
+    amqp_decode_decimal128,
+    &amqp_methods_decimal128,
+    "decimal128",
+    "ieee-754",
+    AMQP_TYPE_CATEGORY_FIXED,
+};
 amqp_encoding_meta_data_t amqp_type_meta_data_uuid = {
     0x98,
     16,
@@ -522,6 +531,7 @@ amqp_encoding_meta_data_t *amqp__type_lookup_table[] = {
     &amqp_type_meta_data_timestamp_ms64,
     &amqp_type_meta_data_decimal64_ieee_754,
     &amqp_type_meta_data_extension_fixed_8,
+    &amqp_type_meta_data_decimal128_ieee_754,
     &amqp_type_meta_data_uuid,
     &amqp_type_meta_data_extension_fixed_16,
     &amqp_type_meta_data_binary_vbin8,

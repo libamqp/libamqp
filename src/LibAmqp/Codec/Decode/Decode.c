@@ -121,72 +121,72 @@ int amqp_decode_fixed_width(amqp_encoding_meta_data_t *meta_data, amqp_type_t *t
 
 int amqp_decode_boolean(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_ubyte(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_byte(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_ushort(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_short(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_uint(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_uint0(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     int rc =  amqp_decode_fixed_zero_width(meta_data, type);
-     if (rc)
-     {
+    int rc =  amqp_decode_fixed_zero_width(meta_data, type);
+    if (rc)
+    {
         type->value.b4._uint = 0U;
-     }
-     return rc;
- }
+    }
+    return rc;
+}
 
 int amqp_decode_int(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_small_uint(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     int rc = amqp_decode_fixed_width(meta_data, type);
-     if (rc)
-     {
+    int rc = amqp_decode_fixed_width(meta_data, type);
+    if (rc)
+    {
         type->value.b4._uint = type->value.b1._unsigned;
-     }
-     return rc;
+    }
+    return rc;
 }
 
 int amqp_decode_small_int(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     int rc = amqp_decode_fixed_width(meta_data, type);
-     if (rc)
-     {
+    int rc = amqp_decode_fixed_width(meta_data, type);
+    if (rc)
+    {
         type->value.b4._int = type->value.b1._signed;
-     }
-     return rc;
+    }
+    return rc;
 }
 
 int amqp_decode_float(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_char(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
@@ -205,37 +205,37 @@ int amqp_decode_char(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 
 int amqp_decode_decimal32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_ulong0(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     int rc =  amqp_decode_fixed_zero_width(meta_data, type);
-     if (rc)
-     {
+    int rc =  amqp_decode_fixed_zero_width(meta_data, type);
+    if (rc)
+    {
         type->value.b8._ulong = 0U;
-     }
-     return rc;
- }
+    }
+    return rc;
+}
 
 int amqp_decode_ulong(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_long(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_small_ulong(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     int rc = amqp_decode_fixed_width(meta_data, type);
-     if (rc)
-     {
+    int rc = amqp_decode_fixed_width(meta_data, type);
+    if (rc)
+    {
         type->value.b8._ulong = type->value.b1._unsigned;
-     }
-     return rc;
+    }
+    return rc;
 }
 
 int amqp_decode_small_long(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
@@ -255,17 +255,23 @@ int amqp_decode_double(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 
 int amqp_decode_timestamp(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 int amqp_decode_decimal64(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
+}
+
+int amqp_decode_decimal128(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
+{
+    not_implemented(must_decode_decimal128);
+    return 0;
 }
 
 int amqp_decode_uuid(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-     return amqp_decode_fixed_width(meta_data, type);
+    return amqp_decode_fixed_width(meta_data, type);
 }
 
 // Variable types

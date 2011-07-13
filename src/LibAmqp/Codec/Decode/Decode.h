@@ -49,6 +49,8 @@ int amqp_decode_small_int(amqp_encoding_meta_data_t *meta_data, amqp_type_t *typ
 int amqp_decode_float(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_char(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_decimal32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
+int amqp_decode_decimal64(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
+int amqp_decode_decimal128(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_ulong0(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_ulong(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_long(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
@@ -56,7 +58,6 @@ int amqp_decode_small_ulong(amqp_encoding_meta_data_t *meta_data, amqp_type_t *t
 int amqp_decode_small_long(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_double(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_timestamp(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
-int amqp_decode_decimal64(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_uuid(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_binary_vbin8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 int amqp_decode_string_str8_utf8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
