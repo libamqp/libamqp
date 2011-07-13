@@ -371,6 +371,11 @@ SUITE(CompoundEncoding)
         ASSERT_VALID(type);
         CHECK_ARRAY(type);
         CHECK_EQUAL((size_t) 3, (size_t) type->value.array.count);
+
+        CHECK_LIST(type->value.array.elements[0]);
+        CHECK_LIST(type->value.array.elements[1]);
+        CHECK_LIST(type->value.array.elements[2]);
+
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::array_of_lists);
     }
 
@@ -386,6 +391,11 @@ SUITE(CompoundEncoding)
         CHECK_ARRAY(type);
         CHECK_EQUAL((size_t) 3, (size_t) type->value.array.count);
 
+        CHECK_LIST(type->value.array.elements[0]);
+        CHECK_LIST(type->value.array.elements[1]);
+        CHECK_LIST(type->value.array.elements[2]);
+        CHECK(amqp_type_is_empty_list(type->value.array.elements[2]));
+
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::array_of_lists_one_empty);
     }
 
@@ -398,6 +408,10 @@ SUITE(CompoundEncoding)
         ASSERT_VALID(type);
         CHECK_ARRAY(type);
         CHECK_EQUAL((size_t) 1, (size_t) type->value.array.count);
+
+        CHECK_LIST(type->value.array.elements[0]);
+
+        CHECK(amqp_type_is_empty_list(type->value.array.elements[0]));
 
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::array_of_single_empty_list);
     }
