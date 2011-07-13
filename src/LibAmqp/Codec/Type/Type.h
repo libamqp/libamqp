@@ -145,6 +145,12 @@ bool amqp_type_is_list(amqp_type_t *type)
 }
 
 static inline
+bool amqp_type_is_empty_list(amqp_type_t *type)
+{
+    return type->flags.container.type.is_list != 0 && type->value.list.count == 0;
+}
+
+static inline
 bool amqp_type_is_valid(amqp_type_t *type)
 {
     return type->flags.is_invalid == 0 && type->flags.is_incomplete == 0;

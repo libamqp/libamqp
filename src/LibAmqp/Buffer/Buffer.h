@@ -64,6 +64,7 @@ extern int amqp_buffer_put_buffer_contents(amqp_buffer_t *desc, amqp_buffer_t *s
 extern uint32_t amqp_buffer_read_size(amqp_buffer_t *buffer, size_t width);
 
 extern int amqp_buffer_check_free_space(amqp_buffer_t *buffer, size_t needed);
+extern void amqp_buffer_backup(amqp_buffer_t *buffer, size_t amount);
 
 extern amqp_buffer_limit_t amqp_buffer_set_limit(amqp_buffer_t *, size_t);
 extern void amqp_buffer_restore_limit(amqp_buffer_t *buffer, amqp_buffer_limit_t *old_limit);

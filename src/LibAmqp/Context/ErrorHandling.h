@@ -46,6 +46,9 @@ typedef struct amqp_context_t amqp_context_t;
 #define AMQP_ERROR_ARRAY_ELEMENT_TYPE_MISMATCH  (AMQP_ERROR_CODE_BASE + 0x22)
 #define AMQP_ERROR_DESCRIBED_TYPE_OVERFLOW      (AMQP_ERROR_CODE_BASE + 0x23)
 
+// TODO -  add test for error
+#define AMQP_ERROR_COMPLETE_WRONG_CONTAINER     (AMQP_ERROR_CODE_BASE + 0x24)
+
 
 #define AMQP_ERROR_NO_DESCRIPTOR                (AMQP_ERROR_CODE_BASE + 0x30)
 #define AMQP_ERROR_NO_DESCRIBED_TYPE            (AMQP_ERROR_CODE_BASE + 0x31)
@@ -75,6 +78,7 @@ extern void _amqp_io_error(amqp_context_t *context, int level, const char * file
 #define unsupported_operation(what)  _TODO(unsupported_operation_ ## what)
 #define not_implemented(what)  _TODO(not_implemented_ ## what)
 
+extern void amqp_api_usage_error(amqp_context_t *context, const char *message);
 extern void amqp_fatal_program_error(const char *message);
 
 #ifdef __cplusplus

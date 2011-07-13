@@ -80,6 +80,11 @@ int amqp_buffer_check_free_space(amqp_buffer_t *buffer, size_t needed)
     return 1;
 }
 
+void amqp_buffer_backup(amqp_buffer_t *buffer, size_t amount)
+{
+    assert(buffer->limit.size >= amount);
+    buffer->limit.size -= amount;
+}
 
 /*
     TODO - move into test file

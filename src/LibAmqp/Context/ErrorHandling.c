@@ -97,7 +97,17 @@ void _amqp_debug(const amqp_context_t *context, int level, const char * filename
 
 void amqp_fatal_program_error(const char *message)
 {
-    fprintf(stderr, "%s\n", message);
+    fprintf(stderr, "libamqp - fatal illegal state detected - %s\n", message);
     abort();
     exit(1);
+}
+
+void amqp_api_usage_error(amqp_context_t *context, const char *message)
+{
+    fprintf(stderr, "libamqp - illegal state detected - %s\n", message);
+    if (!context->config.continue_on_usage_error)
+    {
+        abort();
+        exit(1);
+    }
 }

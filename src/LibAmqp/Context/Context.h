@@ -50,6 +50,7 @@ struct amqp_context_t
         amqp_debug_print_c_t *putc;
         int formatted_print;
         int use_name_for_composite_type;
+        int continue_on_usage_error;
     } config;
 
     struct

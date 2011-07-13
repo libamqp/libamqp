@@ -60,6 +60,7 @@ static inline void amqp_add_element_to_container(amqp_context_t *context, amqp_t
                 amqp_mark_type_invalid(context->encode.container, AMQP_ERROR_ARRAY_ELEMENT_TYPE_INCORRECT);
             }
         }
+
         if (amqp_type_is_described(context->encode.container))
         {
             switch (count)
@@ -73,6 +74,7 @@ static inline void amqp_add_element_to_container(amqp_context_t *context, amqp_t
                 break;
             }
         }
+        
         context->encode.container->value.compound.elements = allocate_elements(context->encode.container->value.compound.elements, count + 1);
         context->encode.container->value.compound.elements[count] = type;
     }
@@ -572,46 +574,87 @@ amqp_type_t *amqp_start_encode_described_type(amqp_context_t *context)
     return encode_compound_type(context, type_flags, &amqp_type_meta_data_described);
 }
 
-amqp_type_t *amqp_complete_type(amqp_context_t *context, amqp_type_t *type)
+static
+amqp_type_t *complete_container_type(amqp_context_t *context, amqp_type_t *type)
 {
     size_t saved_buffer_write_position = context->encode.buffer->limit.size;
 
-        amqp_type_t *top = pop_container(context, type);
-        if (top != type)
+    type->position.size = saved_buffer_write_position - type->position.index;
+    switch (type->meta_data->width)
+    {
+    case 0:
+        if (type->value.described.count > 2)
         {
-            abort();
+            amqp_mark_type_invalid(type, AMQP_ERROR_DESCRIBED_TYPE_OVERFLOW);
+            amqp_mark_type_invalid(context->encode.container, AMQP_ERROR_DESCRIBED_TYPE_OVERFLOW);
         }
+        break;
 
-        type->position.size = saved_buffer_write_position - type->position.index;
+    case 1:
+        // TODO test for size/count overflow
+        context->encode.buffer->limit.size = type->position.index - 1;
+        amqp_unchecked_putc(context->encode.buffer, (unsigned char) type->position.size);
+        amqp_unchecked_putc(context->encode.buffer, (unsigned char) type->value.compound.count);
+        break;
 
-        switch (type->meta_data->width)
-        {
-        case 0:
-            if (type->value.described.count > 2)
-            {
-                amqp_mark_type_invalid(type, AMQP_ERROR_ARRAY_ELEMENT_TYPE_INCORRECT);
-                amqp_mark_type_invalid(context->encode.container, AMQP_ERROR_ARRAY_ELEMENT_TYPE_INCORRECT);
-            }
-            break;
+    case 4:
+        context->encode.buffer->limit.size = type->position.index - 4;
+        amqp_hton_uint(context, (uint32_t) type->position.size);
+        amqp_hton_uint(context, (uint32_t) type->value.compound.count);
+        break;
 
-        case 1:
-            // TODO test for size/count overflow
-            context->encode.buffer->limit.size = type->position.index - 1;
-            amqp_unchecked_putc(context->encode.buffer, (unsigned char) type->position.size);
-            amqp_unchecked_putc(context->encode.buffer, (unsigned char) type->value.compound.count);
-            break;
+    default:
+        amqp_fatal_program_error("Invalid size/count field width.");
+    }
 
-        case 4:
-            context->encode.buffer->limit.size = type->position.index - 4;
-            amqp_hton_uint(context, (uint32_t) type->position.size);
-            amqp_hton_uint(context, (uint32_t) type->value.compound.count);
-            break;
+    context->encode.buffer->limit.size = saved_buffer_write_position;
 
-        default:
-            abort();
-        }
+    return type;
+}
 
-        context->encode.buffer->limit.size = saved_buffer_write_position;
+static
+amqp_type_t *complete_empty_list(amqp_context_t *context, amqp_type_t *type)
+{
+    amqp_encoding_meta_data_t *old_meta_data = type->meta_data;
+    amqp_encoding_meta_data_t *meta_data = &amqp_type_meta_data_list_0;
 
+    type->meta_data = &amqp_type_meta_data_list_0;
+    type->format_code = type->meta_data->format_code;
+
+    // backup over the old list type format code and size field
+    amqp_buffer_backup(context->encode.buffer, old_meta_data->width * 2 + 1);
+
+    // write the zero list0 format code
+    amqp_buffer_putc(context->encode.buffer, meta_data->format_code);
+
+    type->position.index = context->encode.buffer->limit.size;
+    type->position.size = meta_data->width;
+
+    return type;
+}
+
+amqp_type_t *amqp_complete_type(amqp_context_t *context, amqp_type_t *type)
+{
+    amqp_type_t *top = pop_container(context, type);
+    // TODO - check for completion of a nonexistent container
+
+    if (top != type)
+    {
+        amqp_api_usage_error(context, "Can only complete inner most map/list/array.");
+        amqp_mark_type_invalid(type, AMQP_ERROR_COMPLETE_WRONG_CONTAINER);
+        amqp_mark_type_invalid(top, AMQP_ERROR_COMPLETE_WRONG_CONTAINER);
+        return 0;
+    }
+
+    return amqp_type_is_empty_list(type) ? complete_empty_list(context, type) : complete_container_type(context, type);
+}
+
+amqp_type_t *amqp_encode_list_0(amqp_context_t *context)
+{
+    amqp_type_t *type = amqp_encode_list_8(context);
+    if (type)
+    {
+        amqp_complete_type(context, type);
+    }
     return type;
 }

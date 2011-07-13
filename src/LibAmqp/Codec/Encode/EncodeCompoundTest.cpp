@@ -267,7 +267,7 @@ SUITE(CompoundEncoding)
         ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::empty_map);
     }
 
-    TEST_FIXTURE(EncodeFixture, empty_list_8)
+    TEST_FIXTURE(EncodeFixture, empty_list)
     {
         type = amqp_encode_list_8(context);
         ASSERT_INVALID(type);
@@ -278,7 +278,7 @@ SUITE(CompoundEncoding)
         CHECK_NULL(type->value.list.elements);
         CHECK_EQUAL((size_t) 0, (size_t) type->value.list.count);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::empty_list_8);
+        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::empty_list_0);
     }
 
     static amqp_type_t *encode_described_list(amqp_context_t *context)
