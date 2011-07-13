@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-#include "Codec/Type/TypeMetaData.h"
+#include "Codec/Type/EncodingMetaData.h"
 
 // :s/^\(.*amqp_methods_\)\([^ ]*\);
 extern amqp_type_methods_t amqp_methods_described;

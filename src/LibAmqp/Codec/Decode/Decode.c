@@ -25,7 +25,7 @@
 static amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_type_t *array_element_type);
 
 
-int amqp_decode_null(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_null(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     type->position.index = amqp_buffer_index(type->context->decode.buffer);
     type->position.size = 0;
@@ -33,19 +33,19 @@ int amqp_decode_null(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
     return true;
 }
 
-static int amqp_decode_fixed_zero_width(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+static int amqp_decode_fixed_zero_width(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     type->position.index = amqp_buffer_index(type->context->decode.buffer);
     type->position.size = 0;
     return true;
 }
 
-int amqp_decode_boolean_true(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_boolean_true(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_decode_fixed_zero_width(meta_data, type);
 }
 
-int amqp_decode_boolean_false(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_boolean_false(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_decode_fixed_zero_width(meta_data, type);
 }
@@ -86,7 +86,7 @@ int check_available(amqp_type_t *type, size_t width)
 }
 
 static inline
-int amqp_decode_fixed_width(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_fixed_width(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     int rc = check_available(type, meta_data->width);
     if (rc)
@@ -119,37 +119,37 @@ int amqp_decode_fixed_width(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
     return rc;
 }
 
-int amqp_decode_boolean(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_boolean(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_ubyte(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_ubyte(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_byte(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_byte(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_ushort(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_ushort(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_short(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_short(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_uint(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_uint(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_uint0(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_uint0(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      int rc =  amqp_decode_fixed_zero_width(meta_data, type);
      if (rc)
@@ -159,12 +159,12 @@ int amqp_decode_uint0(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
      return rc;
  }
 
-int amqp_decode_int(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_int(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_small_uint(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_small_uint(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      int rc = amqp_decode_fixed_width(meta_data, type);
      if (rc)
@@ -174,7 +174,7 @@ int amqp_decode_small_uint(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
      return rc;
 }
 
-int amqp_decode_small_int(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_small_int(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      int rc = amqp_decode_fixed_width(meta_data, type);
      if (rc)
@@ -184,12 +184,12 @@ int amqp_decode_small_int(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
      return rc;
 }
 
-int amqp_decode_float(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_float(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_char(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_char(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     int rc = amqp_decode_fixed_width(meta_data, type);
     if (rc)
@@ -203,12 +203,12 @@ int amqp_decode_char(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
     return rc;
 }
 
-int amqp_decode_decimal32(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_decimal32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_ulong0(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_ulong0(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      int rc =  amqp_decode_fixed_zero_width(meta_data, type);
      if (rc)
@@ -218,17 +218,17 @@ int amqp_decode_ulong0(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
      return rc;
  }
 
-int amqp_decode_ulong(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_ulong(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_long(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_long(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_small_ulong(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_small_ulong(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      int rc = amqp_decode_fixed_width(meta_data, type);
      if (rc)
@@ -238,7 +238,7 @@ int amqp_decode_small_ulong(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
      return rc;
 }
 
-int amqp_decode_small_long(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_small_long(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      int rc = amqp_decode_fixed_width(meta_data, type);
      if (rc)
@@ -248,29 +248,29 @@ int amqp_decode_small_long(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
      return rc;
 }
 
-int amqp_decode_double(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_double(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_timestamp(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_timestamp(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_decimal64(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_decimal64(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
-int amqp_decode_uuid(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_uuid(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
      return amqp_decode_fixed_width(meta_data, type);
 }
 
 // Variable types
 static
-uint32_t get_variable_type_size(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+uint32_t get_variable_type_size(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     uint32_t size = amqp_buffer_read_size(type->context->decode.buffer, meta_data->width);
     if (size == -1)
@@ -288,7 +288,7 @@ uint32_t get_variable_type_size(amqp_type_meta_data_t *meta_data, amqp_type_t *t
 
 // Variable types
 static
-uint32_t get_variable_type_count(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+uint32_t get_variable_type_count(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     uint32_t count = amqp_buffer_read_size(type->context->decode.buffer, meta_data->width);
     if (count == -1)
@@ -299,7 +299,7 @@ uint32_t get_variable_type_count(amqp_type_meta_data_t *meta_data, amqp_type_t *
 }
 
 static
-int amqp_construct_variable_type(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_construct_variable_type(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     uint32_t size = get_variable_type_size(meta_data, type);
     if (size == -1)
@@ -316,18 +316,18 @@ int amqp_construct_variable_type(amqp_type_meta_data_t *meta_data, amqp_type_t *
     return true;
 }
 
-int amqp_decode_binary_vbin8(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_binary_vbin8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_construct_variable_type(meta_data, type);
 }
 
-int amqp_decode_binary_vbin32(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_binary_vbin32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_construct_variable_type(meta_data, type);
 }
 
 static
-int amqp_decode_symbol(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_symbol(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     int rc = amqp_construct_variable_type(meta_data, type);
     if (rc)
@@ -346,18 +346,18 @@ int amqp_decode_symbol(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
     return rc;
 }
 
-int amqp_decode_symbol_sym8(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_symbol_sym8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_decode_symbol(meta_data, type);
 }
 
-int amqp_decode_symbol_sym32(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_symbol_sym32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_decode_symbol(meta_data, type);
 }
 
 static
-int amqp_decode_string_utf8(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_string_utf8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     int rc = amqp_construct_variable_type(meta_data, type);
     if (rc)
@@ -378,18 +378,18 @@ int amqp_decode_string_utf8(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
     return rc;
 }
 
-int amqp_decode_string_str8_utf8(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_string_str8_utf8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_decode_string_utf8(meta_data, type);
 }
 
-int amqp_decode_string_str32_utf8(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_string_str32_utf8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_decode_string_utf8(meta_data, type);
 }
 
 static
-int amqp_construct_container_type(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_construct_container_type(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     uint32_t size = get_variable_type_size(meta_data, type);
     if (size != -1)
@@ -401,7 +401,7 @@ int amqp_construct_container_type(amqp_type_meta_data_t *meta_data, amqp_type_t 
     return false;
 }
 
-int amqp_decode_described_type(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_described_type(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
 
     type->position.index = amqp_buffer_index(type->context->decode.buffer);
@@ -452,7 +452,7 @@ int amqp_decode_described_type(amqp_type_meta_data_t *meta_data, amqp_type_t *ty
     return true;
 }
 
-int amqp_decode_list_list(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_list_list(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     uint32_t i;
     int rc = amqp_construct_container_type(meta_data, type);
@@ -481,12 +481,12 @@ int amqp_decode_list_list(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
     return rc;
 }
 
-int amqp_decode_list_8(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_list_8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
    return amqp_decode_list_list(meta_data, type);
 }
 
-int amqp_decode_list_32(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_list_32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
    return amqp_decode_list_list(meta_data, type);
 }
@@ -497,7 +497,7 @@ int is_even(size_t v)
     return (v & 0x01) == 0;
 }
 
-static int amqp_decode_map_map(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+static int amqp_decode_map_map(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     size_t i;
     int rc = amqp_construct_container_type(meta_data, type);
@@ -523,17 +523,17 @@ static int amqp_decode_map_map(amqp_type_meta_data_t *meta_data, amqp_type_t *ty
     return rc;
 }
 
-int amqp_decode_map_8(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_map_8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_decode_map_map(meta_data, type);
 }
 
-int amqp_decode_map_32(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_map_32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_decode_map_map(meta_data, type);
 }
 
-static int amqp_decode_array(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+static int amqp_decode_array(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     int i;
     int rc = amqp_construct_container_type(meta_data, type);
@@ -566,17 +566,17 @@ static int amqp_decode_array(amqp_type_meta_data_t *meta_data, amqp_type_t *type
     return rc;
 }
 
-int amqp_decode_array_8(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_array_8(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_decode_array(meta_data, type);
 }
 
-int amqp_decode_array_32(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_array_32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     return amqp_decode_array(meta_data, type);
 }
 
-int amqp_decode_extension_type(amqp_type_meta_data_t *meta_data, amqp_type_t *type)
+int amqp_decode_extension_type(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     not_implemented(Unsupported format code);
 }
@@ -584,7 +584,7 @@ int amqp_decode_extension_type(amqp_type_meta_data_t *meta_data, amqp_type_t *ty
 static int
 decode_type_constructor_into_result(amqp_context_t *context, amqp_type_t *type)
 {
-    amqp_type_meta_data_t *meta_data;
+    amqp_encoding_meta_data_t *meta_data;
 
     type->format_code = amqp_buffer_getc(context->decode.buffer);
 

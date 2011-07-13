@@ -125,7 +125,6 @@ SUITE(Pool)
     TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block)
     {
         initialize_pool();
-        printf("block_size: %ld, allocations_per_block: %d\n", pool.block_size, pool.allocations_per_block);
         test();
     }
 

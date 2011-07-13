@@ -21,7 +21,7 @@ extern "C" {
 #endif
 
 #include <stdarg.h>
-#include "Codec/Type/TypeMetaData.h"
+#include "Codec/Type/EncodingMetaData.h"
 
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_null;
 extern amqp_type_encode_meta_data_t ampq_encode_meta_data_boolean;

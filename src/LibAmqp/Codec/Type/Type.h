@@ -18,7 +18,7 @@
 #define LIBAMQP_CODEC_TYPE_TYPE_H
 
 #include "libamqp_common.h"
-#include "Codec/Type/TypeMetaData.h"
+#include "Codec/Type/EncodingMetaData.h"
 #include "Context/Context.h"
 
 #ifdef __cplusplus
@@ -72,7 +72,7 @@ struct amqp_type_t
 
     int format_code;
     int extension_type_code;
-    amqp_type_meta_data_t *meta_data;
+    amqp_encoding_meta_data_t *meta_data;
 
     amqp_buffer_position_t position;
     amqp_type_flags_t flags;

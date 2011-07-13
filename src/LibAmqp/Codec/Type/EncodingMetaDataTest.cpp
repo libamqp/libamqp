@@ -19,9 +19,9 @@
 #include "Context/ContextTestSupport.h"
 
 #include "Type.h"
-#include "Codec/Type/TypeMetaData.h"
+#include "Codec/Type/EncodingMetaData.h"
 
-extern amqp_type_meta_data_t *amqp__type_lookup_table[];
+extern amqp_encoding_meta_data_t *amqp__type_lookup_table[];
 extern const int amqp__type_lookup_table_ntypes;
 
 SUITE(TypeMetaData)
@@ -72,7 +72,7 @@ SUITE(TypeMetaData)
     // These were generated and protect against changes to the lookup messing up.
     TEST_FIXTURE(TypeMetaDataFixture, lookup_described_)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x00);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x00);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x00, meta_data->format_code);
         CHECK_EQUAL(0, meta_data->width);
@@ -82,7 +82,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_null_)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x40);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x40);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x40, meta_data->format_code);
         CHECK_EQUAL(0, meta_data->width);
@@ -91,7 +91,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_boolean_true)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x41);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x41);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x41, meta_data->format_code);
         CHECK_EQUAL(0, meta_data->width);
@@ -100,7 +100,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_boolean_false)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x42);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x42);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x42, meta_data->format_code);
         CHECK_EQUAL(0, meta_data->width);
@@ -109,7 +109,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_uint_zero)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x43);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x43);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x43, meta_data->format_code);
         CHECK_EQUAL(0, meta_data->width);
@@ -118,7 +118,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_ulong_zero)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x44);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x44);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x44, meta_data->format_code);
         CHECK_EQUAL(0, meta_data->width);
@@ -127,7 +127,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_ubyte_)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x50);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x50);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x50, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -136,7 +136,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_byte_)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x51);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x51);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x51, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -145,7 +145,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_small_uint)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x52);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x52);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x52, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -154,7 +154,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_small_ulong)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x53);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x53);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x53, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -163,7 +163,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_small_int)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x54);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x54);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x54, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -172,7 +172,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_small_long)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x55);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x55);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x55, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -181,7 +181,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_boolean)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x56);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x56);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x56, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -190,7 +190,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_ushort_)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x60);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x60);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x60, meta_data->format_code);
         CHECK_EQUAL(2, meta_data->width);
@@ -199,7 +199,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_short_)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x61);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x61);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x61, meta_data->format_code);
         CHECK_EQUAL(2, meta_data->width);
@@ -208,7 +208,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_uint_)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x70);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x70);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x70, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -217,7 +217,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_int_)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x71);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x71);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x71, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -226,7 +226,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_float_ieee_754)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x72);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x72);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x72, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -235,7 +235,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_char_utf32)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x73);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x73);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x73, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -244,7 +244,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_decimal32_ieee_754)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x74);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x74);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x74, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -253,7 +253,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_ulong_)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x80);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x80);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x80, meta_data->format_code);
         CHECK_EQUAL(8, meta_data->width);
@@ -262,7 +262,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_long_)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x81);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x81);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x81, meta_data->format_code);
         CHECK_EQUAL(8, meta_data->width);
@@ -271,7 +271,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_double_ieee_754)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x82);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x82);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x82, meta_data->format_code);
         CHECK_EQUAL(8, meta_data->width);
@@ -280,7 +280,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_timestamp_ms64)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x83);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x83);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x83, meta_data->format_code);
         CHECK_EQUAL(8, meta_data->width);
@@ -289,7 +289,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_decimal64_ieee_754)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x84);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x84);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x84, meta_data->format_code);
         CHECK_EQUAL(8, meta_data->width);
@@ -298,7 +298,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_uuid_)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x98);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x98);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x98, meta_data->format_code);
         CHECK_EQUAL(16, meta_data->width);
@@ -307,7 +307,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_binary_vbin8)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xa0);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xa0);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xa0, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -316,7 +316,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_string_str8_utf8)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xa1);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xa1);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xa1, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -325,7 +325,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_symbol_sym8)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xa3);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xa3);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xa3, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -334,7 +334,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_binary_vbin32)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xb0);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xb0);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xb0, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -343,7 +343,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_string_str32_utf8)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xb1);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xb1);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xb1, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -352,7 +352,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_symbol_sym32)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xb3);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xb3);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xb3, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -361,7 +361,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_list_8)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xc0);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xc0);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xc0, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -370,7 +370,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_map_8)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xc1);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xc1);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xc1, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -379,7 +379,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_list_32)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xd0);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xd0);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xd0, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -388,7 +388,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_map_32)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xd1);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xd1);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xd1, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -397,7 +397,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_array_8)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xe0);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xe0);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xe0, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -406,7 +406,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_array_32)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xf0);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xf0);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xf0, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -418,7 +418,7 @@ SUITE(TypeMetaData)
     // extension types
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_fixed_0)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x4f);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x4f);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x4f, meta_data->format_code);
         CHECK_EQUAL(0, meta_data->width);
@@ -427,7 +427,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_fixed_1)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x5f);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x5f);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x5f, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -436,7 +436,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_fixed_2)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x6f);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x6f);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x6f, meta_data->format_code);
         CHECK_EQUAL(2, meta_data->width);
@@ -445,7 +445,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_fixed_4)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x7f);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x7f);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x7f, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -454,7 +454,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_fixed_8)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x8f);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x8f);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x8f, meta_data->format_code);
         CHECK_EQUAL(8, meta_data->width);
@@ -463,7 +463,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_fixed_16)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x9f);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0x9f);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0x9f, meta_data->format_code);
         CHECK_EQUAL(16, meta_data->width);
@@ -472,7 +472,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_variable_1)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xaf);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xaf);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xaf, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -481,7 +481,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_variable_4)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xbf);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xbf);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xbf, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -490,7 +490,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_compound_1)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xcf);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xcf);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xcf, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -499,7 +499,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_compound_4)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xdf);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xdf);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xdf, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);
@@ -508,7 +508,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_array_1)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xef);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xef);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xef, meta_data->format_code);
         CHECK_EQUAL(1, meta_data->width);
@@ -517,7 +517,7 @@ SUITE(TypeMetaData)
     }
     TEST_FIXTURE(TypeMetaDataFixture, lookup_extension_array_4)
     {
-        amqp_type_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xff);
+        amqp_encoding_meta_data_t *meta_data = amqp_type_meta_data_lookup(context, 0xff);
         CHECK_NOT_NULL(meta_data);
         CHECK_EQUAL(0xff, meta_data->format_code);
         CHECK_EQUAL(4, meta_data->width);

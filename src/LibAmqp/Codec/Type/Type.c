@@ -99,7 +99,7 @@ bool amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs)
 
 void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type)
 {
-    amqp_type_meta_data_t *meta_data = type->meta_data;
+    amqp_encoding_meta_data_t *meta_data = type->meta_data;
     if (meta_data)
     {
         snprintf(buffer, size, "name=\"%s\", encoding=\"%s\", category=\"%s\"", meta_data->name, meta_data->encoding_name, amqp_category_names[meta_data->category_name_index]);
