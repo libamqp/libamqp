@@ -239,7 +239,30 @@ SUITE(TypePrint)
 
         print_type();
         check_output("{Foo; 123.456000; Hello; 10; [10, 11]; [12]}");
+    }
 
+    TEST_FIXTURE(TypePrintFixture, empty_list)
+    {
+        load_decode_buffer(test_data::empty_list_8);
+        type = amqp_decode(context);
+
+        ASSERT_VALID(type);
+        CHECK_LIST(type);
+
+        print_type();
+        check_output("{}");
+    }
+
+    TEST_FIXTURE(TypePrintFixture, empty_list_0)
+    {
+        load_decode_buffer(test_data::empty_list_0);
+        type = amqp_decode(context);
+
+        ASSERT_VALID(type);
+        CHECK_LIST(type);
+
+        print_type();
+        check_output("{}");
     }
 
     TEST_FIXTURE(TypePrintFixture, Map)
