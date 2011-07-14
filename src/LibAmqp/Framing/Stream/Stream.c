@@ -73,7 +73,7 @@ amqp_stream_t *amqp_buffer_stream_create(amqp_context_t *context, amqp_buffer_t 
 static void amqp_buffer_stream_destroy(amqp_context_t *context, amqp_stream_t *stream)
 {
     amqp_deallocate_buffer(context, stream->buffer);
-    amqp_free(stream);
+    AMQP_FREE(stream);
 }
 
 static  int amqp_buffer_stream_read(amqp_stream_t *stream, unsigned char *buffer, size_t bufsiz, size_t offset, int n)
@@ -118,7 +118,7 @@ static void amqp_socket_stream_destroy(amqp_context_t *context, amqp_stream_t *s
         close(stream->fd);
         stream->fd = -1;
     }
-    amqp_free(stream);
+    AMQP_FREE(stream);
 }
 
 static  int amqp_socket_stream_read(amqp_stream_t *stream, unsigned char *bytes, size_t bufsiz, size_t offset, int n)

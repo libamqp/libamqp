@@ -138,19 +138,19 @@ void *amqp_allocate(amqp_memory_pool_t *pool)
 
     assert(pool != null);
     assert(pool->initialized);
-    assert(pool->object_size_in_fragments != 0);
     assert(pool->initializer_callback != null);
 
- #ifdef DISABLE_MEMORY_POOL
-    result = amqp_malloc(pool->object_size_in_fragments TRACE_ARGS);
- #else
+#ifdef DISABLE_MEMORY_POOL
+    result = amqp_malloc(pool->object_size TRACE_ARGS);
+#else
+    assert(pool->object_size_in_fragments != 0);
     result = allocate_object(pool);
- #endif
+#endif
 
     (*pool->initializer_callback)(pool, result);
 
-     pool->stats.outstanding_allocations++;
-     pool->stats.total_allocation_calls++;
+    pool->stats.outstanding_allocations++;
+    pool->stats.total_allocation_calls++;
 
     return result;
 }
@@ -210,26 +210,28 @@ void amqp_deallocate(amqp_memory_pool_t *pool, void *pooled_object)
     if (pooled_object != 0)
     {
         (*pool->destroyer_callback)(pool, pooled_object);
- #ifdef DISABLE_MEMORY_POOL
+#ifdef DISABLE_MEMORY_POOL
         amqp_free(pooled_object TRACE_ARGS);
- #else
+#else
         delete_object(pool, pooled_object);
- #endif
+#endif
         pool->stats.outstanding_allocations--;
     }
-}
-
-static
-size_t calculate_allocation_t_size_in_bytes(amqp_memory_pool_t *pool)
-{
-    size_t count = pool->object_size_in_fragments + 1;       // allow space for the trailing guard
-    return pool->offset_to_allocation_data + (count - MIN_FRAGMENTS) * SIZE_T_BYTES;
 }
 
 static
 void default_callback(amqp_memory_pool_t *pool, void *object)
 {
     // nothing to see here, move along
+}
+
+#ifndef DISABLE_MEMORY_POOL
+
+static
+size_t calculate_allocation_t_size_in_bytes(amqp_memory_pool_t *pool)
+{
+    size_t count = pool->object_size_in_fragments + 1;       // allow space for the trailing guard
+    return pool->offset_to_allocation_data + (count - MIN_FRAGMENTS) * SIZE_T_BYTES;
 }
 
 static
@@ -254,10 +256,7 @@ size_t calculate_offset_to_allocation_payload()
 }
 
 static
-size_t preferred_block_size()
-{
-    return LONG_BIT > 32 ? 2048 : 1024;
-}
+size_t preferred_block_size();
 
 static
 size_t adjust_block_size(size_t block_size)
@@ -274,11 +273,19 @@ size_t adjust_block_size(size_t block_size)
     }
     return size;
 }
+#endif
+
+static
+size_t preferred_block_size()
+{
+    return LONG_BIT > 32 ? 2048 : 1024;
+}
 
 void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t pooled_object_size, size_t suggested_block_size)
 {
     memset(pool, '\0', sizeof(amqp_memory_pool_t));
-    
+
+#ifndef DISABLE_MEMORY_POOL
     pool->offset_to_first_allocation = calculate_block_offset_to_first_allocation();
     pool->offset_to_allocation_data = calculate_offset_to_allocation_payload();
     pool->object_size_in_fragments = byte_count_rounded_to_size_t_array_size(pooled_object_size);
@@ -297,6 +304,9 @@ void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t
         // round block size up to a power of 2
         pool->block_size = adjust_block_size(pool->block_size);
     }
+#else
+    pool->object_size = pooled_object_size;
+#endif
 
     pool->initializer_callback = default_callback;
     pool->destroyer_callback = default_callback ;

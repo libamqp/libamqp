@@ -18,6 +18,7 @@
 
 #include "Buffer/BufferTestSupport.h"
 #include "Context/ErrorHandling.h"
+#include "debug_helper.h"
 
 SUITE(Buffer)
 {
@@ -43,7 +44,7 @@ SUITE(Buffer)
     {
         CHECK_EQUAL(1UL, pool.stats.outstanding_allocations);
         CHECK_EQUAL(1UL, pool.stats.total_allocation_calls);
-
+        break_one();
         amqp_deallocate(&pool, buffer);
         buffer = 0;
 

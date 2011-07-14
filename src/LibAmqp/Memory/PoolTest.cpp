@@ -15,13 +15,21 @@
  */
 
 #include "Memory/PoolTestSupport.h"
-
 #include "debug_helper.h"
-
-#ifndef DISABLE_MEMORY_POOL
 
 SUITE(Pool)
 {
+
+#ifdef DISABLE_MEMORY_POOL
+    TEST_FIXTURE(InitializedPoolFixture, verify_allocation_works_when_pool_disabled)
+    {
+        test_type_t *p, *q;
+        p = (test_type_t *) amqp_allocate(&pool);
+        q = (test_type_t *) amqp_allocate(&pool);
+        amqp_deallocate(&pool, p);
+        amqp_deallocate(&pool, q);
+    }
+#else
     TEST_FIXTURE(InitializedPoolFixture, first_allocate_from_pool_allocates_block)
     {
         CHECK_NULL(pool.block_list);
@@ -235,6 +243,7 @@ SUITE(Pool)
 
         CHECK_NULL(pool.block_list); // assert that there are no blocks left
     }
+#endif
 
     void allocate_callback(amqp_memory_pool_t *pool, test_type_t *object)
     {
@@ -248,12 +257,12 @@ SUITE(Pool)
     {
     }
 
-    TEST_FIXTURE(InitializedPoolFixture, callback_should_initialize_onject)
+    TEST_FIXTURE(InitializedPoolFixture, callback_should_initialize_onbect)
     {
         amqp_pool_specify_initialization_callbacks(&pool, (amqp_pool_callback_t) allocate_callback, deallocate_callback);
-        test_type_t *t = (test_type_t *) allocate_from_pool();
-        CHECK_EQUAL('A', t->important_stuff[0]);
-        CHECK_EQUAL('Z', t->important_stuff[25]);
+        test_type_t *p = (test_type_t *) amqp_allocate(&pool);
+        CHECK_EQUAL('A', p->important_stuff[0]);
+        CHECK_EQUAL('Z', p->important_stuff[25]);
+        amqp_deallocate(&pool, p);
     }
 }
-#endif
