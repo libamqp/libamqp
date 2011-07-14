@@ -75,8 +75,8 @@ amqp_memory_block_t *allocate_new_memory_block(amqp_memory_pool_t *pool, amqp_me
         amqp_memory_allocation_t *allocation = allocation_from_index(pool, result, i);
         allocation->header.block = result;
         allocation->header.index = i;
-        allocation->header.leading_guard = leading_mask;
-        allocation->data.fragments[pool->object_size_in_fragments] = trailing_mask;
+        allocation->header.leading_guard = (uint32_t) leading_mask;
+        allocation->data.fragments[pool->object_size_in_fragments] = (size_t) trailing_mask;
     }
     return result;
 }
@@ -173,8 +173,9 @@ void delete_object(amqp_memory_pool_t *pool, void *pooled_object)
     size_t index;
     int i, j;
 
-    assert(allocation->header.leading_guard == leading_mask);
-    assert(allocation->data.fragments[pool->object_size_in_fragments] == trailing_mask);
+    assert(allocation->header.leading_guard == (uint32_t) leading_mask);
+    break_one();
+    assert(allocation->data.fragments[pool->object_size_in_fragments] == (size_t) trailing_mask);
 
     block = allocation->header.block;
     index = allocation->header.index;
