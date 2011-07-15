@@ -6,21 +6,21 @@
 MODULES := \
 	LibAmqp \
 	LibAmqp/Memory \
+	../3rd-party/UnitTest++/src  \
+	Test
+
+OLD_MODULES := \
 	LibAmqp/Buffer \
 	LibAmqp/Context \
 	LibAmqp/TestData \
 	LibAmqp/Codec \
 	LibAmqp/Framing \
         DecodeDemo \
-	../3rd-party/UnitTest++/src  \
-	Test
-
-OLD_MODULES := \
+\
 	AmqpClient/Frame \
 	AmqpClient/SaslFrame \
 	AmqpClient/Network \
 	AmqpClient/Stream \
-	DecodeDemo
 
 CC=gcc
 LIBS :=
