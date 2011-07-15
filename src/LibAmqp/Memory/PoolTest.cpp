@@ -23,9 +23,9 @@ SUITE(Pool)
     {
         test_type_t *p = (test_type_t *) amqp_allocate(&pool);
         CHECK_EQUAL('A', p->important_stuff[0]);
-        for (int i = 0; i < sizeof(p->important_stuff); i++)
+        for (unsigned i = 0; i < sizeof(p->important_stuff); i++)
         {
-            CHECK_EQUAL('A' + i, p->important_stuff[i]);
+            CHECK_EQUAL('A' + (int) i, p->important_stuff[i]);
         }
         amqp_deallocate(&pool, p);
     }
