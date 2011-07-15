@@ -126,6 +126,9 @@ void *allocate_object(amqp_memory_pool_t *pool)
     }
     amqp_memory_allocation_t *free_allocation = find_free_allocation_within_block(pool, block_with_free_space);
 
+    printf("free_allocation->header.block: %llx\n", (unsigned long long) (size_t) free_allocation->header.block);
+    printf("block_with_free_space: %llx\n", (unsigned long long) (size_t) block_with_free_space);
+
     assert(free_allocation->header.block == block_with_free_space);
 
     return  &free_allocation->data;
@@ -174,7 +177,6 @@ void delete_object(amqp_memory_pool_t *pool, void *pooled_object)
     int i, j;
 
     assert(allocation->header.leading_guard == (uint32_t) leading_mask);
-    break_one();
     assert(allocation->data.fragments[pool->object_size_in_fragments] == (size_t) trailing_mask);
 
     block = allocation->header.block;

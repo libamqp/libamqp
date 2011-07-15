@@ -85,14 +85,25 @@ namespace SuitePool
         }
     }
 
+    static void allocate_callback(amqp_memory_pool_t *pool, test_type_t *object)
+    {
+        for (int i = 0; i < 32; i++)
+        {
+            object->important_stuff[i] = 'A' + i;
+        }
+    }
+
+    static void deallocate_callback(amqp_memory_pool_t *pool, void *object)
+    {
+    }
+
     void PoolFixture::initialize_pool(int n)
     {
         CHECK(n > 128);
         if (!pool.initialized)
         {
             amqp_initialize_pool_suggesting_block_size(&pool, sizeof(test_type_t), n);
-//            printf("block_size: %ld, allocations_per_block: %d, allocation_size_in_bytes: %ld, object_size_in_fragments: %ld\n",
-//                    pool.block_size, pool.allocations_per_block, pool.allocation_size_in_bytes, pool.object_size_in_fragments);
+            amqp_pool_specify_initialization_callbacks(&pool, (amqp_pool_callback_t) allocate_callback, deallocate_callback);
         }
     }
 
@@ -101,6 +112,7 @@ namespace SuitePool
         if (!pool.initialized)
         {
             amqp_initialize_pool(&pool, sizeof(test_type_t));
+            amqp_pool_specify_initialization_callbacks(&pool, (amqp_pool_callback_t) allocate_callback, deallocate_callback);
         }
     }
 

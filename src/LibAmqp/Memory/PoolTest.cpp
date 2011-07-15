@@ -19,6 +19,13 @@
 
 SUITE(Pool)
 {
+    TEST_FIXTURE(InitializedPoolFixture, callback_should_initialize_object)
+    {
+        test_type_t *p = (test_type_t *) amqp_allocate(&pool);
+        CHECK_EQUAL('A', p->important_stuff[0]);
+        CHECK_EQUAL('Z', p->important_stuff[25]);
+        amqp_deallocate(&pool, p);
+    }
 
 #ifdef DISABLE_MEMORY_POOL
     TEST_FIXTURE(InitializedPoolFixture, verify_allocation_works_when_pool_disabled)
@@ -245,24 +252,4 @@ SUITE(Pool)
     }
 #endif
 
-    void allocate_callback(amqp_memory_pool_t *pool, test_type_t *object)
-    {
-        for (int i = 0; i < 32; i++)
-        {
-            object->important_stuff[i] = 'A' + i;
-        }
-    }
-
-    void deallocate_callback(amqp_memory_pool_t *pool, void *object)
-    {
-    }
-
-    TEST_FIXTURE(InitializedPoolFixture, callback_should_initialize_onbect)
-    {
-        amqp_pool_specify_initialization_callbacks(&pool, (amqp_pool_callback_t) allocate_callback, deallocate_callback);
-        test_type_t *p = (test_type_t *) amqp_allocate(&pool);
-        CHECK_EQUAL('A', p->important_stuff[0]);
-        CHECK_EQUAL('Z', p->important_stuff[25]);
-        amqp_deallocate(&pool, p);
-    }
 }
