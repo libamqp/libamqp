@@ -4,18 +4,18 @@
 #
 
 MODULES := \
+	LibAmqp/TestData \
 	LibAmqp \
 	LibAmqp/Memory \
+	LibAmqp/Buffer \
+	LibAmqp/Context \
+	LibAmqp/Codec \
+	LibAmqp/Framing \
+        DecodeDemo \
 	../3rd-party/UnitTest++/src  \
 	Test
 
 OLD_MODULES := \
-	LibAmqp/Buffer \
-	LibAmqp/Context \
-	LibAmqp/TestData \
-	LibAmqp/Codec \
-	LibAmqp/Framing \
-        DecodeDemo \
 \
 	AmqpClient/Frame \
 	AmqpClient/SaslFrame \

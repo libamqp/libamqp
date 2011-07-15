@@ -283,7 +283,7 @@ static
 size_t calculate_allocation_t_size_in_bytes(amqp_memory_pool_t *pool)
 {
     size_t count = pool->object_size_in_fragments + 1;       // allow space for the trailing guard
-    size_t result =  pool->offset_to_allocation_data + (count - MIN_FRAGMENTS) * SIZE_T_BYTES;
+    size_t result =  pool->offset_to_allocation_data + count * SIZE_T_BYTES;
     printf("calculate_allocation_t_size_in_bytes - result = %lu\n", (unsigned long) result);
     return result;
 }
@@ -293,7 +293,7 @@ static size_t preferred_block_size();
 static
 size_t adjust_block_size(size_t block_size)
 {
-    size_t size = preferred_block_size();
+    size_t size = preferred_block_size() * 2;
     while (true)
     {
         size_t next_size = size >> 1;
@@ -303,6 +303,7 @@ size_t adjust_block_size(size_t block_size)
         }
         size = next_size;
     }
+    printf("suggested block size: %lu, adjusted block size: %lu\n", (unsigned long) block_size, (unsigned long) size);
     return size;
 }
 #endif
@@ -318,35 +319,31 @@ void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t
     break_one();
 
     memset(pool, '\0', sizeof(amqp_memory_pool_t));
-
+printf("pool: %p, object size: %lu, suggested block size: %lu\n", (void *) pool, (unsigned long) pooled_object_size, (unsigned long) suggested_block_size);
 #ifndef DISABLE_MEMORY_POOL
+    pool->block_size = adjust_block_size(suggested_block_size);
+
     pool->offset_to_first_allocation = calculate_block_offset_to_first_allocation();
     pool->offset_to_allocation_data = calculate_offset_to_allocation_data();
     pool->object_size_in_fragments = byte_count_rounded_to_size_t_array_size(pooled_object_size);
     pool->allocation_size_in_bytes = calculate_allocation_t_size_in_bytes(pool);
 
-    pool->allocations_per_block = (suggested_block_size - pool->offset_to_first_allocation) / pool->allocation_size_in_bytes;
-    if (pool->allocations_per_block > LONG_BIT)
-    {
-        pool->allocations_per_block = LONG_BIT;
+    do {
+        pool->allocations_per_block = (pool->block_size - pool->offset_to_first_allocation) / pool->allocation_size_in_bytes;
+        if (pool->allocations_per_block > LONG_BIT)
+        {
+            pool->block_size /= 2;
+        }
     }
-
-    pool->block_size = pool->allocation_size_in_bytes * pool->allocations_per_block + pool->offset_to_first_allocation;
-    
-    if (pool->block_size < preferred_block_size())
-    {
-        // round block size up to a power of 2
-        // pool->block_size = adjust_block_size(pool->block_size);
-        size_t x = adjust_block_size(pool->block_size);
-	printf("suggested block size: %lu, adjusted block size: %lu\n", (unsigned long) pool->block_size, (unsigned long) x);
-    }
-
-    pool->allocations_per_block = (pool->block_size - pool->offset_to_first_allocation) / pool->allocation_size_in_bytes;
+    while (pool->allocations_per_block > LONG_BIT);
     pool->allocations_mask = ((1UL << pool->allocations_per_block) & ~1UL) - 1;
+
+    printf("pool: %p, block size: %lu\n", (void *) pool, (unsigned long) pool->block_size);
+
 #else
     pool->object_size = pooled_object_size;
 #endif
-
+printf("\n");
     break_two();
     pool->initializer_callback = default_callback;
     pool->destroyer_callback = default_callback ;
