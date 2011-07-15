@@ -4,11 +4,11 @@
 #
 
 MODULES := \
+	LibAmqp/TestData \
 	LibAmqp \
 	LibAmqp/Memory \
 	LibAmqp/Buffer \
 	LibAmqp/Context \
-	LibAmqp/TestData \
 	LibAmqp/Codec \
 	LibAmqp/Framing \
         DecodeDemo \
@@ -20,7 +20,6 @@ OLD_MODULES := \
 	AmqpClient/SaslFrame \
 	AmqpClient/Network \
 	AmqpClient/Stream \
-	DecodeDemo
 
 CC=gcc
 LIBS :=

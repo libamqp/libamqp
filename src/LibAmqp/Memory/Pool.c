@@ -30,6 +30,10 @@
 #include "debug_helper.h"
 
 #ifndef DISABLE_MEMORY_POOL
+void amqp_pool_break()
+{
+    // nothing to do here
+}
 
 static
 amqp_memory_block_t *find_block_with_free_space(amqp_memory_block_t *block_list)
@@ -75,8 +79,8 @@ amqp_memory_block_t *allocate_new_memory_block(amqp_memory_pool_t *pool, amqp_me
         amqp_memory_allocation_t *allocation = allocation_from_index(pool, result, i);
         allocation->header.block = result;
         allocation->header.index = i;
-        allocation->header.leading_guard = leading_mask;
-        allocation->data.fragments[pool->object_size_in_fragments] = trailing_mask;
+        allocation->header.leading_guard = (uint32_t) leading_mask;
+        allocation->data.fragments[pool->object_size_in_fragments] = (size_t) trailing_mask;
     }
     return result;
 }
@@ -126,7 +130,11 @@ void *allocate_object(amqp_memory_pool_t *pool)
     }
     amqp_memory_allocation_t *free_allocation = find_free_allocation_within_block(pool, block_with_free_space);
 
-    assert(free_allocation->header.block == block_with_free_space);
+    if (free_allocation->header.block != block_with_free_space)
+    {
+	amqp_pool_break();
+    	amqp_fatal_program_error("allocation from pool does not belong to correct block (set break on amqp_pool_break() to debug)");
+    }
 
     return  &free_allocation->data;
 }
@@ -173,8 +181,16 @@ void delete_object(amqp_memory_pool_t *pool, void *pooled_object)
     size_t index;
     int i, j;
 
-    assert(allocation->header.leading_guard == leading_mask);
-    assert(allocation->data.fragments[pool->object_size_in_fragments] == trailing_mask);
+    if (allocation->header.leading_guard != (uint32_t) leading_mask)
+    {
+	amqp_pool_break();
+    	amqp_fatal_program_error("The leading guard on allocation has been corrupted. (set break on amqp_pool_break() to debug)");
+    }
+    if (allocation->data.fragments[pool->object_size_in_fragments] != (size_t) trailing_mask)
+    {
+	amqp_pool_break();
+    	amqp_fatal_program_error("The trailing guard on allocation has been corrupted. (set break on amqp_pool_break() to debug)");
+    }
 
     block = allocation->header.block;
     index = allocation->header.index;
@@ -228,40 +244,43 @@ void default_callback(amqp_memory_pool_t *pool, void *object)
 #ifndef DISABLE_MEMORY_POOL
 
 static
-size_t calculate_allocation_t_size_in_bytes(amqp_memory_pool_t *pool)
+size_t calculate_block_offset_to_first_allocation()
 {
-    size_t count = pool->object_size_in_fragments + 1;       // allow space for the trailing guard
-    return pool->offset_to_allocation_data + (count - MIN_FRAGMENTS) * SIZE_T_BYTES;
+    amqp_memory_block_t sample_block;
+    size_t result = (unsigned char *) &sample_block.data - (unsigned char *) &sample_block.header;
+    return result;
+}
+
+static
+size_t calculate_offset_to_allocation_data()
+{
+    amqp_memory_block_t sample_allocation;
+    size_t result = (unsigned char *) &sample_allocation.data - (unsigned char *) &sample_allocation.header;
+    return result;
 }
 
 static
 size_t byte_count_rounded_to_size_t_array_size(size_t n)
 {
     size_t result = (n - 1) / SIZE_T_BYTES + 1;
-    return result < MIN_FRAGMENTS ? MIN_FRAGMENTS : result;
+    result = result < MIN_FRAGMENTS ? MIN_FRAGMENTS : result;
+    return result;
 }
 
 static
-size_t calculate_block_offset_to_first_allocation()
+size_t calculate_allocation_t_size_in_bytes(amqp_memory_pool_t *pool)
 {
-    amqp_memory_block_t sample_block;
-    return (unsigned char *) &sample_block.data - (unsigned char *) &sample_block.header;
+    size_t count = pool->object_size_in_fragments + 1;       // allow space for the trailing guard
+    size_t result =  pool->offset_to_allocation_data + count * SIZE_T_BYTES;
+    return result;
 }
 
-static
-size_t calculate_offset_to_allocation_payload()
-{
-    amqp_memory_block_t sample_allocation;
-    return (unsigned char *) &sample_allocation.data - (unsigned char *) &sample_allocation.header;
-}
-
-static
-size_t preferred_block_size();
+static size_t preferred_block_size();
 
 static
 size_t adjust_block_size(size_t block_size)
 {
-    size_t size = preferred_block_size();
+    size_t size = preferred_block_size() * 2;
     while (true)
     {
         size_t next_size = size >> 1;
@@ -284,30 +303,26 @@ size_t preferred_block_size()
 void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t pooled_object_size, size_t suggested_block_size)
 {
     memset(pool, '\0', sizeof(amqp_memory_pool_t));
-
 #ifndef DISABLE_MEMORY_POOL
+    pool->block_size = adjust_block_size(suggested_block_size);
+
     pool->offset_to_first_allocation = calculate_block_offset_to_first_allocation();
-    pool->offset_to_allocation_data = calculate_offset_to_allocation_payload();
+    pool->offset_to_allocation_data = calculate_offset_to_allocation_data();
     pool->object_size_in_fragments = byte_count_rounded_to_size_t_array_size(pooled_object_size);
     pool->allocation_size_in_bytes = calculate_allocation_t_size_in_bytes(pool);
 
-    pool->allocations_per_block = (suggested_block_size - pool->offset_to_first_allocation) / pool->allocation_size_in_bytes;
-    if (pool->allocations_per_block > LONG_BIT)
-    {
-        pool->allocations_per_block = LONG_BIT;
+    do {
+        pool->allocations_per_block = (pool->block_size - pool->offset_to_first_allocation) / pool->allocation_size_in_bytes;
+        if (pool->allocations_per_block > LONG_BIT)
+        {
+            pool->block_size /= 2;
+        }
     }
-
+    while (pool->allocations_per_block > LONG_BIT);
     pool->allocations_mask = ((1UL << pool->allocations_per_block) & ~1UL) - 1;
-    pool->block_size = pool->allocation_size_in_bytes * pool->allocations_per_block + pool->offset_to_first_allocation;
-    if (pool->block_size < preferred_block_size())
-    {
-        // round block size up to a power of 2
-        pool->block_size = adjust_block_size(pool->block_size);
-    }
 #else
     pool->object_size = pooled_object_size;
 #endif
-
     pool->initializer_callback = default_callback;
     pool->destroyer_callback = default_callback ;
     pool->initialized = true;
