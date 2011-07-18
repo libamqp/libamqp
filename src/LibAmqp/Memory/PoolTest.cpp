@@ -13,7 +13,6 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-
 #include "Memory/PoolTestSupport.h"
 #include "debug_helper.h"
 
@@ -89,7 +88,10 @@ SUITE(Pool)
 
     TEST_FIXTURE(InitializedPoolFixture, allocations_should_be_reflected_in_mask)
     {
-        allocate_from_pool(7);
+        allocate_from_pool(1);
+        CHECK_EQUAL(0xfeU, (unsigned) pool.block_list->header.mask.bytes[0]);
+
+        allocate_from_pool(6);
         CHECK_EQUAL(0x80U, (unsigned) pool.block_list->header.mask.bytes[0]);
 
         allocate_from_pool(1);
@@ -109,8 +111,6 @@ SUITE(Pool)
 
         allocate_from_pool(1);
         CHECK_EQUAL(0xfeU, (unsigned) pool.block_list->header.mask.bytes[2]);
-        CHECK_EQUAL(0xffU, (unsigned) pool.block_list->header.mask.bytes[3]);
-
     }
 
     class BlockChainingTestFixture : public PoolFixture
@@ -254,5 +254,4 @@ SUITE(Pool)
         CHECK_NULL(pool.block_list); // assert that there are no blocks left
     }
 #endif
-
 }
