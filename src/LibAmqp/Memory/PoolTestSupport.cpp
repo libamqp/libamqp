@@ -87,7 +87,7 @@ namespace SuitePool
 
     static void allocate_callback(amqp_memory_pool_t *pool, test_type_t *object)
     {
-        for (int i = 0; i < sizeof(object->important_stuff); i++)
+        for (int i = 0; i < (int) sizeof(object->important_stuff); i++)
         {
             object->important_stuff[i] = 'A' + i;
         }
