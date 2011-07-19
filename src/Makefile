@@ -31,6 +31,7 @@ TEST_HARNESS_INCLUDES :=
 
 .PHONY:	all trace libs tests check debug targets
 all:	trace libs targets tests
+ci-build:   scrub all check
 targets::
 
 CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES))
