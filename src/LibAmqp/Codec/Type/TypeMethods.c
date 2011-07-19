@@ -36,7 +36,11 @@ amqp_type_methods_t amqp_methods_small_int = { amqp_type_method_small_int_print 
 
 amqp_type_methods_t amqp_methods_float = { amqp_type_method_float_print };
 amqp_type_methods_t amqp_methods_char = { amqp_type_method_char_print };
+
 amqp_type_methods_t amqp_methods_decimal32 = { amqp_type_method_decimal32_print };
+amqp_type_methods_t amqp_methods_decimal64 = { amqp_type_method_decimal64_print };
+amqp_type_methods_t amqp_methods_decimal128 = { amqp_type_method_decimal128_print };
+
 amqp_type_methods_t amqp_methods_ulong0 = { amqp_type_method_ulong0_print };
 amqp_type_methods_t amqp_methods_ulong = { amqp_type_method_ulong_print };
 amqp_type_methods_t amqp_methods_long = { amqp_type_method_long_print };
@@ -46,7 +50,6 @@ amqp_type_methods_t amqp_methods_small_long = { amqp_type_method_small_long_prin
 
 amqp_type_methods_t amqp_methods_double = { amqp_type_method_double_print };
 amqp_type_methods_t amqp_methods_timestamp = { amqp_type_method_timestamp_print };
-amqp_type_methods_t amqp_methods_decimal64 = { amqp_type_method_decimal64_print };
 amqp_type_methods_t amqp_methods_uuid = { amqp_type_method_uuid_print };
 
 amqp_type_methods_t amqp_methods_binary_vbin8 = { amqp_type_method_binary_vbin8_print };
@@ -55,11 +58,15 @@ amqp_type_methods_t amqp_methods_symbol_sym8 = { amqp_type_method_symbol_sym8_pr
 amqp_type_methods_t amqp_methods_binary_vbin32 = { amqp_type_method_binary_vbin32_print };
 amqp_type_methods_t amqp_methods_string_str32_utf8 = { amqp_type_method_string_str32_utf8_print };
 amqp_type_methods_t amqp_methods_symbol_sym32 = { amqp_type_method_symbol_sym32_print };
-amqp_type_methods_t amqp_methods_list_8 = { amqp_type_method_list_8_print };
-amqp_type_methods_t amqp_methods_map_8 = { amqp_type_method_map_8_print };
-amqp_type_methods_t amqp_methods_list_32 = { amqp_type_method_list_32_print };
-amqp_type_methods_t amqp_methods_map_32 = { amqp_type_method_map_32_print };
-amqp_type_methods_t amqp_methods_array_8 = { amqp_type_method_array_8_print };
-amqp_type_methods_t amqp_methods_array_32 = { amqp_type_method_array_32_print };
+
+amqp_type_methods_t amqp_methods_list_0 = { amqp_type_method_list_print };
+amqp_type_methods_t amqp_methods_list_8 = { amqp_type_method_list_print };
+amqp_type_methods_t amqp_methods_list_32 = { amqp_type_method_list_print };
+
+amqp_type_methods_t amqp_methods_map_8 = { amqp_type_method_map_print };
+amqp_type_methods_t amqp_methods_map_32 = { amqp_type_method_map_print };
+
+amqp_type_methods_t amqp_methods_array_8 = { amqp_type_method_array_print };
+amqp_type_methods_t amqp_methods_array_32 = { amqp_type_method_array_print };
 
 amqp_type_methods_t amqp_methods_extension_type = { amqp_type_method_extension_type_print };

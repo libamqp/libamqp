@@ -33,24 +33,25 @@ typedef struct amqp_memory_block_t amqp_memory_block_t;
 
 struct amqp_memory_pool_t
 {
+#ifndef DISABLE_MEMORY_POOL
     amqp_memory_block_t *block_list;
-    amqp_allocation_stats_t stats;
-
-    int initialized; // TODO - delete this field as it's kinda pointless
     int allocations_per_block;
     unsigned long allocations_mask;
-    size_t safe_alignment;       /* typically 4 or 16 */
-    size_t allocation_data_padding; /* padding after header to ensure correct alignment of object */
-    size_t block_data_padding;      /* padding before first allocation in block */
-    size_t object_size;         /* the size of the object being allocated from the pool */
-    size_t allocation_size;     /* size of an allocation block: header + padding + object */
-
+    size_t block_size;
+    size_t offset_to_first_allocation;
+    size_t offset_to_allocation_data;
+    size_t object_size_in_fragments;    /* the size of the object being allocated from the pool */
+    size_t allocation_size_in_bytes;     /* size of an allocation block: header + padding + object + trailing guard*/
+#else
+    size_t object_size;
+#endif
+    amqp_allocation_stats_t stats;
+    int initialized;
     amqp_pool_callback_t initializer_callback;
     amqp_pool_callback_t destroyer_callback;
 };
 
 extern void amqp_initialize_pool(amqp_memory_pool_t *pool, size_t object_size);
-extern void amqp_initialize_pool_specifing_block_limits(amqp_memory_pool_t *pool, size_t object_size, int allocations_per_block);
 extern void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t object_size, size_t suggested_block_size);
 extern void amqp_pool_specify_initialization_callbacks(amqp_memory_pool_t *pool, amqp_pool_callback_t initializer_callback, amqp_pool_callback_t destroyer_callback);
 

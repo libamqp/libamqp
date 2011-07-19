@@ -76,10 +76,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <type name="amqp-value" class="restricted" source="*" provides="section">
       <descriptor name="amqp:amqp-value:*" code="0x00000000:0x00000077"/>
     </type>
-    <type name="footer" class="composite" source="list" provides="section">
-      <descriptor name="amqp:footer:list" code="0x00000000:0x00000078"/>
-      <field name="message-attrs" type="map"/>
-      <field name="delivery-attrs" type="map"/>
+    <type name="footer" class="restricted" source="annotations" provides="section">
+      <descriptor name="amqp:footer:map" code="0x00000000:0x00000078"/>
     </type>
     <type name="annotations" class="restricted" source="map"/>
     <type name="message-id-ulong" class="restricted" source="ulong" provides="message-id"/>
@@ -90,42 +88,34 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <definition name="MESSAGE-FORMAT" value="0"/>
   </section>
   <section name="delivery-state">
-    <type name="delivery-state" class="composite" source="list" provides="delivery-state">
-      <descriptor name="amqp:delivery-state:list" code="0x00000000:0x00000023"/>
-      <field name="options" type="options"/>
+    <type name="received" class="composite" source="list" provides="delivery-state">
+      <descriptor name="amqp:received:list" code="0x00000000:0x00000023"/>
       <field name="section-number" type="uint"/>
       <field name="section-offset" type="ulong"/>
-      <field name="outcome" type="*" requires="outcome"/>
-      <field name="txn-id" type="*" requires="txn-id"/>
     </type>
-    <type name="accepted" class="composite" source="list" provides="outcome">
+    <type name="accepted" class="composite" source="list" provides="delivery-state, outcome">
       <descriptor name="amqp:accepted:list" code="0x00000000:0x00000024"/>
-      <field name="options" type="options"/>
     </type>
-    <type name="rejected" class="composite" source="list" provides="outcome">
+    <type name="rejected" class="composite" source="list" provides="delivery-state, outcome">
       <descriptor name="amqp:rejected:list" code="0x00000000:0x00000025"/>
-      <field name="options" type="options"/>
       <field name="error" type="error"/>
     </type>
-    <type name="released" class="composite" source="list" provides="outcome">
+    <type name="released" class="composite" source="list" provides="delivery-state, outcome">
       <descriptor name="amqp:released:list" code="0x00000000:0x00000026"/>
-      <field name="options" type="options"/>
     </type>
-    <type name="modified" class="composite" source="list" provides="outcome">
+    <type name="modified" class="composite" source="list" provides="delivery-state, outcome">
       <descriptor name="amqp:modified:list" code="0x00000000:0x00000027"/>
-      <field name="options" type="options"/>
       <field name="delivery-failed" type="boolean"/>
       <field name="undeliverable-here" type="boolean"/>
-      <field name="message-attrs" type="map"/>
+      <field name="message-annotations" type="fields"/>
     </type>
   </section>
   <section name="addressing">
     <type name="source" class="composite" source="list" provides="source">
       <descriptor name="amqp:source:list" code="0x00000000:0x00000028"/>
-      <field name="options" type="options"/>
       <field name="address" type="*" requires="address"/>
       <field name="durable" type="terminus-durability" default="none"/>
-      <field name="expiry-policy" type="terminus-expiry-policy" default="session"/>
+      <field name="expiry-policy" type="terminus-expiry-policy" default="session-end"/>
       <field name="timeout" type="seconds" default="0"/>
       <field name="dynamic" type="boolean" default="false"/>
       <field name="dynamic-node-properties" type="node-properties"/>
@@ -137,10 +127,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </type>
     <type name="target" class="composite" source="list" provides="target">
       <descriptor name="amqp:target:list" code="0x00000000:0x00000029"/>
-      <field name="options" type="options"/>
       <field name="address" type="*" requires="address"/>
       <field name="durable" type="terminus-durability" default="none"/>
-      <field name="expiry-policy" type="terminus-expiry-policy" default="session"/>
+      <field name="expiry-policy" type="terminus-expiry-policy" default="session-end"/>
       <field name="timeout" type="seconds" default="0"/>
       <field name="dynamic" type="boolean" default="false"/>
       <field name="dynamic-node-properties" type="node-properties"/>
@@ -165,19 +154,15 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <type name="node-properties" class="restricted" source="fields"/>
     <type name="delete-on-close" class="composite" source="list" provides="lifetime-policy">
       <descriptor name="amqp:delete-on-close:list" code="0x00000000:0x0000002b"/>
-      <field name="options" type="options"/>
     </type>
     <type name="delete-on-no-links" class="composite" source="list" provides="lifetime-policy">
       <descriptor name="amqp:delete-on-no-links:list" code="0x00000000:0x0000002c"/>
-      <field name="options" type="options"/>
     </type>
     <type name="delete-on-no-messages" class="composite" source="list" provides="lifetime-policy">
       <descriptor name="amqp:delete-on-no-messages:list" code="0x00000000:0x0000002d"/>
-      <field name="options" type="options"/>
     </type>
     <type name="delete-on-no-links-or-messages" class="composite" source="list" provides="lifetime-policy">
       <descriptor name="amqp:delete-on-no-links-or-messages:list" code="0x00000000:0x0000002e"/>
-      <field name="options" type="options"/>
     </type>
   </section>
 </amqp>

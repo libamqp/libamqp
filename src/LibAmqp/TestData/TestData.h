@@ -122,6 +122,10 @@ namespace test_data
 
     extern TestData empty_map;
     extern TestData empty_list_8;
+    extern TestData empty_list_0;
+    extern TestData array_of_lists;
+    extern TestData array_of_lists_one_empty;
+    extern TestData array_of_single_empty_list;
     extern TestData boolean_array;
 
     extern TestData multiple_true_symbol_null;

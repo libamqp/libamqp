@@ -36,25 +36,26 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <section name="coordination">
     <type name="coordinator" class="composite" source="list" provides="target">
       <descriptor name="amqp:coordinator:list" code="0x00000000:0x00000030"/>
-      <field name="options" type="options"/>
       <field name="capabilities" type="symbol" requires="txn-capability" multiple="true"/>
     </type>
     <type name="declare" class="composite" source="list">
       <descriptor name="amqp:declare:list" code="0x00000000:0x00000031"/>
-      <field name="options" type="options"/>
       <field name="global-id" type="*" requires="global-tx-id"/>
     </type>
     <type name="discharge" class="composite" source="list">
       <descriptor name="amqp:discharge:list" code="0x00000000:0x00000032"/>
-      <field name="options" type="options"/>
       <field name="txn-id" type="*" mandatory="true" requires="txn-id"/>
       <field name="fail" type="boolean"/>
     </type>
     <type name="transaction-id" class="restricted" source="binary" provides="txn-id"/>
-    <type name="declared" class="composite" source="list" provides="outcome">
+    <type name="declared" class="composite" source="list" provides="delivery-state, outcome">
       <descriptor name="amqp:declared:list" code="0x00000000:0x00000033"/>
-      <field name="options" type="options"/>
       <field name="txn-id" type="*" mandatory="true" requires="txn-id"/>
+    </type>
+    <type name="transactional-state" class="composite" source="list" provides="delivery-state">
+      <descriptor name="amqp:transactional-state:list" code="0x00000000:0x00000034"/>
+      <field name="txn-id" type="*" mandatory="true" requires="txn-id"/>
+      <field name="outcome" type="*" requires="outcome"/>
     </type>
     <type name="txn-capability" class="restricted" source="symbol" provides="txn-capability">
       <choice name="local-txn" value="amqp:local-transactions"/>

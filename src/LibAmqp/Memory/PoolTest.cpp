@@ -13,40 +13,32 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-
 #include "Memory/PoolTestSupport.h"
-
 #include "debug_helper.h"
-
-#ifndef DISABLE_MEMORY_POOL
 
 SUITE(Pool)
 {
-    TEST_FIXTURE(PoolFixture, pool_initialization)
+    TEST_FIXTURE(InitializedPoolFixture, callback_should_initialize_object)
     {
-        amqp_initialize_pool(&pool, sizeof(test_type_t));
-
-        CHECK_EQUAL(LONG_BIT, pool.allocations_per_block);
-        SOUTV(pool.allocations_per_block);
-
-        CHECK_EQUAL(-1UL, pool.allocations_mask);
-        SOUTVX(pool.allocations_mask);
-
-        CHECK(pool.safe_alignment == 4 || pool.safe_alignment == 16);
-        SOUTV(pool.safe_alignment);
-
-        CHECK_EQUAL(0U, (pool.allocation_data_padding + sizeof(amqp_memory_allocation_header_t)) % pool.safe_alignment);
-        SOUTV(pool.allocation_data_padding);
-
-        CHECK_EQUAL(0U, (pool.block_data_padding + sizeof(amqp_memory_block_header_t)) % pool.safe_alignment);
-        SOUTV(pool.block_data_padding);
-
-        CHECK_EQUAL(sizeof(test_type_t), pool.object_size);
-
-        size_t allocation_size = sizeof(test_type_t) + pool.allocation_data_padding + sizeof(amqp_memory_allocation_header_t);
-        CHECK_EQUAL(allocation_size, pool.allocation_size);
+        test_type_t *p = (test_type_t *) amqp_allocate(&pool);
+        CHECK_EQUAL('A', p->important_stuff[0]);
+        for (unsigned i = 0; i < sizeof(p->important_stuff); i++)
+        {
+            CHECK_EQUAL('A' + (int) i, p->important_stuff[i]);
+        }
+        amqp_deallocate(&pool, p);
     }
 
+#ifdef DISABLE_MEMORY_POOL
+    TEST_FIXTURE(InitializedPoolFixture, verify_allocation_works_when_pool_disabled)
+    {
+        test_type_t *p, *q;
+        p = (test_type_t *) amqp_allocate(&pool);
+        q = (test_type_t *) amqp_allocate(&pool);
+        amqp_deallocate(&pool, p);
+        amqp_deallocate(&pool, q);
+    }
+#else
     TEST_FIXTURE(InitializedPoolFixture, first_allocate_from_pool_allocates_block)
     {
         CHECK_NULL(pool.block_list);
@@ -96,7 +88,10 @@ SUITE(Pool)
 
     TEST_FIXTURE(InitializedPoolFixture, allocations_should_be_reflected_in_mask)
     {
-        allocate_from_pool(7);
+        allocate_from_pool(1);
+        CHECK_EQUAL(0xfeU, (unsigned) pool.block_list->header.mask.bytes[0]);
+
+        allocate_from_pool(6);
         CHECK_EQUAL(0x80U, (unsigned) pool.block_list->header.mask.bytes[0]);
 
         allocate_from_pool(1);
@@ -116,8 +111,6 @@ SUITE(Pool)
 
         allocate_from_pool(1);
         CHECK_EQUAL(0xfeU, (unsigned) pool.block_list->header.mask.bytes[2]);
-        CHECK_EQUAL(0xffU, (unsigned) pool.block_list->header.mask.bytes[3]);
-
     }
 
     class BlockChainingTestFixture : public PoolFixture
@@ -147,96 +140,82 @@ SUITE(Pool)
         }
     };
 
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_64)
+    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block)
     {
         initialize_pool();
         test();
     }
 
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_8)
+    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_256)
     {
-        initialize_pool(8);
+        break_one();
+        initialize_pool(256);
         test();
     }
 
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_16)
+    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_512)
     {
-        initialize_pool(16);
+        initialize_pool(512);
         test();
     }
 
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_32)
+    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_768)
     {
-        initialize_pool(32);
-        test();
-    }
-    
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_2)
-    {
-        initialize_pool(2);
+        initialize_pool(768);
         test();
     }
 
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_7)
+    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_1024)
     {
-        initialize_pool(7);
+        initialize_pool(1024);
         test();
     }
 
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_9)
+    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_1526)
     {
-        initialize_pool(9);
+        initialize_pool(1526);
         test();
     }
 
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_11)
+    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_2048)
     {
-        initialize_pool(11);
+        initialize_pool(2048);
         test();
     }
 
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_15)
+    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_4096)
     {
-        initialize_pool(15);
-        test();
-    }
-
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_17)
-    {
-        initialize_pool(17);
-        test();
-    }
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_31)
-    {
-        initialize_pool(31);
-        test();
-    }
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_33)
-    {
-        initialize_pool(33);
-        test();
-    }
-
-    TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_63)
-    {
-        initialize_pool(63);
+        initialize_pool(4096);
         test();
     }
 
     TEST_FIXTURE(BlockChainingTestFixture, free_allocation_in_block_should_result_in_block_removal_from_chain)
     {
-        initialize_pool(2);
+        initialize_pool(256);
 
-        allocate_from_pool(2);
+        CHECK_NULL(pool.block_list); // no blocks on the pool
+
+        // allocate first block
+        allocate_from_pool();
         amqp_memory_block_t *first_block = pool.block_list;
 
-        test_type_t *p = (test_type_t *) amqp_allocate(&pool);
-        test_type_t *q = (test_type_t *) amqp_allocate(&pool);
+        // allocate remainder of slots in the first block
+        allocate_from_pool(pool.allocations_per_block - 1);
+        CHECK_EQUAL(first_block, pool.block_list);
 
+        // allocate second block
+        allocate_from_pool();
         amqp_memory_block_t *second_block = pool.block_list;
+        CHECK(first_block != second_block);
 
-        allocate_from_pool(2);
+        // allocate remainder of slots in the second block
+        allocate_from_pool(pool.allocations_per_block - 1);
+        CHECK_EQUAL(second_block, pool.block_list);
+
+        // allocate another causing a third block to be allocated
+        test_type_t *p = (test_type_t *) amqp_allocate(&pool);
         amqp_memory_block_t *third_block = pool.block_list;
+        CHECK(second_block != third_block);
 
         CHECK_NULL(first_block->header.next);
         CHECK_EQUAL(second_block, first_block->header.previous);
@@ -245,42 +224,34 @@ SUITE(Pool)
         CHECK_EQUAL(second_block, third_block->header.next);
         CHECK_NULL(third_block->header.previous);
 
-        amqp_deallocate(&pool, p);
-        amqp_deallocate(&pool, q);
+        for (int i = 0; i < pool.allocations_per_block; i++)
+        {
+            return_last_allocated_to_pool(); // return last allocated by call to allocate_from_pool();
+        }
 
         // verify that the second block has been removed from the block list
-        // because all its allocation have been deallocated
+        // because all its allocations have been deallocated
         CHECK_EQUAL(third_block, pool.block_list);
         CHECK_NULL(third_block->header.previous);
         CHECK_EQUAL(first_block, third_block->header.next);
         CHECK_NULL(first_block->header.next);
         CHECK_EQUAL(third_block, first_block->header.previous);
 
-        // now remove the last allocations from the pool causing the third block to be removed from the list.
-        return_last_allocated_to_pool();
-        return_last_allocated_to_pool();
+        // now remove the last allocation from the pool causing the third block to be removed from the list.
+        amqp_deallocate(&pool, p);
+
         CHECK_EQUAL(first_block, pool.block_list);
         CHECK_NULL(first_block->header.previous);
         CHECK_NULL(first_block->header.next);
-    }
 
-    void allocate_callback(amqp_memory_pool_t *pool, test_type_t *object)
-    {
-        for (int i = 0; i < 32; i++)
+        // deallocate everything from the first block
+        for (int i = 0; i < pool.allocations_per_block; i++)
         {
-            object->important_stuff[i] = 'A' + i;
+            return_last_allocated_to_pool(); // return last allocated by call to allocate_from_pool();
         }
-    }
-    void deallocate_callback(amqp_memory_pool_t *pool, void *object)
-    {
-    }
 
-    TEST_FIXTURE(InitializedPoolFixture, callback_should_initialize_onject)
-    {
-        amqp_pool_specify_initialization_callbacks(&pool, (amqp_pool_callback_t) allocate_callback, deallocate_callback);
-        test_type_t *t = (test_type_t *) allocate_from_pool();
-        CHECK_EQUAL('A', t->important_stuff[0]);
-        CHECK_EQUAL('Z', t->important_stuff[25]);
+
+        CHECK_NULL(pool.block_list); // assert that there are no blocks left
     }
-}
 #endif
+}

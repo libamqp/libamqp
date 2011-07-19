@@ -230,11 +230,11 @@ namespace test_data
     );
 
     test_data_def(true_1,
-        0x56, 0x00
+        0x56, 0x01
     );
 
     test_data_def(false_1,
-        0x56, 0x01
+        0x56, 0x00
     );
 
     test_data_def(array_shorts,
@@ -395,13 +395,42 @@ namespace test_data
         0xc0, 0x01, 0x00,
     );
 
+    test_data_def(empty_list_0,
+        0x45
+    );
+
+    test_data_def(array_of_lists,
+        0xe0,
+        0x11, 0x03,
+        0xc0,
+        0x04, 0x01, 0x61, 0x00, 0x07,
+        0x04, 0x01, 0x61, 0x00, 0x0b,
+        0x04, 0x01, 0x61, 0x00, 0x0d,
+    );
+
+    test_data_def(array_of_lists_one_empty,
+        0xe0,
+        0x0e, 0x03,
+        0xc0,
+        0x04, 0x01, 0x61, 0x00, 0x07,
+        0x04, 0x01, 0x61, 0x00, 0x0b,
+        0x01, 0x00,
+    );
+
+    test_data_def(array_of_single_empty_list,
+        0xe0,
+        0x04, 0x01,
+        0xc0,
+        0x01, 0x00,
+    );
+
     test_data_def(boolean_array,
         0xe0,
         0x04,           // size
         0x02,           // count
         0x56,           // member constructor
-        0x00,           // true
-        0x01,           // false
+        0x01,           // true
+        0x00,           // false
     );
 
     // TODO - add decode test for this

@@ -14,31 +14,29 @@
    limitations under the License.
  */
 
-#include <stdlib.h>
 #include <string.h>
 
-#include "TestHarness.h"
-#include "Context/ContextTestSupport.h"
-#include "Buffer/Buffer.h"
-#include "TestData/TestData.h"
+#include "Context/Context.h"
+#include "Framing/Stream/Stream.h"
 
-namespace SuiteContext
+
+int amqp_buffer_read_from_stream(amqp_buffer_t *buffer, amqp_stream_t *stream, int n)
 {
-    ContextFixture::ContextFixture()
-    {
-        context = amqp_create_context();
-    }
+    assert(buffer != 0);
+    assert(stream != 0);
 
-    ContextFixture::~ContextFixture()
+    n = amqp_stream_read(stream, buffer->bytes, buffer->actual_size, buffer->limit.size, n);
+    if (n > 0)
     {
-        int allocations_ok = amqp_destroy_context(context);
-        CHECK(allocations_ok);
-        context = 0;
+        buffer->limit.size += n;
     }
-
-    void ContextFixture::load_decode_buffer(test_data::TestData &data)
-    {
-        data.transfer_to(context->decode.buffer);
-    }
+    return n;
 }
 
+int amqp_buffer_write_to_stream(amqp_buffer_t *buffer, amqp_stream_t *stream)
+{
+    assert(buffer != 0);
+    assert(stream != 0);
+
+    return amqp_stream_write(stream, buffer->bytes, buffer->limit.size);
+}

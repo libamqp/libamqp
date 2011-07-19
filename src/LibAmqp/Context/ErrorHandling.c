@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "Context/Context.h"
 
 
@@ -92,5 +93,37 @@ void _amqp_debug(const amqp_context_t *context, int level, const char * filename
         va_start(args, format);
         output_message(context->debug.stream, filename, line_number, "debug", function, format, args);
         va_end(args);
+    }
+}
+
+static void print_error_message(const char *leader, const char *message)
+{
+    char buffer[128];
+    int leader_length = strlen(leader);
+    int message_length = strlen(message);
+    int limit = sizeof(buffer) - leader_length - 2;
+    int actual = message_length > limit ? limit : message_length;
+
+    strncpy(buffer, leader, leader_length);
+    strncpy(buffer + leader_length,  message, actual);
+    buffer[leader_length + actual] = '\n';
+    
+    write(2, buffer, leader_length + actual + 1);
+}
+
+void amqp_fatal_program_error(const char *message)
+{
+    print_error_message("libamqp - fatal illegal state detected - ", message);
+    abort();
+    exit(1);
+}
+
+void amqp_api_usage_error(amqp_context_t *context, const char *message)
+{
+    fprintf(stderr, "libamqp - illegal state detected - %s\n", message);
+    if (!context->config.continue_on_usage_error)
+    {
+        abort();
+        exit(1);
     }
 }

@@ -4,12 +4,13 @@
 #
 
 MODULES := \
+	LibAmqp/TestData \
 	LibAmqp \
 	LibAmqp/Memory \
 	LibAmqp/Buffer \
 	LibAmqp/Context \
-	LibAmqp/TestData \
 	LibAmqp/Codec \
+	LibAmqp/Framing \
         DecodeDemo \
 	../3rd-party/UnitTest++/src  \
 	Test
@@ -19,7 +20,6 @@ OLD_MODULES := \
 	AmqpClient/SaslFrame \
 	AmqpClient/Network \
 	AmqpClient/Stream \
-	DecodeDemo
 
 CC=gcc
 LIBS :=
@@ -34,7 +34,7 @@ all:	trace libs targets tests
 targets::
 
 CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES))
-CPPFLAGS +=  -DDISABLE_MEMORY_POOL
+# CPPFLAGS +=  -DDISABLE_MEMORY_POOL
 # CPPFLAGS +=  -DTRACE_ALLOCATIONS
 # CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic
 CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L 

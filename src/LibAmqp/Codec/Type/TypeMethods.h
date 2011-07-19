@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-#include "Codec/Type/TypeMetaData.h"
+#include "Codec/Type/EncodingMetaData.h"
 
 // :s/^\(.*amqp_methods_\)\([^ ]*\);
 extern amqp_type_methods_t amqp_methods_described;
@@ -41,7 +41,11 @@ extern amqp_type_methods_t amqp_methods_small_int;
 
 extern amqp_type_methods_t amqp_methods_float;
 extern amqp_type_methods_t amqp_methods_char;
+
 extern amqp_type_methods_t amqp_methods_decimal32;
+extern amqp_type_methods_t amqp_methods_decimal64;
+extern amqp_type_methods_t amqp_methods_decimal128;
+
 extern amqp_type_methods_t amqp_methods_ulong0;
 extern amqp_type_methods_t amqp_methods_ulong;
 extern amqp_type_methods_t amqp_methods_long;
@@ -51,7 +55,6 @@ extern amqp_type_methods_t amqp_methods_small_long;
 
 extern amqp_type_methods_t amqp_methods_double;
 extern amqp_type_methods_t amqp_methods_timestamp;
-extern amqp_type_methods_t amqp_methods_decimal64;
 extern amqp_type_methods_t amqp_methods_uuid;
 
 extern amqp_type_methods_t amqp_methods_binary_vbin8;
@@ -60,6 +63,7 @@ extern amqp_type_methods_t amqp_methods_symbol_sym8;
 extern amqp_type_methods_t amqp_methods_binary_vbin32;
 extern amqp_type_methods_t amqp_methods_string_str32_utf8;
 extern amqp_type_methods_t amqp_methods_symbol_sym32;
+extern amqp_type_methods_t amqp_methods_list_0;
 extern amqp_type_methods_t amqp_methods_list_8;
 extern amqp_type_methods_t amqp_methods_map_8;
 extern amqp_type_methods_t amqp_methods_list_32;

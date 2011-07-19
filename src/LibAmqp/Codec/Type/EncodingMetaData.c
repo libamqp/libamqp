@@ -16,7 +16,7 @@
 
 #include <stdio.h>
 
-#include "Codec/Type/TypeMetaData.h"
+#include "Codec/Type/EncodingMetaData.h"
 #include "Codec/Type/TypeMethods.h"
 #include "Codec/Decode/Decode.h"
 #include "Codec/Type/Type.h"
@@ -28,7 +28,7 @@ const char *amqp_category_names[] = {
     "array"
 };
 
-amqp_type_meta_data_t amqp_type_meta_data_described = {
+amqp_encoding_meta_data_t amqp_type_meta_data_described = {
     0x00,
     0,
     amqp_decode_described_type,
@@ -37,7 +37,7 @@ amqp_type_meta_data_t amqp_type_meta_data_described = {
     "",
     AMQP_TYPE_CATEGORY_COMPOUND,
 };
-amqp_type_meta_data_t amqp_type_meta_data_null = {
+amqp_encoding_meta_data_t amqp_type_meta_data_null = {
     0x40,
     0,
     amqp_decode_null,
@@ -46,7 +46,7 @@ amqp_type_meta_data_t amqp_type_meta_data_null = {
     "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_boolean_true = {
+amqp_encoding_meta_data_t amqp_type_meta_data_boolean_true = {
     0x41,
     0,
     amqp_decode_boolean_true,
@@ -55,7 +55,7 @@ amqp_type_meta_data_t amqp_type_meta_data_boolean_true = {
     "true",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_boolean_false = {
+amqp_encoding_meta_data_t amqp_type_meta_data_boolean_false = {
     0x42,
     0,
     amqp_decode_boolean_false,
@@ -65,7 +65,7 @@ amqp_type_meta_data_t amqp_type_meta_data_boolean_false = {
     AMQP_TYPE_CATEGORY_FIXED,
 };
 // <encoding name="uint0" code="0x43" category="fixed" width="0"/>
-amqp_type_meta_data_t amqp_type_meta_data_uint_uint0 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_uint_uint0 = {
     0x43,
     0,
     amqp_decode_uint0,
@@ -75,7 +75,7 @@ amqp_type_meta_data_t amqp_type_meta_data_uint_uint0 = {
     AMQP_TYPE_CATEGORY_FIXED,
 };
 // <encoding name="ulong0" code="0x44" category="fixed" width="0"/>
-amqp_type_meta_data_t amqp_type_meta_data_ulong_ulong0 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_ulong_ulong0 = {
     0x44,
     0,
     amqp_decode_ulong0,
@@ -84,7 +84,16 @@ amqp_type_meta_data_t amqp_type_meta_data_ulong_ulong0 = {
     "ulong0",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_0 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_list_0 = {
+    0x45,
+    0,
+    amqp_decode_list_0,
+    &amqp_methods_list_0,
+    "list",
+    "list0",
+    AMQP_TYPE_CATEGORY_FIXED,
+};
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_0 = {
     0x4F,
     0,
     amqp_decode_extension_type,
@@ -93,7 +102,7 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_0 = {
     "fixed-0",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_ubyte = {
+amqp_encoding_meta_data_t amqp_type_meta_data_ubyte = {
     0x50,
     1,
     amqp_decode_ubyte,
@@ -102,7 +111,7 @@ amqp_type_meta_data_t amqp_type_meta_data_ubyte = {
     "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_byte = {
+amqp_encoding_meta_data_t amqp_type_meta_data_byte = {
     0x51,
     1,
     amqp_decode_byte,
@@ -111,7 +120,7 @@ amqp_type_meta_data_t amqp_type_meta_data_byte = {
     "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_uint_small_uint = {
+amqp_encoding_meta_data_t amqp_type_meta_data_uint_small_uint = {
     0x52,
     1,
     amqp_decode_small_uint,
@@ -120,7 +129,7 @@ amqp_type_meta_data_t amqp_type_meta_data_uint_small_uint = {
     "smalluint",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_ulong_small_ulong = {
+amqp_encoding_meta_data_t amqp_type_meta_data_ulong_small_ulong = {
     0x53,
     1,
     amqp_decode_small_ulong,
@@ -129,7 +138,7 @@ amqp_type_meta_data_t amqp_type_meta_data_ulong_small_ulong = {
     "smallulong",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_int_small_int = {
+amqp_encoding_meta_data_t amqp_type_meta_data_int_small_int = {
     0x54,
     1,
     amqp_decode_small_int,
@@ -138,7 +147,7 @@ amqp_type_meta_data_t amqp_type_meta_data_int_small_int = {
     "smallint",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_long_small_long = {
+amqp_encoding_meta_data_t amqp_type_meta_data_long_small_long = {
     0x55,
     1,
     amqp_decode_small_long,
@@ -147,12 +156,7 @@ amqp_type_meta_data_t amqp_type_meta_data_long_small_long = {
     "smalllong",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-/*
-TODO - check the next version of the spec for the value of true
-
-    "boolean with the octect 0x00 being true and octet 0x01 being false"
-*/
-amqp_type_meta_data_t amqp_type_meta_data_boolean = {
+amqp_encoding_meta_data_t amqp_type_meta_data_boolean = {
     0x56,
     1,
     amqp_decode_boolean,
@@ -161,7 +165,7 @@ amqp_type_meta_data_t amqp_type_meta_data_boolean = {
     "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_1 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_1 = {
     0x5F,
     1,
     amqp_decode_extension_type,
@@ -170,7 +174,7 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_1 = {
     "fixed-1",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_ushort = {
+amqp_encoding_meta_data_t amqp_type_meta_data_ushort = {
     0x60,
     2,
     amqp_decode_ushort,
@@ -179,7 +183,7 @@ amqp_type_meta_data_t amqp_type_meta_data_ushort = {
     "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_short = {
+amqp_encoding_meta_data_t amqp_type_meta_data_short = {
     0x61,
     2,
     amqp_decode_short,
@@ -188,7 +192,7 @@ amqp_type_meta_data_t amqp_type_meta_data_short = {
     "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_2 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_2 = {
     0x6F,
     2,
     amqp_decode_extension_type,
@@ -197,7 +201,7 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_2 = {
     "fixed-2",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_uint = {
+amqp_encoding_meta_data_t amqp_type_meta_data_uint = {
     0x70,
     4,
     amqp_decode_uint,
@@ -206,7 +210,7 @@ amqp_type_meta_data_t amqp_type_meta_data_uint = {
     "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_int = {
+amqp_encoding_meta_data_t amqp_type_meta_data_int = {
     0x71,
     4,
     amqp_decode_int,
@@ -215,7 +219,7 @@ amqp_type_meta_data_t amqp_type_meta_data_int = {
     "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_float_ieee_754 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_float_ieee_754 = {
     0x72,
     4,
     amqp_decode_float,
@@ -224,7 +228,7 @@ amqp_type_meta_data_t amqp_type_meta_data_float_ieee_754 = {
     "ieee-754",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_char_utf32 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_char_utf32 = {
     0x73,
     4,
     amqp_decode_char,
@@ -233,7 +237,7 @@ amqp_type_meta_data_t amqp_type_meta_data_char_utf32 = {
     "utf32",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_decimal32_ieee_754 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_decimal32_ieee_754 = {
     0x74,
     4,
     amqp_decode_decimal32,
@@ -242,7 +246,7 @@ amqp_type_meta_data_t amqp_type_meta_data_decimal32_ieee_754 = {
     "ieee-754",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_4 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_4 = {
     0x7F,
     4,
     amqp_decode_extension_type,
@@ -251,7 +255,7 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_4 = {
     "fixed-4",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_ulong = {
+amqp_encoding_meta_data_t amqp_type_meta_data_ulong = {
     0x80,
     8,
     amqp_decode_ulong,
@@ -260,7 +264,7 @@ amqp_type_meta_data_t amqp_type_meta_data_ulong = {
     "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_long = {
+amqp_encoding_meta_data_t amqp_type_meta_data_long = {
     0x81,
     8,
     amqp_decode_long,
@@ -269,7 +273,7 @@ amqp_type_meta_data_t amqp_type_meta_data_long = {
     "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_double_ieee_754 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_double_ieee_754 = {
     0x82,
     8,
     amqp_decode_double,
@@ -278,7 +282,7 @@ amqp_type_meta_data_t amqp_type_meta_data_double_ieee_754 = {
     "ieee-754",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_timestamp_ms64 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_timestamp_ms64 = {
     0x83,
     8,
     amqp_decode_timestamp,
@@ -287,7 +291,7 @@ amqp_type_meta_data_t amqp_type_meta_data_timestamp_ms64 = {
     "ms64",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_decimal64_ieee_754 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_decimal64_ieee_754 = {
     0x84,
     8,
     amqp_decode_decimal64,
@@ -296,7 +300,7 @@ amqp_type_meta_data_t amqp_type_meta_data_decimal64_ieee_754 = {
     "ieee-754",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_8 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_8 = {
     0x8F,
     8,
     amqp_decode_extension_type,
@@ -305,7 +309,16 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_8 = {
     "fixed-8",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_uuid = {
+amqp_encoding_meta_data_t amqp_type_meta_data_decimal128_ieee_754 = {
+    0x94,
+    16,
+    amqp_decode_decimal128,
+    &amqp_methods_decimal128,
+    "decimal128",
+    "ieee-754",
+    AMQP_TYPE_CATEGORY_FIXED,
+};
+amqp_encoding_meta_data_t amqp_type_meta_data_uuid = {
     0x98,
     16,
     amqp_decode_uuid,
@@ -314,7 +327,7 @@ amqp_type_meta_data_t amqp_type_meta_data_uuid = {
     "",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_16 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_16 = {
     0x9F,
     16,
     amqp_decode_extension_type,
@@ -323,7 +336,7 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_fixed_16 = {
     "fixed-16",
     AMQP_TYPE_CATEGORY_FIXED,
 };
-amqp_type_meta_data_t amqp_type_meta_data_binary_vbin8 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_binary_vbin8 = {
     0xA0,
     1,
     amqp_decode_binary_vbin8,
@@ -332,7 +345,7 @@ amqp_type_meta_data_t amqp_type_meta_data_binary_vbin8 = {
     "vbin8",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
-amqp_type_meta_data_t amqp_type_meta_data_string_str8_utf8 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_string_str8_utf8 = {
     0xA1,
     1,
     amqp_decode_string_str8_utf8,
@@ -341,7 +354,7 @@ amqp_type_meta_data_t amqp_type_meta_data_string_str8_utf8 = {
     "str8-utf8",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
-amqp_type_meta_data_t amqp_type_meta_data_symbol_sym8 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_symbol_sym8 = {
     0xA3,
     1,
     amqp_decode_symbol_sym8,
@@ -350,7 +363,7 @@ amqp_type_meta_data_t amqp_type_meta_data_symbol_sym8 = {
     "sym8",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_variable_1 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_variable_1 = {
     0xAF,
     1,
     amqp_decode_extension_type,
@@ -359,7 +372,7 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_variable_1 = {
     "variable-1",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
-amqp_type_meta_data_t amqp_type_meta_data_binary_vbin32 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_binary_vbin32 = {
     0xB0,
     4,
     amqp_decode_binary_vbin32,
@@ -368,7 +381,7 @@ amqp_type_meta_data_t amqp_type_meta_data_binary_vbin32 = {
     "vbin32",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
-amqp_type_meta_data_t amqp_type_meta_data_string_str32_utf8 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_string_str32_utf8 = {
     0xB1,
     4,
     amqp_decode_string_str32_utf8,
@@ -377,7 +390,7 @@ amqp_type_meta_data_t amqp_type_meta_data_string_str32_utf8 = {
     "str32-utf8",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
-amqp_type_meta_data_t amqp_type_meta_data_symbol_sym32 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_symbol_sym32 = {
     0xB3,
     4,
     amqp_decode_symbol_sym32,
@@ -386,7 +399,7 @@ amqp_type_meta_data_t amqp_type_meta_data_symbol_sym32 = {
     "sym32",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_variable_4 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_variable_4 = {
     0xBF,
     4,
     amqp_decode_extension_type,
@@ -395,7 +408,7 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_variable_4 = {
     "variable-4",
     AMQP_TYPE_CATEGORY_VARIABLE,
 };
-amqp_type_meta_data_t amqp_type_meta_data_list_8 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_list_8 = {
     0xC0,
     1,
     amqp_decode_list_8,
@@ -404,7 +417,7 @@ amqp_type_meta_data_t amqp_type_meta_data_list_8 = {
     "list8",
     AMQP_TYPE_CATEGORY_COMPOUND,
 };
-amqp_type_meta_data_t amqp_type_meta_data_map_8 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_map_8 = {
     0xC1,
     1,
     amqp_decode_map_8,
@@ -413,7 +426,7 @@ amqp_type_meta_data_t amqp_type_meta_data_map_8 = {
     "map8",
     AMQP_TYPE_CATEGORY_COMPOUND,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_compound_1 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_compound_1 = {
     0xCF,
     1,
     amqp_decode_extension_type,
@@ -422,7 +435,7 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_compound_1 = {
     "compound-1",
     AMQP_TYPE_CATEGORY_COMPOUND,
 };
-amqp_type_meta_data_t amqp_type_meta_data_list_32 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_list_32 = {
     0xD0,
     4,
     amqp_decode_list_32,
@@ -431,7 +444,7 @@ amqp_type_meta_data_t amqp_type_meta_data_list_32 = {
     "list32",
     AMQP_TYPE_CATEGORY_COMPOUND,
 };
-amqp_type_meta_data_t amqp_type_meta_data_map_32 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_map_32 = {
     0xD1,
     4,
     amqp_decode_map_32,
@@ -440,7 +453,7 @@ amqp_type_meta_data_t amqp_type_meta_data_map_32 = {
     "map32",
     AMQP_TYPE_CATEGORY_COMPOUND,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_compound_4 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_compound_4 = {
     0xDF,
     4,
     amqp_decode_extension_type,
@@ -449,7 +462,7 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_compound_4 = {
     "compound-4",
     AMQP_TYPE_CATEGORY_COMPOUND,
 };
-amqp_type_meta_data_t amqp_type_meta_data_array_8 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_array_8 = {
     0xE0,
     1,
     amqp_decode_array_8,
@@ -458,7 +471,7 @@ amqp_type_meta_data_t amqp_type_meta_data_array_8 = {
     "array8",
     AMQP_TYPE_CATEGORY_ARRAY,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_array_1 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_array_1 = {
     0xEF,
     1,
     amqp_decode_extension_type,
@@ -467,7 +480,7 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_array_1 = {
     "array-1",
     AMQP_TYPE_CATEGORY_ARRAY,
 };
-amqp_type_meta_data_t amqp_type_meta_data_array_32 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_array_32 = {
     0xF0,
     4,
     amqp_decode_array_32,
@@ -476,7 +489,7 @@ amqp_type_meta_data_t amqp_type_meta_data_array_32 = {
     "array32",
     AMQP_TYPE_CATEGORY_ARRAY,
 };
-amqp_type_meta_data_t amqp_type_meta_data_extension_array_4 = {
+amqp_encoding_meta_data_t amqp_type_meta_data_extension_array_4 = {
     0xFF,
     4,
     amqp_decode_extension_type,
@@ -486,13 +499,14 @@ amqp_type_meta_data_t amqp_type_meta_data_extension_array_4 = {
     AMQP_TYPE_CATEGORY_ARRAY,
 };
 
-amqp_type_meta_data_t *amqp__type_lookup_table[] = {
+amqp_encoding_meta_data_t *amqp__type_lookup_table[] = {
     &amqp_type_meta_data_described,
     &amqp_type_meta_data_null,
     &amqp_type_meta_data_boolean_true,
     &amqp_type_meta_data_boolean_false,
     &amqp_type_meta_data_uint_uint0,
     &amqp_type_meta_data_ulong_ulong0,
+    &amqp_type_meta_data_list_0,
     &amqp_type_meta_data_extension_fixed_0,
     &amqp_type_meta_data_ubyte,
     &amqp_type_meta_data_byte,
@@ -517,6 +531,7 @@ amqp_type_meta_data_t *amqp__type_lookup_table[] = {
     &amqp_type_meta_data_timestamp_ms64,
     &amqp_type_meta_data_decimal64_ieee_754,
     &amqp_type_meta_data_extension_fixed_8,
+    &amqp_type_meta_data_decimal128_ieee_754,
     &amqp_type_meta_data_uuid,
     &amqp_type_meta_data_extension_fixed_16,
     &amqp_type_meta_data_binary_vbin8,
@@ -540,17 +555,17 @@ amqp_type_meta_data_t *amqp__type_lookup_table[] = {
 };
 
 
-int amqp__type_lookup_table_ntypes = sizeof(amqp__type_lookup_table) / sizeof(amqp_type_meta_data_t *);
+int amqp__type_lookup_table_ntypes = sizeof(amqp__type_lookup_table) / sizeof(amqp_encoding_meta_data_t *);
 
 
 // TODO - this binary search can take 5 compares to find a value, do lookup table for fast version
-amqp_type_meta_data_t *
+amqp_encoding_meta_data_t *
 amqp_type_meta_data_lookup(amqp_context_t *context, int format_code)
 {
     int s = 0;
     int e = amqp__type_lookup_table_ntypes;
     int m;
-    amqp_type_meta_data_t *candidate;
+    amqp_encoding_meta_data_t *candidate;
 
     while (s < e)
     {

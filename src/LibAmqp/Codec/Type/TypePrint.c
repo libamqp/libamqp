@@ -276,6 +276,11 @@ void amqp_type_method_decimal64_print(amqp_context_t *context, amqp_type_t *type
     amqp_type_print_raw_data(context, type);
 }
 
+void amqp_type_method_decimal128_print(amqp_context_t *context, amqp_type_t *type)
+{
+    amqp_type_print_raw_data(context, type);
+}
+
 void amqp_type_method_uuid_print(amqp_context_t *context, amqp_type_t *type)
 {
     static char separator[16] = {0, 0, 0, '-', 0, '-', 0, '-', 0, '-', 0 };
@@ -322,7 +327,7 @@ void amqp_type_method_string_str32_utf8_print(amqp_context_t *context, amqp_type
     amqp_type_print_ascii(context, type);
 }
 
-static void amqp_type_method_list_print(amqp_context_t *context, amqp_type_t *type)
+void amqp_type_method_list_print(amqp_context_t *context, amqp_type_t *type)
 {
     size_t i;
     size_t count = type->value.list.count;
@@ -342,17 +347,7 @@ static void amqp_type_method_list_print(amqp_context_t *context, amqp_type_t *ty
     amqp_context_putc(context, '}');
 }
 
-void amqp_type_method_list_8_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_method_list_print(context, type);
-}
-
-void amqp_type_method_list_32_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_method_list_print(context, type);
-}
-
-static void amqp_type_method_map_print(amqp_context_t *context, amqp_type_t *type)
+void amqp_type_method_map_print(amqp_context_t *context, amqp_type_t *type)
 {
     size_t i;
     size_t count = type->value.list.count;
@@ -379,17 +374,7 @@ static void amqp_type_method_map_print(amqp_context_t *context, amqp_type_t *typ
     amqp_context_putc(context, '}');
 }
 
-void amqp_type_method_map_8_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_method_map_print(context, type);
-}
-
-void amqp_type_method_map_32_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_method_map_print(context, type);
-}
-
-static void amqp_type_method_list_array_print(amqp_context_t *context, amqp_type_t *type)
+void amqp_type_method_array_print(amqp_context_t *context, amqp_type_t *type)
 {
     size_t i;
 
@@ -413,16 +398,6 @@ static void amqp_type_method_list_array_print(amqp_context_t *context, amqp_type
         amqp_nested_type_print(type->value.array.elements[i]);
     }
     amqp_context_putc(context, ']');
-}
-
-void amqp_type_method_array_8_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_method_list_array_print(context, type);
-}
-
-void amqp_type_method_array_32_print(amqp_context_t *context, amqp_type_t *type)
-{
-    amqp_type_method_list_array_print(context, type);
 }
 
 void amqp_type_method_extension_type_print(amqp_context_t *context, amqp_type_t *type)

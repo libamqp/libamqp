@@ -1,5 +1,9 @@
 libamqp release notes:
 
+Version 0.1.3
+--------------
+* update codec to support July, 6th 2011 draft specification (add support for list0 encoding of list)
+
 Version 0.1.2
 --------------
 * remove UTF-16 encoding

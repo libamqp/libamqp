@@ -14,31 +14,27 @@
    limitations under the License.
  */
 
-#include <stdlib.h>
-#include <string.h>
+#ifndef LIBAMQP_FRAMING_TEST_SUPPORT_H
+#define LIBAMQP_FRAMING_TEST_SUPPORT_H
 
-#include "TestHarness.h"
+#include <stdlib.h>
+
 #include "Context/ContextTestSupport.h"
-#include "Buffer/Buffer.h"
+#include "Framing/Stream/Stream.h"
+
 #include "TestData/TestData.h"
 
-namespace SuiteContext
+namespace SuiteFraming
 {
-    ContextFixture::ContextFixture()
+    class FramingFixture : public SuiteContext::ContextFixture
     {
-        context = amqp_create_context();
-    }
-
-    ContextFixture::~ContextFixture()
-    {
-        int allocations_ok = amqp_destroy_context(context);
-        CHECK(allocations_ok);
-        context = 0;
-    }
-
-    void ContextFixture::load_decode_buffer(test_data::TestData &data)
-    {
-        data.transfer_to(context->decode.buffer);
-    }
+    public:
+        FramingFixture();
+        ~FramingFixture();
+    public:
+    };
 }
+
+
+#endif
 

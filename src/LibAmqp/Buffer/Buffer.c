@@ -80,6 +80,11 @@ int amqp_buffer_check_free_space(amqp_buffer_t *buffer, size_t needed)
     return 1;
 }
 
+void amqp_buffer_backup(amqp_buffer_t *buffer, size_t amount)
+{
+    assert(buffer->limit.size >= amount);
+    buffer->limit.size -= amount;
+}
 
 /*
     TODO - move into test file
@@ -113,7 +118,7 @@ uint32_t amqp_buffer_read_size(amqp_buffer_t *buffer, size_t width)
         break;
 
     default:
-        fatal_program_error();
+        amqp_fatal_program_error("Asked to read an invalid size field.");
     }
 
     return result;

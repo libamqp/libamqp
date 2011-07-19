@@ -14,12 +14,15 @@
    limitations under the License.
  */
 
+#include "platform_limits.h"
+
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "libamqp_common.h"
 
+#include "Context/ErrorHandling.h"
 #include "Memory/Memory.h"
 #include "Memory/Pool.h"
 #include "Memory/PoolInternal.h"
@@ -27,6 +30,10 @@
 #include "debug_helper.h"
 
 #ifndef DISABLE_MEMORY_POOL
+void amqp_pool_break()
+{
+    // nothing to do here
+}
 
 static
 amqp_memory_block_t *find_block_with_free_space(amqp_memory_block_t *block_list)
@@ -42,14 +49,14 @@ amqp_memory_block_t *find_block_with_free_space(amqp_memory_block_t *block_list)
 static
 amqp_memory_block_t *allocate_block(amqp_memory_pool_t *pool)
 {
-    size_t block_size = pool->allocation_size * pool->allocations_per_block + sizeof(amqp_memory_block_header_t) + pool->block_data_padding;
+    size_t block_size = pool->allocation_size_in_bytes * pool->allocations_per_block + pool->offset_to_first_allocation;
     return amqp_malloc(block_size TRACE_ARGS);
 }
 
 static
 amqp_memory_allocation_t *allocation_from_index(amqp_memory_pool_t *pool, amqp_memory_block_t *block, int index)
 {
-    return (amqp_memory_allocation_t *) &block->allocations_data[pool->allocation_size * index + pool->block_data_padding];
+    return (amqp_memory_allocation_t *) &block->data.allocations[pool->allocation_size_in_bytes * index];
 }
 
 static
@@ -72,6 +79,8 @@ amqp_memory_block_t *allocate_new_memory_block(amqp_memory_pool_t *pool, amqp_me
         amqp_memory_allocation_t *allocation = allocation_from_index(pool, result, i);
         allocation->header.block = result;
         allocation->header.index = i;
+        allocation->header.leading_guard = (uint32_t) leading_mask;
+        allocation->data.fragments[pool->object_size_in_fragments] = (size_t) trailing_mask;
     }
     return result;
 }
@@ -121,9 +130,13 @@ void *allocate_object(amqp_memory_pool_t *pool)
     }
     amqp_memory_allocation_t *free_allocation = find_free_allocation_within_block(pool, block_with_free_space);
 
-    assert(free_allocation->header.block == block_with_free_space);
+    if (free_allocation->header.block != block_with_free_space)
+    {
+	amqp_pool_break();
+    	amqp_fatal_program_error("allocation from pool does not belong to correct block (set break on amqp_pool_break() to debug)");
+    }
 
-    return  &free_allocation->data[pool->allocation_data_padding];
+    return  &free_allocation->data;
 }
 #endif
 
@@ -133,19 +146,19 @@ void *amqp_allocate(amqp_memory_pool_t *pool)
 
     assert(pool != null);
     assert(pool->initialized);
-    assert(pool->object_size != 0);
     assert(pool->initializer_callback != null);
 
- #ifdef DISABLE_MEMORY_POOL
+#ifdef DISABLE_MEMORY_POOL
     result = amqp_malloc(pool->object_size TRACE_ARGS);
- #else
+#else
+    assert(pool->object_size_in_fragments != 0);
     result = allocate_object(pool);
- #endif
+#endif
 
     (*pool->initializer_callback)(pool, result);
 
-     pool->stats.outstanding_allocations++;
-     pool->stats.total_allocation_calls++;
+    pool->stats.outstanding_allocations++;
+    pool->stats.total_allocation_calls++;
 
     return result;
 }
@@ -155,17 +168,34 @@ void *amqp_allocate(amqp_memory_pool_t *pool)
 static
 amqp_memory_allocation_t *calculate_allocation_ptr_from_object_ptr(amqp_memory_pool_t *pool, void *pooled_object)
 {
-    return (amqp_memory_allocation_t *) ((unsigned char *) pooled_object - sizeof(amqp_memory_allocation_header_t) - pool->allocation_data_padding);
+    amqp_memory_allocation_t sample;
+    size_t offset = (unsigned char *) &sample.data - (unsigned char *) &sample.header;
+    return (amqp_memory_allocation_t *) ((unsigned char *) pooled_object - offset);
 }
 
 static
 void delete_object(amqp_memory_pool_t *pool, void *pooled_object)
 {
     amqp_memory_allocation_t *allocation = calculate_allocation_ptr_from_object_ptr(pool, pooled_object);
-    amqp_memory_block_t *block = allocation->header.block;
-    size_t index = allocation->header.index;
-    int i = index / 8;
-    int j = index % 8;
+    amqp_memory_block_t *block;
+    size_t index;
+    int i, j;
+
+    if (allocation->header.leading_guard != (uint32_t) leading_mask)
+    {
+	amqp_pool_break();
+    	amqp_fatal_program_error("The leading guard on allocation has been corrupted. (set break on amqp_pool_break() to debug)");
+    }
+    if (allocation->data.fragments[pool->object_size_in_fragments] != (size_t) trailing_mask)
+    {
+	amqp_pool_break();
+    	amqp_fatal_program_error("The trailing guard on allocation has been corrupted. (set break on amqp_pool_break() to debug)");
+    }
+
+    block = allocation->header.block;
+    index = allocation->header.index;
+    i = index / 8;
+    j = index % 8;
 
     block->header.mask.bytes[i] = block->header.mask.bytes[i] | (1U << j);
 
@@ -196,97 +226,111 @@ void amqp_deallocate(amqp_memory_pool_t *pool, void *pooled_object)
     if (pooled_object != 0)
     {
         (*pool->destroyer_callback)(pool, pooled_object);
- #ifdef DISABLE_MEMORY_POOL
+#ifdef DISABLE_MEMORY_POOL
         amqp_free(pooled_object TRACE_ARGS);
- #else
+#else
         delete_object(pool, pooled_object);
- #endif
+#endif
         pool->stats.outstanding_allocations--;
     }
 }
 
-static size_t calculate_safe_alignment()
-{
-    struct {
-    	void *p;
-	long double d;
-    } struct_with_long_double;
-
-    size_t  long_double_alignment = (unsigned char *) &struct_with_long_double.d - (unsigned char *) &struct_with_long_double.p;
-
-    struct {
-    	short s;
-	double d;
-    } struct_with_double;
-
-    size_t  double_alignment = (unsigned char *) &struct_with_double.d - (unsigned char *) &struct_with_double.s;
-
-    return long_double_alignment >= double_alignment ? long_double_alignment : double_alignment;
-}
-
 static
-size_t round_object_size_to_alignment_boundary(size_t alignment, size_t pooled_object_size)
-{
-    return ((pooled_object_size - 1) / alignment + 1) * alignment;
-}
-
-static
-size_t calculate_padding(size_t safe_alignment, size_t header_size)
-{
-    return (safe_alignment - header_size % safe_alignment) % safe_alignment;
-}
-
-static
-size_t calculate_memory_allocation_t_size(amqp_memory_pool_t *pool)
-{
-    return sizeof(amqp_memory_allocation_header_t) + pool->allocation_data_padding + pool->object_size;
-}
-
-static void default_callback(amqp_memory_pool_t *pool, void *object)
+void default_callback(amqp_memory_pool_t *pool, void *object)
 {
     // nothing to see here, move along
 }
 
-void amqp_initialize_pool_specifing_block_limits(amqp_memory_pool_t *pool, size_t pooled_object_size, int allocations_per_block)
+#ifndef DISABLE_MEMORY_POOL
+
+static
+size_t calculate_block_offset_to_first_allocation()
 {
-    if (pooled_object_size < sizeof(long))
-    {
-        pooled_object_size = sizeof(long);
-    }
-    
-    if (allocations_per_block > LONG_BIT)
-    {
-        allocations_per_block = LONG_BIT;
-    }
+    amqp_memory_block_t sample_block;
+    size_t result = (unsigned char *) &sample_block.data - (unsigned char *) &sample_block.header;
+    return result;
+}
 
+static
+size_t calculate_offset_to_allocation_data()
+{
+    amqp_memory_block_t sample_allocation;
+    size_t result = (unsigned char *) &sample_allocation.data - (unsigned char *) &sample_allocation.header;
+    return result;
+}
+
+static
+size_t byte_count_rounded_to_size_t_array_size(size_t n)
+{
+    size_t result = (n - 1) / SIZE_T_BYTES + 1;
+    result = result < MIN_FRAGMENTS ? MIN_FRAGMENTS : result;
+    return result;
+}
+
+static
+size_t calculate_allocation_t_size_in_bytes(amqp_memory_pool_t *pool)
+{
+    size_t count = pool->object_size_in_fragments + 1;       // allow space for the trailing guard
+    size_t result =  pool->offset_to_allocation_data + count * SIZE_T_BYTES;
+    return result;
+}
+
+static size_t preferred_block_size();
+
+static
+size_t adjust_block_size(size_t block_size)
+{
+    size_t size = preferred_block_size() * 2;
+    while (true)
+    {
+        size_t next_size = size >> 1;
+        if (next_size < block_size)
+        {
+            break;
+        }
+        size = next_size;
+    }
+    return size;
+}
+#endif
+
+static
+size_t preferred_block_size()
+{
+    return LONG_BIT > 32 ? 2048 : 1024;
+}
+
+void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t pooled_object_size, size_t suggested_block_size)
+{
     memset(pool, '\0', sizeof(amqp_memory_pool_t));
+#ifndef DISABLE_MEMORY_POOL
+    pool->block_size = adjust_block_size(suggested_block_size);
 
-    pool->allocations_per_block = allocations_per_block > 1 ? allocations_per_block : 2;
+    pool->offset_to_first_allocation = calculate_block_offset_to_first_allocation();
+    pool->offset_to_allocation_data = calculate_offset_to_allocation_data();
+    pool->object_size_in_fragments = byte_count_rounded_to_size_t_array_size(pooled_object_size);
+    pool->allocation_size_in_bytes = calculate_allocation_t_size_in_bytes(pool);
+
+    do {
+        pool->allocations_per_block = (pool->block_size - pool->offset_to_first_allocation) / pool->allocation_size_in_bytes;
+        if (pool->allocations_per_block > LONG_BIT)
+        {
+            pool->block_size /= 2;
+        }
+    }
+    while (pool->allocations_per_block > LONG_BIT);
     pool->allocations_mask = ((1UL << pool->allocations_per_block) & ~1UL) - 1;
-
-    pool->safe_alignment = calculate_safe_alignment();
-    pool->object_size = round_object_size_to_alignment_boundary(pool->safe_alignment, pooled_object_size);
-
-    pool->allocation_data_padding = calculate_padding(pool->safe_alignment, sizeof(amqp_memory_allocation_header_t));
-    pool->block_data_padding = calculate_padding(pool->safe_alignment, sizeof(amqp_memory_block_header_t));
-
-    pool->allocation_size = calculate_memory_allocation_t_size(pool);
-
+#else
+    pool->object_size = pooled_object_size;
+#endif
     pool->initializer_callback = default_callback;
     pool->destroyer_callback = default_callback ;
-
     pool->initialized = true;
 }
 
 void amqp_initialize_pool(amqp_memory_pool_t *pool, size_t pooled_object_size)
 {
-    amqp_initialize_pool_specifing_block_limits(pool, pooled_object_size, LONG_BIT);
-}
-
-void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t object_size, size_t suggested_block_size)
-{
-    int n = ((suggested_block_size  - 1) / 512 + 1) * 512 / object_size;
-    amqp_initialize_pool_specifing_block_limits(pool, object_size, n);
+    amqp_initialize_pool_suggesting_block_size(pool, pooled_object_size, preferred_block_size());
 }
 
 void amqp_pool_specify_initialization_callbacks(amqp_memory_pool_t *pool, amqp_pool_callback_t initializer_callback, amqp_pool_callback_t destroyer_callback)

@@ -109,6 +109,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <encoding name="sym32" code="0xb3" category="variable" width="4"/>
     </type>
     <type name="list" class="primitive">
+      <encoding name="list0" code="0x45" category="fixed" width="0"/>
       <encoding name="list8" code="0xc0" category="compound" width="1"/>
       <encoding name="list32" code="0xd0" category="compound" width="4"/>
     </type>

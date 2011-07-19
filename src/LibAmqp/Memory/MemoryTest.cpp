@@ -14,7 +14,6 @@
    limitations under the License.
  */
 
-
 #include "Memory/MemoryTestSupport.h"
 
 SUITE(Memory)
