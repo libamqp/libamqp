@@ -58,13 +58,13 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <field name="outcome" type="*" requires="outcome"/>
     </type>
     <type name="txn-capability" class="restricted" source="symbol" provides="txn-capability">
-      <choice name="local-txn" value="amqp:local-transactions"/>
-      <choice name="distributed-txn" value="amqp:distributed-transactions"/>
-      <choice name="promotable-txn" value="amqp:promotable-transactions"/>
+      <choice name="local-transactions" value="amqp:local-transactions"/>
+      <choice name="distributed-transactions" value="amqp:distributed-transactions"/>
+      <choice name="promotable-transactions" value="amqp:promotable-transactions"/>
       <choice name="multi-txns-per-ssn" value="amqp:multi-txns-per-ssn"/>
       <choice name="multi-ssns-per-txn" value="amqp:multi-ssns-per-txn"/>
     </type>
-    <type name="transaction-errors" class="restricted" source="symbol" provides="error-condition">
+    <type name="transaction-error" class="restricted" source="symbol" provides="error-condition">
       <choice name="unknown-id" value="amqp:transaction:unknown-id"/>
       <choice name="transaction-rollback" value="amqp:transaction:rollback"/>
       <choice name="transaction-timeout" value="amqp:transaction:timeout"/>
