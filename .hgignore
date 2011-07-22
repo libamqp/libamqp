@@ -20,3 +20,5 @@ decode-demo.out.txt
 src/t
 src/t.c
 src/t.dSYM
+Documentation/amqp-xml/minimal.tar
+cccc-output

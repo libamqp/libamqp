@@ -20,3 +20,5 @@ src/t.c
 src/t
 src/t.dSYM
 decode-demo.out.txt
+cccc-output
+output
