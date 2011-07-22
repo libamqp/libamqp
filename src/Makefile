@@ -28,6 +28,7 @@ INCLUDES :=
 TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
+TEST_RUNNER_ARGS :=
 
 .PHONY:	all trace libs tests check debug targets
 all:	trace libs targets tests
@@ -60,7 +61,7 @@ debug:	all
 	gdb ./TestRunner
 	
 check::	all
-	./TestRunner
+	./TestRunner $(TEST_RUNNER_ARGS)
 	
 TestRunner:	$(TEST_OBJ) $(OBJ) $(LIBS)
 	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) -o $@

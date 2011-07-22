@@ -16,35 +16,74 @@
 
 #include <TestHarness.h>
 #include <TestReporterStdout.h>
+#include <XmlTestReporter.h>
 #include <TraceReporter.h>
 #include <iostream>
+#include <fstream>
+#include <string.h>
 
-//SUITE(TestSuite)
-//{
-//    class Fixture
-//    {
-//    public:
-//        Fixture() {
-//            std::cout << "Fixture ctor" << std::endl;
-//        }
-//
-//        ~Fixture() {
-//            std::cout << "Fixture dtor" << std::endl;
-//        }
-//    };
-//
-//    TEST_FIXTURE(Fixture, YourTestName)
-//    {
-//        CHECK(1);
-//        sleep(2);
-//    }
-//}
-
-int main(int, char const *[])
+class ReporterMinder
 {
-    TraceReporter reporter;
-    UnitTest::TestReporterStdout stdoutReporter;
-    
-    UnitTest::TestRunner runner(stdoutReporter);
-    return runner.RunTestsIf(UnitTest::Test::GetTestList(), NULL, UnitTest::True(), 0);
+public:
+    ReporterMinder(UnitTest::TestReporter *_reporter) : reporter(_reporter) {}
+    ~ReporterMinder() { delete reporter; }
+    UnitTest::TestReporter& theReporter() const { return *reporter; }
+private:
+    UnitTest::TestReporter *reporter;
+};
+
+class ArgumentProcessor
+{
+public:
+    ArgumentProcessor() : _reporter(0), _suite(0) {}
+    ~ArgumentProcessor()
+    {
+        delete _reporter;
+    }
+    UnitTest::TestReporter& theReporter() const { return *_reporter; }
+    const char *suite() const { return _suite; }
+
+    void scan(int argc, char const *argv[])
+    {
+        int i = 1;
+        while (i < argc && argv[i][0] == '-')
+        {
+            if (strcmp("--trace", argv[i]) == 0 && _reporter == 0)
+            {
+                _reporter = new TraceReporter();
+            }
+            else if (strcmp("--xml", argv[i]) == 0 && _reporter == 0)
+            {
+                _reporter = new UnitTest::XmlTestReporter(std::cout);
+            }
+            else if (strncmp("--xml=", argv[i], strlen("--xml=")) == 0 && _reporter == 0)
+            {
+                _resultFile.open(&argv[i][strlen("--xml=")]);
+                _reporter = new UnitTest::XmlTestReporter(_resultFile);
+            }
+            i++;
+        }
+        if (_reporter == 0)
+        {
+            _reporter = new UnitTest::TestReporterStdout();
+        }
+        if (i < argc)
+        {
+            _suite = argv[i];
+        }
+    }
+
+private:
+    std::ofstream _resultFile;
+    UnitTest::TestReporter *_reporter;
+    const char *_suite;
+};
+
+int main(int argc, char const *argv[])
+{
+    ArgumentProcessor argumentProcessor;
+    argumentProcessor.scan(argc, argv);
+
+    UnitTest::TestRunner runner(argumentProcessor.theReporter());
+    return runner.RunTestsIf(UnitTest::Test::GetTestList(), argumentProcessor.suite(), UnitTest::True(), 0);
 }
