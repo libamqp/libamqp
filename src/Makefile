@@ -10,7 +10,7 @@ MODULES := \
 	LibAmqp/Buffer \
 	LibAmqp/Context \
 	LibAmqp/Codec \
-	LibAmqp/Framing \
+	LibAmqp/Transport \
         DecodeDemo \
 	../3rd-party/UnitTest++/src  \
 	Test
