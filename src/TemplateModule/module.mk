@@ -3,7 +3,7 @@
 # by Peter Miller (http://aegis.sourceforge.net/auug97.pdf)
 #
 
-MODULE = LibAmqp/Transport
+MAKEVAR = LibAmqp/Parent/Module
 
-SRC += $(wildcard  $(MODULE)/*.c)
-TEST_SRC += $(wildcard  $(MODULE)/*Test.cpp) $(wildcard  $(MODULE)/*TestSupport.cpp)
+SRC += $(wildcard  $(MAKEVAR)/*.c)
+TEST_SRC += $(wildcard  $(MAKEVAR)/*Test.cpp) $(wildcard  $(MAKEVAR)/*TestSupport.cpp)

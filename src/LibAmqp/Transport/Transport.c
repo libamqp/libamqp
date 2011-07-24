@@ -14,27 +14,5 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_FRAMING_TEST_SUPPORT_H
-#define LIBAMQP_FRAMING_TEST_SUPPORT_H
-
-#include <stdlib.h>
-
-#include "Context/ContextTestSupport.h"
-#include "Framing/Stream/Stream.h"
-
-#include "TestData/TestData.h"
-
-namespace SuiteFraming
-{
-    class FramingFixture : public SuiteContext::ContextFixture
-    {
-    public:
-        FramingFixture();
-        ~FramingFixture();
-    public:
-    };
-}
-
-
-#endif
+#include "Transport/Transport.h"
 

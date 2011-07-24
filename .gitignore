@@ -10,6 +10,7 @@
 *.i
 *.s
 *.orig
+*.tar
 
 3rd-party/UnitTest++/TestUnitTest++
 Documentation/amqp.pdf
@@ -22,3 +23,4 @@ src/t.dSYM
 decode-demo.out.txt
 cccc-output
 output
+random-bytes.txt

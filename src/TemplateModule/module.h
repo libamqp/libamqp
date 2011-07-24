@@ -14,29 +14,17 @@
    limitations under the License.
  */
 
-#include <string.h>
+#ifndef LIBAMQP_PARENT_MODULE_MODULE_H
+#define LIBAMQP_PARENT_MODULE_MODULE_H
 
-#include "Context/Context.h"
-#include "Framing/Stream/Stream.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stdlib.h>
 
 
-int amqp_buffer_read_from_stream(amqp_buffer_t *buffer, amqp_stream_t *stream, int n)
-{
-    assert(buffer != 0);
-    assert(stream != 0);
-
-    n = amqp_stream_read(stream, buffer->bytes, buffer->actual_size, buffer->limit.size, n);
-    if (n > 0)
-    {
-        buffer->limit.size += n;
-    }
-    return n;
+#ifdef __cplusplus
 }
-
-int amqp_buffer_write_to_stream(amqp_buffer_t *buffer, amqp_stream_t *stream)
-{
-    assert(buffer != 0);
-    assert(stream != 0);
-
-    return amqp_stream_write(stream, buffer->bytes, buffer->limit.size);
-}
+#endif
+#endif
