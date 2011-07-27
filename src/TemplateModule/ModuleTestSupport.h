@@ -17,7 +17,7 @@
 #ifndef LIBAMQP_PARENT_MODULE_MODULE_TEST_SUPPORT_H
 #define LIBAMQP_PARENT_MODULE_MODULE_TEST_SUPPORT_H
 
-#include "Parent/Module.h"
+#include "Parent/Module/Module.h"
 
 namespace SuiteParentModule
 {

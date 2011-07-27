@@ -53,8 +53,8 @@ do
 	$i > $i.t && mv $i.t $i
 done
 
-mv Module.c ${cc_target}.c
-mv Module.h ${cc_target}.h
+mv module.c ${cc_target}.c
+mv module.h ${cc_target}.h
 mv ModuleTest.cpp ${cc_target}Test.cpp
 mv ModuleTestSupport.cpp ${cc_target}TestSupport.cpp
 mv ModuleTestSupport.h ${cc_target}TestSupport.h
