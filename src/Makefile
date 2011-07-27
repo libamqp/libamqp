@@ -15,11 +15,6 @@ MODULES := \
 	../3rd-party/UnitTest++/src  \
 	Test
 
-OLD_MODULES := \
-	AmqpClient/Frame \
-	AmqpClient/SaslFrame \
-	AmqpClient/Network \
-	AmqpClient/Stream \
 
 CC=gcc
 LIBS :=
