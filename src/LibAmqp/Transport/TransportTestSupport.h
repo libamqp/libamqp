@@ -14,20 +14,21 @@
    limitations under the License.
  */
 
-#include <stdlib.h>
-#include <string.h>
+#ifndef LIBAMQP_TRANSPORT_TRANSPORT_TEST_SUPPORT_H
+#define LIBAMQP_TRANSPORT_TRANSPORT_TEST_SUPPORT_H
 
-#include "TestHarness.h"
-#include "Framing/FramingTestSupport.h"
+#include "Transport.h"
 
-namespace SuiteFraming
+namespace SuiteTransport
 {
-    FramingFixture::FramingFixture()
+    class TransportFixture
     {
-    }
-
-    FramingFixture::~FramingFixture()
-    {
-    }
+    public:
+        TransportFixture();
+        ~TransportFixture();
+    private:
+    };
 }
+
+#endif
 

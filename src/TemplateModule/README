@@ -1,0 +1,5 @@
+This folder contains set of template files for a new module.
+
+Just copy all the files into a new folder and run ./fix_me.sh from within 
+the new folder to rename all the files, include guards and the C++ test 
+classes to match the folder name.

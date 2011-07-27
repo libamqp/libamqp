@@ -10,16 +10,11 @@ MODULES := \
 	LibAmqp/Buffer \
 	LibAmqp/Context \
 	LibAmqp/Codec \
-	LibAmqp/Framing \
+	LibAmqp/Transport \
         DecodeDemo \
 	../3rd-party/UnitTest++/src  \
 	Test
 
-OLD_MODULES := \
-	AmqpClient/Frame \
-	AmqpClient/SaslFrame \
-	AmqpClient/Network \
-	AmqpClient/Stream \
 
 CC=gcc
 LIBS :=
@@ -28,6 +23,7 @@ INCLUDES :=
 TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
+TEST_RUNNER_ARGS :=
 
 .PHONY:	all trace libs tests check debug targets
 all:	trace libs targets tests
@@ -60,7 +56,7 @@ debug:	all
 	gdb ./TestRunner
 	
 check::	all
-	./TestRunner
+	./TestRunner $(TEST_RUNNER_ARGS)
 	
 TestRunner:	$(TEST_OBJ) $(OBJ) $(LIBS)
 	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) -o $@
