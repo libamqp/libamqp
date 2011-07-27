@@ -5,5 +5,5 @@
 
 MAKEVAR = LibAmqp/Parent/Module
 
-SRC += $(wildcard  $(MAKEVAR)/*.c)
-TEST_SRC += $(wildcard  $(MAKEVAR)/*Test.cpp) $(wildcard  $(MAKEVAR)/*TestSupport.cpp)
+SRC += $(filter-out $(wildcard $(MAKEVAR)/*Stubb.c),$(wildcard $(MAKEVAR)/*.c))
+TEST_SRC += $(wildcard  $(MAKEVAR)/*Test.cpp) $(wildcard $(MAKEVAR)/*TestSupport.cpp $(MAKEVAR)/*Stubb.c)
