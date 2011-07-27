@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 
-#include "libamqp_common.h"
+#include "libamqp.h"
 #include "Memory/Pool.h"
 #include "Buffer/Buffer.h"
 #include "Codec/Type/Type.h"

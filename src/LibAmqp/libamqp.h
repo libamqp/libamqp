@@ -21,9 +21,17 @@
 extern "C" {
 #endif
 
-#include "LibAmqp/libamqp_common.h"
+#include "libamqp_common.h"
+
+#define AMQP_DEFAULT_PORT           5672
+#define AMQP_DEFAULT_SECURE_PORT    5671
+#define AMQP_PROTOCOL_MAJOR         1
+#define AMQP_PROTOCOL_MINOR         0
+#define AMQP_PROTOCOL_REVISION      1
+#define AMQP_MIN_MAX_FRAME_SIZE     512
 
 // TODO - external API signatures go here
+
 
 #ifdef __cplusplus
 }
