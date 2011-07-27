@@ -12,6 +12,7 @@ MODULES := \
 	LibAmqp/Codec \
 	LibAmqp/Transport \
         DecodeDemo \
+        SampleServer \
 	../3rd-party/UnitTest++/src  \
 	Test
 
@@ -41,6 +42,7 @@ CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLU
 # CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic
 CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L 
 CXXFLAGS = -g -Wall
+LDFLAGS = -lev
 
 LIBAMQP_LIB := libamqp.a
 LIBS += $(LIBAMQP_LIB)
@@ -65,7 +67,7 @@ check::	all
 	./TestRunner $(TEST_RUNNER_ARGS)
 	
 TestRunner:	$(TEST_OBJ) $(OBJ) $(LIBS)
-	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) -o $@
+	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) $(LDFLAGS) -o $@
 
 $(OBJ) $(TEST_OBJ): Makefile
 

@@ -11,11 +11,13 @@ package, or you may obtain a copy of the License at
 
 Dependencies:
 
-Libamqp has a dependency on UnitTest++ (see: http://unittest-cpp.sourceforge.net/).
+Libamqp has a dependency on UnitTest++ (see: http://unittest-cpp.sourceforge.net/)
 Details on the licensing of UnitTest++ are in: 3rd-party/UnitTest++/README, and
 3rd-party/UnitTest++/COPYING. UnitTest++ is required by the libamqp build and does
 not introduce a dependency on code linking with libamqp.
 
+Libamqp has a dependency on Libev (see: http://software.schmorp.de/pkg/libev.html).
+Currently you must have libev installed on your system to build or use libamqp.
 
 See src/?? for usage.
 
