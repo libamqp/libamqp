@@ -14,20 +14,21 @@
    limitations under the License.
  */
 
-#include <TestHarness.h>
-#include "Transport/Transport.h"
-#include "Transport/TransportTestSupport.h"
+#ifndef LIBAMQP_TRANSPORT_SOCKET_H
+#define LIBAMQP_TRANSPORT_SOCKET_H
 
-SUITE(Transport)
-{
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    void amqp_connection_created_callback(amqp_connection_t *connection)
-    {
+#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
+#define LIBAMQP_AMQP_CONTEXT_TYPE_T
+typedef struct amqp_context_t amqp_context_t;
+#endif
 
-    }
+extern int amqp_setup_listener(amqp_context_t *context, int port_number);
 
-    TEST_FIXTURE(TransportFixture, really_important_test)
-    {
-        amqp_connection_t *connection = amqp__create_connection(context, endpoint, amqp_connection_created_callback);
-    }
+#ifdef __cplusplus
 }
+#endif
+#endif

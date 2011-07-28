@@ -25,6 +25,7 @@
 #include "Context/Context.h"
 
 
+// TODO - lock error output stream
 static void output_message(FILE *stream, const char *filename, int line_number, const char *label, const char *extra, const char *format, va_list args)
 {
     fprintf(stream, "%s:%d: %s: %s", filename, line_number, label, extra);
@@ -56,10 +57,10 @@ void _amqp_io_error(amqp_context_t *context, int level, const char * filename, i
     
     if (context->debug.stream && level < context->debug.level)
     {
-        char message[128];
+        char message[256];
         strerror_r(context->error_code, message, sizeof(message));
 
-        char extra[128];
+        char extra[256];
         snprintf(extra, sizeof(extra), "%s(%d)", message, context->error_code);
 
         va_list args;
@@ -113,7 +114,7 @@ static void print_error_message(const char *leader, const char *message)
 
 void amqp_fatal_program_error(const char *message)
 {
-    print_error_message("libamqp - fatal illegal state detected - ", message);
+    print_error_message("libamqp - fatal - illegal state detected - ", message);
     abort();
     exit(1);
 }
