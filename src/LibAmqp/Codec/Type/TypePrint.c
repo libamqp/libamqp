@@ -38,10 +38,11 @@ static void str_print(amqp_context_t *context, const char *s)
 
 static void printf_type_value(amqp_context_t *context, const char *format, ...)
 {
+    char buffer[64];
+
     va_list args;
     va_start(args, format);
 
-    char buffer[64];
     vsnprintf(buffer, sizeof(buffer), format, args);
 
     str_print(context, buffer);

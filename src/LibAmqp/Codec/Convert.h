@@ -20,7 +20,6 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
 #include "Buffer/Buffer.h"
 #include "Codec/Type/Type.h"
 

@@ -409,6 +409,8 @@ int amqp_construct_container_type(amqp_encoding_meta_data_t *meta_data, amqp_typ
 
 int amqp_decode_described_type(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
+    amqp_type_t *descriptor;
+    amqp_type_t *described;
 
     type->position.index = amqp_buffer_index(type->context->decode.buffer);
     type->position.size = 0;
@@ -417,7 +419,7 @@ int amqp_decode_described_type(amqp_encoding_meta_data_t *meta_data, amqp_type_t
     type->value.described.count = 2;
     type->value.described.elements = amqp_allocate_amqp_type_t_array(2);
 
-    amqp_type_t *descriptor = amqp_decode(type->context);
+    descriptor = amqp_decode(type->context);
     if (descriptor)
     {
         type->value.described.elements[0] = descriptor;
@@ -430,7 +432,7 @@ int amqp_decode_described_type(amqp_encoding_meta_data_t *meta_data, amqp_type_t
         return false;
     }
 
-    amqp_type_t *described = amqp_decode(type->context);
+    described = amqp_decode(type->context);
     if (described)
     {
         type->value.described.elements[1] = described;
@@ -556,6 +558,7 @@ static int amqp_decode_array(amqp_encoding_meta_data_t *meta_data, amqp_type_t *
     int rc = amqp_construct_container_type(meta_data, type);
     if (rc)
     {
+        amqp_type_t *element_type;
         uint32_t count = get_variable_type_count(meta_data, type);
         if (count == -1)
         {
@@ -566,7 +569,7 @@ static int amqp_decode_array(amqp_encoding_meta_data_t *meta_data, amqp_type_t *
         type->value.array.count = count;
         type->value.array.elements = amqp_allocate_amqp_type_t_array(count);
 
-        amqp_type_t *element_type = amqp_decode(type->context);
+        element_type = amqp_decode(type->context);
         element_type->flags.is_contained = true;
 
         type->value.array.elements[0] = element_type;

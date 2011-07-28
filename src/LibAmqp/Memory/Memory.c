@@ -15,6 +15,7 @@
  */
 
 #include "platform_limits.h"
+#include "libamqp_common.h"
 
 #include <assert.h>
 #include <stdlib.h>

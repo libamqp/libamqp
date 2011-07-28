@@ -30,7 +30,17 @@ extern "C" {
 #define null    ((void *) 0)
 #endif
 
+/* If we're not using GNU C, elide __attribute__ */
+#ifndef __GNUC__
+#define __attribute__(x)  /* NOTHING */
+#endif
+
+#ifdef _MSC_VER
+#include "libamqp_win32.h"
+#else
 #include <stdint.h>
+#endif
+
 #include <wchar.h>
 
 #ifndef LIBAMQP_AMQP_TYPE_T
