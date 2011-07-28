@@ -53,15 +53,15 @@ libs::	$(LIBAMQP_LIB)
 $(LIBAMQP_LIB): $(patsubst %.o,$(LIBAMQP_LIB)(%.o), $(OBJ))
 	@ranlib $@
 
-tests::	TestRunner
+tests::	test-runner
 
 debug:	all
-	gdb ./TestRunner
+	gdb ./test-runner
 	
 check::	all
-	./TestRunner $(TEST_RUNNER_ARGS)
+	./test-runner $(TEST_RUNNER_ARGS)
 	
-TestRunner:	$(TEST_OBJ) $(OBJ) $(LIBS)
+test-runner:	$(TEST_OBJ) $(OBJ) $(LIBS)
 	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) $(LDFLAGS) -o $@
 
 $(OBJ) $(TEST_OBJ): Makefile
@@ -121,7 +121,9 @@ clean::
 	rm -f $(CPP_OUT)
 	rm -f $(ASM_OUT)
 	rm -f $(LIBAMQP_LIB)
-	rm -f TestRunner
+	rm -f test-runner
+	rm -f decode-demo
+	rm -f sample-server
 
 scrub::
 	$(MAKE) -f Makefile.util scrub

@@ -8,12 +8,13 @@ syntax: glob
 *.s
 *.orig
 *.swp
+*.tar
+*.gz
 .idea/workspace.xml
 src/DequeTest
-src/TestRunner
+src/test-runner
 workspace/
 src/decode-demo
-src/decode-demo.tar.gz
 external/amqp
 3rd-party/UnitTest++/TestUnitTest++
 decode-demo.out.txt

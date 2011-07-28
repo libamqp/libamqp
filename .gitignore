@@ -11,12 +11,13 @@
 *.s
 *.orig
 *.tar
+*.tar.gz
 
 3rd-party/UnitTest++/TestUnitTest++
 Documentation/amqp.pdf
-src/TestRunner
+src/test-runner
 src/decode-demo
-src/decode-demo.tar.gz
+src/sample-server
 src/t.c
 src/t
 src/t.dSYM
