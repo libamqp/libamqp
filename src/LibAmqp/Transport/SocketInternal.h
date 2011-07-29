@@ -23,18 +23,33 @@ extern "C" {
 
 #include <ev.h>
 
+#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
+#define LIBAMQP_AMQP_CONTEXT_TYPE_T
+typedef struct amqp_context_t amqp_context_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_TRANSPORT_STATE_TYPE_T
 #define LIBAMQP_AMQP_TRANSPORT_STATE_TYPE_T
 typedef struct amqp_transport_state_t amqp_transport_state_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_EVENT_WATCHER_TYPE_T
+#define LIBAMQP_AMQP_EVENT_WATCHER_TYPE_T
+typedef struct amqp_event_watcher_t amqp_event_watcher_t;
+#endif
+
 const int amqp_max_listen_queue_length = 5;
+
+struct amqp_event_watcher_t
+{
+    struct ev_io io;
+    amqp_context_t *context;
+};
 
 struct amqp_transport_state_t
 {
     struct ev_loop *loop;
-    int listen_fd;
-    struct ev_io *accept_watcher;
+    amqp_event_watcher_t *accept_watcher;
 };
 
 #ifdef __cplusplus

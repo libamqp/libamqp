@@ -30,7 +30,7 @@ namespace SuiteTransport
     {
         endpoint = TransportFixture::initialize_endpoint(context);
         // TODO - exposing event loop details
-        amqp_save_event_loop_for_context(context, ev_default_loop(0));
+//        amqp_save_event_loop_for_context(context, ev_default_loop(0));
     }
 
     TransportFixture::~TransportFixture()

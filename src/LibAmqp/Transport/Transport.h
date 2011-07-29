@@ -36,6 +36,18 @@ typedef struct amqp_context_t amqp_context_t;
 typedef struct amqp_transport_state_t amqp_transport_state_t;
 #endif
 
+
+#ifndef LIBAMQP_AMQP_EVENT_WATCHER_TYPE_T
+#define LIBAMQP_AMQP_EVENT_WATCHER_TYPE_T
+typedef struct amqp_event_watcher_t amqp_event_watcher_t;
+#endif
+
+struct amqp_transport_state_t
+{
+    struct ev_loop *loop;
+    amqp_event_watcher_t *accept_watcher;
+};
+
 typedef struct amqp_endpoint_address_t
 {
     const char *hostname;
@@ -59,11 +71,8 @@ struct amqp_connection_t
     amqp_endpoint_t *endpoint;
 };
 
-
-extern void amqp_transport_initialize(amqp_context_t *context);
+extern void amqp_transport_initialize(amqp_context_t *context, struct ev_loop *loop);
 extern void amqp_transport_cleanup(amqp_context_t *context);
-extern void amqp_save_event_loop_for_context(amqp_context_t *context, struct ev_loop *loop);
-
 
 extern amqp_endpoint_t *amqp__initialize_endpoint(amqp_context_t *context, amqp_endpoint_address_t *address);
 extern amqp_connection_t *amqp__create_connection(amqp_context_t *context, amqp_endpoint_t *endpoint, amqp_connection_callback_t callback);

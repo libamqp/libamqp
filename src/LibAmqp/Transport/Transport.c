@@ -18,8 +18,22 @@
 #include "Transport/Transport.h"
 #include "Transport/Socket.h"
 
+void amqp_transport_initialize(amqp_context_t *context, struct ev_loop *loop)
+{
+    assert(context != 0);
+    assert(loop != 0);
 
+    context->transport_state = AMQP_MALLOC(amqp_transport_state_t);
+    context->transport_state->loop = loop;
+}
 
+void amqp_transport_cleanup(amqp_context_t *context)
+{
+    assert(context != 0);
+
+    // TODO - cleanup loop if it was not provided
+    AMQP_FREE(context->transport_state);
+}
 
 amqp_endpoint_t *amqp__initialize_endpoint(amqp_context_t *context, amqp_endpoint_address_t *address)
 {
