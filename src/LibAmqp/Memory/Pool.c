@@ -123,12 +123,13 @@ amqp_memory_allocation_t *find_free_allocation_within_block(amqp_memory_pool_t *
 static
 void *allocate_object(amqp_memory_pool_t *pool)
 {
+    amqp_memory_allocation_t *free_allocation;
     amqp_memory_block_t *block_with_free_space = find_block_with_free_space((amqp_memory_block_t *) pool->block_list);
     if (block_with_free_space == 0)
     {
         block_with_free_space = allocate_new_memory_block(pool, &pool->block_list);
     }
-    amqp_memory_allocation_t *free_allocation = find_free_allocation_within_block(pool, block_with_free_space);
+    free_allocation = find_free_allocation_within_block(pool, block_with_free_space);
 
     if (free_allocation->header.block != block_with_free_space)
     {

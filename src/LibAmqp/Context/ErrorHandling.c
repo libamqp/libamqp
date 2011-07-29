@@ -16,12 +16,10 @@
 
 #include "Context/ErrorHandling.h"
 
-#include <err.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
-#include <unistd.h>
 #include "Context/Context.h"
 
 
@@ -57,12 +55,12 @@ void _amqp_io_error(amqp_context_t *context, int level, const char * filename, i
     if (context->debug.stream && level < context->debug.level)
     {
         char message[128];
-        strerror_r(context->error_code, message, sizeof(message));
-
         char extra[128];
+        va_list args;
+
+        strerror_r(context->error_code, message, sizeof(message));
         snprintf(extra, sizeof(extra), "%s(%d)", message, context->error_code);
 
-        va_list args;
         va_start(args, format);
         output_message(context->debug.stream, filename, line_number, "io error", extra, format, args);
         va_end(args);
@@ -76,9 +74,9 @@ void _amqp_error(amqp_context_t *context, int level, const char * filename, int 
     if (context->debug.stream && level < context->debug.level)
     {
         char extra[128];
+        va_list args;
         snprintf(extra, sizeof(extra), "%s(%d)", shorten_error_mnemonic(error_mnemonic), error_code);
 
-        va_list args;
         va_start(args, format);
         output_message(context->debug.stream, filename, line_number, "error", extra, format, args);
         va_end(args);

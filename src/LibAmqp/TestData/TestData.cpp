@@ -42,7 +42,8 @@ namespace test_data
 
 namespace test_data
 {
-    static unsigned char empty_buffer_bytes[0];
+    /* NOTE: Windows doesn't allow zero-length static buffers. */
+    static unsigned char empty_buffer_bytes[1];
     TestData empty_buffer(empty_buffer_bytes, 0);
 
     test_data_def(hello_world, 0xA1,
