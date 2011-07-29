@@ -148,7 +148,7 @@ SUITE(Pool)
 
     TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_256)
     {
-        break_one();
+        // break_one();
         initialize_pool(256);
         test();
     }

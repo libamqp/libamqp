@@ -21,7 +21,6 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
 #include <stdlib.h>
 
 #include "libamqp_common.h"

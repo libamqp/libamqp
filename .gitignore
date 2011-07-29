@@ -25,3 +25,17 @@ decode-demo.out.txt
 cccc-output
 output
 random-bytes.txt
+
+CMakeCache.txt
+CMakeFiles
+CTestTestfile.cmake
+cmake_install.cmake
+Testing
+
+Debug
+Release
+*.ncb
+*.sln
+*.suo
+*.vcproj
+*.vcproj.*.user
