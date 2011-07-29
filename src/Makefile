@@ -10,6 +10,7 @@ MODULES := \
 	LibAmqp/Buffer \
 	LibAmqp/Context \
 	LibAmqp/Codec \
+	LibAmqp/Thread \
 	LibAmqp/Transport \
         DecodeDemo \
         SampleServer \
