@@ -30,6 +30,24 @@ extern "C" {
 #include <unistd.h>
 #endif
 
+typedef struct amqp_mutex_t
+{
+#if defined(AMQP__WIN32_THREADS)
+    #error "no pthreads"
+#else
+    pthread_mutex_t mutex;
+#endif
+} amqp_mutex_t;
+
+typedef struct amqp_condition_variable_t
+{
+#if defined(AMQP__WIN32_THREADS)
+    #error "no pthreads"
+#else
+    pthread_cond_t cv;
+#endif
+} amqp_condition_variable_t;
+
 typedef void (*amqp_thread_handler_t)(void *argument);
 
 typedef struct amqp_thread_t amqp_thread_t;
@@ -37,6 +55,17 @@ typedef struct amqp_thread_t amqp_thread_t;
 extern amqp_thread_t *amqp_thread_start(amqp_thread_handler_t handler, void *handler_argument);
 extern void amqp_thread_destroy(amqp_thread_t *thread);
 extern int amqp_thread_is_running(amqp_thread_t *thread);
+
+extern void amqp_mutex_initialize(amqp_mutex_t *mutex);
+extern void amqp_mutex_destroy(amqp_mutex_t *mutex);
+extern void amqp_mutex_lock(amqp_mutex_t *mutex);
+extern void amqp_mutex_unlock(amqp_mutex_t *mutex);
+
+extern void amqp_condition_initialize(amqp_condition_variable_t *cv);
+extern void amqp_condition_destroy(amqp_condition_variable_t *cv);
+extern void amqp_condition_wait(amqp_condition_variable_t *cv, amqp_mutex_t *mutex);
+extern void amqp_condition_notify(amqp_condition_variable_t *cv);
+extern void amqp_condition_notify_all(amqp_condition_variable_t *cv);
 
 #ifdef __cplusplus
 }

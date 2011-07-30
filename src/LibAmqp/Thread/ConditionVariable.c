@@ -15,29 +15,49 @@
  */
 
 #include "libamqp_common.h"
-#include "Thread/ConditionVariable.h"
+#include "Thread/Thread.h"
 
 void amqp_condition_initialize(amqp_condition_variable_t *cv)
 {
+#if defined(AMQP__WIN32_THREADS)
+    #error "no pthreads"
+#else
     pthread_cond_init(&cv->cv, 0);
+#endif
 }
 
 void amqp_condition_destroy(amqp_condition_variable_t *cv)
 {
+#if defined(AMQP__WIN32_THREADS)
+    #error "no pthreads"
+#else
     pthread_cond_destroy(&cv->cv);
+#endif
 }
 
 void amqp_condition_wait(amqp_condition_variable_t *cv, amqp_mutex_t *mutex)
 {
+#if defined(AMQP__WIN32_THREADS)
+    #error "no pthreads"
+#else
     pthread_cond_wait(&cv->cv, &mutex->mutex);
+#endif
 }
 
 void amqp_condition_notify(amqp_condition_variable_t *cv)
 {
+#if defined(AMQP__WIN32_THREADS)
+    #error "no pthreads"
+#else
     pthread_cond_signal(&cv->cv);
+#endif
 }
 
 void amqp_condition_notify_all(amqp_condition_variable_t *cv)
 {
+#if defined(AMQP__WIN32_THREADS)
+    #error "no pthreads"
+#else
     pthread_cond_broadcast(&cv->cv);
+#endif
 }
