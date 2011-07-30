@@ -16,8 +16,6 @@
 
 #include <TestHarness.h>
 #include "Thread/Thread.h"
-#include "Thread/Mutex.h"
-#include "Thread/ConditionVariable.h"
 
 #include "debug_helper.h"
 
