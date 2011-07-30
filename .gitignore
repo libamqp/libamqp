@@ -12,6 +12,7 @@
 *.orig
 *.tar
 *.tar.gz
+*.swp
 
 3rd-party/UnitTest++/TestUnitTest++
 Documentation/amqp.pdf
