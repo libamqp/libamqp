@@ -33,7 +33,7 @@ extern "C" {
 typedef struct amqp_mutex_t
 {
 #if defined(AMQP__WIN32_THREADS)
-    #error "no pthreads"
+    CRITICAL_SECTION mutex;
 #else
     pthread_mutex_t mutex;
 #endif
@@ -42,6 +42,7 @@ typedef struct amqp_mutex_t
 typedef struct amqp_condition_variable_t
 {
 #if defined(AMQP__WIN32_THREADS)
+    HANDLE event;
     #error "no pthreads"
 #else
     pthread_cond_t cv;
@@ -51,6 +52,9 @@ typedef struct amqp_condition_variable_t
 typedef void (*amqp_thread_handler_t)(void *argument);
 
 typedef struct amqp_thread_t amqp_thread_t;
+
+extern void amqp_threading_initialize();
+extern void amqp_threading_cleanup();
 
 extern amqp_thread_t *amqp_thread_start(amqp_thread_handler_t handler, void *handler_argument);
 extern void amqp_thread_destroy(amqp_thread_t *thread);

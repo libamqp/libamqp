@@ -20,7 +20,7 @@
 void amqp_mutex_initialize(amqp_mutex_t *mutex)
 {
 #if defined(AMQP__WIN32_THREADS)
-    #error "no pthreads"
+    InitializeCriticalSection(&mutex->mutex);
 #else
     pthread_mutex_init(&mutex->mutex, 0);
 #endif
@@ -29,7 +29,7 @@ void amqp_mutex_initialize(amqp_mutex_t *mutex)
 void amqp_mutex_destroy(amqp_mutex_t *mutex)
 {
 #if defined(AMQP__WIN32_THREADS)
-    #error "no pthreads"
+    DeleteCriticalSection(&mutex->mutex);
 #else
     pthread_mutex_destroy(&mutex->mutex);
 #endif
@@ -38,7 +38,7 @@ void amqp_mutex_destroy(amqp_mutex_t *mutex)
 void amqp_mutex_lock(amqp_mutex_t *mutex)
 {
 #if defined(AMQP__WIN32_THREADS)
-    #error "no pthreads"
+    EnterCriticalSection(&mutex->mutex);
 #else
     pthread_mutex_lock(&mutex->mutex);
 #endif
@@ -47,7 +47,7 @@ void amqp_mutex_lock(amqp_mutex_t *mutex)
 void amqp_mutex_unlock(amqp_mutex_t *mutex)
 {
 #if defined(AMQP__WIN32_THREADS)
-    #error "no pthreads"
+    LeaveCriticalSection(&mutex->mutex);
 #else
     pthread_mutex_unlock(&mutex->mutex);
 #endif

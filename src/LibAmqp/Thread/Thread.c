@@ -13,10 +13,45 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+#include <assert.h>
 #include <stdlib.h>
 
 #include "libamqp_common.h"
 #include "Thread/Thread.h"
+
+#if defined(AMQP__WIN32_THREADS)
+void amqp_threading_initialize()
+{
+}
+void amqp_threading_cleanup()
+{
+}
+#else
+static amqp_mutex_t global_mutex;
+static volatile unsigned int next_thread_id = 1;
+static volatile int threading_initialized = 0;
+
+void amqp_threading_initialize()
+{
+    threading_initialized = 1;
+    amqp_mutex_initialize(&global_mutex);
+}
+void amqp_threading_cleanup()
+{
+    amqp_mutex_destroy(&global_mutex);
+}
+unsigned int get_next_posix_thread_id()
+{
+    int result;
+    assert(threading_initialized);
+
+    amqp_mutex_lock(&global_mutex);
+    result = next_thread_id++;
+    amqp_mutex_unlock(&global_mutex);
+
+    return result;
+}
+#endif
 
 struct amqp_thread_t
 {
@@ -24,18 +59,24 @@ struct amqp_thread_t
     void *argument;
     int running;
     amqp_mutex_t mutex;
+    unsigned int thread_id;
 
 #if defined(AMQP__WIN32_THREADS)
-    #error "no pthreads"
+    HANDLE thread;
 #else
     pthread_t thread;
 #endif
 };
 
-typedef void *(*thread_wrapper_t)(void *);
+#if defined(AMQP__WIN32_THREADS)
+#define WRAPPER_RETURN_TYPE unsigned WINAPI
+#else
+#define WRAPPER_RETURN_TYPE void *
+#endif
+typedef WRAPPER_RETURN_TYPE(*thread_wrapper_t)(void *);
 
 static
-void *thread_wrapper(void *argument)
+WRAPPER_RETURN_TYPE thread_wrapper(void *argument)
 {
     amqp_thread_t *thread = (amqp_thread_t *) argument;
     (*thread->handler)(thread->argument);
@@ -51,8 +92,16 @@ static
 int create_thread(amqp_thread_t *t, thread_wrapper_t wrapper)
 {
 #if defined(AMQP__WIN32_THREADS)
-    #error "no pthreads"
+    t->thread = CreateThread(
+            NULL,              // default security
+            0,                 // default stack size
+            thread_wrapper,    // name of the thread function
+            (void *) t,        // no thread parameters
+            0,                 // default startup flags
+            &t->thread_id);
+    return t->thread != 0;
 #else
+    t->thread_id = get_next_posix_thread_id();
     return pthread_create(&t->thread, 0, wrapper, t) == 0;
 #endif
 }
@@ -78,7 +127,7 @@ amqp_thread_t *amqp_thread_start(amqp_thread_handler_t handler, void *handler_ar
 void amqp_thread_destroy(amqp_thread_t *thread)
 {
 #if defined(AMQP__WIN32_THREADS)
-    #error "no pthreads"
+    WaitForSingleObject(thread->thread, INFINITE);
 #else
     pthread_join(thread->thread, 0);
 #endif
