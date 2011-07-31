@@ -40,3 +40,4 @@ Release
 *.suo
 *.vcproj
 *.vcproj.*.user
+*.cache
