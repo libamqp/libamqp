@@ -174,7 +174,7 @@ SUITE(Buffer)
         CHECK_EQUAL(2U, amqp_buffer_read_size(buffer, 1));
         CHECK_EQUAL(10U, amqp_buffer_read_size(buffer, 1));
         CHECK_EQUAL(14U, amqp_buffer_read_size(buffer, 1));
-        CHECK_EQUAL(-1U, amqp_buffer_read_size(buffer, 1));
+        CHECK_EQUAL((uint32_t) -1, amqp_buffer_read_size(buffer, 1));
     }
 
     TEST_FIXTURE(BufferFixture, amqp_buffer_read_size_four)
@@ -184,7 +184,7 @@ SUITE(Buffer)
 
         CHECK_EQUAL(14U, amqp_buffer_read_size(buffer, 4));
         CHECK_EQUAL(513U, amqp_buffer_read_size(buffer, 4));
-        CHECK_EQUAL(-1U, amqp_buffer_read_size(buffer, 4));
+        CHECK_EQUAL((uint32_t) -1, amqp_buffer_read_size(buffer, 4));
     }
 
     TEST_FIXTURE(BufferFixture, amqp_buffer_read_size_bad)
@@ -192,6 +192,6 @@ SUITE(Buffer)
         unsigned char data[] = { 0, 0,0x0e};
         load_buffer(data, sizeof(data));
 
-        CHECK_EQUAL(-1U, amqp_buffer_read_size(buffer, 4));
+        CHECK_EQUAL((uint32_t) -1, amqp_buffer_read_size(buffer, 4));
     }
 }

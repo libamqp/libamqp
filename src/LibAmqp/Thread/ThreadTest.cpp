@@ -26,6 +26,7 @@ SUITE(Thread)
     public:
         ThreadFixture() : saved_from_thread(0)
         {
+            amqp_threading_initialize();
             amqp_mutex_initialize(&mutex);
             amqp_condition_initialize(&cv);
         }
@@ -34,6 +35,7 @@ SUITE(Thread)
         {
             amqp_condition_destroy(&cv);
             amqp_mutex_destroy(&mutex);
+            amqp_threading_cleanup();
         }
 
         const char *saved_from_thread;

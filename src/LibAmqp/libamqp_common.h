@@ -37,8 +37,10 @@ extern "C" {
 
 #ifdef _MSC_VER
 #include "libamqp_win32.h"
+#define not_reached()   abort(); return 0;
 #else
 #include <stdint.h>
+#define not_reached()   abort();
 #endif
 
 #include <wchar.h>
