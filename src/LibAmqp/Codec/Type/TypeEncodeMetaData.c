@@ -69,111 +69,111 @@
     **/
 int amqp_type_describe_null(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_boolean(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_ubyte(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_byte(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_ushort(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_short(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_uint(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_int(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_small_uint(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_small_int(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_float(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_char(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_decimal32(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_ulong(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_long(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 int amqp_type_describe_small_ulong(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_small_long(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_double(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_timestamp(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_decimal64(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_uuid(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_binary(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 int amqp_type_describe_symbol(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
@@ -196,106 +196,106 @@ int amqp_type_describe_string_utf8(amqp_context_t *context, amqp_type_descriptio
 
 amqp_type_t *amqp_call_encode_null(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_boolean(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_ubyte(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_byte(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_ushort(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_short(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_uint(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_int(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_small_uint(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_small_int(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_float(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_char(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_decimal32(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_ulong(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_long(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 amqp_type_t *amqp_call_encode_small_ulong(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_small_long(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_double(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_timestamp(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_decimal64(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_uuid(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_binary(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
