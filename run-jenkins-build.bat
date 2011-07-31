@@ -1,21 +1,35 @@
+@echo off
+set DEVENV=C:\Windows\Microsoft.NET\Framework\v3.5\MSBuild
 
-set MSBUILD_EXE=C:\Windows\Microsoft.NET\Framework\v3.5\MSBuild
+set DEVENV=C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe
+if exist "%DEVENV%" goto devenv_found
 
+set DEVENV=C:\Program Files(x86)\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe
+if exist "%DEVENV%" goto devenv_found
 
+echo "Please set DEVENV to the location of the devenv.exe program.
+got end
+
+:devenv_found
+
+echo "Building UnitTest++"
 cd 3rd-party\UnitTest++
 
 
-%MSBUILD_EXE% UnitTest++.vsnet2008.sln  /p:Configuration=Debug /target:Clean
-%MSBUILD_EXE% UnitTest++.vsnet2008.sln  /p:Configuration=Release /target:Clean
+"%DEVENV%" UnitTest++.vsnet2008.sln /Rebuild Debug
+"%DEVENV%" UnitTest++.vsnet2008.sln /Rebuild Release
 
-%MSBUILD_EXE% UnitTest++.vsnet2008.sln  /p:Configuration=Debug 
-%MSBUILD_EXE% UnitTest++.vsnet2008.sln  /p:Configuration=Release
 
 cd ..\..
-
+echo "Running CMake"
+del CMakeCache.txt /q
+del CMakeFiles /s /q
 cmake CMakeLists.txt
 
-%MSBUILD_EXE% libamqp.sln  /p:Configuration=Debug /target:Clean
-%MSBUILD_EXE% libamqp.sln  /p:Configuration=Release /target:Clean
+echo "Building Libamqp"
+"%DEVENV%" libamqp.sln /Rebuild Debug
+"%DEVENV%" libamqp.sln /Build Debug /project RUN_TESTS
 
-%MSBUILD_EXE% libamqp.sln  /p:Configuration=Debug
+
+:end
+
