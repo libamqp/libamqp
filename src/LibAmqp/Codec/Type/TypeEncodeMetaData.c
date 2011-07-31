@@ -300,7 +300,7 @@ amqp_type_t *amqp_call_encode_uuid(amqp_context_t *context, amqp_type_descriptio
 
 amqp_type_t *amqp_call_encode_binary(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    abort();
+    abort(); return 0;
 }
 
 amqp_type_t *amqp_call_encode_symbol(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
