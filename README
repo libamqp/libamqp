@@ -21,6 +21,7 @@ Libamqp uses a fast mutex implementation that is based on the TinyThread++
 of TinyTHreads++ are in 3rd-party/TinyThread++-1.0/README.txt. 
 
 Libamqp has a dependency on Libev (see: http://software.schmorp.de/pkg/libev.html).
+Details on the licensing of livev are in: 3rd-party/libev-4_4/LICENSE.
 Currently you must have libev installed on your system to build or use libamqp.
 
 See src/?? for usage.
