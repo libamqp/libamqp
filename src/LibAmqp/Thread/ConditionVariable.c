@@ -20,9 +20,9 @@
 void amqp_condition_initialize(amqp_condition_variable_t *cv)
 {
 #if defined(AMQP__WIN32_THREADS)
-	cv->event_handle = CreateEvent(0, false, false, 0);
-	cv->waiters_count = 0;
-	amqp_mutex_initialize(&cv->internal_mutex);
+    cv->event_handle = CreateEvent(0, false, false, 0);
+    cv->waiters_count = 0;
+    amqp_mutex_initialize(&cv->internal_mutex);
 #else
     pthread_cond_init(&cv->cv, 0);
 #endif
@@ -31,8 +31,8 @@ void amqp_condition_initialize(amqp_condition_variable_t *cv)
 void amqp_condition_destroy(amqp_condition_variable_t *cv)
 {
 #if defined(AMQP__WIN32_THREADS)
-	CloseHandle(cv->event_handle);
-	amqp_mutex_destroy(&cv->internal_mutex);
+    CloseHandle(cv->event_handle);
+    amqp_mutex_destroy(&cv->internal_mutex);
 #else
     pthread_cond_destroy(&cv->cv);
 #endif
@@ -41,15 +41,15 @@ void amqp_condition_destroy(amqp_condition_variable_t *cv)
 void amqp_condition_wait(amqp_condition_variable_t *cv, amqp_mutex_t *mutex)
 {
 #if defined(AMQP__WIN32_THREADS)
-	amqp_mutex_lock(&cv->internal_mutex);
-	++cv->waiters_count;
-	amqp_mutex_unlock(&cv->internal_mutex);
-	amqp_mutex_unlock(mutex);
-	WaitForSingleObject(cv->event_handle, INFINITE);
-	amqp_mutex_lock(&cv->internal_mutex);
-	--cv->waiters_count;
-	amqp_mutex_unlock(&cv->internal_mutex);
-	amqp_mutex_lock(mutex);
+    amqp_mutex_lock(&cv->internal_mutex);
+    ++cv->waiters_count;
+    amqp_mutex_unlock(&cv->internal_mutex);
+    amqp_mutex_unlock(mutex);
+    WaitForSingleObject(cv->event_handle, INFINITE);
+    amqp_mutex_lock(&cv->internal_mutex);
+    --cv->waiters_count;
+    amqp_mutex_unlock(&cv->internal_mutex);
+    amqp_mutex_lock(mutex);
 #else
     pthread_cond_wait(&cv->cv, &mutex->mutex);
 #endif
@@ -58,12 +58,12 @@ void amqp_condition_wait(amqp_condition_variable_t *cv, amqp_mutex_t *mutex)
 void amqp_condition_notify(amqp_condition_variable_t *cv)
 {
 #if defined(AMQP__WIN32_THREADS)
-	amqp_mutex_lock(&cv->internal_mutex);
-	if (cv->waiters_count > 0)
-	{
-		SetEvent(cv->event_handle);
-	}
-	amqp_mutex_unlock(&cv->internal_mutex);
+    amqp_mutex_lock(&cv->internal_mutex);
+    if (cv->waiters_count > 0)
+    {
+        SetEvent(cv->event_handle);
+    }
+    amqp_mutex_unlock(&cv->internal_mutex);
 #else
     pthread_cond_signal(&cv->cv);
 #endif
@@ -72,7 +72,7 @@ void amqp_condition_notify(amqp_condition_variable_t *cv)
 void amqp_condition_notify_all(amqp_condition_variable_t *cv)
 {
 #if defined(AMQP__WIN32_THREADS)
-	abort();
+    abort();
 #else
     pthread_cond_broadcast(&cv->cv);
 #endif

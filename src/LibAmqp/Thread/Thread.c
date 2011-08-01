@@ -101,7 +101,7 @@ int create_thread(amqp_thread_t *t)
     return t->thread != 0;
 #else
     t->thread_id = get_next_posix_thread_id();
-    return pthread_create(&t->thread, 0, wrapper, t) == 0;
+    return pthread_create(&t->thread, 0, thread_wrapper, t) == 0;
 #endif
 }
 
