@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# ensure libev in on the LD_LIBRARY_PATH
+if [ "$(uname -a | awk '{print $2}')" = "ubuntu" ]
+then
+    export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+fi
+
 # remove artifacts from a prior build
 rm -rf output
 mkdir output
