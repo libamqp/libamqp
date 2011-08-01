@@ -1,5 +1,4 @@
 @echo off
-set DEVENV=C:\Windows\Microsoft.NET\Framework\v3.5\MSBuild
 
 set DEVENV=C:\Program Files\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe
 if exist "%DEVENV%" goto devenv_found
