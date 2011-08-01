@@ -19,7 +19,7 @@
 
 #include <stdio.h>
 
-#include "libamqp_common.h"
+#include "libamqp.h"
 #include "Memory/Pool.h"
 #include "Buffer/Buffer.h"
 #include "Codec/Type/Type.h"
@@ -37,6 +37,11 @@ typedef struct amqp_type_t amqp_type_t;
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_TRANSPORT_STATE_TYPE_T
+#define LIBAMQP_AMQP_TRANSPORT_STATE_TYPE_T
+typedef struct amqp_transport_state_t amqp_transport_state_t;
 #endif
 
 typedef int amqp_debug_print_c_t(int c);
@@ -77,6 +82,8 @@ struct amqp_context_t
         amqp_buffer_t *buffer;
         amqp_type_t *container;
     } encode;
+
+    amqp_transport_state_t *transport_state;
 };
 
 extern amqp_context_t *amqp_create_context();

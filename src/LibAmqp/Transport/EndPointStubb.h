@@ -14,30 +14,18 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_TRANSPORT_TEST_SUPPORT_H
-#define LIBAMQP_TRANSPORT_TRANSPORT_TEST_SUPPORT_H
+#ifndef LIBAMQP_TRANSPORT_ENDPOINT_STUBB_H
+#define LIBAMQP_TRANSPORT_ENDPOINT_STUBB_H
 
-#include "Context/ContextTestSupport.h"
-#include "Transport/Transport.h"
-#include "Transport/EndPointStubb.h"
-
-namespace SuiteTransport
-{
-    class TransportFixture : public SuiteContext::ContextFixture
-    {
-    public:
-        TransportFixture();
-        ~TransportFixture();
-
-        amqp_endpoint_t *endpoint;
-
-        static int in_memory;
-        static amqp_endpoint_address_t endpoint_address;
-        static amqp_endpoint_t *initialize_endpoint(amqp_context_t *context);
-        static void opened_callback();;
-    private:
-    };
-}
-
+#ifdef __cplusplus
+extern "C" {
 #endif
 
+#include "Transport/Transport.h"
+
+extern amqp_endpoint_t *amqp__initialize_endpoint_stubb(amqp_context_t *context, amqp_endpoint_address_t *address);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

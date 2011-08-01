@@ -554,7 +554,7 @@ int amqp_decode_map_32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 
 static int amqp_decode_array(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-    int i;
+    unsigned int i;
     int rc = amqp_construct_container_type(meta_data, type);
     if (rc)
     {
@@ -599,6 +599,7 @@ int amqp_decode_array_32(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type
 int amqp_decode_extension_type(amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     not_implemented(Unsupported format code);
+    return 0;
 }
 
 static int
@@ -684,14 +685,14 @@ amqp_type_t *amqp_decode_supress_messages(amqp_context_t *context)
     return result;
 }
 
-amqp_type_t *amqp_list_element(amqp_type_t *type, int index)
+amqp_type_t *amqp_list_element(amqp_type_t *type, size_t index)
 {
     assert(amqp_type_is_list(type));
     assert(type->value.list.count > index);
     return type->value.list.elements[index];
 }
 
-amqp_type_t *amqp_map_element(amqp_type_t *type, int index)
+amqp_type_t *amqp_map_element(amqp_type_t *type, size_t index)
 {
     assert(amqp_type_is_map(type));
     assert(type->value.map.count > index);

@@ -20,7 +20,13 @@
 
 SUITE(Transport)
 {
+    void amqp_connection_created_callback(amqp_connection_t *connection)
+    {
+
+    }
+
     TEST_FIXTURE(TransportFixture, really_important_test)
     {
+        amqp_connection_t *connection = amqp__create_connection(context, endpoint, amqp_connection_created_callback);
     }
 }

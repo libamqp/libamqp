@@ -3,8 +3,8 @@
 # by Peter Miller (http://aegis.sourceforge.net/auug97.pdf)
 #
 
-MODULE = LibAmqp/Transport
+MODULE = LibAmqp/Thread
 
 SRC += $(filter-out $(wildcard $(MODULE)/*Stubb.c),$(wildcard $(MODULE)/*.c))
-# TODO - fixme - disabled WIP to work on windows build
-# TEST_SRC += $(wildcard  $(MODULE)/*Test.cpp) $(wildcard $(MODULE)/*TestSupport.cpp $(MODULE)/*Stubb.c)
+TEST_SRC += $(wildcard  $(MODULE)/*Test.cpp) $(wildcard $(MODULE)/*TestSupport.cpp $(MODULE)/*Stubb.c)
+

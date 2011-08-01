@@ -14,20 +14,13 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_H
-#define LIBAMQP_H
+#include "Context/Context.h"
+#include "Transport/EndPointStubb.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "LibAmqp/libamqp_common.h"
-
-// TODO - external API signatures go here
-
-#ifdef __cplusplus
+amqp_endpoint_t *amqp__initialize_endpoint_stubb(amqp_context_t *context, amqp_endpoint_address_t *address)
+{
+    amqp_endpoint_t *result = AMQP_MALLOC(amqp_endpoint_t);
+    not_implemented(amqp__initialize_local_endpoint);
+    return result;
 }
-#endif
-#endif
-
 

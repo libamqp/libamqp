@@ -14,21 +14,21 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_PARENT_MODULE_MODULE_TEST_SUPPORT_H
-#define LIBAMQP_PARENT_MODULE_MODULE_TEST_SUPPORT_H
+#ifndef LIBAMQP_TRANSPORT_SOCKET_H
+#define LIBAMQP_TRANSPORT_SOCKET_H
 
-#include "Parent/Module/Module.h"
-
-namespace SuiteParentModule
-{
-    class ParentModuleFixture
-    {
-    public:
-        ParentModuleFixture();
-        ~ParentModuleFixture();
-    private:
-    };
-}
-
+#ifdef __cplusplus
+extern "C" {
 #endif
 
+#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
+#define LIBAMQP_AMQP_CONTEXT_TYPE_T
+typedef struct amqp_context_t amqp_context_t;
+#endif
+
+extern int amqp_setup_listener(amqp_context_t *context, int port_number);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

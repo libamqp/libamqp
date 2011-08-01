@@ -38,6 +38,7 @@ amqp_encode_multiple_true_va(amqp_context_t *context, amqp_type_encode_meta_data
     va_start(args, meta_data);
     for (count = 0; count < 32 && needed < 254; count++)
     {
+    // Don't worry about the error on windows here. Multiple has changed to this fn will be rewritten
         va_copy(args_copy, args);
         arg = va_arg(args, void *);
         if (arg == 0) break;

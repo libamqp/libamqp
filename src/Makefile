@@ -1,5 +1,5 @@
 #
-# For details on how this Malkefile works see the paper "Recursive Make Considered Harmful"
+# For details on how this Makefile works see the paper "Recursive Make Considered Harmful"
 # by Peter Miller (http://aegis.sourceforge.net/auug97.pdf)
 #
 
@@ -10,8 +10,10 @@ MODULES := \
 	LibAmqp/Buffer \
 	LibAmqp/Context \
 	LibAmqp/Codec \
+	LibAmqp/Thread \
 	LibAmqp/Transport \
         DecodeDemo \
+        SampleServer \
 	../3rd-party/UnitTest++/src  \
 	Test
 
@@ -36,6 +38,7 @@ CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLU
 # CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic
 CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L 
 CXXFLAGS = -g -Wall
+LDFLAGS = -lev
 
 LIBAMQP_LIB := libamqp.a
 LIBS += $(LIBAMQP_LIB)
@@ -43,23 +46,24 @@ LIBS += $(LIBAMQP_LIB)
 include $(patsubst %,%/module.mk,$(MODULES))
 
 OBJ = $(patsubst %.c,%.o,$(SRC))
-TEST_OBJ = $(patsubst %.cpp,%.o,$(TEST_SRC))
-DEP_SRC += $(TEST_SRC)
+TEST_OBJ = $(patsubst %.cpp,%.o,$(filter %.cpp,$(TEST_SRC))) \
+	$(patsubst %.c,%.o,$(filter %.c,$(TEST_SRC)))
+DEP_SRC += $(SRC) $(TEST_SRC)
 
 libs::	$(LIBAMQP_LIB)
 $(LIBAMQP_LIB): $(patsubst %.o,$(LIBAMQP_LIB)(%.o), $(OBJ))
 	@ranlib $@
 
-tests::	TestRunner
+tests::	test-runner
 
 debug:	all
-	gdb ./TestRunner
+	gdb ./test-runner
 	
 check::	all
-	./TestRunner $(TEST_RUNNER_ARGS)
+	./test-runner $(TEST_RUNNER_ARGS)
 	
-TestRunner:	$(TEST_OBJ) $(OBJ) $(LIBS)
-	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) -o $@
+test-runner:	$(TEST_OBJ) $(OBJ) $(LIBS)
+	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) $(LDFLAGS) -o $@
 
 $(OBJ) $(TEST_OBJ): Makefile
 
@@ -76,8 +80,7 @@ print:
 	@echo CFLAGS=$(CFLAGS)
 	@echo CXXFLAGS=$(CXXFLAGS)
 
-DEP = $(OBJ:.o=.d) $(TEST_OBJ:.o=.d) \
-	$(patsubst %.cpp,%.d,$(filter %.cpp,$(DEP_SRC))) \
+DEP = 	$(patsubst %.cpp,%.d,$(filter %.cpp,$(DEP_SRC))) \
 	$(patsubst %.c,%.d,$(filter %.c,$(DEP_SRC)))
 
 include $(DEP)
@@ -89,8 +92,6 @@ include $(DEP)
 	@./depend.sh `dirname $*` $(CPPFLAGS) $*.c > $@
 
 CPP_OUT := \
-	$(OBJ:.o=.i) \
-	$(TEST_OBJ:.o=.i) \
 	$(patsubst %.cpp,%.i,$(filter %.cpp,$(DEP_SRC))) \
 	$(patsubst %.c,%.i,$(filter %.c,$(DEP_SRC)))
 .PHONY: cpp-out
@@ -103,8 +104,6 @@ cpp-out:	$(CPP_OUT)
 	$(CC) -E $(CPPFLAGS) $*.c -o $@
 
 ASM_OUT := \
-	$(OBJ:.o=.s) \
-	$(TEST_OBJ:.o=.s) \
 	$(patsubst %.cpp,%.s,$(filter %.cpp,$(DEP_SRC))) \
 	$(patsubst %.c,%.s,$(filter %.c,$(DEP_SRC)))
 .PHONY: asm-out
@@ -116,7 +115,6 @@ asm-out:	$(ASM_OUT)
 %.s: %.c
 	$(CC) -S $(CPPFLAGS) $(CFLAGS) $*.c -o $@
 
-
 .PHONY:	clean scrub
 clean::
 	rm -f $(OBJ)
@@ -124,7 +122,9 @@ clean::
 	rm -f $(CPP_OUT)
 	rm -f $(ASM_OUT)
 	rm -f $(LIBAMQP_LIB)
-	rm -f TestRunner
+	rm -f test-runner
+	rm -f decode-demo
+	rm -f sample-server
 
 scrub::
 	$(MAKE) -f Makefile.util scrub

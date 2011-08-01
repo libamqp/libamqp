@@ -14,21 +14,28 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_PARENT_MODULE_MODULE_TEST_SUPPORT_H
-#define LIBAMQP_PARENT_MODULE_MODULE_TEST_SUPPORT_H
+#ifndef LIBAMQP_H
+#define LIBAMQP_H
 
-#include "Parent/Module/Module.h"
-
-namespace SuiteParentModule
-{
-    class ParentModuleFixture
-    {
-    public:
-        ParentModuleFixture();
-        ~ParentModuleFixture();
-    private:
-    };
-}
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+#include "libamqp_common.h"
+
+#define AMQP_DEFAULT_PORT           5672
+#define AMQP_DEFAULT_SECURE_PORT    5671
+#define AMQP_PROTOCOL_MAJOR         1
+#define AMQP_PROTOCOL_MINOR         0
+#define AMQP_PROTOCOL_REVISION      1
+#define AMQP_MIN_MAX_FRAME_SIZE     512
+
+// TODO - external API signatures go here
+
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 

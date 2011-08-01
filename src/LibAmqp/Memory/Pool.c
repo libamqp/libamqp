@@ -29,6 +29,8 @@
 
 #include "debug_helper.h"
 
+#define All_ONES_MASK ((unsigned long) -1)
+
 #ifndef DISABLE_MEMORY_POOL
 void amqp_pool_break()
 {
@@ -72,7 +74,7 @@ amqp_memory_block_t *allocate_new_memory_block(amqp_memory_pool_t *pool, amqp_me
     result->header.previous = 0;
     *head = result;
 
-    result->header.mask.bits = -1UL & pool->allocations_mask;
+    result->header.mask.bits = All_ONES_MASK & pool->allocations_mask;
 
     for (i = 0; i < pool->allocations_per_block; i++)
     {
@@ -98,7 +100,7 @@ unsigned find_first_free_allocation(unsigned char byte)
         }
         mask <<= 1;
     }
-    abort();
+    not_reached();
 }
 
 static
@@ -117,7 +119,7 @@ amqp_memory_allocation_t *find_free_allocation_within_block(amqp_memory_pool_t *
             return free_allocation;
         }
     }
-    abort();
+    not_reached();
 }
 
 static
