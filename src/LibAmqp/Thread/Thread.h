@@ -42,8 +42,9 @@ typedef struct amqp_mutex_t
 typedef struct amqp_condition_variable_t
 {
 #if defined(AMQP__WIN32_THREADS)
-    HANDLE event;
-    #error "no pthreads"
+    HANDLE event_handle;
+	amqp_mutex_t internal_mutex;
+    unsigned int waiters_count;
 #else
     pthread_cond_t cv;
 #endif

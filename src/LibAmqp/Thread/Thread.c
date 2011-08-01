@@ -73,7 +73,6 @@ struct amqp_thread_t
 #else
 #define WRAPPER_RETURN_TYPE void *
 #endif
-typedef WRAPPER_RETURN_TYPE(*thread_wrapper_t)(void *);
 
 static
 WRAPPER_RETURN_TYPE thread_wrapper(void *argument)
@@ -89,7 +88,7 @@ WRAPPER_RETURN_TYPE thread_wrapper(void *argument)
 }
 
 static
-int create_thread(amqp_thread_t *t, thread_wrapper_t wrapper)
+int create_thread(amqp_thread_t *t)
 {
 #if defined(AMQP__WIN32_THREADS)
     t->thread = CreateThread(
@@ -115,7 +114,7 @@ amqp_thread_t *amqp_thread_start(amqp_thread_handler_t handler, void *handler_ar
 
     amqp_mutex_initialize(&result->mutex);
 
-    if (!create_thread(result, thread_wrapper))
+    if (!create_thread(result))
     {
         free(result);
         return 0;
