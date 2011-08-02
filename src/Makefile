@@ -38,7 +38,7 @@ CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLU
 # CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic
 CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L 
 CXXFLAGS = -g -Wall
-LDFLAGS = -lev
+LDFLAGS += -lev -lpthread
 
 LIBAMQP_LIB := libamqp.a
 LIBS += $(LIBAMQP_LIB)
