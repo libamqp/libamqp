@@ -77,6 +77,7 @@ SUITE(Thread)
         CHECK_EQUAL(pattern, saved_from_thread);
     }
 
+
     class FastMutexFixture
     {
     public:
@@ -110,7 +111,8 @@ SUITE(Thread)
     private:
     };
 
-    TEST_FIXTURE(FastMutexFixture, validate_fast_lock_lock_value)
+#if !defined(LIBAMQP_DISABLE_FAST_MUTEX)
+    TEST_FIXTURE(FastMutexFixture, validate_fast_mutex_internal_value)
     {
         CHECK_EQUAL(0, fast_mutex);
         amqp_fast_mutex_lock(&fast_mutex);
@@ -118,6 +120,7 @@ SUITE(Thread)
         amqp_fast_mutex_unlock(&fast_mutex);
         CHECK_EQUAL(0, fast_mutex);
     }
+#endif
 
     void FastMutexFixture::handler(void *argument)
     {
