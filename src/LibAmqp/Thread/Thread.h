@@ -70,7 +70,7 @@ extern void amqp_condition_initialize(amqp_condition_variable_t *cv);
 extern void amqp_condition_destroy(amqp_condition_variable_t *cv);
 extern void amqp_condition_wait(amqp_condition_variable_t *cv, amqp_mutex_t *mutex);
 extern void amqp_condition_notify(amqp_condition_variable_t *cv);
-extern void amqp_condition_notify_all(amqp_condition_variable_t *cv);
+extern void amqp_condition_broadcast(amqp_condition_variable_t *cv);
 
 #ifdef __cplusplus
 }

@@ -35,8 +35,7 @@ targets::
 CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES))
 # CPPFLAGS +=  -DDISABLE_MEMORY_POOL
 # CPPFLAGS +=  -DTRACE_ALLOCATIONS
-# CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic
-CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L 
+CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -fasm
 CXXFLAGS = -g -Wall
 LDFLAGS += -lev -lpthread
 
