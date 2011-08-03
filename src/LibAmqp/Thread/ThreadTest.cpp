@@ -27,7 +27,6 @@ SUITE(Thread)
     public:
         ThreadFixture() : saved_from_thread(0)
         {
-            amqp_threading_initialize();
             amqp_mutex_initialize(&mutex);
             amqp_condition_initialize(&cv);
         }
@@ -36,7 +35,6 @@ SUITE(Thread)
         {
             amqp_condition_destroy(&cv);
             amqp_mutex_destroy(&mutex);
-            amqp_threading_cleanup();
         }
 
         const char *saved_from_thread;
@@ -83,7 +81,6 @@ SUITE(Thread)
     public:
         FastMutexFixture() : count(0), thread_done_count(0), thread_ready_count(0)
         {
-            amqp_threading_initialize();
             amqp_fast_mutex_initialize(&fast_mutex);
             amqp_mutex_initialize(&mutex);
             amqp_condition_initialize(&cv);
@@ -96,7 +93,6 @@ SUITE(Thread)
             amqp_condition_destroy(&cv_gate);
             amqp_mutex_destroy(&mutex);
             amqp_fast_mutex_destroy(&fast_mutex);
-            amqp_threading_cleanup();
         }
 
         amqp_fast_mutex_t fast_mutex;

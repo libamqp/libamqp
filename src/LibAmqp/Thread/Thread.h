@@ -54,9 +54,6 @@ typedef void (*amqp_thread_handler_t)(void *argument);
 
 typedef struct amqp_thread_t amqp_thread_t;
 
-extern void amqp_threading_initialize();
-extern void amqp_threading_cleanup();
-
 extern amqp_thread_t *amqp_thread_start(amqp_thread_handler_t handler, void *handler_argument);
 extern void amqp_thread_destroy(amqp_thread_t *thread);
 extern int amqp_thread_is_running(amqp_thread_t *thread);

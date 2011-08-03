@@ -32,10 +32,10 @@ all:	trace libs samples targets tests
 ci-build:   scrub all check
 targets::
 
-CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES))
-# CPPFLAGS += -DDISABLE_MEMORY_POOL
-# CPPFLAGS += -DTRACE_ALLOCATIONS
-# CPPFLAGS += -DLIBAMQP_DISABLE_FAST_MUTEX
+# BUILD_OPTIONS += -DDISABLE_MEMORY_POOL
+# BUILD_OPTIONS += -DTRACE_ALLOCATIONS
+# BUILD_OPTIONS += -DLIBAMQP_DISABLE_FAST_MUTEX
+CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES)) $(BUILD_OPTIONS)
 CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -fasm
 CXXFLAGS = -g -Wall
 LDFLAGS += -lev -lpthread

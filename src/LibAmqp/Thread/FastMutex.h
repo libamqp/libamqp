@@ -56,6 +56,9 @@ inline static void amqp_fast_mutex_unlock(amqp_fast_mutex_t *fm)
 {
     amqp_mutex_unlock(&fm->non_fast_mutex);
 }
+
+/* will not work on Windows */
+#define LIBAMQP_FAST_MUTEX_INITIALIZER  {{PTHREAD_MUTEX_INITIALIZER}}
 #else
 /* Can have and want fast mutexes */
 
@@ -94,6 +97,8 @@ inline static void amqp_fast_mutex_unlock(amqp_fast_mutex_t *mutex)
 {
     amqp_unlock_asm_from_tthread_lib(mutex);
 }
+
+#define LIBAMQP_FAST_MUTEX_INITIALIZER  0
 
 #endif /* !defined(_TTHREAD_FAST_MUTEX_ASM_) || defined (LIBAMQP_DISABLE_FAST_MUTEX) */
 #endif /* LIBAMQP_THREAD_FAST_MUTEX_H */
