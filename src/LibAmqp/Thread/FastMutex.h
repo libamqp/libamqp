@@ -32,12 +32,32 @@
 #if !defined(_TTHREAD_FAST_MUTEX_ASM_) || defined (LIBAMQP_DISABLE_FAST_MUTEX)
 /* Can't have or don't want fast mutexes */
 
-#define amqp_fast_mutex_t void *
-#define amqp_fast_mutex_initialize(m) amqp_mutex_initialize((amqp_mutex_t *) m)
-#define amqp_fast_mutex_destroy(m) amqp_mutex_destroy((amqp_mutex_t *) m)
-#define amqp_fast_mutex_lock(m) amqp_mutex_lock((amqp_mutex_t *) m)
-#define amqp_fast_mutex_unlock(m) amqp_mutex_unlock((amqp_mutex_t *) m)
+/*
+ The compile should conver these into straight calls on the normal mutex api
+ but prevent accidental use of a fast_mutex with a condition variable.
+*/
+typedef struct amqp_fast_mutex_t
+{
+    amqp_mutex_t non_fast_mutex;
+} amqp_fast_mutex_t;
+inline static void amqp_fast_mutex_initialize(amqp_fast_mutex_t *fm)
+{
+    amqp_mutex_initialize(&fm->non_fast_mutex);
+}
+inline static void amqp_fast_mutex_destroy(amqp_fast_mutex_t *fm)
+{
+    amqp_mutex_destroy(&fm->non_fast_mutex);
+}
+inline static void amqp_fast_mutex_lock(amqp_fast_mutex_t *fm)
+{
+    amqp_mutex_lock(&fm->non_fast_mutex);
+}
+inline static void amqp_fast_mutex_unlock(amqp_fast_mutex_t *fm)
+{
+    amqp_mutex_unlock(&fm->non_fast_mutex);
+}
 #else
+/* Can have and want fast mutexes */
 
 typedef volatile int amqp_fast_mutex_t;
 
