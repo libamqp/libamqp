@@ -33,7 +33,7 @@
 /* Can't have or don't want fast mutexes */
 
 /*
- The compile should conver these into straight calls on the normal mutex api
+ The compiler should convert these into straight calls on the normal mutex api
  but prevent accidental use of a fast_mutex with a condition variable.
 */
 typedef struct amqp_fast_mutex_t
