@@ -87,7 +87,7 @@ freely, subject to the following restrictions:
         "movl $1,%%eax\n\t"                     \
         "xchg %%eax,%0\n\t"                     \
         "movl %%eax,%1\n\t"                     \
-        : "=m" (*lock), "=m" (oldLock)          \
+        : "=m" (*lock), "=m" (old_lock)          \
         :                                       \
         : "%eax", "memory"                      \
     );
@@ -97,11 +97,11 @@ freely, subject to the following restrictions:
         mov eax,1                               \
         mov ecx,lock                            \
         xchg eax,[ecx]                          \
-        mov oldLock,eax                         \
+        mov old_lock,eax                         \
     }
 #elif defined(__GNUC__) && (defined(__ppc__))
 #define amqp_lock_asm_from_tthread_lib(lock)    \
-    int newLock = 1;                            \
+    int new_lock = 1;                            \
     asm volatile (                              \
         "\n1:\n\t"                              \
         "lwarx  %0,0,%1\n\t"                    \
@@ -111,8 +111,8 @@ freely, subject to the following restrictions:
         "bne-   1b\n\t"                         \
         "isync\n"                               \
         "2:\n\t"                                \
-        : "=&r" (oldLock)                       \
-        : "r" (lock), "r" (newLock)             \
+        : "=&r" (old_lock)                       \
+        : "r" (lock), "r" (new_lock)             \
         : "cr0", "memory"                       \
     );
 #endif

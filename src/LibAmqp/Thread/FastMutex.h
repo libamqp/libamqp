@@ -30,15 +30,16 @@
 #endif
 
 #if !defined(_TTHREAD_FAST_MUTEX_ASM_) || defined (LIBAMQP_DISABLE_FAST_MUTEX)
-#define amqp_fast_mutex_t amqp_mutex_t
-#define amqp_fast_mutex_initialize amqp_mutex_initialize
-#define amqp_fast_mutex_destroy amqp_mutex_destroy
-#define amqp_fast_mutex_lock amqp_mutex_lock
-#define amqp_fast_mutex_unlock amqp_mutex_unlock
+/* Can't have or don't want fast mutexes */
+
+#define amqp_fast_mutex_t void *
+#define amqp_fast_mutex_initialize(m) amqp_mutex_initialize((amqp_mutex_t *) m)
+#define amqp_fast_mutex_destroy(m) amqp_mutex_destroy((amqp_mutex_t *) m)
+#define amqp_fast_mutex_lock(m) amqp_mutex_lock((amqp_mutex_t *) m)
+#define amqp_fast_mutex_unlock(m) amqp_mutex_unlock((amqp_mutex_t *) m)
 #else
 
-/* Can't have or don't want fast mutexes */
-typedef int amqp_fast_mutex_t;
+typedef volatile int amqp_fast_mutex_t;
 
 inline static void amqp_fast_mutex_initialize(amqp_fast_mutex_t *mutex)
 {
@@ -52,21 +53,21 @@ inline static void amqp_fast_mutex_destroy(amqp_fast_mutex_t *mutex)
 
 inline static int amqp_fast_mutex_try_lock(amqp_fast_mutex_t *mutex)
 {
-    int oldLock;
+    int old_lock;
     amqp_lock_asm_from_tthread_lib(mutex);
-    return (oldLock == 0);
+    return (old_lock == 0);
 }
 
 inline static void amqp_fast_mutex_lock(amqp_fast_mutex_t *mutex)
 {
-    int gotLock;
+    int got_lock;
     do {
-        gotLock = amqp_fast_mutex_try_lock(mutex);
-        if(!gotLock)
+        got_lock = amqp_fast_mutex_try_lock(mutex);
+        if(!got_lock)
         {
             amqp__thread_yield();
         }
-    } while(!gotLock);
+    } while(!got_lock);
 }
 
 inline static void amqp_fast_mutex_unlock(amqp_fast_mutex_t *mutex)

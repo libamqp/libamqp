@@ -17,7 +17,6 @@ MODULES := \
 	../3rd-party/UnitTest++/src  \
 	Test
 
-
 CC=gcc
 LIBS :=
 SRC :=
@@ -26,9 +25,10 @@ TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
 TEST_RUNNER_ARGS :=
+SAMPLE_SRC :=
 
 .PHONY:	all trace libs tests check debug targets
-all:	trace libs targets tests
+all:	trace libs samples targets tests
 ci-build:   scrub all check
 targets::
 
@@ -46,9 +46,10 @@ LIBS += $(LIBAMQP_LIB)
 include $(patsubst %,%/module.mk,$(MODULES))
 
 OBJ = $(patsubst %.c,%.o,$(SRC))
+SAMPLE_OBJ = $(patsubst %.c,%.o,$(SAMPLE_SRC))
 TEST_OBJ = $(patsubst %.cpp,%.o,$(filter %.cpp,$(TEST_SRC))) \
 	$(patsubst %.c,%.o,$(filter %.c,$(TEST_SRC)))
-DEP_SRC += $(SRC) $(TEST_SRC)
+DEP_SRC += $(SRC) $(TEST_SRC) $(SAMPLE_SRC)
 
 libs::	$(LIBAMQP_LIB)
 $(LIBAMQP_LIB): $(patsubst %.o,$(LIBAMQP_LIB)(%.o), $(OBJ))
@@ -129,3 +130,4 @@ clean::
 scrub::
 	$(MAKE) -f Makefile.util scrub
 
+samples: $(SAMPLE_OBJ)
