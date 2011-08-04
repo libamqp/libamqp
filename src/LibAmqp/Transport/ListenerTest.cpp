@@ -55,6 +55,7 @@ SUITE(Transport)
 
         int rc = connect(socket_fd, (struct sockaddr *) &address, sizeof(address));
         CHECK(rc != -1);
+        if (rc == -1) return;
 
         char buffer[128];
         bzero(buffer, sizeof(buffer));
@@ -80,6 +81,7 @@ SUITE(Transport)
 
         int rc = connect(socket_fd, (struct sockaddr *) &address, sizeof(address));
         CHECK(rc != -1);
+        if (rc == -1) return;
 
         char buffer[128];
         bzero(buffer, sizeof(buffer));

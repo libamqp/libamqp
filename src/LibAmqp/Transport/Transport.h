@@ -58,12 +58,14 @@ typedef struct amqp_connection_t amqp_connection_t;
 
 typedef void (*amqp_connection_callback_t)(amqp_connection_t *connection);
 
-typedef struct amqp_endpoint_t
+typedef struct amqp_endpoint_t amqp_endpoint_t;
+struct amqp_endpoint_t
 {
     amqp_endpoint_address_t address;
     int (*read)(unsigned char *buffer, size_t bufsiz, size_t offset, int n, amqp_connection_callback_t callback);
     int (*write)(unsigned char *buffer, int n, amqp_connection_callback_t callback);
-} amqp_endpoint_t;
+    void (*cleanup)(amqp_endpoint_t *endpoint);
+};
 
 struct amqp_connection_t
 {
@@ -74,7 +76,9 @@ struct amqp_connection_t
 extern void amqp_transport_initialize(amqp_context_t *context, struct ev_loop *loop);
 extern void amqp_transport_cleanup(amqp_context_t *context);
 
-extern amqp_endpoint_t *amqp__initialize_endpoint(amqp_context_t *context, amqp_endpoint_address_t *address);
+extern amqp_endpoint_t *amqp__endpoint_initialize(amqp_context_t *context, amqp_endpoint_address_t *address);
+extern void amqp__endpoint_destroy(amqp_endpoint_t *endpoint);
+
 extern amqp_connection_t *amqp__create_connection(amqp_context_t *context, amqp_endpoint_t *endpoint, amqp_connection_callback_t callback);
 
 #ifdef __cplusplus
