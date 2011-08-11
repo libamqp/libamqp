@@ -11,24 +11,24 @@ got end
 
 :devenv_found
 
+echo "Removing old artifacts"
+del output /s /q
+del CMakeCache.txt /q
+del CMakeFiles /s /q
+if not exist output mkdir output
+
 echo "Building UnitTest++"
 cd 3rd-party\UnitTest++
-
 
 "%DEVENV%" UnitTest++.vsnet2008.sln /Rebuild Debug
 "%DEVENV%" UnitTest++.vsnet2008.sln /Rebuild Release
 
-
 cd ..\..
 echo "Running CMake"
-del CMakeCache.txt /q
-del CMakeFiles /s /q
 cmake CMakeLists.txt
 
 echo "Building Libamqp"
 "%DEVENV%" libamqp.sln /Rebuild Debug
 "%DEVENV%" libamqp.sln /Build Debug /project RUN_TESTS
 
-
 :end
-

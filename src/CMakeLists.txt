@@ -34,6 +34,6 @@ TARGET_LINK_LIBRARIES(Test
   ${UNITTEST++_LIBRARIES}
 )
 
-ADD_TEST(UnitTest++ Test)
+ADD_TEST(UnitTest++ Test --xml=../output/test-result.xml)
 
 # $Id: CMakeLists.txt,v 1.14 2011/03/16 12:33:34 erk Exp $
