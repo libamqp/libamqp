@@ -11,6 +11,22 @@
 #include "Transport/Listener.h"
 
 
+static int write_all(int fd, const char *buffer, size_t n)
+{
+    int count = n;
+    int written;
+    while ((written = write(fd, buffer, count)) >= 0 || errno == EINTR)
+    {
+        buffer += written;
+        count -= written;
+	if (count == 0)
+	{
+	    return n;
+	}
+    }
+    return written;
+}
+
 static int new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
 {
     char buffer[128];
@@ -20,7 +36,8 @@ static int new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, 
 
     while ((n = read(fd, buffer, sizeof(buffer) -1)) > 0)
     {
-        write (fd, buffer, n);
+	if (write_all(fd, buffer, n) == -1)
+	    break;
     }
     close(fd);
     return 0;

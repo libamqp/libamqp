@@ -21,7 +21,7 @@ typedef void (*livev_event_handler_t)(amqp_event_loop_t *loop, ev_io* io, const 
 
 void amqp_io_event_watcher_adjust_priority(amqp_io_event_watcher_t *watcher, int amount)
 {
-    ev_set_priority(&watcher->io, amount);
+    ev_set_priority((ev_io *) watcher, amount);
 }
 
 void amqp_io_event_watcher_start(amqp_io_event_watcher_t *watcher)
@@ -41,7 +41,7 @@ amqp_io_event_watcher_t *amqp_io_event_watcher_initialize(amqp_context_t *contex
     amqp_io_event_watcher_t *result = AMQP_MALLOC(amqp_io_event_watcher_t);
     result->context = context;
     result->loop = loop;
-    ev_io_init(&result->io, (livev_event_handler_t) handler, fd, revents);
+    ev_io_init((ev_io *) result, (livev_event_handler_t) handler, fd, revents);
     return result;
 }
 
