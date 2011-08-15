@@ -100,6 +100,16 @@ void _amqp_debug(const amqp_context_t *context, int level, const char * filename
     }
 }
 
+static void write_to_stderr(const char *buffer, size_t n)
+{
+    int written;
+    while ((n > 0) && ((written = write(2, buffer, n)) >= 0 || errno == EINTR))
+    {
+        buffer += written;
+        n -= written;
+    }
+}
+
 static void print_error_message(const char *leader, const char *message)
 {
     char buffer[128];
@@ -112,7 +122,7 @@ static void print_error_message(const char *leader, const char *message)
     strncpy(buffer + leader_length,  message, actual);
     buffer[leader_length + actual] = '\n';
     
-    write(2, buffer, leader_length + actual + 1);
+    write_to_stderr(buffer, leader_length + actual + 1);
 }
 
 void amqp_fatal_program_error(const char *message)
