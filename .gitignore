@@ -2,7 +2,7 @@
 .hg
 .hgtags
 .hgignore
-.idea/workspace.xml
+.idea
 
 *.o
 *.a
