@@ -15,18 +15,25 @@
  */
 
 #include <TestHarness.h>
-#include "Transport/Transport.h"
-#include "Transport/TransportTestSupport.h"
+#include "Transport/EventThreadTestSupport.h"
+
+#include "Transport/EventThread.h"
 
 SUITE(Transport)
 {
-    void amqp_connection_created_callback(amqp_connection_t *connection)
-    {
 
+
+
+    TEST_FIXTURE(EventThreadFixture, event_thread_providing_loop)
+    {
+        struct ev_loop *loop = ev_default_loop(0);
+        m_event_thread = amqp_event_thread_initialize(EventThreadFixture::basic_event_thread_handler, loop);
     }
 
-    TEST_FIXTURE(TransportFixture, really_important_test)
+    TEST_FIXTURE(EventThreadFixture, event_thread_without_loop)
     {
-        // amqp_connection_t *connection = amqp__create_connection(context, endpoint, amqp_connection_created_callback);
+        m_event_thread = amqp_event_thread_initialize(EventThreadFixture::basic_event_thread_handler, 0);
     }
+
+
 }

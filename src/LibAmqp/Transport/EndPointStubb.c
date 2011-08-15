@@ -17,10 +17,19 @@
 #include "Context/Context.h"
 #include "Transport/EndPointStubb.h"
 
-amqp_endpoint_t *amqp__initialize_endpoint_stubb(amqp_context_t *context, amqp_endpoint_address_t *address)
+//static
+void amqp_endpoint_stubb_cleanup(amqp_endpoint_t *endpoint)
 {
-    amqp_endpoint_t *result = AMQP_MALLOC(amqp_endpoint_t);
-    not_implemented(amqp__initialize_local_endpoint);
-    return result;
+    // nothing to do here
 }
 
+amqp_endpoint_t *amqp__endpoint_stubb_initialize(amqp_context_t *context, amqp_endpoint_address_t *address)
+{
+    amqp_endpoint_t *result = AMQP_MALLOC(amqp_endpoint_t);
+
+//    result->read = 0;
+//    result->write = 0;
+//    result->cleanup = amqp_endpoint_stubb_cleanup;
+
+    return result;
+}

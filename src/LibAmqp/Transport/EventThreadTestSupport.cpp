@@ -14,19 +14,15 @@
    limitations under the License.
  */
 
-#include <TestHarness.h>
-#include "Transport/Transport.h"
-#include "Transport/TransportTestSupport.h"
+#include <stdlib.h>
 
-SUITE(Transport)
+#include "Transport/EventThreadTestSupport.h"
+
+namespace SuiteTransport
 {
-    void amqp_connection_created_callback(amqp_connection_t *connection)
-    {
 
-    }
-
-    TEST_FIXTURE(TransportFixture, really_important_test)
+    void EventThreadFixture::basic_event_thread_handler(amqp_event_thread_t *event_thread)
     {
-        // amqp_connection_t *connection = amqp__create_connection(context, endpoint, amqp_connection_created_callback);
+        amqp_event_thread_run_loop(event_thread);
     }
 }

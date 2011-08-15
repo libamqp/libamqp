@@ -69,7 +69,7 @@ void amqp_condition_notify(amqp_condition_variable_t *cv)
 #endif
 }
 
-void amqp_condition_notify_all(amqp_condition_variable_t *cv)
+void amqp_condition_broadcast(amqp_condition_variable_t *cv)
 {
 #if defined(AMQP__WIN32_THREADS)
     abort();

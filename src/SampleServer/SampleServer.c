@@ -8,21 +8,36 @@
 // TODO - libamqp.h should include all the API declarations
 #include "Context/Context.h"
 #include "Transport/Transport.h"
-#include "Transport/Socket.h"
+#include "Transport/Listener.h"
+
+
+static int new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
+{
+    char buffer[128];
+    int n;
+
+    set_socket_to_blocking(fd);
+
+    while ((n = read(fd, buffer, sizeof(buffer) -1)) > 0)
+    {
+        write (fd, buffer, n);
+    }
+    close(fd);
+    return 0;
+}
 
 void run(int port_number)
 {
-    amqp_context_t *context = amqp_create_context();
-
+    static amqp_event_fn_list_t handlers = { new_connection };
     struct ev_loop *loop = ev_default_loop(0);
+    amqp_context_t *context = amqp_create_context();
+    amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(context, loop, port_number);
 
-    amqp_transport_initialize(context, loop);
-    amqp_setup_listener(context, port_number);
+    accept_watcher->fns = &handlers;
 
     ev_run(loop, 0);
 
-    // Might never be reached
-    amqp_transport_cleanup(context);
+    amqp_listener_destroy(accept_watcher);
     amqp_destroy_context(context);
 }
 

@@ -23,7 +23,7 @@ extern "C" {
 
 #include "Transport/Transport.h"
 
-extern amqp_endpoint_t *amqp__initialize_endpoint_stubb(amqp_context_t *context, amqp_endpoint_address_t *address);
+extern amqp_endpoint_t *amqp__endpoint_stubb_initialize(amqp_context_t *context, amqp_endpoint_address_t *address);
 
 #ifdef __cplusplus
 }

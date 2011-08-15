@@ -18,36 +18,20 @@
 
 #include "libamqp_common.h"
 #include "Thread/Thread.h"
+#include "Thread/FastMutex.h"
 
-#if defined(AMQP__WIN32_THREADS)
-void amqp_threading_initialize()
-{
-}
-void amqp_threading_cleanup()
-{
-}
-#else
-static amqp_mutex_t global_mutex;
+#if !defined(AMQP__WIN32_THREADS)
+static amqp_fast_mutex_t global_mutex = LIBAMQP_FAST_MUTEX_INITIALIZER;
+
 static volatile unsigned int next_thread_id = 1;
-static volatile int threading_initialized = 0;
 
-void amqp_threading_initialize()
-{
-    threading_initialized = 1;
-    amqp_mutex_initialize(&global_mutex);
-}
-void amqp_threading_cleanup()
-{
-    amqp_mutex_destroy(&global_mutex);
-}
-unsigned int get_next_posix_thread_id()
+static unsigned int get_next_posix_thread_id()
 {
     int result;
-    assert(threading_initialized);
 
-    amqp_mutex_lock(&global_mutex);
+    amqp_fast_mutex_lock(&global_mutex);
     result = next_thread_id++;
-    amqp_mutex_unlock(&global_mutex);
+    amqp_fast_mutex_unlock(&global_mutex);
 
     return result;
 }

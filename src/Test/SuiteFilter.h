@@ -14,19 +14,27 @@
    limitations under the License.
  */
 
+#ifndef LIBAMQP_TEST_SUITE_FILTER_H
+#define LIBAMQP_TEST_SUITE_FILTER_H
+
 #include <TestHarness.h>
-#include "Transport/Transport.h"
-#include "Transport/TransportTestSupport.h"
+#include <vector>
+#include <string.h>
 
-SUITE(Transport)
+class SuiteFilter
 {
-    void amqp_connection_created_callback(amqp_connection_t *connection)
-    {
+public:
+    SuiteFilter();
+    ~SuiteFilter();
 
-    }
+    bool operator() (const UnitTest::Test * test) const;
 
-    TEST_FIXTURE(TransportFixture, really_important_test)
-    {
-        // amqp_connection_t *connection = amqp__create_connection(context, endpoint, amqp_connection_created_callback);
-    }
-}
+    void add(const char *suite_name);
+    void set_exclusion_mode();
+
+private:
+    std::vector<std::string> m_suites;
+    bool m_is_exclusion_filter;
+};
+
+#endif

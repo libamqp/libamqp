@@ -17,8 +17,6 @@
 #include <TestHarness.h>
 #include "Thread/Thread.h"
 
-#include "debug_helper.h"
-
 SUITE(Thread)
 {
     class ThreadFixture
@@ -26,7 +24,6 @@ SUITE(Thread)
     public:
         ThreadFixture() : saved_from_thread(0)
         {
-            amqp_threading_initialize();
             amqp_mutex_initialize(&mutex);
             amqp_condition_initialize(&cv);
         }
@@ -35,7 +32,6 @@ SUITE(Thread)
         {
             amqp_condition_destroy(&cv);
             amqp_mutex_destroy(&mutex);
-            amqp_threading_cleanup();
         }
 
         const char *saved_from_thread;
@@ -52,12 +48,10 @@ SUITE(Thread)
     void ThreadFixture::handler(void *argument)
     {
         ThreadFixture *fixture = (ThreadFixture *) argument;
+
         amqp_mutex_lock(&fixture->mutex);
-
         fixture->saved_from_thread = ThreadFixture::pattern;
-
         amqp_condition_notify(&fixture->cv);
-
         amqp_mutex_unlock(&fixture->mutex);
     }
 
@@ -66,9 +60,12 @@ SUITE(Thread)
     {
         CHECK_EQUAL((void *) 0, saved_from_thread);
 
-        amqp_mutex_lock(&mutex);
         amqp_thread_t *thread = amqp_thread_start(ThreadFixture::handler, this);
-        amqp_condition_wait(&cv, &mutex);
+        amqp_mutex_lock(&mutex);
+        while (saved_from_thread == 0)
+        {
+            amqp_condition_wait(&cv, &mutex);
+        }
         amqp_mutex_unlock(&mutex);
 
         amqp_thread_destroy(thread);

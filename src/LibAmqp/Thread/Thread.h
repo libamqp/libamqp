@@ -50,12 +50,16 @@ typedef struct amqp_condition_variable_t
 #endif
 } amqp_condition_variable_t;
 
+typedef struct
+{
+    amqp_mutex_t mutex;
+    amqp_condition_variable_t cv;
+    int count;
+} amqp_semaphore_t;
+
 typedef void (*amqp_thread_handler_t)(void *argument);
 
 typedef struct amqp_thread_t amqp_thread_t;
-
-extern void amqp_threading_initialize();
-extern void amqp_threading_cleanup();
 
 extern amqp_thread_t *amqp_thread_start(amqp_thread_handler_t handler, void *handler_argument);
 extern void amqp_thread_destroy(amqp_thread_t *thread);
@@ -70,7 +74,12 @@ extern void amqp_condition_initialize(amqp_condition_variable_t *cv);
 extern void amqp_condition_destroy(amqp_condition_variable_t *cv);
 extern void amqp_condition_wait(amqp_condition_variable_t *cv, amqp_mutex_t *mutex);
 extern void amqp_condition_notify(amqp_condition_variable_t *cv);
-extern void amqp_condition_notify_all(amqp_condition_variable_t *cv);
+extern void amqp_condition_broadcast(amqp_condition_variable_t *cv);
+
+extern void amqp_semaphore_initialize(amqp_semaphore_t *semaphore);
+extern void amqp_semaphore_destroy(amqp_semaphore_t *semaphore);
+extern void amqp_semaphore_wait(amqp_semaphore_t *semaphore);
+extern void amqp_semaphore_signal(amqp_semaphore_t *semaphore);
 
 #ifdef __cplusplus
 }

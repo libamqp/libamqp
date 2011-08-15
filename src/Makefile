@@ -17,7 +17,6 @@ MODULES := \
 	../3rd-party/UnitTest++/src  \
 	Test
 
-
 CC=gcc
 LIBS :=
 SRC :=
@@ -26,17 +25,18 @@ TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
 TEST_RUNNER_ARGS :=
+SAMPLE_SRC :=
 
 .PHONY:	all trace libs tests check debug targets
-all:	trace libs targets tests
+all:	trace libs samples targets tests
 ci-build:   scrub all check
 targets::
 
-CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES))
-# CPPFLAGS +=  -DDISABLE_MEMORY_POOL
-# CPPFLAGS +=  -DTRACE_ALLOCATIONS
-# CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic
-CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L 
+# BUILD_OPTIONS += -DDISABLE_MEMORY_POOL
+# BUILD_OPTIONS += -DTRACE_ALLOCATIONS
+# BUILD_OPTIONS += -DLIBAMQP_DISABLE_FAST_MUTEX
+CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES)) $(BUILD_OPTIONS)
+CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -fasm
 CXXFLAGS = -g -Wall
 LDFLAGS += -lev -lpthread
 
@@ -46,9 +46,10 @@ LIBS += $(LIBAMQP_LIB)
 include $(patsubst %,%/module.mk,$(MODULES))
 
 OBJ = $(patsubst %.c,%.o,$(SRC))
+SAMPLE_OBJ = $(patsubst %.c,%.o,$(SAMPLE_SRC))
 TEST_OBJ = $(patsubst %.cpp,%.o,$(filter %.cpp,$(TEST_SRC))) \
 	$(patsubst %.c,%.o,$(filter %.c,$(TEST_SRC)))
-DEP_SRC += $(SRC) $(TEST_SRC)
+DEP_SRC += $(SRC) $(TEST_SRC) $(SAMPLE_SRC)
 
 libs::	$(LIBAMQP_LIB)
 $(LIBAMQP_LIB): $(patsubst %.o,$(LIBAMQP_LIB)(%.o), $(OBJ))
@@ -61,7 +62,10 @@ debug:	all
 	
 check::	all
 	./test-runner $(TEST_RUNNER_ARGS)
-	
+
+check-quick: all
+	./test-runner --exclude Transport
+
 test-runner:	$(TEST_OBJ) $(OBJ) $(LIBS)
 	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) $(LDFLAGS) -o $@
 
@@ -129,3 +133,4 @@ clean::
 scrub::
 	$(MAKE) -f Makefile.util scrub
 
+samples: $(SAMPLE_OBJ)
