@@ -20,13 +20,47 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include <errno.h>
 
-#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
-#define LIBAMQP_AMQP_CONTEXT_TYPE_T
-typedef struct amqp_context_t amqp_context_t;
-#endif
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
 
-extern int amqp_setup_listener(amqp_context_t *context, int port_number);
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
+
+extern void bzero(void *block, size_t n);
+
+inline static
+int set_socket_option(int fd, int option, int value)
+{
+    return setsockopt(fd, SOL_SOCKET, option, &value, sizeof(value));
+}
+
+inline static
+int set_socket_to_nonblocking(int fd)
+{
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1)
+    {
+        return -1;
+    }
+    return fcntl(fd, F_SETFL, flags |O_NONBLOCK);
+}
+
+inline static
+int set_socket_to_blocking(int fd)
+{
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1)
+    {
+        return -1;
+    }
+    return fcntl(fd, F_SETFL, flags & ~O_NONBLOCK);
+}
 
 #ifdef __cplusplus
 }

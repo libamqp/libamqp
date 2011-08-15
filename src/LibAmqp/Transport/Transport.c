@@ -16,25 +16,25 @@
 
 #include "Context/Context.h"
 #include "Transport/Transport.h"
-#include "Transport/Socket.h"
+#include "Transport/Listener.h"
 
-void amqp_transport_initialize(amqp_context_t *context, struct ev_loop *loop)
+amqp_transport_state_t * amqp_transport_initialize_with_ev_loop(amqp_context_t *context, struct ev_loop *loop)
 {
-    assert(context != 0);
-    assert(loop != 0);
-    context->transport_state = AMQP_MALLOC(amqp_transport_state_t);
-    context->transport_state->loop = loop;
+    amqp_transport_state_t *result;
+    assert(context != 0 && loop != 0);
+    result = AMQP_MALLOC(amqp_transport_state_t);
+    result->loop = loop;
+    return result;
 }
 
-void amqp_transport_cleanup(amqp_context_t *context)
+void amqp_transport_cleanup(amqp_transport_state_t *transport_state)
 {
-    assert(context != 0);
+    assert(transport_state != 0);
 
-    // TODO - cleanup loop if it was not provided
-    AMQP_FREE(context->transport_state);
+    AMQP_FREE(transport_state);
 }
 
-static void socket_endpoint_cleanup(amqp_endpoint_t *endpoint)
+ void socket_endpoint_cleanup(amqp_endpoint_t *endpoint)
 {
 }
 
@@ -46,19 +46,19 @@ amqp_endpoint_t *amqp__endpoint_initialize(amqp_context_t *context, amqp_endpoin
     assert(address->hostname != 0);
     assert(address->hostname[0] != 0);
 
-    result->read = 0;
-    result->write = 0;
-    result->cleanup = socket_endpoint_cleanup;
+//    result->read = 0;
+//    result->write = 0;
+//    result->cleanup = socket_endpoint_cleanup;
 
     return result;
 }
 
-void amqp__endpoint_destroy(amqp_endpoint_t *endpoint)
+void amqp_endpoint_destroy(amqp_endpoint_t *endpoint)
 {
     assert(endpoint != 0);
-    assert(endpoint->cleanup != 0);
-
-    (*endpoint->cleanup)(endpoint);
+//    assert(endpoint->cleanup != 0);
+//
+//    (*endpoint->cleanup)(endpoint);
     AMQP_FREE(endpoint);
 }
 

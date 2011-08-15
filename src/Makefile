@@ -62,7 +62,10 @@ debug:	all
 	
 check::	all
 	./test-runner $(TEST_RUNNER_ARGS)
-	
+
+check-quick: all
+	./test-runner --exclude Transport
+
 test-runner:	$(TEST_OBJ) $(OBJ) $(LIBS)
 	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) $(LDFLAGS) -o $@
 

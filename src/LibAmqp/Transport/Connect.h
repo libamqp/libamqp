@@ -14,12 +14,18 @@
    limitations under the License.
  */
 
-#include <string.h>
+#ifndef LIBAMQP_TRANSPORT_CONNECT_H
+#define LIBAMQP_TRANSPORT_CONNECT_H
 
-#include "Context/Context.h"
-#include "Transport/Socket.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void bzero(void *block, size_t n)
-{
-    memset(block, '\0', n);
+#include "libamqp_common.h"
+
+extern int tcp_connect_to(const char *host_name, int port);
+
+#ifdef __cplusplus
 }
+#endif
+#endif

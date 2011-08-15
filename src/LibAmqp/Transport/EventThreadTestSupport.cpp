@@ -14,12 +14,15 @@
    limitations under the License.
  */
 
-#include <string.h>
+#include <stdlib.h>
 
-#include "Context/Context.h"
-#include "Transport/Socket.h"
+#include "Transport/EventThreadTestSupport.h"
 
-void bzero(void *block, size_t n)
+namespace SuiteTransport
 {
-    memset(block, '\0', n);
+
+    void EventThreadFixture::basic_event_thread_handler(amqp_event_thread_t *event_thread)
+    {
+        amqp_event_thread_run_loop(event_thread);
+    }
 }

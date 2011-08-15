@@ -14,12 +14,26 @@
    limitations under the License.
  */
 
-#include <string.h>
+#include <TestHarness.h>
+#include "Transport/EventThreadTestSupport.h"
 
-#include "Context/Context.h"
-#include "Transport/Socket.h"
+#include "Transport/EventThread.h"
 
-void bzero(void *block, size_t n)
+SUITE(Transport)
 {
-    memset(block, '\0', n);
+
+
+
+    TEST_FIXTURE(EventThreadFixture, event_thread_providing_loop)
+    {
+        struct ev_loop *loop = ev_default_loop(0);
+        m_event_thread = amqp_event_thread_initialize(EventThreadFixture::basic_event_thread_handler, loop);
+    }
+
+    TEST_FIXTURE(EventThreadFixture, event_thread_without_loop)
+    {
+        m_event_thread = amqp_event_thread_initialize(EventThreadFixture::basic_event_thread_handler, 0);
+    }
+
+
 }

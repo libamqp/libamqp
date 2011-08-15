@@ -28,18 +28,14 @@ namespace SuiteTransport
 
     TransportFixture::TransportFixture()
     {
-        amqp_transport_initialize(context, ev_default_loop(0));
-
-        // TODO - consider using an endpoint here
-        amqp_setup_listener(context, port_number);
-
-        endpoint = TransportFixture::initialize_endpoint(context);
+//        amqp_transport_initialize_with_ev_loop(context, ev_default_loop(0));
+//        endpoint = TransportFixture::initialize_endpoint(context);
     }
 
     TransportFixture::~TransportFixture()
     {
-        amqp__endpoint_destroy(endpoint);
-        amqp_transport_cleanup(context);
+//        amqp_endpoint_destroy(endpoint);
+//        amqp_transport_cleanup(context);
     }
 
     amqp_endpoint_t *TransportFixture::initialize_endpoint(amqp_context_t *context)
