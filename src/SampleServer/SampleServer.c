@@ -55,7 +55,7 @@ void run(int port_number)
     ev_run(loop, 0);
 
     amqp_listener_destroy(accept_watcher);
-    amqp_destroy_context(context);
+    amqp_context_destroy(context);
 }
 
 int main(int argc, char *argv[])

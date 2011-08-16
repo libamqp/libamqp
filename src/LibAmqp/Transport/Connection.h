@@ -14,22 +14,21 @@
    limitations under the License.
  */
 
-#include "Context/Context.h"
-#include "Transport/EndPointStubb.h"
+#ifndef LIBAMQP_TRANSPORT_CONNECTION_H
+#define LIBAMQP_TRANSPORT_CONNECTION_H
 
-//static
-void amqp_endpoint_stubb_cleanup(amqp_endpoint_t *endpoint)
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "libamqp_common.h"
+
+typedef struct amqp_connection_t
 {
-    // nothing to do here
+
+} amqp_connection_t;
+
+#ifdef __cplusplus
 }
-
-amqp_endpoint_t *amqp__endpoint_stubb_initialize(amqp_context_t *context, amqp_endpoint_address_t *address)
-{
-    amqp_endpoint_t *result = AMQP_MALLOC(amqp_endpoint_t);
-
-//    result->read = 0;
-//    result->write = 0;
-//    result->cleanup = amqp_endpoint_stubb_cleanup;
-
-    return result;
-}
+#endif
+#endif

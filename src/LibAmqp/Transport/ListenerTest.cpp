@@ -52,7 +52,7 @@ SUITE(Transport)
     amqp_event_thread_t *ListenerFixture::thread_create()
     {
         struct ev_loop *loop = ev_default_loop(0);
-        return amqp_event_thread_initialize(ListenerFixture::listen_thread_handler, loop);
+        return amqp_event_thread_initialize(ListenerFixture::listen_thread_handler, 0, loop);
     }
 
     int ListenerFixture::accept_new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
@@ -81,7 +81,7 @@ SUITE(Transport)
         amqp_event_thread_run_loop(event_thread);
 
         amqp_listener_destroy(accept_watcher);
-        amqp_destroy_context(context);
+        amqp_context_destroy(context);
     }
 
     int ListenerFixture::connect(struct sockaddr *address, socklen_t address_size)

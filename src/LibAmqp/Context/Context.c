@@ -60,6 +60,34 @@ amqp_create_context()
     return (amqp_context_t *) result;
 }
 
+amqp_context_t *amqp_create_or_clone(amqp_context_t *context)
+{
+    if (context != 0)
+    {
+        amqp__context_with_guard_t *result = AMQP_MALLOC(amqp__context_with_guard_t);
+
+        result->context.config.putc = context->config.putc;
+        result->context.config.max_listen_queue_length = context->config.max_listen_queue_length;
+
+        result->context.debug.stream = context->debug.stream;
+        result->context.debug.level = context->debug.level;
+
+        result->context.pools.amqp_buffer_t_pool = context->pools.amqp_buffer_t_pool;
+        result->context.pools.amqp_type_t_pool = context->pools.amqp_type_t_pool;
+
+        result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
+        result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
+
+        result->multiple_delete_protection = random_sequence;
+
+        return (amqp_context_t *) result;
+    }
+    else
+    {
+        return amqp_create_context();
+    }
+}
+
 #define check_pool(context, pool) check_pool_allocations(context, pool, #pool)
 static int check_pool_allocations(amqp_context_t *context, amqp_memory_pool_t *pool, const char *pool_name)
 {
@@ -71,8 +99,8 @@ static int check_pool_allocations(amqp_context_t *context, amqp_memory_pool_t *p
     return true;
 }
 
-// amqp_destroy_context
-int  amqp_destroy_context(amqp_context_t *context)
+// amqp_context_destroy
+int  amqp_context_destroy(amqp_context_t *context)
 {
     int rc = true;
     if (context != 0)

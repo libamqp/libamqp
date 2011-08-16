@@ -14,18 +14,5 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_ENDPOINT_STUBB_H
-#define LIBAMQP_TRANSPORT_ENDPOINT_STUBB_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "Transport/Transport.h"
-
-extern amqp_endpoint_t *amqp__endpoint_stubb_initialize(amqp_context_t *context, amqp_endpoint_address_t *address);
-
-#ifdef __cplusplus
-}
-#endif
-#endif
+#include "Transport/Connect.h"

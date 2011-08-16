@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     amqp_type_print_formatted(type);
 
     amqp_deallocate_type(context, type);
-    amqp_destroy_context(context);
+    amqp_context_destroy(context);
 
     assert(amqp_assert_that_calls_to_free_match_calls_to_malloc());
 

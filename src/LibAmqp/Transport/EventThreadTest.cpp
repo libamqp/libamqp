@@ -24,11 +24,11 @@ SUITE(Transport)
     TEST_FIXTURE(EventThreadFixture, event_thread_providing_loop)
     {
         struct ev_loop *loop = ev_default_loop(0);
-        m_event_thread = amqp_event_thread_initialize(EventThreadFixture::basic_event_thread_handler, loop);
+        m_event_thread = amqp_event_thread_initialize(EventThreadFixture::basic_event_thread_handler, 0, loop);
     }
 
     TEST_FIXTURE(EventThreadFixture, event_thread_without_loop)
     {
-        m_event_thread = amqp_event_thread_initialize(EventThreadFixture::basic_event_thread_handler, 0);
+        m_event_thread = amqp_event_thread_initialize(EventThreadFixture::basic_event_thread_handler, 0, 0);
     }
 }

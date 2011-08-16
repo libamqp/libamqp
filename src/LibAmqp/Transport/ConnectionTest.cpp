@@ -14,31 +14,13 @@
    limitations under the License.
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <TestHarness.h>
+#include "Transport/Transport.h"
 
-#include "TestHarness.h"
-#include "Context/ContextTestSupport.h"
-#include "Buffer/Buffer.h"
-#include "TestData/TestData.h"
+#include "Context/Context.h"
+#include "Transport/EventThreadTestSupport.h"
+#include "Transport/Listener.h"
+#include "Transport/Connect.h"
 
-namespace SuiteContext
-{
-    ContextFixture::ContextFixture()
-    {
-        context = amqp_create_context();
-    }
-
-    ContextFixture::~ContextFixture()
-    {
-        int allocations_ok = amqp_context_destroy(context);
-        CHECK(allocations_ok);
-        context = 0;
-    }
-
-    void ContextFixture::load_decode_buffer(test_data::TestData &data)
-    {
-        data.transfer_to(context->decode.buffer);
-    }
-}
+#include "debug_helper.h"
 

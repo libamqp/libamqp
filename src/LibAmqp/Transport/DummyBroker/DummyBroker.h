@@ -14,31 +14,23 @@
    limitations under the License.
  */
 
-#include <stdlib.h>
-#include <string.h>
+#ifndef LIBAMQP_TRANSPORT_DUMMY_BROKER_DUMMY_BROKER_H
+#define LIBAMQP_TRANSPORT_DUMMY_BROKER_DUMMY_BROKER_H
 
-#include "TestHarness.h"
-#include "Context/ContextTestSupport.h"
-#include "Buffer/Buffer.h"
-#include "TestData/TestData.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-namespace SuiteContext
+#include "libamqp_common.h"
+
+typedef struct amqp_dummy_broker_t
 {
-    ContextFixture::ContextFixture()
-    {
-        context = amqp_create_context();
-    }
+    amqp_event_thread_t *thread;
+} amqp_dummy_broker_t;
 
-    ContextFixture::~ContextFixture()
-    {
-        int allocations_ok = amqp_context_destroy(context);
-        CHECK(allocations_ok);
-        context = 0;
-    }
+extern amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context);
 
-    void ContextFixture::load_decode_buffer(test_data::TestData &data)
-    {
-        data.transfer_to(context->decode.buffer);
-    }
+#ifdef __cplusplus
 }
-
+#endif
+#endif

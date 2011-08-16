@@ -81,7 +81,8 @@ struct amqp_context_t
 };
 
 extern amqp_context_t *amqp_create_context();
-extern int amqp_destroy_context(amqp_context_t *context);
+extern amqp_context_t *amqp_create_or_clone(amqp_context_t *context);
+extern int amqp_context_destroy(amqp_context_t *context);
 
 extern amqp_type_t *amqp_allocate_type(amqp_context_t *context);
 extern void amqp_deallocate_type(amqp_context_t *context, amqp_type_t *type);
