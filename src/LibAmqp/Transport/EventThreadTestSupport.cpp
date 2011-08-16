@@ -20,7 +20,6 @@
 
 namespace SuiteTransport
 {
-
     void EventThreadFixture::basic_event_thread_handler(amqp_event_thread_t *event_thread)
     {
         amqp_event_thread_run_loop(event_thread);

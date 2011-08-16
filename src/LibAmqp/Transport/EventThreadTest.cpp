@@ -21,9 +21,6 @@
 
 SUITE(Transport)
 {
-
-
-
     TEST_FIXTURE(EventThreadFixture, event_thread_providing_loop)
     {
         struct ev_loop *loop = ev_default_loop(0);
@@ -34,6 +31,4 @@ SUITE(Transport)
     {
         m_event_thread = amqp_event_thread_initialize(EventThreadFixture::basic_event_thread_handler, 0);
     }
-
-
 }
