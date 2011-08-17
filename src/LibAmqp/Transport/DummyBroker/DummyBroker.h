@@ -23,12 +23,23 @@ extern "C" {
 
 #include "libamqp_common.h"
 
+#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
+#define LIBAMQP_AMQP_CONTEXT_TYPE_T
+typedef struct amqp_context_t amqp_context_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_EVENT_THREAD_TYPE_T
+#define LIBAMQP_AMQP_EVENT_THREAD_TYPE_T
+typedef struct amqp_event_thread_t amqp_event_thread_t;
+#endif
+
 typedef struct amqp_dummy_broker_t
 {
     amqp_event_thread_t *thread;
 } amqp_dummy_broker_t;
 
 extern amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context);
+extern void amqp_dummy_broker_destroy(amqp_dummy_broker_t *broker);
 
 #ifdef __cplusplus
 }

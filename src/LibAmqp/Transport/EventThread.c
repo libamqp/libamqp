@@ -54,13 +54,14 @@ void amqp_event_thread_run_loop(amqp_event_thread_t *event_thread)
     ev_async_stop(event_thread->loop, async_watcher);
 }
 
-amqp_event_thread_t *amqp_event_thread_initialize(amqp_event_thread_handler_t handler, amqp_context_t *context, amqp_event_loop_t *loop)
+amqp_event_thread_t *amqp_event_thread_initialize(amqp_event_thread_handler_t handler, amqp_context_t *context, amqp_event_loop_t *loop, void *argument)
 {
     amqp_event_thread_t *result = AMQP_MALLOC(amqp_event_thread_t);
     amqp_semaphore_initialize(&result->thread_running_semaphore);
 
     result->handler = handler;
     result->loop = loop;
+    result->argument = argument;
     result->context = amqp_create_or_clone(context);
 
     result->thread = amqp_thread_start(event_thread_handler, result);

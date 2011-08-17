@@ -15,12 +15,33 @@
  */
 
 #include <TestHarness.h>
-#include "Transport/Transport.h"
-
-#include "Context/Context.h"
-#include "Transport/EventThreadTestSupport.h"
-#include "Transport/Listener.h"
-#include "Transport/Connect.h"
+#include "Transport/DummyBroker/DummyBroker.h"
+#include "Context/ContextTestSupport.h"
 
 #include "debug_helper.h"
 
+SUITE(Transport)
+{
+    class ConnectionFixture : public SuiteContext::ContextFixture
+    {
+    public:
+        ConnectionFixture();
+        ~ConnectionFixture();
+    public:
+        amqp_dummy_broker_t *m_broker;
+    };
+
+    ConnectionFixture::ConnectionFixture()
+    {
+        m_broker = amqp_dummy_broker_initialize(context);
+    }
+
+    ConnectionFixture::~ConnectionFixture()
+    {
+        amqp_dummy_broker_destroy(m_broker);
+    }
+
+    TEST_FIXTURE(ConnectionFixture, really_important_test)
+    {
+    }
+}
