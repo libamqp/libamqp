@@ -27,21 +27,21 @@ SUITE(Memory)
     {
         test_type_t *p, *q, *r;
 
-        p = (test_type_t *) amqp_malloc(sizeof(test_type_t) TRACE_ARGS);
+        p = (test_type_t *) amqp_malloc(sizeof(test_type_t));
         CHECK_EQUAL(1UL, amqp_malloc_stats.outstanding_allocations);
-        amqp_free(p TRACE_ARGS);
+        amqp_free(p);
         CHECK_EQUAL(0UL, amqp_malloc_stats.outstanding_allocations);
 
-        q = (test_type_t *) amqp_malloc(sizeof(test_type_t) TRACE_ARGS);
+        q = (test_type_t *) amqp_malloc(sizeof(test_type_t));
         CHECK_EQUAL(1UL, amqp_malloc_stats.outstanding_allocations);
 
-        r = (test_type_t *) amqp_malloc(sizeof(test_type_t) TRACE_ARGS);
+        r = (test_type_t *) amqp_malloc(sizeof(test_type_t));
         CHECK_EQUAL(2UL, amqp_malloc_stats.outstanding_allocations);
 
-        amqp_free(q TRACE_ARGS);
+        amqp_free(q);
         CHECK_EQUAL(1UL, amqp_malloc_stats.outstanding_allocations);
 
-        amqp_free(r TRACE_ARGS);
+        amqp_free(r);
         CHECK_EQUAL(0UL, amqp_malloc_stats.outstanding_allocations);
     }
 

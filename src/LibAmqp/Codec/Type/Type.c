@@ -59,7 +59,7 @@ void amqp_type_initialize_pool(amqp_memory_pool_t *pool)
 amqp_type_t ** amqp_allocate_amqp_type_t_array(size_t count)
 {
     size_t n = (count / 16 + 1) * 16;
-    return (amqp_type_t **) amqp_malloc(n * sizeof(amqp_type_t *) TRACE_ARGS);
+    return (amqp_type_t **) amqp_malloc(n * sizeof(amqp_type_t *));
 }
 
 amqp_type_t ** amqp_realloc_amqp_type_t_array(amqp_type_t **elements, size_t count)
@@ -69,7 +69,7 @@ amqp_type_t ** amqp_realloc_amqp_type_t_array(amqp_type_t **elements, size_t cou
 
     if (new_n > old_n)
     {
-        elements = amqp_realloc(elements, new_n * sizeof(amqp_type_t *) TRACE_ARGS);
+        elements = amqp_realloc(elements, new_n * sizeof(amqp_type_t *));
     }
     return elements;
 }

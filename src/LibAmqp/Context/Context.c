@@ -60,7 +60,7 @@ amqp_create_context()
     return (amqp_context_t *) result;
 }
 
-amqp_context_t *amqp_create_or_clone(amqp_context_t *context)
+amqp_context_t *amqp_context_clone(amqp_context_t *context)
 {
     if (context != 0)
     {

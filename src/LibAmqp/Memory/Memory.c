@@ -60,17 +60,10 @@ static inline void save_guard_mask(amqp__memory_block_t *block, size_t count)
     block->data.fragments[count] = mask ^ count;
 }
 
-void *amqp_malloc(size_t n TRACE_PARAMS)
+void *amqp_malloc(size_t n)
 {
     size_t count = byte_count_rounded_to_size_t_array_size(n);
     amqp__memory_block_t *block = (amqp__memory_block_t *) malloc(calculate_bytes_to_allocate(count));
-
-#ifdef TRACE_ALLOCATIONS
-    if (amqp_memory_trace_enabled)
-    {
-        printf("%s:%d: trace - amqp_malloc(%lu) called, block=%p, count=%lu\n", fileName, lineNumber, (unsigned long) n, (void *) block, (unsigned long) count);
-    }
-#endif
 
     amqp_malloc_stats.outstanding_allocations++;
     amqp_malloc_stats.total_allocation_calls++;
@@ -110,7 +103,7 @@ static void assert_trailing_guard_correct(amqp__memory_block_t *block)
     }
 }
 
-void *amqp_realloc(void *p, size_t n TRACE_PARAMS)
+void *amqp_realloc(void *p, size_t n)
 {
     amqp__memory_block_t *old_block = calculate_block_start(p);
     size_t old_count;
@@ -131,21 +124,13 @@ void *amqp_realloc(void *p, size_t n TRACE_PARAMS)
 
     memset(&block->data.fragments[old_count], '\0', (count - old_count) * SIZE_T_BYTES);
 
-#ifdef TRACE_ALLOCATIONS
-    if (amqp_memory_trace_enabled)
-    {
-        printf("%s:%d: trace - amqp_realloc(%p, %lu) called, old_block=%p, old_count=%lu, block=%p, count=%lu\n",
-            fileName, lineNumber, p, (unsigned long) n, (void *) old_block, (unsigned long) old_count, (void *) block, (unsigned long) count);
-    }
-#endif
-
     amqp_malloc_stats.total_allocation_calls++;
     save_guard_mask(block, count);
 
     return &block->data.fragments[0];
 }
 
-void amqp_free(void *p TRACE_PARAMS)
+void amqp_free(void *p)
 {
     amqp__memory_block_t *block;
 
@@ -157,13 +142,6 @@ void amqp_free(void *p TRACE_PARAMS)
         assert_trailing_guard_correct(block);
 
         amqp_malloc_stats.outstanding_allocations--;
-
-#       ifdef TRACE_ALLOCATIONS
-        if (amqp_memory_trace_enabled)
-        {
-            printf("%s:%d: trace - amqp_free(%p) called, block=%p, count=%lu\n", fileName, lineNumber, p, (void *) block, (unsigned long) block->count);
-        }
-#       endif
 
         free(block);
     }

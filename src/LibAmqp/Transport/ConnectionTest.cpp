@@ -41,7 +41,7 @@ SUITE(Transport)
         amqp_dummy_broker_destroy(m_broker);
     }
 
-    TEST_FIXTURE(ConnectionFixture, really_important_test)
-    {
-    }
+//    TEST_FIXTURE(ConnectionFixture, really_important_test)
+//    {
+//    }
 }

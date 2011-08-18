@@ -25,7 +25,7 @@ static
 void amqp_alloc_amqp_buffer_t(amqp_memory_pool_t *pool, amqp_buffer_t *buffer)
 {
     const int size = 1024 * 4;
-    buffer->bytes = amqp_malloc(size TRACE_ARGS);
+    buffer->bytes = amqp_malloc(size);
 
     buffer->actual_size = size;
     buffer->limit.index = 0;

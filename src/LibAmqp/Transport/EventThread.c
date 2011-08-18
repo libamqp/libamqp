@@ -62,7 +62,7 @@ amqp_event_thread_t *amqp_event_thread_initialize(amqp_event_thread_handler_t ha
     result->handler = handler;
     result->loop = loop;
     result->argument = argument;
-    result->context = amqp_create_or_clone(context);
+    result->context = amqp_context_clone(context);
 
     result->thread = amqp_thread_start(event_thread_handler, result);
 

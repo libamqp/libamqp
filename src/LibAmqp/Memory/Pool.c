@@ -52,7 +52,7 @@ static
 amqp_memory_block_t *allocate_block(amqp_memory_pool_t *pool)
 {
     size_t block_size = pool->allocation_size_in_bytes * pool->allocations_per_block + pool->offset_to_first_allocation;
-    return amqp_malloc(block_size TRACE_ARGS);
+    return amqp_malloc(block_size);
 }
 
 static
@@ -152,7 +152,7 @@ void *amqp_allocate(amqp_memory_pool_t *pool)
     assert(pool->initializer_callback != null);
 
 #ifdef DISABLE_MEMORY_POOL
-    result = amqp_malloc(pool->object_size TRACE_ARGS);
+    result = amqp_malloc(pool->object_size);
 #else
     assert(pool->object_size_in_fragments != 0);
     result = allocate_object(pool);
@@ -230,7 +230,7 @@ void amqp_deallocate(amqp_memory_pool_t *pool, void *pooled_object)
     {
         (*pool->destroyer_callback)(pool, pooled_object);
 #ifdef DISABLE_MEMORY_POOL
-        amqp_free(pooled_object TRACE_ARGS);
+        amqp_free(pooled_object);
 #else
         delete_object(pool, pooled_object);
 #endif
