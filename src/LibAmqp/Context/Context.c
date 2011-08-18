@@ -124,20 +124,20 @@ int  amqp_context_destroy(amqp_context_t *context)
 
 amqp_type_t *amqp_allocate_type(amqp_context_t *context)
 {
-    return (amqp_type_t *) amqp_allocate(&context->pools.amqp_type_t_pool);
+    return (amqp_type_t *) amqp_allocate(context, &context->pools.amqp_type_t_pool);
 }
 
 void amqp_deallocate_type(amqp_context_t *context, amqp_type_t *type)
 {
-    amqp_deallocate(&context->pools.amqp_type_t_pool, type);
+    amqp_deallocate(context, &context->pools.amqp_type_t_pool, type);
 }
 
 amqp_buffer_t *amqp_allocate_buffer(amqp_context_t *context)
 {
-    return (amqp_buffer_t *) amqp_allocate(&context->pools.amqp_buffer_t_pool);
+    return (amqp_buffer_t *) amqp_allocate(context, &context->pools.amqp_buffer_t_pool);
 }
 
 void amqp_deallocate_buffer(amqp_context_t *context, amqp_buffer_t *buffer)
 {
-    amqp_deallocate(&context->pools.amqp_buffer_t_pool, buffer);
+    amqp_deallocate(context, &context->pools.amqp_buffer_t_pool, buffer);
 }

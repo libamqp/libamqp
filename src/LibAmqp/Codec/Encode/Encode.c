@@ -35,9 +35,9 @@ static inline int emit_constructor(amqp_context_t *context)
     return type == 0 || (amqp_type_is_container(type) && !amqp_type_is_array(type)) || (amqp_type_is_array(type)  && type->value.array.count == 0);
 }
 
-static inline amqp_type_t **allocate_elements(amqp_type_t **elements, size_t count)
+static inline amqp_type_t **allocate_elements(amqp_context_t *c, amqp_type_t **elements, size_t count)
 {
-    return elements == 0 ? amqp_allocate_amqp_type_t_array(1) : amqp_realloc_amqp_type_t_array(elements, count);
+    return elements == 0 ? amqp_allocate_amqp_type_t_array(c, 1) : amqp_realloc_amqp_type_t_array(c, elements, count);
 }
 
 static inline void amqp_add_element_to_container(amqp_context_t *context, amqp_type_t *type)
@@ -75,7 +75,7 @@ static inline void amqp_add_element_to_container(amqp_context_t *context, amqp_t
             }
         }
         
-        context->encode.container->value.compound.elements = allocate_elements(context->encode.container->value.compound.elements, count + 1);
+        context->encode.container->value.compound.elements = allocate_elements(context, context->encode.container->value.compound.elements, count + 1);
         context->encode.container->value.compound.elements[count] = type;
     }
 }
@@ -104,7 +104,7 @@ static amqp_type_t *pop_container(amqp_context_t *context, amqp_type_t *cc)
 
 static amqp_type_t *initialize_type(amqp_context_t *context, const amqp_type_type_flags_t type_flags, amqp_encoding_meta_data_t *meta_data)
 {
-    amqp_type_t *type = (amqp_type_t *) amqp_allocate(&context->pools.amqp_type_t_pool);
+    amqp_type_t *type = (amqp_type_t *) amqp_allocate(context, &context->pools.amqp_type_t_pool);
 
     type->format_code = meta_data->format_code;
     type->context = context;

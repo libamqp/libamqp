@@ -40,14 +40,14 @@ namespace SuiteCodec
     amqp_type_t *
     CodecFixture::allocate_type()
     {
-        return (amqp_type_t *) amqp_allocate(type_pool());
+        return (amqp_type_t *) amqp_allocate(context, type_pool());
     }
 
     void
     CodecFixture::deallocate_type(amqp_type_t *type)
     {
 
-        amqp_deallocate(type_pool(), type);
+        amqp_deallocate(context, type_pool(), type);
     }
 
     bool

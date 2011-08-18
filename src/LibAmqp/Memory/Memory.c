@@ -60,7 +60,7 @@ static inline void save_guard_mask(amqp__memory_block_t *block, size_t count)
     block->data.fragments[count] = mask ^ count;
 }
 
-void *amqp_malloc(size_t n)
+void *amqp_malloc(amqp_context_t *c, size_t n)
 {
     size_t count = byte_count_rounded_to_size_t_array_size(n);
     amqp__memory_block_t *block = (amqp__memory_block_t *) malloc(calculate_bytes_to_allocate(count));
@@ -103,7 +103,7 @@ static void assert_trailing_guard_correct(amqp__memory_block_t *block)
     }
 }
 
-void *amqp_realloc(void *p, size_t n)
+void *amqp_realloc(amqp_context_t *c, void *p, size_t n)
 {
     amqp__memory_block_t *old_block = calculate_block_start(p);
     size_t old_count;
@@ -130,7 +130,7 @@ void *amqp_realloc(void *p, size_t n)
     return &block->data.fragments[0];
 }
 
-void amqp_free(void *p)
+void amqp_free(amqp_context_t *c, void *p)
 {
     amqp__memory_block_t *block;
 

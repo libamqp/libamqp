@@ -17,7 +17,7 @@
 
 #include "Memory/MemoryTestSupport.h"
 
-#define CHECK_ALLOCATIONS() \
+#define CHECK_ALLOCATIONS(c) \
     do \
     { \
         try { \
@@ -33,10 +33,10 @@ namespace SuiteMemory
 {
     MemoryFixture::MemoryFixture()
     {
-        amqp_reset_malloc_allocation_stats();
+        memset(&m_context, '\0', sizeof(amqp_context_t));
     }
     MemoryFixture::~MemoryFixture()
     {
-        CHECK_ALLOCATIONS();
+        CHECK_ALLOCATIONS(&m_context);
     }
 }

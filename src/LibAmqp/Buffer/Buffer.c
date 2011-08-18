@@ -22,10 +22,10 @@
 #include "Context/ErrorHandling.h"
 
 static
-void amqp_alloc_amqp_buffer_t(amqp_memory_pool_t *pool, amqp_buffer_t *buffer)
+void amqp_initialize_amqp_buffer_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_buffer_t *buffer)
 {
     const int size = 1024 * 4;
-    buffer->bytes = amqp_malloc(size);
+    buffer->bytes = amqp_malloc(c, size);
 
     buffer->actual_size = size;
     buffer->limit.index = 0;
@@ -33,7 +33,7 @@ void amqp_alloc_amqp_buffer_t(amqp_memory_pool_t *pool, amqp_buffer_t *buffer)
 }
 
 static
-void amqp_dealloc_amqp_buffer_t(amqp_memory_pool_t *pool, amqp_buffer_t *buffer)
+void amqp_cleanup_amqp_buffer_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_buffer_t *buffer)
 {
     if (buffer)
     {
@@ -44,7 +44,7 @@ void amqp_dealloc_amqp_buffer_t(amqp_memory_pool_t *pool, amqp_buffer_t *buffer)
 void amqp_buffer_initialize_pool(amqp_memory_pool_t *pool)
 {
     amqp_initialize_pool_suggesting_block_size(pool, sizeof(amqp_buffer_t), 512);
-    amqp_pool_specify_initialization_callbacks(pool, (amqp_pool_callback_t) amqp_alloc_amqp_buffer_t, (amqp_pool_callback_t) amqp_dealloc_amqp_buffer_t);
+    amqp_pool_specify_initialization_callbacks(pool, (amqp_pool_callback_t) amqp_initialize_amqp_buffer_t, (amqp_pool_callback_t) amqp_cleanup_amqp_buffer_t);
 }
 
 int amqp_buffer_putc(amqp_buffer_t *buffer, int c)

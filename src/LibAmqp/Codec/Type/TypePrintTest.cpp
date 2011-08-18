@@ -47,7 +47,7 @@ SUITE(TypePrint)
         }
         ~TypePrintFixture() 
         {
-            amqp_deallocate(&context->pools.amqp_type_t_pool, type);
+            amqp_deallocate(context, &context->pools.amqp_type_t_pool, type);
         }
         int putc(int c)
         {

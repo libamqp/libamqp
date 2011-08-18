@@ -30,7 +30,7 @@ void amqp_mark_type_invalid(amqp_type_t *type, int cause)
 }
 
 static
-void amqp_alloc_amqp_type_t(amqp_memory_pool_t *pool, amqp_type_t *type)
+void amqp_initialize_amqp_type_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_type_t *type)
 {
     assert(pool != 0);
     assert(type != 0);
@@ -39,42 +39,42 @@ void amqp_alloc_amqp_type_t(amqp_memory_pool_t *pool, amqp_type_t *type)
 }
 
 static
-void amqp_dealloc_amqp_type_t(amqp_memory_pool_t *pool, amqp_type_t *type)
+void amqp_cleanup_amqp_type_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_type_t *type)
 {
     assert(pool != 0);
     assert(type != 0);
 
     if (type->flags.container.is_compound)
     {
-        amqp_deallocate_amqp_type_t_array(pool, type->value.compound.elements, type->value.compound.count);
+        amqp_deallocate_amqp_type_t_array(c, pool, type->value.compound.elements, type->value.compound.count);
     }
 }
 
 void amqp_type_initialize_pool(amqp_memory_pool_t *pool)
 {
     amqp_initialize_pool_suggesting_block_size(pool, sizeof(amqp_type_t), 2048);
-    amqp_pool_specify_initialization_callbacks(pool, (amqp_pool_callback_t) amqp_alloc_amqp_type_t, (amqp_pool_callback_t) amqp_dealloc_amqp_type_t);
+    amqp_pool_specify_initialization_callbacks(pool, (amqp_pool_callback_t) amqp_initialize_amqp_type_t, (amqp_pool_callback_t) amqp_cleanup_amqp_type_t);
 }
 
-amqp_type_t ** amqp_allocate_amqp_type_t_array(size_t count)
+amqp_type_t ** amqp_allocate_amqp_type_t_array(amqp_context_t *c, size_t count)
 {
     size_t n = (count / 16 + 1) * 16;
-    return (amqp_type_t **) amqp_malloc(n * sizeof(amqp_type_t *));
+    return (amqp_type_t **) amqp_malloc(c, n * sizeof(amqp_type_t *));
 }
 
-amqp_type_t ** amqp_realloc_amqp_type_t_array(amqp_type_t **elements, size_t count)
+amqp_type_t ** amqp_realloc_amqp_type_t_array(amqp_context_t *c, amqp_type_t **elements, size_t count)
 {
     size_t old_n = ((count - 1) / 16 + 1) * 16;
     size_t new_n = (count / 16 + 1) * 16;
 
     if (new_n > old_n)
     {
-        elements = amqp_realloc(elements, new_n * sizeof(amqp_type_t *));
+        elements = amqp_realloc(c, elements, new_n * sizeof(amqp_type_t *));
     }
     return elements;
 }
 
-void amqp_deallocate_amqp_type_t_array(amqp_memory_pool_t *pool, amqp_type_t **array, size_t count)
+void amqp_deallocate_amqp_type_t_array(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_type_t **array, size_t count)
 {
     size_t i;
 
@@ -82,7 +82,7 @@ void amqp_deallocate_amqp_type_t_array(amqp_memory_pool_t *pool, amqp_type_t **a
     {
         for (i = 0; i < count; i++)
         {
-            amqp_deallocate(pool, array[i]);
+            amqp_deallocate(c, pool, array[i]);
         }
         AMQP_FREE(array);
     }

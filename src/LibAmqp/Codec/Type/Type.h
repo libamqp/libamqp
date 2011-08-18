@@ -110,10 +110,10 @@ struct amqp_type_t
 
 extern void amqp_type_initialize_pool(amqp_memory_pool_t *pool);
 
-extern amqp_type_t **amqp_allocate_amqp_type_t_array(size_t count);
-extern void amqp_deallocate_amqp_type_t_array(amqp_memory_pool_t *pool, amqp_type_t **array, size_t count);
+extern amqp_type_t **amqp_allocate_amqp_type_t_array(amqp_context_t *c, size_t count);
+extern void amqp_deallocate_amqp_type_t_array(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_type_t **array, size_t count);
+extern amqp_type_t **amqp_realloc_amqp_type_t_array(amqp_context_t *c, amqp_type_t **elements, size_t count);
 
-extern amqp_type_t **amqp_realloc_amqp_type_t_array(amqp_type_t **elements, size_t count);
 extern int amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs);
 extern void amqp_mark_type_invalid(amqp_type_t *type, int cause);
 extern void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type);

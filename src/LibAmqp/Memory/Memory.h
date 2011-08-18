@@ -22,6 +22,12 @@ extern "C" {
 
 #include <stdlib.h>
 
+
+#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
+#define LIBAMQP_AMQP_CONTEXT_TYPE_T
+typedef struct amqp_context_t amqp_context_t;
+#endif
+
 #ifdef AMQP_MALLOC
     #error libamqp redefines AMQP_MALLOC
 #endif
@@ -29,8 +35,8 @@ extern "C" {
     #error libamqp redefines AMQP_FREE
 #endif
 
-#define AMQP_MALLOC(type)     	    ((type *) amqp_malloc(sizeof(type)))
-#define AMQP_FREE(p)                (amqp_free(p), p = 0)
+#define AMQP_MALLOC(type)     	    ((type *) amqp_malloc(0, sizeof(type)))
+#define AMQP_FREE(p)                (amqp_free(0, p), p = 0)
 
 typedef struct amqp_allocation_stats_t
 {
@@ -38,9 +44,9 @@ typedef struct amqp_allocation_stats_t
     unsigned long total_allocation_calls;
 } amqp_allocation_stats_t;
 
-extern void *amqp_malloc(size_t n);
-extern void *amqp_realloc(void *p, size_t n);
-extern void amqp_free(void *p);
+extern void *amqp_malloc(amqp_context_t *c, size_t n);
+extern void *amqp_realloc(amqp_context_t *c, void *p, size_t n);
+extern void amqp_free(amqp_context_t *c, void *p);
 
 extern void amqp_reset_malloc_allocation_stats();
 extern amqp_allocation_stats_t amqp_malloc_stats;

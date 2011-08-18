@@ -45,7 +45,7 @@ SUITE(Buffer)
         CHECK_EQUAL(1UL, pool.stats.outstanding_allocations);
         CHECK_EQUAL(1UL, pool.stats.total_allocation_calls);
         // break_one();
-        amqp_deallocate(&pool, buffer);
+        amqp_deallocate(&m_context, &pool, buffer);
         buffer = 0;
 
         CHECK_EQUAL(0UL, pool.stats.outstanding_allocations);

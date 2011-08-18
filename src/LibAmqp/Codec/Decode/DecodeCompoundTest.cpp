@@ -80,7 +80,7 @@ SUITE(CompoundTypeDecode)
 
         e  = amqp_list_element(type, 0);
         CHECK_EQUAL(0xa3, e->format_code);
-        result = amqp_convert_bytes_to_cstr(e);
+        result = amqp_convert_bytes_to_cstr(context, e);
         CHECK_EQUAL("Foo", result);
         AMQP_FREE(result);
 
@@ -90,7 +90,7 @@ SUITE(CompoundTypeDecode)
 
         e  = amqp_list_element(type, 2);
         CHECK_EQUAL(0xa1, e->format_code);
-        result = amqp_convert_bytes_to_cstr(e);
+        result = amqp_convert_bytes_to_cstr(context, e);
         CHECK_EQUAL("Hello", result);
         AMQP_FREE(result);
 

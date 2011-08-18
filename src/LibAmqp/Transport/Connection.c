@@ -16,3 +16,5 @@
 
 
 #include "Transport/Connect.h"
+
+int not_empty;
