@@ -33,7 +33,10 @@ SUITE(Transport)
     class ListenerFixture : public EventThreadFixture
     {
     public:
-        ListenerFixture() : EventThreadFixture(ListenerFixture::thread_create()) { }
+        ListenerFixture() : EventThreadFixture()
+        {
+            m_event_thread = ListenerFixture::thread_create(context);
+        }
         ~ListenerFixture() { }
         int connect(struct sockaddr *address, socklen_t address_size);
         void client_send_and_receive(int fd);
@@ -42,17 +45,17 @@ SUITE(Transport)
         static const int port_number;
 
     private:
-        static amqp_event_thread_t *thread_create();
+        static amqp_event_thread_t *thread_create(amqp_context_t *context);
         static void listen_thread_handler(amqp_event_thread_t *event_thread);
         static int accept_new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size);
     };
 
     const int ListenerFixture::port_number = 7654;
 
-    amqp_event_thread_t *ListenerFixture::thread_create()
+    amqp_event_thread_t *ListenerFixture::thread_create(amqp_context_t *context)
     {
         struct ev_loop *loop = ev_default_loop(0);
-        return amqp_event_thread_initialize(ListenerFixture::listen_thread_handler, 0, loop, 0);
+        return amqp_event_thread_initialize(context, ListenerFixture::listen_thread_handler, loop, 0);
     }
 
     int ListenerFixture::accept_new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
@@ -74,14 +77,12 @@ SUITE(Transport)
     {
         static amqp_event_fn_list_t handlers = { accept_new_connection };
 
-        amqp_context_t *context = amqp_create_context();
-        amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(context, event_thread->loop, ListenerFixture::port_number);
+        amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(event_thread->context, event_thread->loop, ListenerFixture::port_number);
         accept_watcher->fns = &handlers;
 
         amqp_event_thread_run_loop(event_thread);
 
-        amqp_listener_destroy(accept_watcher);
-        amqp_context_destroy(context);
+        amqp_listener_destroy(event_thread->context, accept_watcher);
     }
 
     int ListenerFixture::connect(struct sockaddr *address, socklen_t address_size)

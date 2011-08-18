@@ -35,8 +35,8 @@ typedef struct amqp_context_t amqp_context_t;
     #error libamqp redefines AMQP_FREE
 #endif
 
-#define AMQP_MALLOC(type)     	    ((type *) amqp_malloc(0, sizeof(type)))
-#define AMQP_FREE(p)                (amqp_free(0, p), p = 0)
+#define AMQP_MALLOC(c, type)        ((type *) amqp_malloc((c), sizeof(type)))
+#define AMQP_FREE(c, p)             (amqp_free((c), (p)), (p) = 0)
 
 typedef struct amqp_allocation_stats_t
 {

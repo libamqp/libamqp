@@ -30,7 +30,7 @@ SUITE(SymbolDecode)
         DecodeFixture() : result(0) {}
         ~DecodeFixture()
         {
-            AMQP_FREE(result);
+            AMQP_FREE(context, result);
         }
 
     public:

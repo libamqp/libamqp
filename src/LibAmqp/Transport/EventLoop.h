@@ -50,7 +50,7 @@ extern void amqp_io_event_watcher_stop(amqp_io_event_watcher_t *watcher);
 extern void amqp_io_event_watcher_adjust_priority(amqp_io_event_watcher_t *watcher, int amount);
 
 extern amqp_io_event_watcher_t *amqp_io_event_watcher_initialize(amqp_context_t *context, amqp_event_loop_t *loop, amqp_event_handler_t handler, int fd, const int revents);
-extern void amqp_io_event_watcher_destroy(amqp_io_event_watcher_t *watcher);
+extern void amqp_io_event_watcher_destroy(amqp_context_t *context, amqp_io_event_watcher_t *watcher);
 
 #ifdef __cplusplus
 }

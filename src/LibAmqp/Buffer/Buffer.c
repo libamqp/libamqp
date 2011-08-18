@@ -22,10 +22,10 @@
 #include "Context/ErrorHandling.h"
 
 static
-void amqp_initialize_amqp_buffer_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_buffer_t *buffer)
+void amqp_initialize_amqp_buffer_t(amqp_context_t *context, amqp_memory_pool_t *pool, amqp_buffer_t *buffer)
 {
     const int size = 1024 * 4;
-    buffer->bytes = amqp_malloc(c, size);
+    buffer->bytes = amqp_malloc(context, size);
 
     buffer->actual_size = size;
     buffer->limit.index = 0;
@@ -33,11 +33,11 @@ void amqp_initialize_amqp_buffer_t(amqp_context_t *c, amqp_memory_pool_t *pool, 
 }
 
 static
-void amqp_cleanup_amqp_buffer_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_buffer_t *buffer)
+void amqp_cleanup_amqp_buffer_t(amqp_context_t *context, amqp_memory_pool_t *pool, amqp_buffer_t *buffer)
 {
     if (buffer)
     {
-        AMQP_FREE(buffer->bytes);
+        amqp_free(context, buffer->bytes);
     }
 }
 

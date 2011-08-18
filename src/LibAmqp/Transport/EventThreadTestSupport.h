@@ -18,21 +18,19 @@
 #define LIBAMQP_TRANSPORT_EVENT_THREAD_TEST_SUPPORT_H
 
 #include "Transport/EventThread.h"
+#include "Context/ContextTestSupport.h"
 
 namespace SuiteTransport
 {
-    class EventThreadFixture
+    class EventThreadFixture : public SuiteContext::ContextFixture
     {
     public:
         EventThreadFixture() : m_event_thread(0)
         {
         }
-        EventThreadFixture(amqp_event_thread_t *event_thread) : m_event_thread(event_thread)
-        {
-        }
         ~EventThreadFixture()
         {
-            amqp_event_thread_destroy(m_event_thread);
+            amqp_event_thread_destroy(context, m_event_thread);
         }
 
     public:

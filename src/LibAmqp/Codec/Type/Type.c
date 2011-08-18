@@ -74,7 +74,7 @@ amqp_type_t ** amqp_realloc_amqp_type_t_array(amqp_context_t *c, amqp_type_t **e
     return elements;
 }
 
-void amqp_deallocate_amqp_type_t_array(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_type_t **array, size_t count)
+void amqp_deallocate_amqp_type_t_array(amqp_context_t *context, amqp_memory_pool_t *pool, amqp_type_t **array, size_t count)
 {
     size_t i;
 
@@ -82,9 +82,9 @@ void amqp_deallocate_amqp_type_t_array(amqp_context_t *c, amqp_memory_pool_t *po
     {
         for (i = 0; i < count; i++)
         {
-            amqp_deallocate(c, pool, array[i]);
+            amqp_deallocate(context, pool, array[i]);
         }
-        AMQP_FREE(array);
+        AMQP_FREE(context, array);
     }
 }
 

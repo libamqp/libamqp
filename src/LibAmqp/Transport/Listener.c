@@ -175,8 +175,8 @@ amqp_io_event_watcher_t *amqp_listener_initialize(amqp_context_t *context, amqp_
     return result;
 }
 
-void amqp_listener_destroy(amqp_io_event_watcher_t *accept_watcher)
+void amqp_listener_destroy(amqp_context_t *context, amqp_io_event_watcher_t *accept_watcher)
 {
     close(accept_watcher->io.fd);
-    amqp_io_event_watcher_destroy(accept_watcher);
+    amqp_io_event_watcher_destroy(context, accept_watcher);
 }

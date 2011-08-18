@@ -40,7 +40,7 @@ static int amqp_context_default_debug_putc(int c)
 amqp_context_t *
 amqp_create_context()
 {
-    amqp__context_with_guard_t *result = AMQP_MALLOC(amqp__context_with_guard_t);
+    amqp__context_with_guard_t *result = AMQP_MALLOC(0, amqp__context_with_guard_t);
 
     result->context.config.putc = amqp_context_default_debug_putc;
     result->context.config.max_listen_queue_length = 5;
@@ -64,7 +64,7 @@ amqp_context_t *amqp_context_clone(amqp_context_t *context)
 {
     if (context != 0)
     {
-        amqp__context_with_guard_t *result = AMQP_MALLOC(amqp__context_with_guard_t);
+        amqp__context_with_guard_t *result = AMQP_MALLOC(0, amqp__context_with_guard_t);
 
         result->context.config.putc = context->config.putc;
         result->context.config.max_listen_queue_length = context->config.max_listen_queue_length;
@@ -117,7 +117,7 @@ int  amqp_context_destroy(amqp_context_t *context)
         rc = check_pool(context, &context->pools.amqp_buffer_t_pool) &&
                 check_pool(context, &context->pools.amqp_type_t_pool);
 
-        AMQP_FREE(context);
+        AMQP_FREE(0, context);
     }
     return rc;
 }

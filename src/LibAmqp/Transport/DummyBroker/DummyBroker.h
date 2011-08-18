@@ -39,7 +39,7 @@ typedef struct amqp_dummy_broker_t
 } amqp_dummy_broker_t;
 
 extern amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context);
-extern void amqp_dummy_broker_destroy(amqp_dummy_broker_t *broker);
+extern void amqp_dummy_broker_destroy(amqp_context_t *context, amqp_dummy_broker_t *broker);
 
 #ifdef __cplusplus
 }

@@ -38,7 +38,7 @@ SUITE(Transport)
 
     ConnectionFixture::~ConnectionFixture()
     {
-        amqp_dummy_broker_destroy(m_broker);
+        amqp_dummy_broker_destroy(context, m_broker);
     }
 
 //    TEST_FIXTURE(ConnectionFixture, really_important_test)

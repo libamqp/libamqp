@@ -54,9 +54,9 @@ void amqp_event_thread_run_loop(amqp_event_thread_t *event_thread)
     ev_async_stop(event_thread->loop, async_watcher);
 }
 
-amqp_event_thread_t *amqp_event_thread_initialize(amqp_event_thread_handler_t handler, amqp_context_t *context, amqp_event_loop_t *loop, void *argument)
+amqp_event_thread_t *amqp_event_thread_initialize(amqp_context_t *context, amqp_event_thread_handler_t handler, amqp_event_loop_t *loop, void *argument)
 {
-    amqp_event_thread_t *result = AMQP_MALLOC(amqp_event_thread_t);
+    amqp_event_thread_t *result = AMQP_MALLOC(context, amqp_event_thread_t);
     amqp_semaphore_initialize(&result->thread_running_semaphore);
 
     result->handler = handler;
@@ -76,7 +76,7 @@ static void send_break_request(amqp_event_thread_t *event_thread)
     ev_async_send(event_thread->loop, async_watcher);
 }
 
-void amqp_event_thread_destroy(amqp_event_thread_t *event_thread)
+void amqp_event_thread_destroy(amqp_context_t *context, amqp_event_thread_t *event_thread)
 {
     if (event_thread != 0)
     {
@@ -87,6 +87,6 @@ void amqp_event_thread_destroy(amqp_event_thread_t *event_thread)
 
         amqp_thread_destroy(event_thread->thread);
         amqp_semaphore_destroy(&event_thread->thread_running_semaphore);
-        AMQP_FREE(event_thread);
+        AMQP_FREE(context, event_thread);
     }
 }

@@ -29,7 +29,7 @@ SUITE(CompoundTypeDecode)
         DecodeFixture() : result(0) {}
         ~DecodeFixture()
         {
-            AMQP_FREE(result);
+            AMQP_FREE(context, result);
         }
 
     public:
@@ -82,7 +82,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(0xa3, e->format_code);
         result = amqp_convert_bytes_to_cstr(context, e);
         CHECK_EQUAL("Foo", result);
-        AMQP_FREE(result);
+        AMQP_FREE(context, result);
 
         e  = amqp_list_element(type, 1);
         CHECK_EQUAL(0x82, e->format_code);
@@ -92,7 +92,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(0xa1, e->format_code);
         result = amqp_convert_bytes_to_cstr(context, e);
         CHECK_EQUAL("Hello", result);
-        AMQP_FREE(result);
+        AMQP_FREE(context, result);
 
         e  = amqp_list_element(type, 3);
         CHECK_EQUAL(0x61, e->format_code);

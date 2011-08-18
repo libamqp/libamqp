@@ -48,9 +48,9 @@ SUITE(Memory)
     TEST_FIXTURE(MemoryFixture, allocate_macro_should_increase_allocated_block_count)
     {
         test_type_t *q;
-        q = AMQP_MALLOC(test_type_t);
+        q = AMQP_MALLOC(&m_context, test_type_t);
         CHECK_EQUAL(1UL, amqp_malloc_stats.outstanding_allocations);
-        AMQP_FREE(q);
+        AMQP_FREE(&m_context, q);
         CHECK_NULL(q);
         CHECK_EQUAL(0UL, amqp_malloc_stats.outstanding_allocations);
     }

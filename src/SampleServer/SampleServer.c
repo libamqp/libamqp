@@ -54,7 +54,7 @@ void run(int port_number)
 
     ev_run(loop, 0);
 
-    amqp_listener_destroy(accept_watcher);
+    amqp_listener_destroy(context, accept_watcher);
     amqp_context_destroy(context);
 }
 

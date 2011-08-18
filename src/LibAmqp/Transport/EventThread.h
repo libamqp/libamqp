@@ -42,8 +42,8 @@ struct amqp_event_thread_t
     void *argument;
 };
 
-extern amqp_event_thread_t *amqp_event_thread_initialize(amqp_event_thread_handler_t handler, amqp_context_t *context, amqp_event_loop_t *loop, void *argument);
-extern void amqp_event_thread_destroy(amqp_event_thread_t *event_thread);
+extern amqp_event_thread_t *amqp_event_thread_initialize(amqp_context_t *context, amqp_event_thread_handler_t handler, amqp_event_loop_t *loop, void *argument);
+extern void amqp_event_thread_destroy(amqp_context_t *context, amqp_event_thread_t *event_thread);
 extern void amqp_event_thread_run_loop(amqp_event_thread_t *event_thread);
 
 #ifdef __cplusplus
