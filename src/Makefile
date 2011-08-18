@@ -33,7 +33,6 @@ ci-build:   scrub all check
 targets::
 
 # BUILD_OPTIONS += -DDISABLE_MEMORY_POOL
-# BUILD_OPTIONS += -DTRACE_ALLOCATIONS
 # BUILD_OPTIONS += -DLIBAMQP_DISABLE_FAST_MUTEX
 CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES)) $(BUILD_OPTIONS)
 CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -fasm

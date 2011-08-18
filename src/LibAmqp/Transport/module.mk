@@ -9,5 +9,4 @@ SRC += $(filter-out $(wildcard $(MODULE)/*Stubb.c),$(wildcard $(MODULE)/*.c))
 TEST_SRC += $(wildcard  \
     $(MODULE)/*Test.cpp) \
     $(wildcard $(MODULE)/*TestSupport.cpp) \
-    $(wildcard $(MODULE)/*Stubb.c) \
     $(wildcard $(MODULE)/DummyBroker/*.c) \
