@@ -22,6 +22,8 @@
 #include "Buffer/Buffer.h"
 #include "TestData/TestData.h"
 
+#include "debug_helper.h"
+
 namespace SuiteContext
 {
     ContextFixture::ContextFixture()
@@ -33,7 +35,6 @@ namespace SuiteContext
     {
         int allocations_ok = amqp_context_destroy(context);
         CHECK(allocations_ok);
-        context = 0;
     }
 
     void ContextFixture::load_decode_buffer(test_data::TestData &data)

@@ -28,30 +28,30 @@ SUITE(Memory)
         test_type_t *p, *q, *r;
 
         p = (test_type_t *) amqp_malloc(&m_context, sizeof(test_type_t));
-        CHECK_EQUAL(1UL, amqp_malloc_stats.outstanding_allocations);
+        CHECK_EQUAL(1UL, m_context.allocation_stats.outstanding_allocations);
         amqp_free(&m_context, p);
-        CHECK_EQUAL(0UL, amqp_malloc_stats.outstanding_allocations);
+        CHECK_EQUAL(0UL,  m_context.allocation_stats.outstanding_allocations);
 
         q = (test_type_t *) amqp_malloc(&m_context, sizeof(test_type_t));
-        CHECK_EQUAL(1UL, amqp_malloc_stats.outstanding_allocations);
+        CHECK_EQUAL(1UL,  m_context.allocation_stats.outstanding_allocations);
 
         r = (test_type_t *) amqp_malloc(&m_context, sizeof(test_type_t));
-        CHECK_EQUAL(2UL, amqp_malloc_stats.outstanding_allocations);
+        CHECK_EQUAL(2UL,  m_context.allocation_stats.outstanding_allocations);
 
         amqp_free(&m_context, q);
-        CHECK_EQUAL(1UL, amqp_malloc_stats.outstanding_allocations);
+        CHECK_EQUAL(1UL,  m_context.allocation_stats.outstanding_allocations);
 
         amqp_free(&m_context, r);
-        CHECK_EQUAL(0UL, amqp_malloc_stats.outstanding_allocations);
+        CHECK_EQUAL(0UL,  m_context.allocation_stats.outstanding_allocations);
     }
 
     TEST_FIXTURE(MemoryFixture, allocate_macro_should_increase_allocated_block_count)
     {
         test_type_t *q;
         q = AMQP_MALLOC(&m_context, test_type_t);
-        CHECK_EQUAL(1UL, amqp_malloc_stats.outstanding_allocations);
+        CHECK_EQUAL(1UL,  m_context.allocation_stats.outstanding_allocations);
         AMQP_FREE(&m_context, q);
         CHECK_NULL(q);
-        CHECK_EQUAL(0UL, amqp_malloc_stats.outstanding_allocations);
+        CHECK_EQUAL(0UL,  m_context.allocation_stats.outstanding_allocations);
     }
 }

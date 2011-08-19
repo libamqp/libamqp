@@ -20,6 +20,7 @@
 
 #include "Memory/Memory.h"
 #include "Memory/Pool.h"
+#include "debug_helper.h"
 
 typedef struct amqp__context_with_guard_t
 {
@@ -62,30 +63,26 @@ amqp_create_context()
 
 amqp_context_t *amqp_context_clone(amqp_context_t *context)
 {
-    if (context != 0)
-    {
-        amqp__context_with_guard_t *result = AMQP_MALLOC(0, amqp__context_with_guard_t);
+    assert(context != 0);
 
-        result->context.config.putc = context->config.putc;
-        result->context.config.max_listen_queue_length = context->config.max_listen_queue_length;
+    amqp__context_with_guard_t *result = AMQP_MALLOC(0, amqp__context_with_guard_t);
 
-        result->context.debug.stream = context->debug.stream;
-        result->context.debug.level = context->debug.level;
+    result->context.config.putc = context->config.putc;
+    result->context.config.max_listen_queue_length = context->config.max_listen_queue_length;
 
-        result->context.pools.amqp_buffer_t_pool = context->pools.amqp_buffer_t_pool;
-        result->context.pools.amqp_type_t_pool = context->pools.amqp_type_t_pool;
+    result->context.debug.stream = context->debug.stream;
+    result->context.debug.level = context->debug.level;
 
-        result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
-        result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
+    // TODO - consider letting threads share the same set of pools, especially if memory is tight
+    result->context.pools.amqp_buffer_t_pool = context->pools.amqp_buffer_t_pool;
+    result->context.pools.amqp_type_t_pool = context->pools.amqp_type_t_pool;
 
-        result->multiple_delete_protection = random_sequence;
+    result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
+    result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
 
-        return (amqp_context_t *) result;
-    }
-    else
-    {
-        return amqp_create_context();
-    }
+    result->multiple_delete_protection = random_sequence;
+
+    return (amqp_context_t *) result;
 }
 
 #define check_pool(context, pool) check_pool_allocations(context, pool, #pool)
@@ -99,10 +96,11 @@ static int check_pool_allocations(amqp_context_t *context, amqp_memory_pool_t *p
     return true;
 }
 
-// amqp_context_destroy
 int  amqp_context_destroy(amqp_context_t *context)
 {
-    int rc = true;
+    int pools_ok = true;
+    int allocations_ok = true;
+
     if (context != 0)
     {
         if (((amqp__context_with_guard_t *) context)->multiple_delete_protection != random_sequence)
@@ -114,12 +112,17 @@ int  amqp_context_destroy(amqp_context_t *context)
         amqp_deallocate_buffer(context, context->encode.buffer);
         amqp_deallocate_buffer(context, context->decode.buffer);
 
-        rc = check_pool(context, &context->pools.amqp_buffer_t_pool) &&
+        pools_ok = check_pool(context, &context->pools.amqp_buffer_t_pool) &&
                 check_pool(context, &context->pools.amqp_type_t_pool);
+
+        if (!(allocations_ok = context->allocation_stats.outstanding_allocations == 0))
+        {
+            amqp_error(context, AMQP_ERROR_MEMORY_ERROR, "Number of calls to malloc does not match numbers of calls to free - %d outstanding allocations.", context->allocation_stats.outstanding_allocations);
+        }
 
         AMQP_FREE(0, context);
     }
-    return rc;
+    return pools_ok && allocations_ok;
 }
 
 amqp_type_t *amqp_allocate_type(amqp_context_t *context)

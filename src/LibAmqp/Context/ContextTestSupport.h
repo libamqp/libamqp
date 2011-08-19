@@ -19,13 +19,12 @@
 
 #include <stdlib.h>
 
-#include "Memory/MemoryTestSupport.h"
 #include "Context/Context.h"
 #include "TestData/TestData.h"
 
 namespace SuiteContext
 {
-    class ContextFixture : public SuiteMemory::MemoryFixture
+    class ContextFixture 
     {
     public:
         ContextFixture();

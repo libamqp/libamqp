@@ -49,10 +49,7 @@ extern void *amqp_realloc(amqp_context_t *c, void *p, size_t n);
 extern void amqp_free(amqp_context_t *c, void *p);
 
 extern void amqp_reset_malloc_allocation_stats();
-extern amqp_allocation_stats_t amqp_malloc_stats;
-extern volatile int amqp_memory_trace_enabled;
 
-extern int amqp_assert_that_calls_to_free_match_calls_to_malloc();
 #ifdef __cplusplus
 }
 #endif
