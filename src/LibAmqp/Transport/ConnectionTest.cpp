@@ -22,6 +22,9 @@
 
 SUITE(Transport)
 {
+
+
+
     class ConnectionFixture : public SuiteContext::ContextFixture
     {
     public:
@@ -33,7 +36,7 @@ SUITE(Transport)
 
     ConnectionFixture::ConnectionFixture()
     {
-        m_broker = amqp_dummy_broker_initialize(context);
+        m_broker = amqp_dummy_broker_initialize(context, 5000, 0);
     }
 
     ConnectionFixture::~ConnectionFixture()
@@ -41,7 +44,7 @@ SUITE(Transport)
         amqp_dummy_broker_destroy(context, m_broker);
     }
 
-//    TEST_FIXTURE(ConnectionFixture, really_important_test)
-//    {
-//    }
+    TEST_FIXTURE(ConnectionFixture, really_important_test)
+    {
+    }
 }

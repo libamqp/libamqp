@@ -32,7 +32,13 @@ int new_connection(amqp_io_event_watcher_t *accept_watcher, amqp_event_loop_t *l
 //         return -1;
 //    }
 
-    if ((*accept_watcher->fns->accept)(accept_watcher, loop, fd, client_address, client_address_size) == -1)
+    if (accept_watcher->fns.accept == 0)
+    {
+        amqp_io_error(accept_watcher->context, "Cannot accept new connection. No accept handler provided.");
+        return -1;
+    }
+
+    if ((*accept_watcher->fns.accept)(accept_watcher, loop, fd, client_address, client_address_size) == -1)
     {
         amqp_io_error(accept_watcher->context, "New connection handler failed");
         return -1;
@@ -113,7 +119,7 @@ static int bind_socket_to_any(amqp_context_t *context, int socket_fd, int port_n
 
     if (bind(socket_fd, (struct sockaddr *) &sin6, sizeof(sin6)) == -1)
     {
-        amqp_io_error(context, "Cannot bind to IPv6 port");
+        amqp_io_error(context, "Cannot bind to IPv6 port: %d", port_number);
         return false;
     }
 
@@ -149,7 +155,7 @@ static int start_listening_on_socket(amqp_context_t *context, int socket_fd, int
     return true;
 }
 
-amqp_io_event_watcher_t *amqp_listener_initialize(amqp_context_t *context, amqp_event_loop_t *loop, int port_number)
+amqp_io_event_watcher_t *amqp_listener_initialize(amqp_context_t *context, amqp_event_loop_t *loop, int port_number, amqp_accept_event_handle_t accept_handler)
 {
     int socket_fd;
     amqp_io_event_watcher_t *result;
@@ -169,6 +175,7 @@ amqp_io_event_watcher_t *amqp_listener_initialize(amqp_context_t *context, amqp_
     }
 
     result = amqp_io_event_watcher_initialize(context, loop, accept_new_connection_handler, socket_fd, EV_READ);
+    result->fns.accept = accept_handler;
     amqp_io_event_watcher_adjust_priority(result, -2);
     amqp_io_event_watcher_start(result);
 

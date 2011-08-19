@@ -26,9 +26,10 @@
 struct arguments
 {
     int port_number;
+    amqp_accept_event_handle_t accept_handler;
 };
 
-static int accept_new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
+static int default_accept_new_connection_handler(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
 {
     char buffer[128];
     int n;
@@ -43,28 +44,27 @@ static int accept_new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t 
     return 0;
 }
 
-static void thread_handler(amqp_event_thread_t *event_thread)
+static void dummy_broker_thread_handler(amqp_event_thread_t *event_thread)
 {
-    static amqp_event_fn_list_t handlers = { accept_new_connection };
-
     struct arguments *arguments = (struct arguments *) event_thread->argument;
-    amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(event_thread->context, event_thread->loop, arguments->port_number);
-    
-    accept_watcher->fns = &handlers;
+
+    amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(event_thread->context, event_thread->loop, arguments->port_number, arguments->accept_handler);
 
     amqp_event_thread_run_loop(event_thread);
 
     amqp_listener_destroy(event_thread->context, accept_watcher);
 }
 
-amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context)
+
+amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context, int listen_port_number, amqp_accept_event_handle_t accept_handler)
 {
     amqp_dummy_broker_t *broker = AMQP_MALLOC(context, amqp_dummy_broker_t);
     struct arguments arguments = {
-        .port_number = 5000
+        .port_number = listen_port_number,
+        .accept_handler = accept_handler != 0 ? accept_handler : default_accept_new_connection_handler
     };
 
-    broker->thread =  amqp_event_thread_initialize(context, thread_handler, 0, &arguments);
+    broker->thread =  amqp_event_thread_initialize(context, dummy_broker_thread_handler, 0, &arguments);
     return broker;
 }
 

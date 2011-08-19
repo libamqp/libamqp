@@ -23,7 +23,7 @@ extern "C" {
 
 #include "libamqp_common.h"
 
-extern int tcp_connect_to(const char *host_name, int port);
+extern int amqp_blocking_tcp_connect_to(const char *host_name, int port);
 
 #ifdef __cplusplus
 }

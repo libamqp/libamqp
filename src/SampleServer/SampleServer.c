@@ -27,7 +27,7 @@ static int write_all(int fd, const char *buffer, size_t n)
     return written;
 }
 
-static int new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
+static int new_connection_handler(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
 {
     char buffer[128];
     int n;
@@ -45,12 +45,10 @@ static int new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, 
 
 void run(int port_number)
 {
-    static amqp_event_fn_list_t handlers = { new_connection };
     struct ev_loop *loop = ev_default_loop(0);
     amqp_context_t *context = amqp_create_context();
-    amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(context, loop, port_number);
-
-    accept_watcher->fns = &handlers;
+    
+    amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(context, loop, port_number, new_connection_handler);
 
     ev_run(loop, 0);
 

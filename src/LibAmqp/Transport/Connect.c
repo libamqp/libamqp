@@ -82,7 +82,7 @@ static int establish_connection(const char *host_name, struct addrinfo *entries)
     return -1;
 }
 
-int tcp_connect_to(const char *host_name, int port)
+int amqp_blocking_tcp_connect_to(const char *host_name, int port)
 {
     struct addrinfo *host_entries;
 

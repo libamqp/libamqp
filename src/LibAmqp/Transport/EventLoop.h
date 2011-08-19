@@ -31,16 +31,19 @@ typedef struct amqp_context_t amqp_context_t;
 
 typedef struct ev_loop amqp_event_loop_t;
 typedef struct amqp_io_event_watcher_t amqp_io_event_watcher_t;
+typedef int (*amqp_accept_event_handle_t)(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size);
 
 typedef struct amqp_event_fn_list_t {
-    int (*accept)(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size);
+//    int (*accept)(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size);
+    amqp_accept_event_handle_t accept;
 } amqp_event_fn_list_t;
+
 struct amqp_io_event_watcher_t
 {
     ev_io io;
     amqp_context_t *context;
     amqp_event_loop_t *loop;
-    amqp_event_fn_list_t *fns;
+    amqp_event_fn_list_t fns;
 };
 
 typedef void (*amqp_event_handler_t)(amqp_event_loop_t *loop, ev_io* io, const int revents);

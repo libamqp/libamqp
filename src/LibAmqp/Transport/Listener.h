@@ -28,7 +28,7 @@ extern "C" {
 typedef struct amqp_context_t amqp_context_t;
 #endif
 
-extern amqp_io_event_watcher_t *amqp_listener_initialize(amqp_context_t *context, amqp_event_loop_t *loop, int port_number);
+extern amqp_io_event_watcher_t *amqp_listener_initialize(amqp_context_t *context, amqp_event_loop_t *loop, int port_number, amqp_accept_event_handle_t accept_handler);
 extern void amqp_listener_destroy(amqp_context_t *context, amqp_io_event_watcher_t *accept_watcher);
 
 #ifdef __cplusplus
