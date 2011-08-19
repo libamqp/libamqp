@@ -76,17 +76,19 @@ static void send_break_request(amqp_event_thread_t *event_thread)
     ev_async_send(event_thread->loop, async_watcher);
 }
 
-void amqp_event_thread_destroy(amqp_context_t *context, amqp_event_thread_t *event_thread)
+int amqp_event_thread_destroy(amqp_context_t *context, amqp_event_thread_t *event_thread)
 {
+    int allocations_ok = true;
     if (event_thread != 0)
     {
         send_break_request(event_thread);
         amqp_semaphore_wait(&event_thread->thread_running_semaphore);
 
-        amqp_context_destroy(event_thread->context);
-
         amqp_thread_destroy(event_thread->thread);
+        allocations_ok = amqp_context_destroy(event_thread->context);
+
         amqp_semaphore_destroy(&event_thread->thread_running_semaphore);
         AMQP_FREE(context, event_thread);
     }
+    return allocations_ok;
 }

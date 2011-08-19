@@ -25,13 +25,8 @@ namespace SuiteTransport
     class EventThreadFixture : public SuiteContext::ContextFixture
     {
     public:
-        EventThreadFixture() : m_event_thread(0)
-        {
-        }
-        ~EventThreadFixture()
-        {
-            amqp_event_thread_destroy(context, m_event_thread);
-        }
+        EventThreadFixture();
+        ~EventThreadFixture();
 
     public:
         amqp_event_thread_t *m_event_thread;

@@ -17,9 +17,20 @@
 #include <stdlib.h>
 
 #include "Transport/EventThreadTestSupport.h"
+#include "TestHarness.h"
 
 namespace SuiteTransport
 {
+    EventThreadFixture::EventThreadFixture() : m_event_thread(0)
+    {
+    }
+
+    EventThreadFixture::~EventThreadFixture()
+    {
+        int thread_allocations_ok = amqp_event_thread_destroy(context, m_event_thread);
+        CHECK(thread_allocations_ok);
+    }
+
     void EventThreadFixture::basic_event_thread_handler(amqp_event_thread_t *event_thread)
     {
         amqp_event_thread_run_loop(event_thread);
