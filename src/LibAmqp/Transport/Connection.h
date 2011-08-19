@@ -23,10 +23,30 @@ extern "C" {
 
 #include "libamqp_common.h"
 
+#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
+#define LIBAMQP_AMQP_CONTEXT_TYPE_T
+typedef struct amqp_context_t amqp_context_t;
+#endif
+
+typedef struct amqp_connection_state_t amqp_connection_state_t;
+
+typedef void (*amqp_connection_stop_f)(amqp_context_t *context, amqp_connection_state_t *state);
+typedef void (*amqp_connection_start_f)(amqp_context_t *context, amqp_connection_state_t *state);
+
+struct amqp_connection_state_t
+{
+    const char *name;
+    amqp_connection_stop_f stop;
+    amqp_connection_start_f start;
+};
+
 typedef struct amqp_connection_t
 {
-
+    amqp_connection_state_t state;
 } amqp_connection_t;
+
+extern amqp_connection_t *amqp_connection_initialize(amqp_context_t *context);
+extern void amqp_connection_destroy(amqp_context_t *context, amqp_connection_t *connection);
 
 #ifdef __cplusplus
 }

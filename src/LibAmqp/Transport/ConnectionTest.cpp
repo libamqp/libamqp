@@ -17,6 +17,7 @@
 #include <TestHarness.h>
 #include "Transport/DummyBroker/DummyBroker.h"
 #include "Context/ContextTestSupport.h"
+#include "Transport/Connection.h"
 
 #include "debug_helper.h"
 
@@ -43,5 +44,8 @@ SUITE(Transport)
 
     TEST_FIXTURE(ConnectionFixture, really_important_test)
     {
+        amqp_connection_t *connection = amqp_connection_initialize(context);
+        connection->state.start(context, &connection->state);
+        amqp_connection_destroy(context, connection);
     }
 }
