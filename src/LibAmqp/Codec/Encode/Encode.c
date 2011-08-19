@@ -104,7 +104,7 @@ static amqp_type_t *pop_container(amqp_context_t *context, amqp_type_t *cc)
 
 static amqp_type_t *initialize_type(amqp_context_t *context, const amqp_type_type_flags_t type_flags, amqp_encoding_meta_data_t *meta_data)
 {
-    amqp_type_t *type = (amqp_type_t *) amqp_allocate(context, &context->pools.amqp_type_t_pool);
+    amqp_type_t *type = (amqp_type_t *) amqp_allocate(context, &context->memory.amqp_type_t_pool);
 
     type->format_code = meta_data->format_code;
     type->context = context;

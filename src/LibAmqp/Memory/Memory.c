@@ -64,8 +64,8 @@ void *amqp_malloc(amqp_context_t *context, size_t n)
 
     if (context != 0)
     {
-        context->allocation_stats.outstanding_allocations++;
-        context->allocation_stats.total_allocation_calls++;
+        context->memory.allocation_stats.outstanding_allocations++;
+        context->memory.allocation_stats.total_allocation_calls++;
     }
 
     save_guard_mask(block, count);
@@ -126,7 +126,7 @@ void *amqp_realloc(amqp_context_t *context, void *p, size_t n)
 
     if (context != 0)
     {
-        context->allocation_stats.total_allocation_calls++;
+        context->memory.allocation_stats.total_allocation_calls++;
     }
     save_guard_mask(block, count);
 
@@ -146,7 +146,7 @@ void amqp_free(amqp_context_t *context, void *p)
 
         if (context != 0)
         {
-            context->allocation_stats.outstanding_allocations--;
+            context->memory.allocation_stats.outstanding_allocations--;
         }
         
         free(block);

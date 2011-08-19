@@ -62,13 +62,13 @@ struct amqp_context_t
         int last_char;
     } debug;
 
-    amqp_allocation_stats_t allocation_stats;
     struct
     {
+        amqp_allocation_stats_t allocation_stats;
         amqp_memory_pool_t amqp_buffer_t_pool;
         amqp_memory_pool_t amqp_type_t_pool;
 //        amqp_memory_pool_t amqp_frame_t_pool;
-    } pools;
+    } memory;
 
     struct {
         amqp_buffer_t *buffer;

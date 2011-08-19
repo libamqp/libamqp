@@ -32,7 +32,7 @@ SUITE(Type)
         }
         amqp_memory_pool_t *type_pool()
         {
-            return &context->pools.amqp_type_t_pool;
+            return &context->memory.amqp_type_t_pool;
         }
         amqp_type_t *allocate_type()
         {

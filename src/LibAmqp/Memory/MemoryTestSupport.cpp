@@ -21,7 +21,7 @@
     do \
     { \
         try { \
-            if (!UnitTest::Check((c)->allocation_stats.outstanding_allocations == 0)) \
+            if (!UnitTest::Check((c)->memory.allocation_stats.outstanding_allocations == 0)) \
                 UnitTest::CurrentTest::Results()->OnTestFailure(*UnitTest::CurrentTest::Details(), "Number of calls to amqp_free() does not match number of calls to amqp_malloc()."); \
         } \
         catch (...) { \
