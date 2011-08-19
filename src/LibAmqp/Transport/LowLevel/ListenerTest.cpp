@@ -18,9 +18,9 @@
 #include "Transport/Transport.h"
 
 #include "Context/Context.h"
-#include "Transport/EventThreadTestSupport.h"
-#include "Transport/Listener.h"
-#include "Transport/Connect.h"
+#include "Transport/LowLevel/EventThreadTestSupport.h"
+#include "Transport/LowLevel/Listener.h"
+#include "Transport/LowLevel/Connect.h"
 #include "Transport/DummyBroker/DummyBroker.h"
 
 #include <sys/socket.h>

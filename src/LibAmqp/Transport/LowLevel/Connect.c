@@ -25,7 +25,7 @@
 #include <netdb.h>
 #include <unistd.h>
 
-#include "Transport/Connect.h"
+#include "Transport/LowLevel/Connect.h"
 
 // TODO - integrate with libev
 

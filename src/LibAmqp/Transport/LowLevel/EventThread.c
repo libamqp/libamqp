@@ -15,7 +15,7 @@
  */
 
 #include "Context/Context.h"
-#include "Transport/EventThread.h"
+#include "Transport/LowLevel/EventThread.h"
 
 static void event_thread_handler(void *argument)
 {

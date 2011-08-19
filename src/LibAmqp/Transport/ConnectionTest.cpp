@@ -22,9 +22,6 @@
 
 SUITE(Transport)
 {
-
-
-
     class ConnectionFixture : public SuiteContext::ContextFixture
     {
     public:

@@ -15,10 +15,10 @@
  */
 
 #include <TestHarness.h>
-#include "Transport/EventThreadTestSupport.h"
+#include "Transport/LowLevel/EventThreadTestSupport.h"
 #include "debug_helper.h"
 
-#include "Transport/EventThread.h"
+#include "Transport/LowLevel/EventThread.h"
 
 static void event_thread_handler(amqp_event_thread_t *event_thread)
 {

@@ -15,7 +15,7 @@
  */
 
 #include "Context/Context.h"
-#include "Transport/EventLoop.h"
+#include "Transport/LowLevel/EventLoop.h"
 
 typedef void (*livev_event_handler_t)(amqp_event_loop_t *loop, ev_io* io, const int revents);
 

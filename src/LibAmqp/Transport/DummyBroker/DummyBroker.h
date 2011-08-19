@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 #include "libamqp_common.h"
-#include "Transport/EventLoop.h"
+#include "Transport/LowLevel/EventLoop.h"
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T

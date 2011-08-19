@@ -15,10 +15,10 @@
  */
 
 #include "Context/Context.h"
-#include "Transport/EventLoop.h"
-#include "Transport/EventThread.h"
-#include "Transport/Listener.h"
-#include "Transport/Socket.h"
+#include "Transport/LowLevel/EventLoop.h"
+#include "Transport/LowLevel/EventThread.h"
+#include "Transport/LowLevel/Listener.h"
+#include "Transport/LowLevel/Socket.h"
 #include "Transport/DummyBroker/DummyBroker.h"
 
 #include "debug_helper.h"
@@ -54,7 +54,6 @@ static void dummy_broker_thread_handler(amqp_event_thread_t *event_thread)
 
     amqp_listener_destroy(event_thread->context, accept_watcher);
 }
-
 
 amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context, int listen_port_number, amqp_accept_event_handle_t accept_handler)
 {

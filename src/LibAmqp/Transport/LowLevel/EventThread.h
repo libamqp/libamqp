@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 #include "Thread/Thread.h"
-#include "Transport/EventLoop.h"
+#include "Transport/LowLevel/EventLoop.h"
 
 #ifndef LIBAMQP_AMQP_EVENT_THREAD_TYPE_T
 #define LIBAMQP_AMQP_EVENT_THREAD_TYPE_T

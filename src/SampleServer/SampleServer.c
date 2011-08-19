@@ -7,9 +7,7 @@
 
 // TODO - libamqp.h should include all the API declarations
 #include "Context/Context.h"
-#include "Transport/Transport.h"
-#include "Transport/Listener.h"
-
+#include "Transport/LowLevel/Listener.h"
 
 static int write_all(int fd, const char *buffer, size_t n)
 {

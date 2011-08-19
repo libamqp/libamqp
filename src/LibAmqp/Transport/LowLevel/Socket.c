@@ -14,24 +14,12 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_LISTENER_H
-#define LIBAMQP_TRANSPORT_LISTENER_H
+#include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "Context/Context.h"
+#include "Transport/LowLevel/Socket.h"
 
-#include "Transport/EventLoop.h"
-
-#ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
-#define LIBAMQP_AMQP_CONTEXT_TYPE_T
-typedef struct amqp_context_t amqp_context_t;
-#endif
-
-extern amqp_io_event_watcher_t *amqp_listener_initialize(amqp_context_t *context, amqp_event_loop_t *loop, int port_number, amqp_accept_event_handle_t accept_handler);
-extern void amqp_listener_destroy(amqp_context_t *context, amqp_io_event_watcher_t *accept_watcher);
-
-#ifdef __cplusplus
+void bzero(void *block, size_t n)
+{
+    memset(block, '\0', n);
 }
-#endif
-#endif
