@@ -16,11 +16,31 @@
 
 #include <TestHarness.h>
 #include "Transport/EventThreadTestSupport.h"
+#include "debug_helper.h"
 
 #include "Transport/EventThread.h"
 
+static void event_thread_handler(amqp_event_thread_t *event_thread)
+{
+    amqp_event_thread_run_loop(event_thread);
+}
+
 SUITE(Transport)
 {
+    TEST(event_thread_no_fixture)
+    {
+        amqp_context_t *context = amqp_create_context();
+
+        struct ev_loop *loop = ev_default_loop(0);
+        amqp_event_thread_t *event_thread = amqp_event_thread_initialize(context, event_thread_handler, loop, 0);
+
+        int thread_allocations_ok = amqp_event_thread_destroy(context, event_thread);
+        CHECK(thread_allocations_ok);
+
+        int outer_allocations_ok = amqp_context_destroy(context);
+        CHECK(outer_allocations_ok);
+    }
+
     TEST_FIXTURE(EventThreadFixture, event_thread_providing_loop)
     {
         struct ev_loop *loop = ev_default_loop(0);

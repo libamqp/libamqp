@@ -49,14 +49,13 @@ amqp_create_context()
     // TODO - should be stderr
     result->context.debug.stream = stdout;
     result->context.debug.level = 10;
+    result->multiple_delete_protection = random_sequence;
 
     amqp_buffer_initialize_pool(&result->context.pools.amqp_buffer_t_pool);
     amqp_type_initialize_pool(&result->context.pools.amqp_type_t_pool);
 
-    result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
-    result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
-
-    result->multiple_delete_protection = random_sequence;
+    result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
+    result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
 
     return (amqp_context_t *) result;
 }
@@ -72,15 +71,14 @@ amqp_context_t *amqp_context_clone(amqp_context_t *context)
 
     result->context.debug.stream = context->debug.stream;
     result->context.debug.level = context->debug.level;
+    result->multiple_delete_protection = random_sequence;
 
     // TODO - consider letting threads share the same set of pools, especially if memory is tight
-    result->context.pools.amqp_buffer_t_pool = context->pools.amqp_buffer_t_pool;
-    result->context.pools.amqp_type_t_pool = context->pools.amqp_type_t_pool;
+    amqp_buffer_initialize_pool(&result->context.pools.amqp_buffer_t_pool);
+    amqp_type_initialize_pool(&result->context.pools.amqp_type_t_pool);
 
-    result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
-    result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);;
-
-    result->multiple_delete_protection = random_sequence;
+    result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
+    result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
 
     return (amqp_context_t *) result;
 }
