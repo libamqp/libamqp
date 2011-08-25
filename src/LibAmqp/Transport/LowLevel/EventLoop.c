@@ -45,6 +45,11 @@ amqp_io_event_watcher_t *amqp_io_event_watcher_initialize(amqp_context_t *contex
     return result;
 }
 
+void amqp_io_event_watcher_cb_set(amqp_io_event_watcher_t *watcher, amqp_event_handler_t handler)
+{
+    ev_set_cb((ev_io *) watcher, (livev_event_handler_t) handler);
+}
+
 void amqp_io_event_watcher_destroy(amqp_context_t *context, amqp_io_event_watcher_t *watcher)
 {
     amqp_io_event_watcher_stop(watcher);

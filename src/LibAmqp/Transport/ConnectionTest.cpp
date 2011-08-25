@@ -28,24 +28,64 @@ SUITE(Transport)
     public:
         ConnectionFixture();
         ~ConnectionFixture();
+
     public:
-        amqp_dummy_broker_t *m_broker;
+        amqp_event_loop_t *loop;
+        amqp_dummy_broker_t *broker;
+        amqp_connection_t *connection;
     };
 
     ConnectionFixture::ConnectionFixture()
     {
-        m_broker = amqp_dummy_broker_initialize(context, 5000, 0);
+        loop = ev_default_loop(0);
+        context->loop = loop;
+        broker = amqp_dummy_broker_initialize(context, 54321, 0);
+        connection = amqp_connection_initialize(context);
     }
 
     ConnectionFixture::~ConnectionFixture()
     {
-        amqp_dummy_broker_destroy(context, m_broker);
+        amqp_connection_destroy(context, connection);
+        amqp_dummy_broker_destroy(context, broker);
     }
 
-    TEST_FIXTURE(ConnectionFixture, really_important_test)
+    TEST_FIXTURE(ConnectionFixture, connect_should_fail_on_lookup_with_dodgy_hostname)
     {
-        amqp_connection_t *connection = amqp_connection_initialize(context);
-        connection->state.start(context, &connection->state);
-        amqp_connection_destroy(context, connection);
+        amqp_connection_connect(context, connection, "unknown-dodgy-host.localdomain", 54321);
+        CHECK(!connection->running);
+        CHECK_EQUAL("Lookup failed", connection->state.name);
+    }
+
+    TEST_FIXTURE(ConnectionFixture, connection_can_be_stopped)
+    {
+        amqp_connection_connect(context, connection, "localhost", 54321);
+        CHECK(connection->running);
+        CHECK_EQUAL("Connecting", connection->state.name);
+        connection->state.shutdown(context, connection);
+        CHECK_EQUAL("Stopped", connection->state.name);
+    }
+
+    TEST_FIXTURE(ConnectionFixture, connect_to_invalid_address)
+    {
+        amqp_connection_connect(context, connection, "localhost", 54322);
+        CHECK(connection->running);
+        while (connection->running)
+        {
+            ev_run(context->loop, EVRUN_ONCE);
+        }
+        CHECK_EQUAL("Connect failed", connection->state.name);
+    }
+
+    TEST_FIXTURE(ConnectionFixture, connect_to_good_address)
+    {
+        amqp_connection_connect(context, connection, "localhost", 54321);
+        CHECK(connection->running);
+        while (connection->running && !amqp_connection_is_state(connection, "Connected"))
+        {
+            ev_run(context->loop, EVRUN_ONCE);
+        }
+        CHECK_EQUAL("Connected", connection->state.name);
+        connection->state.shutdown(context, connection);
+        CHECK_EQUAL("Stopped", connection->state.name);
     }
 }

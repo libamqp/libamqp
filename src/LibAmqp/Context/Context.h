@@ -36,7 +36,12 @@ typedef struct amqp_type_t amqp_type_t;
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
-typedef struct amqp_context_t amqp_context_t;
+typedef struct amqp_event_loop_t amqp_event_loop_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_EVENT_LOOP_TYPE_T
+#define LIBAMQP_AMQP_EVENT_LOOP_TYPE_T
+typedef struct ev_loop amqp_event_loop_t;
 #endif
 
 typedef int amqp_debug_print_c_t(int c);
@@ -79,6 +84,8 @@ struct amqp_context_t
         amqp_buffer_t *buffer;
         amqp_type_t *container;
     } encode;
+
+    amqp_event_loop_t *loop;
 };
 
 extern amqp_context_t *amqp_create_context();

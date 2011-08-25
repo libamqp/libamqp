@@ -34,7 +34,7 @@ static int default_accept_new_connection_handler(amqp_io_event_watcher_t *me, am
     char buffer[128];
     int n;
 
-    set_socket_to_blocking(fd);
+    amqp_set_socket_to_blocking(fd);
 
     while ((n = read(fd, buffer, sizeof(buffer) -1)) > 0)
     {

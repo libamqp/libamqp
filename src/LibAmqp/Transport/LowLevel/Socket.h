@@ -29,19 +29,20 @@ extern "C" {
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netdb.h>
 #include <unistd.h>
-
 
 extern void bzero(void *block, size_t n);
 
 inline static
-int set_socket_option(int fd, int option, int value)
+int amqp_set_socket_option(int fd, int option, int value)
 {
-    return setsockopt(fd, SOL_SOCKET, option, &value, sizeof(value));
+    socklen_t value_length   = sizeof(value);
+    return setsockopt(fd, SOL_SOCKET, option, &value, value_length);
 }
 
 inline static
-int set_socket_to_nonblocking(int fd)
+int amqp_set_socket_to_nonblocking(int fd)
 {
     int flags = fcntl(fd, F_GETFL, 0);
     if (flags == -1)
@@ -52,7 +53,7 @@ int set_socket_to_nonblocking(int fd)
 }
 
 inline static
-int set_socket_to_blocking(int fd)
+int amqp_set_socket_to_blocking(int fd)
 {
     int flags = fcntl(fd, F_GETFL, 0);
     if (flags == -1)
@@ -60,6 +61,15 @@ int set_socket_to_blocking(int fd)
         return -1;
     }
     return fcntl(fd, F_SETFL, flags & ~O_NONBLOCK);
+}
+
+inline static
+int amqp_socket_get_error(int fd)
+{
+    int so_error = 0;
+    socklen_t so_error_length = sizeof(so_error);
+    int rc = getsockopt(fd, SOL_SOCKET, SO_ERROR, &so_error, &so_error_length);
+    return rc != -1 ? so_error : errno;
 }
 
 #ifdef __cplusplus

@@ -14,15 +14,17 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_CONNECT_H
-#define LIBAMQP_TRANSPORT_CONNECT_H
+#ifndef LIBAMQP_TRANSPORT_LOW_LEVEL_CONNECT_H
+#define LIBAMQP_TRANSPORT_LOW_LEVEL_CONNECT_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "libamqp_common.h"
+#include "Transport/LowLevel/Socket.h"
 
+extern int amqp_lookup_host_address(const char *host_name, int port, struct addrinfo **result);
 extern int amqp_blocking_tcp_connect_to(const char *host_name, int port);
 
 #ifdef __cplusplus

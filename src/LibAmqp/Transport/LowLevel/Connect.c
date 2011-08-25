@@ -14,27 +14,18 @@
    limitations under the License.
  */
 
-#include <err.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <unistd.h>
-
 #include "Transport/LowLevel/Connect.h"
 
-// TODO - integrate with libev
-
-static struct addrinfo *lookup_host_address(const char *host_name, int port)
+int amqp_lookup_host_address(const char *host_name, int port, struct addrinfo **result)
 {
     struct addrinfo hints;
-    struct addrinfo *result;
     int rc;
-    char service[16];
+    char service[16 + 1];
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = PF_UNSPEC;
@@ -43,15 +34,9 @@ static struct addrinfo *lookup_host_address(const char *host_name, int port)
 
     snprintf(service, sizeof(service), "%d", port);
 
-    rc = getaddrinfo(host_name, service, &hints, &result);
+    rc = getaddrinfo(host_name, service, &hints, result);
 
-    if (rc != 0)
-    {
-       warn("%s", gai_strerror(rc));
-       return 0;
-    }
-
-    return result;
+    return rc;
 }
 
 static int establish_connection(const char *host_name, struct addrinfo *entries)
@@ -59,7 +44,6 @@ static int establish_connection(const char *host_name, struct addrinfo *entries)
     struct addrinfo *iterator;
     int socket_fd;
     int error = 0;
-    char message[256];
 
     for (iterator = entries; iterator; iterator = iterator->ai_next)
     {
@@ -77,16 +61,17 @@ static int establish_connection(const char *host_name, struct addrinfo *entries)
         close(socket_fd);
     }
 
-    strerror_r(errno, message, sizeof(message));
-    warn("Cannot connect to %s - %s", host_name, message);
+    fprintf(stderr, "Cannot connect to %s - error: %d", host_name, error);
     return -1;
 }
 
+// TODO - move into test code (not used by library)
 int amqp_blocking_tcp_connect_to(const char *host_name, int port)
 {
     struct addrinfo *host_entries;
+    int eai_error;
 
-    if ((host_entries =  lookup_host_address(host_name, port)) != 0)
+    if ((eai_error = amqp_lookup_host_address(host_name, port, &host_entries)) == 0)
     {
         int fd = establish_connection(host_name, host_entries);
         freeaddrinfo(host_entries);

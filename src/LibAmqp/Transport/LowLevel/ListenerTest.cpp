@@ -63,7 +63,7 @@ SUITE(Transport)
         char buffer[128];
         int n;
 
-        set_socket_to_blocking(fd);
+        amqp_set_socket_to_blocking(fd);
 
         while ((n = read(fd, buffer, sizeof(buffer) -1)) > 0)
         {

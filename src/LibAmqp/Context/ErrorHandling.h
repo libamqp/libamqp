@@ -72,6 +72,7 @@ extern void _amqp_error(amqp_context_t *context, int level, const char * filenam
 #define amqp_debug_level(context, level, ...) _amqp_debug(context, level, __FILE__, __LINE__, __func__, "" __VA_ARGS__);
 extern void _amqp_debug(const amqp_context_t *context, int level, const char * filename, int line_number, const char *function, const char *format, ...);
 
+// TODO - pass in errno
 #define amqp_io_error(context, ...) _amqp_io_error(context, 1, __FILE__, __LINE__, "" __VA_ARGS__);
 extern void _amqp_io_error(amqp_context_t *context, int level, const char * filename, int line_number, const char *format, ...);
 
