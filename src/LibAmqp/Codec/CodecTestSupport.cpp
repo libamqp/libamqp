@@ -34,20 +34,20 @@ namespace SuiteCodec
     amqp_memory_pool_t *
     CodecFixture::type_pool()
     {
-        return &context->pools.amqp_type_t_pool;
+        return &context->memory.amqp_type_t_pool;
     }
 
     amqp_type_t *
     CodecFixture::allocate_type()
     {
-        return (amqp_type_t *) amqp_allocate(type_pool());
+        return (amqp_type_t *) amqp_allocate(context, type_pool());
     }
 
     void
     CodecFixture::deallocate_type(amqp_type_t *type)
     {
 
-        amqp_deallocate(type_pool(), type);
+        amqp_deallocate(context, type_pool(), type);
     }
 
     bool

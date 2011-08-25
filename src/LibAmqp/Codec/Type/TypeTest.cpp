@@ -32,15 +32,15 @@ SUITE(Type)
         }
         amqp_memory_pool_t *type_pool()
         {
-            return &context->pools.amqp_type_t_pool;
+            return &context->memory.amqp_type_t_pool;
         }
         amqp_type_t *allocate_type()
         {
-            return (amqp_type_t *) amqp_allocate(type_pool());
+            return (amqp_type_t *) amqp_allocate(context, type_pool());
         }
         void deallocate_type(amqp_type_t *type)
         {
-            amqp_deallocate(type_pool(), type);
+            amqp_deallocate(context, type_pool(), type);
         }
 
     public:
@@ -50,8 +50,8 @@ SUITE(Type)
     TEST_FIXTURE(TypeFixture, aray_realloc)
     {
         int i;
-        amqp_type_t **array_1 = amqp_allocate_amqp_type_t_array(15);
-        amqp_type_t **array_2 = amqp_allocate_amqp_type_t_array(15);
+        amqp_type_t **array_1 = amqp_allocate_amqp_type_t_array(context, 15);
+        amqp_type_t **array_2 = amqp_allocate_amqp_type_t_array(context, 15);
     
         for (i = 0; i < 15; i++)
         {
@@ -59,15 +59,15 @@ SUITE(Type)
             array_2[i] = array_1[i];
         }
     
-        array_1 = amqp_realloc_amqp_type_t_array(array_1, 16);
+        array_1 = amqp_realloc_amqp_type_t_array(context, array_1, 16);
         for (i = 0; i < 15; i++)
         {
             CHECK_EQUAL(array_2[i], array_1[i]);
         }
         CHECK_EQUAL((void *) 0, array_1[16]);
     
-        amqp_deallocate_amqp_type_t_array(type_pool(), array_1, 15);
-        amqp_deallocate_amqp_type_t_array(type_pool(), array_2, 0);
+        amqp_deallocate_amqp_type_t_array(context, type_pool(), array_1, 15);
+        amqp_deallocate_amqp_type_t_array(context, type_pool(), array_2, 0);
     }
     
     TEST_FIXTURE(TypeFixture, flags)

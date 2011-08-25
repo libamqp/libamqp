@@ -15,7 +15,7 @@
  */
 
 #include "Context/Context.h"
-#include "Transport/EventThread.h"
+#include "Transport/LowLevel/EventThread.h"
 
 static void event_thread_handler(void *argument)
 {
@@ -54,13 +54,15 @@ void amqp_event_thread_run_loop(amqp_event_thread_t *event_thread)
     ev_async_stop(event_thread->loop, async_watcher);
 }
 
-amqp_event_thread_t *amqp_event_thread_initialize(amqp_event_thread_handler_t handler, amqp_event_loop_t *loop)
+amqp_event_thread_t *amqp_event_thread_initialize(amqp_context_t *context, amqp_event_thread_handler_t handler, amqp_event_loop_t *loop, void *argument)
 {
-    amqp_event_thread_t *result = AMQP_MALLOC(amqp_event_thread_t);
+    amqp_event_thread_t *result = AMQP_MALLOC(context, amqp_event_thread_t);
     amqp_semaphore_initialize(&result->thread_running_semaphore);
 
     result->handler = handler;
     result->loop = loop;
+    result->argument = argument;
+    result->context = amqp_context_clone(context);
 
     result->thread = amqp_thread_start(event_thread_handler, result);
 
@@ -74,14 +76,19 @@ static void send_break_request(amqp_event_thread_t *event_thread)
     ev_async_send(event_thread->loop, async_watcher);
 }
 
-void amqp_event_thread_destroy(amqp_event_thread_t *event_thread)
+int amqp_event_thread_destroy(amqp_context_t *context, amqp_event_thread_t *event_thread)
 {
+    int allocations_ok = true;
     if (event_thread != 0)
     {
         send_break_request(event_thread);
         amqp_semaphore_wait(&event_thread->thread_running_semaphore);
+
         amqp_thread_destroy(event_thread->thread);
+        allocations_ok = amqp_context_destroy(event_thread->context);
+
         amqp_semaphore_destroy(&event_thread->thread_running_semaphore);
-        AMQP_FREE(event_thread);
+        AMQP_FREE(context, event_thread);
     }
+    return allocations_ok;
 }

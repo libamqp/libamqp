@@ -20,6 +20,26 @@
 
 SUITE(Context)
 {
+    TEST_FIXTURE(ContextFixture, fixture_dtor_should_not_raise_an_exception)
+    {
+        // nothing to do here
+    }
+
+    TEST_FIXTURE(ContextFixture, clone_should_balance_its_allocation_counts)
+    {
+        amqp_context_t *clone = amqp_context_clone(context);
+        amqp_buffer_t *buffer = amqp_allocate_buffer(clone);
+
+        void *p = amqp_malloc(clone, 128);
+
+        amqp_deallocate_buffer(clone, buffer);
+        
+        amqp_free(clone, p);
+
+        int clone_allocations_ok = amqp_context_destroy(clone);
+        CHECK(clone_allocations_ok);
+    }
+
     TEST_FIXTURE(ContextFixture, fixture_should_have_a_usable_decode_buffer)
     {
         static unsigned char bytes[] = { 0x01, 0xa5, 0x03 };

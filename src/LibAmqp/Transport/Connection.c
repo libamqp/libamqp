@@ -14,22 +14,24 @@
    limitations under the License.
  */
 
+#include "Transport/Connection.h"
 #include "Context/Context.h"
-#include "Transport/EndPointStubb.h"
 
-//static
-void amqp_endpoint_stubb_cleanup(amqp_endpoint_t *endpoint)
+amqp_connection_t *amqp_connection_initialize(amqp_context_t *context)
 {
-    // nothing to do here
+    amqp_connection_t *result = AMQP_MALLOC(context, amqp_connection_t);
+    amqp_connection_state_initialize(context, result);
+    return result;
 }
 
-amqp_endpoint_t *amqp__endpoint_stubb_initialize(amqp_context_t *context, amqp_endpoint_address_t *address)
+void amqp_connection_destroy(amqp_context_t *context, amqp_connection_t *connection)
 {
-    amqp_endpoint_t *result = AMQP_MALLOC(amqp_endpoint_t);
+    connection->state.shutdown(context, connection);
+    AMQP_FREE(context, connection);
+}
 
-//    result->read = 0;
-//    result->write = 0;
-//    result->cleanup = amqp_endpoint_stubb_cleanup;
+void amqp_connection_connect(amqp_context_t *context, amqp_connection_t *connection, const char *hostname, int port_number)
+{
 
-    return result;
+    connection->state.connect(context, connection, hostname, port_number);
 }

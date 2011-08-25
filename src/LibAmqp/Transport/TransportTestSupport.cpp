@@ -20,35 +20,11 @@
 
 namespace SuiteTransport
 {
-    int TransportFixture::in_memory = false;
-    
-    amqp_endpoint_address_t TransportFixture::endpoint_address = {
-        "localhost", AMQP_DEFAULT_PORT
-    };
-
     TransportFixture::TransportFixture()
     {
-//        amqp_transport_initialize_with_ev_loop(context, ev_default_loop(0));
-//        endpoint = TransportFixture::initialize_endpoint(context);
     }
 
     TransportFixture::~TransportFixture()
     {
-//        amqp_endpoint_destroy(endpoint);
-//        amqp_transport_cleanup(context);
-    }
-
-    amqp_endpoint_t *TransportFixture::initialize_endpoint(amqp_context_t *context)
-    {
-        amqp_endpoint_t *result;
-        if (in_memory)
-        {
-            result = amqp__endpoint_stubb_initialize(context, &TransportFixture::endpoint_address);
-        }
-        else
-        {
-            result = amqp__endpoint_initialize(context, &TransportFixture::endpoint_address);
-        }
-        return result;
     }
 }

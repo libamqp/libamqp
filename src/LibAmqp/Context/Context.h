@@ -36,7 +36,12 @@ typedef struct amqp_type_t amqp_type_t;
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
-typedef struct amqp_context_t amqp_context_t;
+typedef struct amqp_event_loop_t amqp_event_loop_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_EVENT_LOOP_TYPE_T
+#define LIBAMQP_AMQP_EVENT_LOOP_TYPE_T
+typedef struct ev_loop amqp_event_loop_t;
 #endif
 
 typedef int amqp_debug_print_c_t(int c);
@@ -64,10 +69,11 @@ struct amqp_context_t
 
     struct
     {
+        amqp_allocation_stats_t allocation_stats;
         amqp_memory_pool_t amqp_buffer_t_pool;
         amqp_memory_pool_t amqp_type_t_pool;
 //        amqp_memory_pool_t amqp_frame_t_pool;
-    } pools;
+    } memory;
 
     struct {
         amqp_buffer_t *buffer;
@@ -78,10 +84,13 @@ struct amqp_context_t
         amqp_buffer_t *buffer;
         amqp_type_t *container;
     } encode;
+
+    amqp_event_loop_t *loop;
 };
 
 extern amqp_context_t *amqp_create_context();
-extern int amqp_destroy_context(amqp_context_t *context);
+extern amqp_context_t *amqp_context_clone(amqp_context_t *context);
+extern int amqp_context_destroy(amqp_context_t *context);
 
 extern amqp_type_t *amqp_allocate_type(amqp_context_t *context);
 extern void amqp_deallocate_type(amqp_context_t *context, amqp_type_t *type);

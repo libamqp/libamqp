@@ -35,13 +35,14 @@ namespace SuitePool
     class PoolAllocator
     {
     public:
-        PoolAllocator(amqp_memory_pool_t *pool_);
+        PoolAllocator(amqp_context_t *context, amqp_memory_pool_t *pool_);
         ~PoolAllocator();
         test_type_t *allocate_one();
         void remove_one();
 
     private:
         int count, capacity;
+        amqp_context_t *m_context;
         amqp_memory_pool_t *pool;
         test_type_t **allocations;
     };

@@ -32,6 +32,9 @@ Eamon Walshe <eamon.walshe@stormmq.com>
 Contributors:
 Petr Gotthard <petr.gotthard@centrum.cz>
 
+References:
+Miller, Peter, "Recursive Make Considered Harmful", http://aegis.sourceforge.net/auug97.pdf
+Peterson, Adam, "Patterns in C - Part 2: STATE", http://www.adampetersen.se/Patterns%20in%20C%202,%20STATE.pdf
 
 StormMQ Limited UK Office:
 Gateshead int'l Business Centre, Mulgrave Terrace, Gateshead, NE8 1AN, United Kingdom

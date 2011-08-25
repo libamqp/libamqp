@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 typedef struct amqp_memory_pool_t amqp_memory_pool_t;
-typedef void (*amqp_pool_callback_t)(amqp_memory_pool_t *pool, void *object);
+typedef void (*amqp_pool_callback_t)(amqp_context_t *c, amqp_memory_pool_t *pool, void *object);
 
 typedef struct amqp_memory_block_t amqp_memory_block_t;
 
@@ -55,8 +55,8 @@ extern void amqp_initialize_pool(amqp_memory_pool_t *pool, size_t object_size);
 extern void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t object_size, size_t suggested_block_size);
 extern void amqp_pool_specify_initialization_callbacks(amqp_memory_pool_t *pool, amqp_pool_callback_t initializer_callback, amqp_pool_callback_t destroyer_callback);
 
-extern void *amqp_allocate(amqp_memory_pool_t *pool);
-extern void amqp_deallocate(amqp_memory_pool_t *pool, void *);
+extern void *amqp_allocate(amqp_context_t *c, amqp_memory_pool_t *pool);
+extern void amqp_deallocate(amqp_context_t *c, amqp_memory_pool_t *pool, void *);
 
 #ifdef __cplusplus
 }

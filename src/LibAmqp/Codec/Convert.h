@@ -23,7 +23,7 @@ extern "C" {
 #include "Buffer/Buffer.h"
 #include "Codec/Type/Type.h"
 
-extern char *amqp_convert_bytes_to_cstr(amqp_type_t *);
+extern char *amqp_convert_bytes_to_cstr(amqp_context_t *c, amqp_type_t *);
 
 inline static int amqp_convert_to_boolean(amqp_type_t *type)
 {

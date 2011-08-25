@@ -18,7 +18,7 @@
 
 #include "Thread/FastMutex.h"
 
-extern volatile int shared_data;
+static int shared_data;
 
 int fast_mutex_usage()
 {

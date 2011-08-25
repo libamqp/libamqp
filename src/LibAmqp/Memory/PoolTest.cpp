@@ -20,42 +20,42 @@ SUITE(Pool)
 {
     TEST_FIXTURE(InitializedPoolFixture, callback_should_initialize_object)
     {
-        test_type_t *p = (test_type_t *) amqp_allocate(&pool);
+        test_type_t *p = (test_type_t *) amqp_allocate(&m_context, &pool);
         CHECK_EQUAL('A', p->important_stuff[0]);
         for (unsigned i = 0; i < sizeof(p->important_stuff); i++)
         {
             CHECK_EQUAL('A' + (int) i, p->important_stuff[i]);
         }
-        amqp_deallocate(&pool, p);
+        amqp_deallocate(&m_context, &pool, p);
     }
 
 #ifdef DISABLE_MEMORY_POOL
     TEST_FIXTURE(InitializedPoolFixture, verify_allocation_works_when_pool_disabled)
     {
         test_type_t *p, *q;
-        p = (test_type_t *) amqp_allocate(&pool);
-        q = (test_type_t *) amqp_allocate(&pool);
-        amqp_deallocate(&pool, p);
-        amqp_deallocate(&pool, q);
+        p = (test_type_t *) amqp_allocate(&m_context, &pool);
+        q = (test_type_t *) amqp_allocate(&m_context, &pool);
+        amqp_deallocate(&m_context, &pool, p);
+        amqp_deallocate(&m_context, &pool, q);
     }
 #else
     TEST_FIXTURE(InitializedPoolFixture, first_allocate_from_pool_allocates_block)
     {
         CHECK_NULL(pool.block_list);
 
-        amqp_memory_pool_t *p = (amqp_memory_pool_t *) amqp_allocate(&pool);
+        amqp_memory_pool_t *p = (amqp_memory_pool_t *) amqp_allocate(&m_context, &pool);
         CHECK_NOT_NULL(p);
 
         CHECK_NOT_NULL(pool.block_list);
         CHECK_NULL(pool.block_list->header.previous);
         CHECK_NULL(pool.block_list->header.next);
 
-        amqp_deallocate(&pool, p);
+        amqp_deallocate(&m_context, &pool, p);
     }
 
     TEST_FIXTURE(InitializedPoolFixture, allocate_from_pool)
     {
-        test_type_t *p = (test_type_t *) amqp_allocate(&pool);
+        test_type_t *p = (test_type_t *) amqp_allocate(&m_context, &pool);
 
         CHECK_NOT_NULL(pool.block_list);
         CHECK_NULL(pool.block_list->header.previous);
@@ -64,7 +64,7 @@ SUITE(Pool)
         CHECK_EQUAL(0xfe, pool.block_list->header.mask.bytes[0]);
         CHECK_NOT_NULL(p);
 
-        amqp_deallocate(&pool, p);
+        amqp_deallocate(&m_context, &pool, p);
     }
 
     TEST_FIXTURE(InitializedPoolFixture, allocate_from_pool_increases_allocation_count)
@@ -213,7 +213,7 @@ SUITE(Pool)
         CHECK_EQUAL(second_block, pool.block_list);
 
         // allocate another causing a third block to be allocated
-        test_type_t *p = (test_type_t *) amqp_allocate(&pool);
+        test_type_t *p = (test_type_t *) amqp_allocate(&m_context, &pool);
         amqp_memory_block_t *third_block = pool.block_list;
         CHECK(second_block != third_block);
 
@@ -238,7 +238,7 @@ SUITE(Pool)
         CHECK_EQUAL(third_block, first_block->header.previous);
 
         // now remove the last allocation from the pool causing the third block to be removed from the list.
-        amqp_deallocate(&pool, p);
+        amqp_deallocate(&m_context, &pool, p);
 
         CHECK_EQUAL(first_block, pool.block_list);
         CHECK_NULL(first_block->header.previous);
