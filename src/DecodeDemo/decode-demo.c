@@ -14,7 +14,6 @@
    limitations under the License.
  */
 #include <assert.h>
-//#include <stdio.h>
 
 #include "Codec/Codec.h"
 
@@ -23,6 +22,7 @@ int main(int argc, char *argv[])
     int c;
     amqp_type_t *type;
     amqp_context_t *context = amqp_create_context();
+    int rc;
 
     while ((c = getc(stdin)) != -1)
     {
@@ -33,9 +33,9 @@ int main(int argc, char *argv[])
     amqp_type_print_formatted(type);
 
     amqp_deallocate_type(context, type);
-    amqp_destroy_context(context);
+    rc = amqp_context_destroy(context);
 
-    assert(amqp_assert_that_calls_to_free_match_calls_to_malloc());
+    assert(rc);
 
     return 0;
 }

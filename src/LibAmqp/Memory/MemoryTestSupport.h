@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <TestHarness.h>
 #include "Memory/Memory.h"
+#include "Context/Context.h"
 #include <iostream>
 
 namespace SuiteMemory {
@@ -28,6 +29,8 @@ namespace SuiteMemory {
     public:
         MemoryFixture();
         ~MemoryFixture();
+
+        amqp_context_t m_context;
     };
 }
 #endif

@@ -28,11 +28,11 @@ namespace SuiteBuffer
         BufferFixture()
         {
             amqp_buffer_initialize_pool(&pool);
-            buffer = (amqp_buffer_t *) amqp_allocate(&pool);
+            buffer = (amqp_buffer_t *) amqp_allocate(&m_context, &pool);
         }
         ~BufferFixture()
         {
-            amqp_deallocate(&pool, buffer);
+            amqp_deallocate(&m_context, &pool, buffer);
         }
         void load_buffer(unsigned char *p, size_t n)
         {

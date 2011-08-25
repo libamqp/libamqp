@@ -22,35 +22,52 @@ extern "C" {
 #endif
 
 #include <ev.h>
-#include "Transport/Socket.h"
+#include "Transport/LowLevel/Socket.h"
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_EVENT_LOOP_TYPE_T
+#define LIBAMQP_AMQP_EVENT_LOOP_TYPE_T
 typedef struct ev_loop amqp_event_loop_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_CONNECTION_TYPE_T
+#define LIBAMQP_AMQP_CONNECTION_TYPE_T
+typedef struct amqp_connection_t amqp_connection_t;
+#endif
+
 typedef struct amqp_io_event_watcher_t amqp_io_event_watcher_t;
+typedef int (*amqp_accept_event_handle_t)(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size);
 
 typedef struct amqp_event_fn_list_t {
-    int (*accept)(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size);
+//    int (*accept)(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size);
+    amqp_accept_event_handle_t accept;
 } amqp_event_fn_list_t;
+
 struct amqp_io_event_watcher_t
 {
     ev_io io;
     amqp_context_t *context;
     amqp_event_loop_t *loop;
-    amqp_event_fn_list_t *fns;
+    union {
+        amqp_event_fn_list_t fns; // TODO - don't need the list
+        amqp_connection_t *connection;
+    } data;
 };
 
 typedef void (*amqp_event_handler_t)(amqp_event_loop_t *loop, ev_io* io, const int revents);
 
+// TODO - pass loop
 extern void amqp_io_event_watcher_start(amqp_io_event_watcher_t *watcher);
 extern void amqp_io_event_watcher_stop(amqp_io_event_watcher_t *watcher);
 extern void amqp_io_event_watcher_adjust_priority(amqp_io_event_watcher_t *watcher, int amount);
 
+extern void amqp_io_event_watcher_cb_set(amqp_io_event_watcher_t *watcher, amqp_event_handler_t handler);
 extern amqp_io_event_watcher_t *amqp_io_event_watcher_initialize(amqp_context_t *context, amqp_event_loop_t *loop, amqp_event_handler_t handler, int fd, const int revents);
-extern void amqp_io_event_watcher_destroy(amqp_io_event_watcher_t *watcher);
+extern void amqp_io_event_watcher_destroy(amqp_context_t *context, amqp_io_event_watcher_t *watcher);
 
 #ifdef __cplusplus
 }

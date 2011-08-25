@@ -14,19 +14,33 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_TRANSPORT_H
-#define LIBAMQP_TRANSPORT_TRANSPORT_H
+#ifndef LIBAMQP_TRANSPORT_LOW_LEVEL_TIMER_H
+#define LIBAMQP_TRANSPORT_LOW_LEVEL_TIMER_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <ev.h>
+#include "Transport/LowLevel/EventLoop.h"
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
 #endif
+
+typedef struct amqp_timer_t amqp_timer_t;
+typedef void (*amqp_timer_expiry_handler_t)(amqp_context_t *context, amqp_timer_t *timer);
+
+struct amqp_timer_t
+{
+    ev_timer timer;
+    amqp_context_t *context;
+    amqp_timer_expiry_handler_t expiry_handler;
+};
+
+extern amqp_timer_t *amqp_timer_initialize(amqp_context_t *context, amqp_timer_expiry_handler_t expiry_handler);
+extern void amqp_timer_destroy(amqp_context_t *context, amqp_timer_t *timer);
+extern void amqp_timer_start(amqp_context_t *context, amqp_timer_t *timer, ev_tstamp delay);
 
 #ifdef __cplusplus
 }

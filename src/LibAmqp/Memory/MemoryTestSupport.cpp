@@ -17,11 +17,11 @@
 
 #include "Memory/MemoryTestSupport.h"
 
-#define CHECK_ALLOCATIONS() \
+#define CHECK_ALLOCATIONS(c) \
     do \
     { \
         try { \
-            if (!UnitTest::Check(amqp_assert_that_calls_to_free_match_calls_to_malloc())) \
+            if (!UnitTest::Check((c)->memory.allocation_stats.outstanding_allocations == 0)) \
                 UnitTest::CurrentTest::Results()->OnTestFailure(*UnitTest::CurrentTest::Details(), "Number of calls to amqp_free() does not match number of calls to amqp_malloc()."); \
         } \
         catch (...) { \
@@ -33,10 +33,10 @@ namespace SuiteMemory
 {
     MemoryFixture::MemoryFixture()
     {
-        amqp_reset_malloc_allocation_stats();
+        memset(&m_context, '\0', sizeof(amqp_context_t));
     }
     MemoryFixture::~MemoryFixture()
     {
-        CHECK_ALLOCATIONS();
+        CHECK_ALLOCATIONS(&m_context);
     }
 }

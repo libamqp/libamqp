@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 #include "Thread/Thread.h"
-#include "Transport/EventLoop.h"
+#include "Transport/LowLevel/EventLoop.h"
 
 #ifndef LIBAMQP_AMQP_EVENT_THREAD_TYPE_T
 #define LIBAMQP_AMQP_EVENT_THREAD_TYPE_T
@@ -36,13 +36,14 @@ struct amqp_event_thread_t
     amqp_semaphore_t thread_running_semaphore;
     amqp_event_thread_handler_t handler;
     amqp_event_loop_t *loop;
-    amqp_event_loop_t *private_loop;
+    amqp_context_t *context;
     amqp_thread_t *thread;
     ev_async async_watcher;
+    void *argument;
 };
 
-extern amqp_event_thread_t *amqp_event_thread_initialize(amqp_event_thread_handler_t handler, amqp_event_loop_t *loop);
-extern void amqp_event_thread_destroy(amqp_event_thread_t *event_thread);
+extern amqp_event_thread_t *amqp_event_thread_initialize(amqp_context_t *context, amqp_event_thread_handler_t handler, amqp_event_loop_t *loop, void *argument);
+extern int amqp_event_thread_destroy(amqp_context_t *context, amqp_event_thread_t *event_thread);
 extern void amqp_event_thread_run_loop(amqp_event_thread_t *event_thread);
 
 #ifdef __cplusplus

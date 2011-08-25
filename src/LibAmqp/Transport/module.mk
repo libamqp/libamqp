@@ -5,5 +5,11 @@
 
 MODULE = LibAmqp/Transport
 
-SRC += $(filter-out $(wildcard $(MODULE)/*Stubb.c),$(wildcard $(MODULE)/*.c))
-TEST_SRC += $(wildcard  $(MODULE)/*Test.cpp) $(wildcard $(MODULE)/*TestSupport.cpp) $(wildcard $(MODULE)/*Stubb.c)
+SRC += $(filter-out $(wildcard $(MODULE)/*Stubb.c),$(wildcard $(MODULE)/*.c)) \
+    $(wildcard $(MODULE)/LowLevel/*.c)
+
+TEST_SRC += $(wildcard  \
+    $(MODULE)/*Test.cpp) \
+    $(wildcard $(MODULE)/*TestSupport.cpp) \
+    $(wildcard $(MODULE)/LowLevel/*.cpp) \
+    $(wildcard $(MODULE)/DummyBroker/*.c)

@@ -34,7 +34,7 @@ SUITE(CompoundEncoding)
         EncodeFixture() : result(0) {}
         ~EncodeFixture()
         {
-            AMQP_FREE(result);
+            AMQP_FREE(context, result);
         }
 
     public:

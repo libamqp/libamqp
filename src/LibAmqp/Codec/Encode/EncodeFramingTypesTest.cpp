@@ -30,7 +30,7 @@ SUITE(FramingTypesEncoding)
         EncodeFixture() : result(0) {}
         ~EncodeFixture()
         {
-            AMQP_FREE(result);
+            AMQP_FREE(context, result);
             deallocate_type(result);
         }
 

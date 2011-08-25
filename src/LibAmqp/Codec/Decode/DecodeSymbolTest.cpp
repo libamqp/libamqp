@@ -30,7 +30,7 @@ SUITE(SymbolDecode)
         DecodeFixture() : result(0) {}
         ~DecodeFixture()
         {
-            AMQP_FREE(result);
+            AMQP_FREE(context, result);
         }
 
     public:
@@ -46,7 +46,7 @@ SUITE(SymbolDecode)
         CHECK_EQUAL(0xb3, type->format_code);
         CHECK_EQUAL((size_t) 0x05, type->position.index);
         CHECK_EQUAL((size_t) 0x06, type->position.size);
-        CHECK_EQUAL("FooBar", (result = amqp_convert_bytes_to_cstr(type)));
+        CHECK_EQUAL("FooBar", (result = amqp_convert_bytes_to_cstr(context, type)));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeSymbol)
@@ -58,7 +58,7 @@ SUITE(SymbolDecode)
         CHECK_EQUAL(0xa3, type->format_code);
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 0x03, type->position.size);
-        CHECK_EQUAL("Foo", (result = amqp_convert_bytes_to_cstr(type)));
+        CHECK_EQUAL("Foo", (result = amqp_convert_bytes_to_cstr(context, type)));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeInvalidSymbol)

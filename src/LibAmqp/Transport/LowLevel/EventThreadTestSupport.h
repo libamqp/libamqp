@@ -14,15 +14,25 @@
    limitations under the License.
  */
 
-#include <stdlib.h>
+#ifndef LIBAMQP_TRANSPORT_EVENT_THREAD_TEST_SUPPORT_H
+#define LIBAMQP_TRANSPORT_EVENT_THREAD_TEST_SUPPORT_H
 
-#include "Transport/EventThreadTestSupport.h"
+#include "Transport/LowLevel/EventThread.h"
+#include "Context/ContextTestSupport.h"
 
 namespace SuiteTransport
 {
-
-    void EventThreadFixture::basic_event_thread_handler(amqp_event_thread_t *event_thread)
+    class EventThreadFixture : public SuiteContext::ContextFixture
     {
-        amqp_event_thread_run_loop(event_thread);
-    }
+    public:
+        EventThreadFixture();
+        ~EventThreadFixture();
+
+    public:
+        amqp_event_thread_t *m_event_thread;
+        static void basic_event_thread_handler(amqp_event_thread_t *event_thread);
+    };
 }
+
+#endif
+

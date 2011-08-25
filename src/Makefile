@@ -24,16 +24,15 @@ INCLUDES :=
 TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
-TEST_RUNNER_ARGS :=
+TEST_RUNNER_ARGS := --exclude SlowRunning
 SAMPLE_SRC :=
 
-.PHONY:	all trace libs tests check debug targets
+.PHONY:	all trace libs tests check check-all debug targets
 all:	trace libs samples targets tests
 ci-build:   scrub all check
 targets::
 
 # BUILD_OPTIONS += -DDISABLE_MEMORY_POOL
-# BUILD_OPTIONS += -DTRACE_ALLOCATIONS
 # BUILD_OPTIONS += -DLIBAMQP_DISABLE_FAST_MUTEX
 CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES)) $(BUILD_OPTIONS)
 CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -fasm
@@ -62,6 +61,9 @@ debug:	all
 	
 check::	all
 	./test-runner $(TEST_RUNNER_ARGS)
+
+check-all:	all
+	./test-runner 
 
 check-quick: all
 	./test-runner --exclude Transport

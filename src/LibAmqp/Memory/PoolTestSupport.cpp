@@ -35,7 +35,7 @@
 
 namespace SuitePool
 {
-    PoolAllocator::PoolAllocator(amqp_memory_pool_t *pool_) :  count(0), capacity(256), pool(pool_)
+    PoolAllocator::PoolAllocator(amqp_context_t *context, amqp_memory_pool_t *pool_) :  count(0), capacity(256), m_context(context), pool(pool_)
     {
     }
 
@@ -43,7 +43,7 @@ namespace SuitePool
     {
         for (int i = 0; i < count; i++)
         {
-            amqp_deallocate(pool, allocations[i]);
+            amqp_deallocate(m_context, pool, allocations[i]);
         }
         free(allocations);
     }
@@ -59,7 +59,7 @@ namespace SuitePool
             capacity *= 2;
             allocations = (test_type_t **) realloc(allocations, sizeof(test_type_t *) * capacity);
         }
-        return allocations[count++] = (test_type_t *) amqp_allocate(pool);
+        return allocations[count++] = (test_type_t *) amqp_allocate(m_context, pool);
     }
 
     void PoolAllocator::remove_one()
@@ -67,7 +67,7 @@ namespace SuitePool
         if (count > 0)
         {
             count--;
-            amqp_deallocate(pool, allocations[count]);
+            amqp_deallocate(m_context, pool, allocations[count]);
         }
     }
 
@@ -85,7 +85,7 @@ namespace SuitePool
         }
     }
 
-    static void allocate_callback(amqp_memory_pool_t *pool, test_type_t *object)
+    static void allocate_callback(amqp_context_t *context, amqp_memory_pool_t *pool, test_type_t *object)
     {
         for (int i = 0; i < (int) sizeof(object->important_stuff); i++)
         {
@@ -93,7 +93,7 @@ namespace SuitePool
         }
     }
 
-    static void deallocate_callback(amqp_memory_pool_t *pool, void *object)
+    static void deallocate_callback(amqp_context_t *context, amqp_memory_pool_t *pool, void *object)
     {
     }
 
@@ -121,7 +121,7 @@ namespace SuitePool
         test_type_t *result;
         if (allocator == 0)
         {
-            allocator = new PoolAllocator(&pool);
+            allocator = new PoolAllocator(&m_context, &pool);
         }
         for (int i = 0; i < n; i++)
         {

@@ -14,19 +14,33 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_TRANSPORT_H
-#define LIBAMQP_TRANSPORT_TRANSPORT_H
+#ifndef LIBAMQP_TRANSPORT_DUMMY_BROKER_DUMMY_BROKER_H
+#define LIBAMQP_TRANSPORT_DUMMY_BROKER_DUMMY_BROKER_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <ev.h>
+#include "libamqp_common.h"
+#include "Transport/LowLevel/EventLoop.h"
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
 #endif
+
+#ifndef LIBAMQP_AMQP_EVENT_THREAD_TYPE_T
+#define LIBAMQP_AMQP_EVENT_THREAD_TYPE_T
+typedef struct amqp_event_thread_t amqp_event_thread_t;
+#endif
+
+typedef struct amqp_dummy_broker_t
+{
+    amqp_event_thread_t *thread;
+} amqp_dummy_broker_t;
+
+extern amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context, int listen_port_number, amqp_accept_event_handle_t accept_handler);
+extern void amqp_dummy_broker_destroy(amqp_context_t *context, amqp_dummy_broker_t *broker);
 
 #ifdef __cplusplus
 }

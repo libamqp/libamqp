@@ -49,10 +49,10 @@ amqp_memory_block_t *find_block_with_free_space(amqp_memory_block_t *block_list)
 }
 
 static
-amqp_memory_block_t *allocate_block(amqp_memory_pool_t *pool)
+amqp_memory_block_t *allocate_block(amqp_context_t *c, amqp_memory_pool_t *pool)
 {
     size_t block_size = pool->allocation_size_in_bytes * pool->allocations_per_block + pool->offset_to_first_allocation;
-    return amqp_malloc(block_size TRACE_ARGS);
+    return amqp_malloc(c, block_size);
 }
 
 static
@@ -62,9 +62,9 @@ amqp_memory_allocation_t *allocation_from_index(amqp_memory_pool_t *pool, amqp_m
 }
 
 static
-amqp_memory_block_t *allocate_new_memory_block(amqp_memory_pool_t *pool, amqp_memory_block_t **head)
+amqp_memory_block_t *allocate_new_memory_block(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_memory_block_t **head)
 {
-    amqp_memory_block_t *result = allocate_block(pool);
+    amqp_memory_block_t *result = allocate_block(c, pool);
 
     int i;
     if ((result->header.next = *head) != 0)
@@ -123,13 +123,13 @@ amqp_memory_allocation_t *find_free_allocation_within_block(amqp_memory_pool_t *
 }
 
 static
-void *allocate_object(amqp_memory_pool_t *pool)
+void *allocate_object(amqp_context_t *c, amqp_memory_pool_t *pool)
 {
     amqp_memory_allocation_t *free_allocation;
     amqp_memory_block_t *block_with_free_space = find_block_with_free_space((amqp_memory_block_t *) pool->block_list);
     if (block_with_free_space == 0)
     {
-        block_with_free_space = allocate_new_memory_block(pool, &pool->block_list);
+        block_with_free_space = allocate_new_memory_block(c, pool, &pool->block_list);
     }
     free_allocation = find_free_allocation_within_block(pool, block_with_free_space);
 
@@ -143,7 +143,7 @@ void *allocate_object(amqp_memory_pool_t *pool)
 }
 #endif
 
-void *amqp_allocate(amqp_memory_pool_t *pool)
+void *amqp_allocate(amqp_context_t *c, amqp_memory_pool_t *pool)
 {
     void *result;
 
@@ -152,13 +152,13 @@ void *amqp_allocate(amqp_memory_pool_t *pool)
     assert(pool->initializer_callback != null);
 
 #ifdef DISABLE_MEMORY_POOL
-    result = amqp_malloc(pool->object_size TRACE_ARGS);
+    result = amqp_malloc(c, pool->object_size);
 #else
     assert(pool->object_size_in_fragments != 0);
-    result = allocate_object(pool);
+    result = allocate_object(c, pool);
 #endif
 
-    (*pool->initializer_callback)(pool, result);
+    (*pool->initializer_callback)(c, pool, result);
 
     pool->stats.outstanding_allocations++;
     pool->stats.total_allocation_calls++;
@@ -177,7 +177,7 @@ amqp_memory_allocation_t *calculate_allocation_ptr_from_object_ptr(amqp_memory_p
 }
 
 static
-void delete_object(amqp_memory_pool_t *pool, void *pooled_object)
+void delete_object(amqp_context_t *c, amqp_memory_pool_t *pool, void *pooled_object)
 {
     amqp_memory_allocation_t *allocation = calculate_allocation_ptr_from_object_ptr(pool, pooled_object);
     amqp_memory_block_t *block;
@@ -216,30 +216,29 @@ void delete_object(amqp_memory_pool_t *pool, void *pooled_object)
         {
             pool->block_list = block->header.next;
         }
-        amqp_free(block);
+        amqp_free(c, block);
     }
 }
 #endif
 
-void amqp_deallocate(amqp_memory_pool_t *pool, void *pooled_object)
+void amqp_deallocate(amqp_context_t *c, amqp_memory_pool_t *pool, void *pooled_object)
 {
-    assert(pool != null);
-    assert(pool->destroyer_callback != null);
+    assert(pool != null && pool->destroyer_callback != null);
 
     if (pooled_object != 0)
     {
-        (*pool->destroyer_callback)(pool, pooled_object);
+        (*pool->destroyer_callback)(c, pool, pooled_object);
 #ifdef DISABLE_MEMORY_POOL
-        amqp_free(pooled_object TRACE_ARGS);
+        amqp_free(c, pooled_object);
 #else
-        delete_object(pool, pooled_object);
+        delete_object(c, pool, pooled_object);
 #endif
         pool->stats.outstanding_allocations--;
     }
 }
 
 static
-void default_callback(amqp_memory_pool_t *pool, void *object)
+void default_callback(amqp_context_t *c, amqp_memory_pool_t *pool, void *object)
 {
     // nothing to see here, move along
 }

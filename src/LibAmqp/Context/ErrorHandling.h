@@ -63,6 +63,8 @@ typedef struct amqp_context_t amqp_context_t;
 
 #define AMQP_ERROR_MEMORY_ERROR                 (AMQP_ERROR_CODE_BASE + 0x40)
 
+#define AMQP_ERROR_ILLEGAL_STATE                (AMQP_ERROR_CODE_BASE + 0x50)
+
 #define amqp_error(context, code, ...) _amqp_error(context, 1, __FILE__, __LINE__, #code, code, "" __VA_ARGS__);
 extern void _amqp_error(amqp_context_t *context, int level, const char * filename, int line_number, const char *error_mnemonic, int error_code, const char *format, ...);
 
@@ -70,6 +72,7 @@ extern void _amqp_error(amqp_context_t *context, int level, const char * filenam
 #define amqp_debug_level(context, level, ...) _amqp_debug(context, level, __FILE__, __LINE__, __func__, "" __VA_ARGS__);
 extern void _amqp_debug(const amqp_context_t *context, int level, const char * filename, int line_number, const char *function, const char *format, ...);
 
+// TODO - pass in errno
 #define amqp_io_error(context, ...) _amqp_io_error(context, 1, __FILE__, __LINE__, "" __VA_ARGS__);
 extern void _amqp_io_error(amqp_context_t *context, int level, const char * filename, int line_number, const char *format, ...);
 
