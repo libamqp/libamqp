@@ -167,6 +167,25 @@ static void attempt_connection(amqp_context_t *context, amqp_connection_t *conne
     amqp_io_event_watcher_start(connection->write_watcher);
 }
 
+static const char *duplicate_and_clip(const char *hostname)
+{
+    const int space = 32;
+    const int room = space - 1;
+    const int clipped = room - 3;
+    char *result = (char *) malloc(space);
+
+    size_t n = strlen(hostname);
+    if (n > room)
+    {
+        strncpy(result, hostname, clipped);
+        strcpy(result + clipped, "...");
+    }
+    else
+    {
+        strcpy(result, hostname);
+    }
+    return result;
+}
 static void connect_while_stopped_or_failed(amqp_context_t *context, amqp_connection_t *connection, const char *hostname, int port_number)
 {
     struct addrinfo *addrinfo;
@@ -174,7 +193,7 @@ static void connect_while_stopped_or_failed(amqp_context_t *context, amqp_connec
 
     transition_to_connecting_start(context, connection);
 
-    connection->hostname = strdup(hostname);
+    connection->hostname = duplicate_and_clip(hostname);
     connection->port_number = port_number;
 
     eai_error = amqp_lookup_host_address(hostname, port_number, &addrinfo);
@@ -268,7 +287,7 @@ static void lookup_failed_while_connect_start(amqp_context_t *context, amqp_conn
 {
     transition_to_lookup_failed(context, connection);
     connection->eai_error_code = error_code;
-    amqp_error(context, error_code, "Failed to lookup a valid addres for %s:%d", connection->hostname, connection->port_number);
+    amqp_error(context, error_code, "Failed to lookup a valid address for %s:%d", connection->hostname, connection->port_number);
 }
 static void connect_failed_while_connect_start(amqp_context_t *context, amqp_connection_t *connection, int error_code)
 {
