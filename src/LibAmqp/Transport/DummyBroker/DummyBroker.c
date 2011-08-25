@@ -29,6 +29,22 @@ struct arguments
     amqp_accept_event_handle_t accept_handler;
 };
 
+static int write_all(int fd, const char *buffer, size_t n)
+{
+    int count = n;
+    int written;
+    while ((written = write(fd, buffer, count)) >= 0 || errno == EINTR)
+    {
+        buffer += written;
+        count -= written;
+	if (count == 0)
+	{
+	    return n;
+	}
+    }
+    return written;
+}
+
 static int default_accept_new_connection_handler(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
 {
     char buffer[128];
@@ -38,7 +54,7 @@ static int default_accept_new_connection_handler(amqp_io_event_watcher_t *me, am
 
     while ((n = read(fd, buffer, sizeof(buffer) -1)) > 0)
     {
-        write (fd, buffer, n);
+        write_all(fd, buffer, n);
     }
     close(fd);
     return 0;

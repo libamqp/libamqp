@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-
+#include <string.h>
 #include "Memory/MemoryTestSupport.h"
 
 #define CHECK_ALLOCATIONS(c) \
