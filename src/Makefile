@@ -65,8 +65,8 @@ check::	all
 check-all:	all
 	./test-runner 
 
-check-quick: all
-	./test-runner --exclude Transport
+quick:
+	make AR=./ar.serialize --jobs 2 check
 
 test-runner:	$(TEST_OBJ) $(OBJ) $(LIBS)
 	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) $(LDFLAGS) -o $@

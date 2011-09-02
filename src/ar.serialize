@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Use a lockfile to serialize access to ar command.
+
+function cleanup
+{
+    rm -f ar.lock
+}
+trap "cleanup; exit 1" 1 2 3 15
+
+lockfile -1 ar.lock 
+
+/usr/bin/ar "$@"
+rc=$?
+cleanup
+exit $rc
