@@ -3,6 +3,8 @@
 .hgtags
 .hgignore
 .idea
+.project
+.cproject
 
 *.o
 *.a
