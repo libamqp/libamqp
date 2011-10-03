@@ -29,6 +29,8 @@ static amqp_connection_t *create_connection(amqp_context_t *context)
     result->specification_version.required.sasl = AMQP_SASL_PREFERRED_VERSION;
     result->specification_version.required.amqp = AMQP_PREFERRED_VERSION;
 
+    result->limits.max_frame_size = context->limits.max_frame_size;
+
     return result;
 }
 

@@ -21,6 +21,8 @@
 #include "Transport/Connection/ConnectionFrame.h"
 #include "debug_helper.h"
 
+static const uint32_t amqp_protocol_header = ('A' << 24) | ('M' << 16) | ('Q' << 8) | 'P';
+
 #ifdef LIBAMQP_TRACE_CONNECT_STATE
 #define save_old_state()  const char* old_state_name = connection->state.frame.name
 #define trace_transition(old_state_name) amqp_connection_trace_transition(connection, AMQP_TRACE_FRAME_READER, old_state_name, connection->state.frame.name)
@@ -35,6 +37,9 @@ if (connection->trace_flags & AMQP_TRACE_DISCONNECTS) \
 #endif
 
 static void transition_to_initialized(amqp_connection_t *connection);
+static void transition_to_enabled(amqp_connection_t *connection);
+static void transition_to_reading_frame_header(amqp_connection_t *connection);
+static void transition_to_reading_frame_body(amqp_connection_t *connection);
 
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name);
 
@@ -55,23 +60,107 @@ int amqp_connection_frame_is_state(const amqp_connection_t *connection, const ch
 {
     return connection->state.frame.name != 0 ? (strcmp(connection->state.frame.name, state_name) == 0) : false;
 }
-/*
-static void read_complete(amqp_connection_t *connection, int amount)
+
+static void read_complete_callback(amqp_connection_t *connection, int amount)
 {
     connection->state.frame.read_done(connection, amount);
 }
-static void start_while_initialized(amqp_connection_t *connection, uint32_t version, amqp_connection_action_f done_callback, amqp_connection_negotiate_callback_f reject_callback)
+
+static void enable_while_initialized(amqp_connection_t *connection)
 {
+    transition_to_enabled(connection);
 }
-static void wait_while_initialized(amqp_connection_t *connection, amqp_connection_negotiate_callback_f request_callback)
-{
-}*/
 static void transition_to_initialized(amqp_connection_t *connection)
 {
     default_state_initialization(connection, "Initialized");
-//    connection->state.frame.reset = reset_while_initialized;
-
+    connection->state.frame.enable = enable_while_initialized;
     trace_transition("Created");
+}
+
+// TODO - required is not used
+static void read_while_enabled(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t unused, amqp_connection_action_f done_callback)
+{
+    transition_to_reading_frame_header(connection);
+    connection->io.frame.buffer = buffer;
+    connection->io.frame.done_callback = done_callback;
+    connection->state.reader.commence_read(connection, buffer, AMQP_FRAME_HEADER_SIZE, read_complete_callback);
+}
+static void transition_to_enabled(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "Enabled");
+    connection->state.frame.read = read_while_enabled;
+    trace_transition(old_state_name);
+}
+
+static void read_done_while_reading_frame_header(amqp_connection_t *connection, int amount)
+{
+    if (amount != AMQP_FRAME_HEADER_SIZE)
+    {
+        amqp_connection_failed(connection, AMQP_ERROR_PARTIAL_READ, AMQP_CONNECTION_READ_ERROR, "Cannot read frame header. Got %d bytes.", amount);
+        return;
+    }
+
+    uint32_t frame_size = amqp_buffer_read_uint32(connection->io.frame.buffer, 0);
+    connection->io.frame.frame_size = frame_size;
+
+    if ((frame_size > connection->limits.max_frame_size) || (frame_size < AMQP_FRAME_HEADER_SIZE) || (frame_size == amqp_protocol_header))
+    {
+        amqp_connection_failed(connection, AMQP_ERROR_INVALID_FRAME_SIZE, AMQP_CONNECTION_READ_ERROR, "Invalid frame size. Size: %lu, max_frame_size: %lu", (unsigned long) frame_size, (unsigned long) connection->limits.max_frame_size);
+        return;
+    }
+
+    if (frame_size == AMQP_FRAME_HEADER_SIZE)
+    {
+        // already got the minimum legal frame size
+        transition_to_enabled(connection);
+        connection->io.frame.done_callback(connection);
+        return;
+    }
+
+    transition_to_reading_frame_body(connection);
+    connection->state.reader.commence_read(connection, connection->io.frame.buffer, frame_size - AMQP_FRAME_HEADER_SIZE, read_complete_callback);
+}
+static void transition_to_reading_frame_header(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "ReadingFrameHeader");
+    connection->state.frame.read_done = read_done_while_reading_frame_header;
+    trace_transition(old_state_name);
+}
+
+static void read_done_while_reading_frame_body(amqp_connection_t *connection, int amount)
+{
+    if (amount != (connection->io.frame.frame_size - AMQP_FRAME_HEADER_SIZE))
+    {
+        amqp_connection_failed(connection, AMQP_ERROR_PARTIAL_READ, AMQP_CONNECTION_READ_ERROR, "Cannot read frame body. Got %d bytes. Frame size in header: %lu", amount, (unsigned long) connection->io.frame.frame_size);
+        return;
+    }
+
+    transition_to_enabled(connection);
+    connection->io.frame.done_callback(connection);
+}
+static void transition_to_reading_frame_body(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "ReadingFrameBody");
+    connection->state.frame.read_done = read_done_while_reading_frame_body;
+    trace_transition(old_state_name);
+}
+
+static void stop_while_stopped(amqp_connection_t *connection)
+{
+}
+static void read_done_while_stopped(amqp_connection_t *connection, int amount)
+{
+}
+static void transition_to_stopped(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "Stopped");
+    connection->state.frame.stop = stop_while_stopped;
+    connection->state.frame.read_done = read_done_while_stopped;
+    trace_transition(old_state_name);
 }
 
 /**********************************************
@@ -99,7 +188,7 @@ static void default_read_done(amqp_connection_t *connection, int amount)
 }
 static void default_stop(amqp_connection_t *connection)
 {
-    illegal_state(connection, "Stop");
+    transition_to_stopped(connection);
 }
 
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)

@@ -107,6 +107,11 @@ typedef struct amqp_connection_t amqp_connection_t;
             amqp_type_t *container;
         } encode;
 
+        struct
+        {
+            uint32_t max_frame_size;
+        } limits;
+
         amqp_event_loop_t *thread_event_loop;
     };
 

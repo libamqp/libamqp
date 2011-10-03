@@ -234,7 +234,7 @@ struct amqp_connection_t
     amqp_context_t *context;
     amqp_connection_socket_t socket;
     int flags;
-    int failure_flags;
+    uint32_t failure_flags;
     int trace_flags;
     int protocols;
     struct
@@ -283,8 +283,15 @@ struct amqp_connection_t
             size_t satisfied;
             amqp_connection_read_callback_f read_callback;
         } read;
+        struct {
+            amqp_buffer_t *buffer;
+            amqp_connection_action_f done_callback;
+            uint32_t frame_size;
+        } frame;
     } io;
-
+    struct {
+        uint32_t max_frame_size;
+    } limits;
     amqp_accept_handler_arguments_t *accept_handler_arguments;
     amqp_timer_t *timer;
 };

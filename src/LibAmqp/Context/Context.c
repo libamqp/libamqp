@@ -64,6 +64,10 @@ amqp_create_context()
     result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
     result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
 
+    result->context.limits.max_frame_size = AMQP_DEFAULT_MAX_FRAME_SIZE;
+
+    result->context.thread_event_loop = 0;
+
     return (amqp_context_t *) result;
 }
 
@@ -86,6 +90,8 @@ amqp_context_t *amqp_context_clone(amqp_context_t *context)
 
     result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
     result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
+
+    result->context.limits = context->limits;
 
     result->context.thread_event_loop = 0;   // Don't clone the event loop. Need one per thread.
     return (amqp_context_t *) result;

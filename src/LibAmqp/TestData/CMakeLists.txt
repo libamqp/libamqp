@@ -1,4 +1,6 @@
 SET(AMQP_TEST_SOURCES
+  TestFrames.cpp
+  TestFrames.h
   TestData.cpp
   TestData.h
 )

@@ -228,6 +228,7 @@ size_t amqp_buffer_size(amqp_buffer_t *buffer)
     return buffer->limit.size;
 }
 
+// TODO - rename
 AMQP_BUFFER_INLINE_DEFN
 void amqp_buffer_set_write_index(amqp_buffer_t *buffer, size_t value)
 {

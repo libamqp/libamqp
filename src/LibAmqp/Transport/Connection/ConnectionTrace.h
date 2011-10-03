@@ -73,6 +73,8 @@ else { \
 #define amqp_connection_error(connection, code, ...) _amqp_connection_error(connection, __FILE__, __LINE__, #code, code, "" __VA_ARGS__)
 extern void _amqp_connection_error(amqp_connection_t *connection, const char * filename, int line_number, const char *error_mnemonic, int error_code, const char *format, ...);
 
+#define amqp_connection_failed(connection, code, flags, ...) _amqp_connection_failed(connection, __FILE__, __LINE__, #code, code, flags, "" __VA_ARGS__)
+extern void _amqp_connection_failed(amqp_connection_t *connection, const char *filename, int line_number, const char *error_mnemonic, int error_code, uint32_t failure_flag, const char *format, ...);
 
 #ifdef __cplusplus
 }

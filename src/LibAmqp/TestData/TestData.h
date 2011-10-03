@@ -45,8 +45,6 @@ namespace test_data
     };
 }
 
-
-
 namespace test_data
 {
     extern TestData empty_buffer;

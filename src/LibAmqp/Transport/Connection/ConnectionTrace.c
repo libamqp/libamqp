@@ -38,16 +38,16 @@ static void connection_source(amqp_connection_t *connection, char *buffer, size_
     snprintf(buffer, buffer_size, "%s:%d", connection->socket.hostname ? connection->socket.hostname : "no-peer", connection->socket.port_number);
 }
 
-void _amqp_connection_error(amqp_connection_t *connection, const char *filename, int line_number, const char *error_mnemonic, int error_code, const char *format, ...)
+void _vamqp_connection_error(amqp_connection_t *connection, const char *filename, int line_number, const char *error_mnemonic, int error_code, const char *format, va_list args)
 {
-    va_list args;
+//    va_list args;
     char source[128];
 
     connection_source(connection, source, sizeof(source));
 
-    va_start(args, format);
+//    va_start(args, format);
     _vamqp_error(connection->context, 1, filename, line_number, source, error_mnemonic, error_code, format, args);
-    va_end(args);
+//    va_end(args);
 
     _amqp_debug(connection->context, 2, filename, line_number, source, 0,
             "connection state - %s:socket=%s:writer=%s:reader=%s:tls=%s:sasl=%s:amqp=%s:neg=%s",
@@ -59,6 +59,28 @@ void _amqp_connection_error(amqp_connection_t *connection, const char *filename,
             connection->state.sasl.name,
             connection->state.amqp.name,
             connection->state.negotiator.name);
+}
+
+void _amqp_connection_error(amqp_connection_t *connection, const char *filename, int line_number, const char *error_mnemonic, int error_code, const char *format, ...)
+{
+    va_list args;
+
+    va_start(args, format);
+    _vamqp_connection_error(connection, filename, line_number, error_mnemonic, error_code, format, args);
+    va_end(args);
+}
+
+
+void _amqp_connection_failed(amqp_connection_t *connection, const char *filename, int line_number, const char *error_mnemonic, int error_code, uint32_t failure_flag, const char *format, ...)
+{
+    va_list args;
+
+    va_start(args, format);
+    _vamqp_connection_error(connection, filename, line_number, error_mnemonic, error_code, format, args);
+    va_end(args);
+
+    amqp_connection_failure_flag_set(connection, failure_flag);
+    connection->state.connection.fail(connection);
 }
 
 void _amqp_connection_trace(amqp_connection_t *connection, const char * filename, int line_number, const char *format, ...)
