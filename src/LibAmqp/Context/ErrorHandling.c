@@ -28,23 +28,14 @@
 #include "Context/Context.h"
 
 
-// TODO - lock error output stream
-static void output_message(FILE *stream, const char *filename, int line_number, const char *label, const char *extra, const char *format, va_list args)
-{
-    fprintf(stream, "%s:%d: %s: %s", filename, line_number, label, extra);
-    if (format && *format)
-    {
-        fputc(' ', stream);
-        fputc('-', stream);
-        fputc(' ', stream);
-        vfprintf(stream, format, args);
-    }
-    fputc('\n', stream);
-}
-
 static const char *shorten_error_mnemonic(const char *mnemonic)
 {
-    const char *leader = "LIBAMQP_ERROR_";
+    const char *leader = "AMQP_ERROR_";
+
+    if (strncmp(mnemonic, leader, strlen(leader)) != 0)
+    {
+        return mnemonic;
+    }
 
     while (*leader && *leader == *mnemonic)
     {
@@ -54,11 +45,15 @@ static const char *shorten_error_mnemonic(const char *mnemonic)
     return mnemonic;
 }
 
-void _amqp_io_error(amqp_context_t *context, int level, const char * filename, int line_number, const char *format, ...)
+void _amqp_io_error(amqp_context_t *context, int level, const char * filename, int line_number, const char *source, int error_code, const char *format, ...)
 {
-    context->error_code = errno;
+    if (error_code == -1)
+    {
+        error_code = errno;
+    }
+    context->error_code = error_code;
     
-    if (context->debug.stream && level < context->debug.level)
+    if (context->debug.outputter && level < context->debug.level)
     {
         char message[256];
         char extra[256];
@@ -68,36 +63,57 @@ void _amqp_io_error(amqp_context_t *context, int level, const char * filename, i
         snprintf(extra, sizeof(extra), "%s(%d)", message, context->error_code);
 
         va_start(args, format);
-        output_message(context->debug.stream, filename, line_number, "io error", extra, format, args);
+        (*context->debug.outputter)(&context->debug.arg, filename, line_number, context->debug.name, "io error", source, extra, format, args);
         va_end(args);
     }
 }
 
-void _amqp_error(amqp_context_t *context, int level, const char * filename, int line_number, const char *error_mnemonic, int error_code, const char *format, ...)
+void _vamqp_error(amqp_context_t *context, int level, const char *filename, int line_number, const char *source, const char *error_mnemonic, int error_code, const char *format, va_list args)
 {
     context->error_code = error_code;
 
-    if (context->debug.stream && level < context->debug.level)
+    if (context->debug.outputter && level < context->debug.level)
     {
         char extra[128];
-        va_list args;
         snprintf(extra, sizeof(extra), "%s(%d)", shorten_error_mnemonic(error_mnemonic), error_code);
 
+        (*context->debug.outputter)(&context->debug.arg, filename, line_number, context->debug.name, "error", source, extra, format, args);
+    }
+}
+
+void _amqp_error(amqp_context_t *context, int level, const char *filename, int line_number, const char *source, const char *error_mnemonic, int error_code, const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    _vamqp_error(context, level, filename, line_number, source, error_mnemonic, error_code, format, args);
+    va_end(args);
+}
+
+void _amqp_debug(amqp_context_t *context, int level, const char * filename, int line_number, const char *source, const char *function, const char *format, ...)
+{
+    if (context->debug.outputter && level < context->debug.level)
+    {
+        va_list args;
         va_start(args, format);
-        output_message(context->debug.stream, filename, line_number, "error", extra, format, args);
+        (*context->debug.outputter)(&context->debug.arg, filename, line_number, context->debug.name, "debug", source, function, format, args);
         va_end(args);
     }
 }
 
-void _amqp_debug(const amqp_context_t *context, int level, const char * filename, int line_number, const char *function, const char *format, ...)
+void _vamqp_trace(amqp_context_t *context, int level, const char *filename, int line_number, const char *source, const char *format, va_list args)
 {
-    if (context->debug.stream && level < context->debug.level)
+    if (context->debug.outputter && level < context->debug.level)
     {
-        va_list args;
-        va_start(args, format);
-        output_message(context->debug.stream, filename, line_number, "debug", function, format, args);
-        va_end(args);
+        (*context->debug.outputter)(&context->debug.arg, filename, line_number, context->debug.name, "trace", source, 0, format, args);
     }
+}
+
+void _amqp_trace(amqp_context_t *context, int level, const char *filename, int line_number, const char *source, const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    _vamqp_trace(context, level, filename, line_number, source, format, args);
+    va_end(args);
 }
 
 static void write_to_stderr(const char *buffer, size_t n)

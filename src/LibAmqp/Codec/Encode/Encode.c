@@ -139,7 +139,7 @@ static amqp_type_t *amqp_encode_fixed(amqp_context_t *context, amqp_encoding_met
 
     type = initialize_type(context, not_a_compound_type, meta_data);
 
-    type->position.index = context->encode.buffer->limit.size;
+    type->position.index = amqp_buffer_size(context->encode.buffer);
     type->position.size = meta_data->width;
 
     return type;
@@ -177,7 +177,7 @@ static amqp_type_t *amqp_encode_simple_variable(amqp_context_t *context, amqp_en
         abort();
     }
 
-    type->position.index = context->encode.buffer->limit.size;
+    type->position.index = amqp_buffer_size(context->encode.buffer);
     type->position.size = size;
     amqp_buffer_puts(context->encode.buffer, value, size);
 
@@ -200,18 +200,18 @@ static amqp_type_t *encode_compound_type(amqp_context_t *context, amqp_type_type
     switch (meta_data->width)
     {
     case 0:
-        type->position.index = context->encode.buffer->limit.size;
+        type->position.index = amqp_buffer_size(context->encode.buffer);
         break;
 
     case 1:
         amqp_unchecked_putc(context->encode.buffer, (unsigned char) 1);
-        type->position.index = context->encode.buffer->limit.size;
+        type->position.index = amqp_buffer_size(context->encode.buffer);
         amqp_unchecked_putc(context->encode.buffer, (unsigned char) 0);
         break;
 
     case 4:
         amqp_hton_uint(context, (uint32_t) 4);
-        type->position.index = context->encode.buffer->limit.size;
+        type->position.index = amqp_buffer_size(context->encode.buffer);
         amqp_hton_uint(context, (uint32_t) 0);
         break;
 
@@ -577,7 +577,7 @@ amqp_type_t *amqp_start_encode_described_type(amqp_context_t *context)
 static
 amqp_type_t *complete_container_type(amqp_context_t *context, amqp_type_t *type)
 {
-    size_t saved_buffer_write_position = context->encode.buffer->limit.size;
+    size_t saved_buffer_write_position = amqp_buffer_size(context->encode.buffer);
 
     type->position.size = saved_buffer_write_position - type->position.index;
     switch (type->meta_data->width)
@@ -592,13 +592,13 @@ amqp_type_t *complete_container_type(amqp_context_t *context, amqp_type_t *type)
 
     case 1:
         // TODO test for size/count overflow
-        context->encode.buffer->limit.size = type->position.index - 1;
+        amqp_buffer_set_write_index(context->encode.buffer, type->position.index - 1);
         amqp_unchecked_putc(context->encode.buffer, (unsigned char) type->position.size);
         amqp_unchecked_putc(context->encode.buffer, (unsigned char) type->value.compound.count);
         break;
 
     case 4:
-        context->encode.buffer->limit.size = type->position.index - 4;
+        amqp_buffer_set_write_index(context->encode.buffer, type->position.index - 4);
         amqp_hton_uint(context, (uint32_t) type->position.size);
         amqp_hton_uint(context, (uint32_t) type->value.compound.count);
         break;
@@ -607,7 +607,7 @@ amqp_type_t *complete_container_type(amqp_context_t *context, amqp_type_t *type)
         amqp_fatal_program_error("Invalid size/count field width.");
     }
 
-    context->encode.buffer->limit.size = saved_buffer_write_position;
+    amqp_buffer_set_write_index(context->encode.buffer, saved_buffer_write_position);
 
     return type;
 }
@@ -627,7 +627,7 @@ amqp_type_t *complete_empty_list(amqp_context_t *context, amqp_type_t *type)
     // write the zero list0 format code
     amqp_buffer_putc(context->encode.buffer, meta_data->format_code);
 
-    type->position.index = context->encode.buffer->limit.size;
+    type->position.index = amqp_buffer_size(context->encode.buffer);
     type->position.size = meta_data->width;
 
     return type;

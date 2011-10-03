@@ -66,8 +66,9 @@ static void _decode_error(amqp_context_t *context, amqp_type_t *type, int level,
         va_start(args, format);
         vsnprintf(message, sizeof(message), format, args);
         va_end(args);
-    
-        _amqp_error(context, level, filename, line_number, error_mnemonic, error_code, "Decode failure; %s; while decoding %s", message, description);
+
+        // TODO - pass source
+        _amqp_error(context, level, filename, line_number, 0, error_mnemonic, error_code, "Decode failure; %s; while decoding %s", message, description);
     }
 
 //    if (context->debug.level) abort();
@@ -83,6 +84,16 @@ int check_available(amqp_context_t *context, amqp_type_t *type, size_t width)
         decode_error(context, type, AMQP_ERROR_BUFFER_WOULD_OVERRUN, "Type extends past end of buffer");
     }
     return rc;
+}
+
+// TODO - revisit
+static void copy_uuid(unsigned char *uuid, amqp_buffer_t *buffer, size_t index)
+{
+    int i;
+    for (i = 0; i < 16; i++)
+    {
+        uuid[i] = amqp_unchecked_getc_at(buffer, index + i);
+    }
 }
 
 static inline
@@ -109,7 +120,7 @@ int amqp_decode_fixed_width(amqp_context_t *context, amqp_encoding_meta_data_t *
             amqp_ntoh_64(&type->value.b8, context->decode.buffer, type->position.index);
             break;
         case 16:
-            type->value.uuid = amqp_buffer_pointer(context->decode.buffer, type->position.index);
+            copy_uuid(type->value.uuid, context->decode.buffer, type->position.index);
             break;
             
         default:
@@ -278,7 +289,7 @@ int amqp_decode_uuid(amqp_context_t *context, amqp_encoding_meta_data_t *meta_da
 static
 uint32_t get_variable_type_size(amqp_context_t *context, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-    uint32_t size = amqp_buffer_read_size(context->decode.buffer, meta_data->width);
+    uint32_t size = amqp_buffer_read_size_field(context->decode.buffer, meta_data->width);
     if (size == -1)
     {
         decode_error(context, type, AMQP_ERROR_BUFFER_WOULD_OVERRUN, "Cannot read size field for a variable/compound sized type");
@@ -296,7 +307,7 @@ uint32_t get_variable_type_size(amqp_context_t *context, amqp_encoding_meta_data
 static
 uint32_t get_variable_type_count(amqp_context_t *context, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-    uint32_t count = amqp_buffer_read_size(context->decode.buffer, meta_data->width);
+    uint32_t count = amqp_buffer_read_size_field(context->decode.buffer, meta_data->width);
     if (count == -1)
     {
         decode_error(context, type, AMQP_ERROR_VARIABLE_TYPE_MALFORMED, "Cannot read count field for a compound type");

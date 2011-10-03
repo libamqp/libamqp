@@ -5,27 +5,11 @@
 #include <ev.h>
 #include "libamqp.h"
 
-// TODO - libamqp.h should include all the API declarations
+#include "Misc/IO.h"
 #include "Context/Context.h"
 #include "Transport/LowLevel/Listener.h"
 
-static int write_all(int fd, const char *buffer, size_t n)
-{
-    int count = n;
-    int written;
-    while ((written = write(fd, buffer, count)) >= 0 || errno == EINTR)
-    {
-        buffer += written;
-        count -= written;
-	if (count == 0)
-	{
-	    return n;
-	}
-    }
-    return written;
-}
-
-static int new_connection_handler(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
+static int new_connection_handler(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t address_size, amqp_accept_handler_arguments_t *arguments)
 {
     char buffer[128];
     int n;
@@ -46,7 +30,7 @@ void run(int port_number)
     struct ev_loop *loop = ev_default_loop(0);
     amqp_context_t *context = amqp_create_context();
     
-    amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(context, loop, port_number, new_connection_handler);
+    amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(context, loop, port_number, new_connection_handler, 0);
 
     ev_run(loop, 0);
 

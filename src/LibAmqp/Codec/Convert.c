@@ -24,7 +24,13 @@
 char *amqp_convert_bytes_to_cstr(amqp_context_t *c, amqp_type_t *type)
 {
     char *result = amqp_malloc(c, type->position.size + 1);
-    strncpy(result, (const char *) &amqp_type_convert_buffer(type)->bytes[type->position.index], type->position.size);
+//    strncpy(result, (const char *) &amqp_type_convert_buffer(type)->bytes[type->position.index], type->position.size);
+// TODO - block copy
+    int i, j;
+    for (i = 0, j = type->position.index; i < type->position.size; i++, j++)
+    {
+        result[i] = amqp_unchecked_getc_at(amqp_type_convert_buffer(type), j);
+    }
     return result;
 }
 

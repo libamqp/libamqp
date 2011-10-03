@@ -90,8 +90,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <section name="delivery-state">
     <type name="received" class="composite" source="list" provides="delivery-state">
       <descriptor name="amqp:received:list" code="0x00000000:0x00000023"/>
-      <field name="section-number" type="uint"/>
-      <field name="section-offset" type="ulong"/>
+      <field name="section-number" type="uint" mandatory="true"/>
+      <field name="section-offset" type="ulong" mandatory="true"/>
     </type>
     <type name="accepted" class="composite" source="list" provides="delivery-state, outcome">
       <descriptor name="amqp:accepted:list" code="0x00000000:0x00000024"/>

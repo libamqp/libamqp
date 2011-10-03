@@ -144,4 +144,9 @@ namespace t
         }
         return 1;
     }
+
+    int compare_buffers(const unsigned char *expect, size_t expect_size, amqp_buffer_t *buffer)
+    {
+        return compare_buffers(expect, expect_size, amqp_buffer_pointer(buffer, 0), amqp_buffer_size(buffer));
+    }
 }

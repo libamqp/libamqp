@@ -21,6 +21,8 @@
 
 #include <TestHarness.h>
 
+#include "Buffer/Buffer.h"
+
 #include "Codec/Decode/Decode.h"
 #include "Codec/Encode/Encode.h"
 #include "Codec/Type/Type.h"
@@ -55,6 +57,7 @@ namespace t
     void dump_type_buffer(amqp_type_t *type);
 
     int compare_buffers(const unsigned char *lhs, size_t lhs_size, const unsigned char *rhs, size_t rhs_size);
+    int compare_buffers(const unsigned char *expect, size_t expect_size, amqp_buffer_t *buffer);
 }
 
 #define ASSERT_VALID(type)  \
@@ -65,8 +68,8 @@ namespace t
     CHECK_NOT_NULL(type); \
     CHECK(!amqp_type_is_valid(type))
 
-#define ASSERT_BUFFERS_MATCH(context, byte_array) \
-     CHECK(t::compare_buffers(byte_array.bytes(), byte_array.size(), context->bytes, context->limit.size))
+#define ASSERT_BUFFERS_MATCH(buffer, byte_array) \
+     CHECK(t::compare_buffers(byte_array.bytes(), byte_array.size(), buffer))
 
 #define CHECK_ARRAY(type) \
     CHECK(amqp_type_is_container(type)); \

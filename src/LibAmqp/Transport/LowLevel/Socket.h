@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_SOCKET_H
-#define LIBAMQP_TRANSPORT_SOCKET_H
+#ifndef LIBAMQP_TRANSPORT_LOW_LEVEL_SOCKET_H
+#define LIBAMQP_TRANSPORT_LOW_LEVEL_SOCKET_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,9 +30,15 @@ extern "C" {
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 
 extern void bzero(void *block, size_t n);
+extern void amqp_socket_address_tos(char *buffer, size_t buffer_size, struct sockaddr_storage *client_address, socklen_t address_size);
+extern int amqp_socket_address_port(struct sockaddr_storage *client_address, socklen_t address_size);
+extern int amqp_socket_shutdown_output(int fd);
 
 inline static
 int amqp_set_socket_option(int fd, int option, int value)
@@ -49,7 +55,7 @@ int amqp_set_socket_to_nonblocking(int fd)
     {
         return -1;
     }
-    return fcntl(fd, F_SETFL, flags |O_NONBLOCK);
+    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
 inline static

@@ -32,7 +32,7 @@ SUITE(Transport)
         amqp_context_t *context = amqp_create_context();
 
         struct ev_loop *loop = ev_default_loop(0);
-        amqp_event_thread_t *event_thread = amqp_event_thread_initialize(context, event_thread_handler, loop, 0);
+        amqp_event_thread_t *event_thread = amqp_event_thread_initialize(context, event_thread_handler, loop, 0, "evt");
 
         int thread_allocations_ok = amqp_event_thread_destroy(context, event_thread);
         CHECK(thread_allocations_ok);
@@ -44,11 +44,11 @@ SUITE(Transport)
     TEST_FIXTURE(EventThreadFixture, event_thread_providing_loop)
     {
         struct ev_loop *loop = ev_default_loop(0);
-        m_event_thread = amqp_event_thread_initialize(context, EventThreadFixture::basic_event_thread_handler, loop, 0);
+        m_event_thread = amqp_event_thread_initialize(context, EventThreadFixture::basic_event_thread_handler, loop, 0, "evt");
     }
 
     TEST_FIXTURE(EventThreadFixture, event_thread_without_loop)
     {
-        m_event_thread = amqp_event_thread_initialize(context, EventThreadFixture::basic_event_thread_handler, 0, 0);
+        m_event_thread = amqp_event_thread_initialize(context, EventThreadFixture::basic_event_thread_handler, 0, 0, "evt");
     }
 }

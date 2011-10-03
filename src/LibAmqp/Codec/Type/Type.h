@@ -82,7 +82,7 @@ struct amqp_type_t
         amqp_four_byte_t b4;
         amqp_two_byte_t b2;
         amqp_one_byte_t b1;
-        const unsigned char *uuid;
+        unsigned char uuid[16];
         struct {
             size_t count;
             amqp_type_t **elements;

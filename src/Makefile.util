@@ -1,7 +1,11 @@
 scrub: 
 	find . \( -name \*.[aodsi] -or -name \*.orig \) -print | xargs rm -f
 	find ../3rd-party -name \*.[aodsi] -print | xargs rm -f
+	find . \( -name \*.gcov -o -name \*.gcda -o -name \*.gcno \) -print | xargs rm -f
 	rm -f src/TestRunner src/decode-demo src/test-runner
 
 scrub-asm: 
 	find . \( -name \*.s -or -name \*.orig \) -print | xargs rm -f
+
+scrub-cpp: 
+	find . -name \*.i -print | xargs rm -f

@@ -22,24 +22,21 @@ extern "C" {
 #endif
 
 #include "libamqp_common.h"
-#include "Transport/LowLevel/EventLoop.h"
+#include "Transport/LowLevel/ListenerThread.h"
+#include "Transport/Connection/ConnectionTestHook.h"
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
 #endif
 
-#ifndef LIBAMQP_AMQP_EVENT_THREAD_TYPE_T
-#define LIBAMQP_AMQP_EVENT_THREAD_TYPE_T
-typedef struct amqp_event_thread_t amqp_event_thread_t;
-#endif
-
 typedef struct amqp_dummy_broker_t
 {
-    amqp_event_thread_t *thread;
+    amqp_accept_handler_arguments_t *accept_handler_arguments;
+    amqp_listener_thread_t *listener_thread;
 } amqp_dummy_broker_t;
 
-extern amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context, int listen_port_number, amqp_accept_event_handle_t accept_handler);
+extern amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context, int listen_port_number, amqp_connection_test_hook_t *test_hooks);
 extern void amqp_dummy_broker_destroy(amqp_context_t *context, amqp_dummy_broker_t *broker);
 
 #ifdef __cplusplus

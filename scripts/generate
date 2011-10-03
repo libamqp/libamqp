@@ -1,0 +1,6 @@
+#!/bin/bash
+
+base=$(dirname "$0")
+
+${base}/generate.rb ${base}/../Documentation/amqp-xml/transport.bare.xml > ${base}/../src/LibAmqp/Amqp/AmqpTransport.h
+${base}/generate.rb ${base}/../Documentation/amqp-xml/security.bare.xml > ${base}/../src/LibAmqp/Amqp/AmqpSecurity.h

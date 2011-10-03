@@ -26,8 +26,8 @@ SUITE(SlowRunning)
     public:
         TimerFixture()
         {
-            context->loop = ev_default_loop(0);
-            timer = amqp_timer_initialize(context, TimerFixture::expiry_handler);
+            context->thread_event_loop = ev_default_loop(0);
+            timer = amqp_timer_initialize(context, TimerFixture::expiry_handler, 0);
         }
         ~TimerFixture()
         {
@@ -41,7 +41,7 @@ SUITE(SlowRunning)
 
     void TimerFixture::expiry_handler(amqp_context_t *context, amqp_timer_t *timer)
     {
-        ev_break(context->loop);
+        ev_break(context->thread_event_loop, EVBREAK_ONE);
     }
 
     TEST_FIXTURE(TimerFixture, fixture_should_not_cause_an_error)
@@ -52,8 +52,8 @@ SUITE(SlowRunning)
     {
         ev_tstamp start = ev_time();
         amqp_timer_start(context, timer, 1.0);
-        ev_run(context->loop, 0);
-        ev_tstamp now = ev_now(context->loop);
+        ev_run(context->thread_event_loop, 0);
+        ev_tstamp now = ev_now(context->thread_event_loop);
         CHECK_CLOSE(1.0, now - start, 0.1);
     }
 }

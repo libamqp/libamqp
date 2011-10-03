@@ -33,8 +33,8 @@ namespace SuiteContext
 
     ContextFixture::~ContextFixture()
     {
-        int allocations_ok = amqp_context_destroy(context);
-        CHECK(allocations_ok);
+        int memory_allocations_ok = amqp_context_destroy(context);
+        CHECK(memory_allocations_ok);
     }
 
     void ContextFixture::load_decode_buffer(test_data::TestData &data)

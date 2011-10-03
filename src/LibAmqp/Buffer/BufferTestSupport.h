@@ -42,12 +42,12 @@ namespace SuiteBuffer
         amqp_buffer_t *buffer;
     };
 }
+
 namespace t
 {
     void amqp_buffer_dump_fragment(amqp_context_t* context, amqp_buffer_t *buffer, size_t start, size_t end);
     void amqp_buffer_dump(amqp_context_t* context, amqp_buffer_t *buffer);
 }
-
 #endif
 
 

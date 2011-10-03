@@ -25,13 +25,26 @@ extern "C" {
 
 #define AMQP_DEFAULT_PORT           5672
 #define AMQP_DEFAULT_SECURE_PORT    5671
+
+#define AMQP_PROTOCOL_ID            0
 #define AMQP_PROTOCOL_MAJOR         1
 #define AMQP_PROTOCOL_MINOR         0
-#define AMQP_PROTOCOL_REVISION      1
+#define AMQP_PROTOCOL_REVISION      0
+
+#define AMQP_TLS_PROTOCOL_ID        2
+#define AMQP_TLS_PROTOCOL_MAJOR         1
+#define AMQP_TLS_PROTOCOL_MINOR         0
+#define AMQP_TLS_PROTOCOL_REVISION      0
+
+#define AMQP_SASL_PROTOCOL_ID       3
+#define AMQP_SASL_PROTOCOL_MAJOR         1
+#define AMQP_SASL_PROTOCOL_MINOR         0
+#define AMQP_SASL_PROTOCOL_REVISION      0
+
 #define AMQP_MIN_MAX_FRAME_SIZE     512
+#define AMQP_FRAME_HEADER_SIZE      8
 
 // TODO - external API signatures go here
-
 
 #ifdef __cplusplus
 }

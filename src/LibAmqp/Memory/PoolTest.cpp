@@ -29,7 +29,7 @@ SUITE(Pool)
         amqp_deallocate(&m_context, &pool, p);
     }
 
-#ifdef DISABLE_MEMORY_POOL
+#ifdef LIBAMQP_DISABLE_MEMORY_POOL
     TEST_FIXTURE(InitializedPoolFixture, verify_allocation_works_when_pool_disabled)
     {
         test_type_t *p, *q;
@@ -148,7 +148,6 @@ SUITE(Pool)
 
     TEST_FIXTURE(BlockChainingTestFixture, allocation_beyond_block_capacity_should_allocate_another_block_256)
     {
-        // break_one();
         initialize_pool(256);
         test();
     }

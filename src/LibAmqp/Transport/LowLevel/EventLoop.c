@@ -32,7 +32,8 @@ void amqp_io_event_watcher_start(amqp_io_event_watcher_t *watcher)
 
 void amqp_io_event_watcher_stop(amqp_io_event_watcher_t *watcher)
 {
-    assert(watcher != 0 && watcher->loop != 0);
+    assert(watcher != 0);
+    assert(watcher->loop != 0);
     ev_io_stop(watcher->loop, &watcher->io);
 }
 
