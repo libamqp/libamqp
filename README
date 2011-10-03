@@ -24,6 +24,9 @@ Libamqp has a dependency on Libev (see: http://software.schmorp.de/pkg/libev.htm
 Details on the licensing of livev are in: 3rd-party/libev-4_4/LICENSE.
 Currently you must have libev installed on your system to build or use libamqp.
 
+Libamqp uses Paul Hsieh's SuperFastHast (see: http://www.azillionmonkeys.com/qed/hash.html)
+Details on the licensing of SuperFastHast are in: 3rd-party/PaulHsieh/LICENSE.
+
 See src/?? for usage.
 
 Authors:
