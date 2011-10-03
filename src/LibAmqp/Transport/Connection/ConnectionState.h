@@ -32,6 +32,7 @@ extern "C" {
 #include "Transport/Connection/ConnectionTls.h"
 #include "Transport/Connection/ConnectionSasl.h"
 #include "Transport/Connection/ConnectionAmqp.h"
+#include "Transport/Connection/ConnectionFrame.h"
 
 #ifndef LIBAMQP_BUFFER_T_TYPE
 #define LIBAMQP_BUFFER_T_TYPE
