@@ -29,9 +29,14 @@ extern "C" {
 typedef struct amqp_context_t amqp_context_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_FRAME_TYPE_T
+#define LIBAMQP_AMQP_FRAME_TYPE_T
+typedef struct amqp_frame_t amqp_frame_t;
+#endif
+
 #define AMQP_FRAME_HEADER_DATA_OFFSET_MULTIPLIER 4
 
-typedef struct amqp_frame_t
+struct amqp_frame_t
 {
     uint32_t data_offset;
     uint8_t frame_type;
@@ -39,8 +44,7 @@ typedef struct amqp_frame_t
         uint16_t word;
         uint16_t channel;
     } type_specific;
-}
-amqp_frame_t;
+};
 
 extern amqp_type_t *amqp_encode_open_frame(amqp_context_t *context);
 
