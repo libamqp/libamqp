@@ -30,8 +30,6 @@ SUITE(ConnectionFrame)
 
         static void write_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback);
         static void read_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f done_callback);
-        static void hangup_intercept(amqp_connection_t *connection);
-
         static void done_callback(amqp_connection_t *connection);
 
         static test_data::TestData *test_data_p;
@@ -52,24 +50,21 @@ SUITE(ConnectionFrame)
 
     ConnectionFrameFixture::~ConnectionFrameFixture()
     {
-        amqp_connection_destroy(context, connection); // TODO - intercept hangup
-
+        amqp_connection_destroy(context, connection);
         amqp_deallocate_buffer(context, buffer);
     }
 
     void ConnectionFrameFixture::write_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback)
     {
-        SOUTS("write_intercept called");
+//        SOUTS("write_intercept called");
         not_implemented(todo);
     }
     void ConnectionFrameFixture::read_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f done_callback)
     {
-        SOUTS("read_intercept called");
-        SOUTV(required);
+//        SOUTS("read_intercept called");
+//        SOUTV(required);
         if (test_data_p)
         {
-            SOUTS("read_done callback called");
-
             size_t index = amqp_buffer_index(buffer);
             size_t size = amqp_buffer_size(buffer) + required;
             amqp_buffer_reset(buffer);
@@ -80,15 +75,9 @@ SUITE(ConnectionFrame)
             done_callback(connection, required);
         }
     }
-
-    void ConnectionFrameFixture::hangup_intercept(amqp_connection_t *connection)
-    {
-        SOUTS("hangup called");
-    }  
     
     void ConnectionFrameFixture::done_callback(amqp_connection_t *connection)
     {
-        SOUTS("done_callback called");
     }
 
     TEST_FIXTURE(ConnectionFrameFixture, fixture_should_balance_allocations)
@@ -116,30 +105,21 @@ SUITE(ConnectionFrame)
         CHECK_EQUAL("Stopped", connection->state.frame.name);
     }
 
-    TEST_FIXTURE(ConnectionFrameFixture, read)
+    TEST_FIXTURE(ConnectionFrameFixture, read_minimal_frame)
     {
         ConnectionFrameFixture::test_data_p = &test_data::minimal_frame_header;
-
         connection->state.frame.enable(connection);
         connection->state.frame.read(connection, buffer, 8, done_callback);
-
         CHECK_EQUAL("Enabled", connection->state.frame.name);
         CHECK_EQUAL(8U, connection->io.frame.frame_size);
     }
 
-//    TEST_FIXTURE(ConnectionFrameFixture, enable_frame)
-//    {
-//        connection->state.frame.enable(connection, AMQP_PREFERRED_VERSION, ConnectionFrameFixture::done_callback, ConnectionFrameFixture::reject_callback);
-//        CHECK_EQUAL("Negotiated", connection->state.negotiator.name);
-//    }
-
-//    TEST_FIXTURE(ConnectionFrameFixture, broker_response)
-//    {
-//        connection->state.writer.commence_write = write_intercept;
-//        connection->state.reader.commence_read = read_intercept;
-//
-//        connection->state.negotiator.wait(connection, request_callback);
-//        CHECK_EQUAL("WaitToSendServerResponse", connection->state.negotiator.name);
-//    }
-
+    TEST_FIXTURE(ConnectionFrameFixture, read_frame)
+    {
+        ConnectionFrameFixture::test_data_p = &test_data::sasl_mechanisms_frame;
+        connection->state.frame.enable(connection);
+        connection->state.frame.read(connection, buffer, 8, done_callback);
+        CHECK_EQUAL("Enabled", connection->state.frame.name);
+        CHECK_EQUAL(0x23U, connection->io.frame.frame_size);
+    }
 }

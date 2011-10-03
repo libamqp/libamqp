@@ -22,6 +22,7 @@
 namespace test_data
 {
     extern TestData minimal_frame_header;
+    extern TestData sasl_mechanisms_frame;
 }
 #endif
 
