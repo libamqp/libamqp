@@ -44,6 +44,9 @@ extern "C" {
 #define AMQP_MIN_MAX_FRAME_SIZE     512
 #define AMQP_FRAME_HEADER_SIZE      8
 
+#define AMQP_FRAME_TYPE         0x00
+#define AMQP_SASL_FRAME_TYPE    0x01
+
 #define AMQP_DEFAULT_MAX_FRAME_SIZE ((uint32_t) ((1 << 24) - 1))
 
 // TODO - external API signatures go here
