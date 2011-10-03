@@ -20,11 +20,14 @@
 
 namespace SuiteFrame
 {
-    FrameFixture::FrameFixture()
+    FrameFixture::FrameFixture() : frame(0)
     {
+        buffer = amqp_allocate_buffer(context);
     }
 
     FrameFixture::~FrameFixture()
     {
+        amqp_deallocate_buffer(context, buffer);
+        amqp_deallocate_frame(context, frame);
     }
 }

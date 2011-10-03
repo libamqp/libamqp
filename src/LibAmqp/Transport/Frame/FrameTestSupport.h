@@ -31,6 +31,8 @@ namespace SuiteFrame
         ~FrameFixture();
 
     public:
+        amqp_frame_t *frame;
+        amqp_buffer_t *buffer;
     };
 
 }

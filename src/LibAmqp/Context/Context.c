@@ -160,6 +160,16 @@ void amqp_deallocate_buffer(amqp_context_t *context, amqp_buffer_t *buffer)
     amqp_deallocate(context, &context->memory.amqp_buffer_t_pool, buffer);
 }
 
+amqp_frame_t *amqp_allocate_frame(amqp_context_t *context)
+{
+    return (amqp_frame_t *) amqp_allocate(context, &context->memory.amqp_frame_t_pool);
+}
+
+void amqp_deallocate_frame(amqp_context_t *context, amqp_frame_t *frame)
+{
+    amqp_deallocate(context, &context->memory.amqp_frame_t_pool, frame);
+}
+
 // TODO - lock error output stream
 void amqp_stream_outputter(amqp_outputter_arg_t *dest, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format,
         va_list args)
