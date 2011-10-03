@@ -15,6 +15,7 @@ MODULES := \
         DecodeDemo \
         SampleServer \
 	../3rd-party/UnitTest++/src  \
+	../3rd-party/PaulHsieh/src \
 	Test
 
 CC=gcc
