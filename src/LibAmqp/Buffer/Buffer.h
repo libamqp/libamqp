@@ -31,11 +31,6 @@ extern "C" {
 typedef struct amqp_buffer_t amqp_buffer_t;
 #endif
 
-#ifndef LIBAMQP_STREAM_T_TYPE
-#define LIBAMQP_STREAM_T_TYPE
-typedef struct amqp_stream_t amqp_stream_t;
-#endif
-
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
@@ -57,9 +52,6 @@ extern int amqp_buffer_put_buffer_contents(amqp_buffer_t *desc, amqp_buffer_t *s
 extern uint32_t amqp_buffer_read_size_field(amqp_buffer_t *buffer, size_t width);
 
 extern void amqp_buffer_backup(amqp_buffer_t *buffer, size_t amount);
-
-extern int amqp_buffer_read_from_stream(amqp_buffer_t *buffer, amqp_stream_t *stream, int n);
-extern int amqp_buffer_write_to_stream(amqp_buffer_t *buffer, amqp_stream_t *stream);
 
 /* get an iovec for writing into the buffer for use by the readv call */
 extern struct iovec *amqp_buffer_write_io_vec(amqp_buffer_t *buffer, size_t n, int *iov_count);

@@ -38,8 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                        +(uint32_t)(((const uint8_t *)(d))[0]) )
 #endif
 
+#ifndef NULL
+#define NULL    ((void *) 0)
+#endif
+
 // More commonly known as SuperFastHash
-uint32_t amqp_hash (const char * data, int len) {
+uint32_t amqp_hash (const char * data, int len)
+{
 uint32_t hash = len, tmp;
 int rem;
 

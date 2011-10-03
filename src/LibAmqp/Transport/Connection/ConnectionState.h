@@ -158,11 +158,20 @@ typedef struct amqp_connection_amqp_state_t
     amqp_connection_tunnel_actions_t tunnel;
 } amqp_connection_amqp_state_t;
 
-typedef struct amqp_connection_write_command_t // TODO - ?
+//typedef struct amqp_connection_write_command_t // TODO - ?
+//{
+//    amqp_buffer_t *buffer;
+//    amqp_connection_action_f callback;
+//} amqp_connection_write_command_t;
+
+typedef struct amqp_connection_frame_reader_state_t
 {
-    amqp_buffer_t *buffer;
-    amqp_connection_action_f callback;
-} amqp_connection_write_command_t;
+    const char *name;
+    amqp_connection_action_f enable;
+    void (*read)(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_action_f done_callback);
+    amqp_connection_read_callback_f read_done;
+    amqp_connection_action_f stop;
+} amqp_connection_frame_reader_state_t;
 
 typedef struct amqp_connection_state_t
 {
@@ -243,6 +252,7 @@ struct amqp_connection_t
         amqp_connection_amqp_state_t amqp;
 
         amqp_connection_negotiator_state_t negotiator;
+        amqp_connection_frame_reader_state_t frame;
 
         amqp_connection_action_f stopped_hook;  // not used by SM
     } state;
