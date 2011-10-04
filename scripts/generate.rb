@@ -113,11 +113,11 @@ class Parser
     puts("    amqp_property_fields_t properties;") if  name == 'properties' and type == 'fields'
   end
   def typedefs(n)
-    name = n.attributes['name']
+    name = n.attributes['name'].gsub(/-/, '_')
     puts "typedef struct amqp_frame_#{name}_t amqp_frame_#{name}_t;"
   end 
   def frame(n)
-    name = n.attributes['name']
+    name = n.attributes['name'].gsub(/-/, '_')
     puts "struct amqp_frame_#{name}_t {"
     n.elements.each('field') {|f| field(f) }
     puts "};"

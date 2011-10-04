@@ -18,27 +18,27 @@
     
 #include "Amqp/Types.h"
     
-typedef struct amqp_frame_sasl-mechanisms_t amqp_frame_sasl-mechanisms_t;
-typedef struct amqp_frame_sasl-init_t amqp_frame_sasl-init_t;
-typedef struct amqp_frame_sasl-challenge_t amqp_frame_sasl-challenge_t;
-typedef struct amqp_frame_sasl-response_t amqp_frame_sasl-response_t;
-typedef struct amqp_frame_sasl-outcome_t amqp_frame_sasl-outcome_t;
+typedef struct amqp_frame_sasl_mechanisms_t amqp_frame_sasl_mechanisms_t;
+typedef struct amqp_frame_sasl_init_t amqp_frame_sasl_init_t;
+typedef struct amqp_frame_sasl_challenge_t amqp_frame_sasl_challenge_t;
+typedef struct amqp_frame_sasl_response_t amqp_frame_sasl_response_t;
+typedef struct amqp_frame_sasl_outcome_t amqp_frame_sasl_outcome_t;
 
-struct amqp_frame_sasl-mechanisms_t {
+struct amqp_frame_sasl_mechanisms_t {
     amqp_multiple_symbol_t sasl_server_mechanisms; /* mandatory; */
 };
-struct amqp_frame_sasl-init_t {
+struct amqp_frame_sasl_init_t {
     amqp_symbol_t mechanism; /* mandatory; */
     amqp_binary_t initial_response; 
     amqp_string_t hostname; 
 };
-struct amqp_frame_sasl-challenge_t {
+struct amqp_frame_sasl_challenge_t {
     amqp_binary_t challenge; /* mandatory; */
 };
-struct amqp_frame_sasl-response_t {
+struct amqp_frame_sasl_response_t {
     amqp_binary_t response; /* mandatory; */
 };
-struct amqp_frame_sasl-outcome_t {
+struct amqp_frame_sasl_outcome_t {
     amqp_sasl_code_t code; /* mandatory; */
     amqp_binary_t additional_data; 
 };
