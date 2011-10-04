@@ -7,6 +7,7 @@ MODULES := \
 	LibAmqp/TestData \
 	LibAmqp \
 	LibAmqp/Misc \
+	LibAmqp/AmqpTypes \
 	LibAmqp/Buffer \
 	LibAmqp/Memory \
 	LibAmqp/Context \
