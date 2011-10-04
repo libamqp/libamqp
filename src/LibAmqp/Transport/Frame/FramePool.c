@@ -19,13 +19,25 @@
 
 #include "debug_helper.h"
 
-amqp_frame_t *amqp_decode_frame(amqp_context_t *context, amqp_buffer_t *buffer)
+static
+void amqp_initialize_amqp_frame_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_frame_t *type)
 {
-    amqp_frame_t *result = amqp_allocate_frame(context);
+    assert(pool != 0);
+    assert(type != 0);
 
-    result->data_offset = ((uint32_t) amqp_buffer_read_uint8(buffer, 4)) * AMQP_FRAME_HEADER_DATA_OFFSET_MULTIPLIER;
-    result->frame_type = amqp_buffer_read_uint8(buffer, 5);
-    result->type_specific.word = amqp_buffer_read_uint16(buffer, 6);
-
-    return result;
 }
+
+static
+void amqp_cleanup_amqp_frame_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_frame_t *type)
+{
+    assert(pool != 0);
+    assert(type != 0);
+
+}
+
+void amqp_frame_initialize_pool(amqp_memory_pool_t *pool)
+{
+    amqp_initialize_pool_suggesting_block_size(pool, sizeof(amqp_type_t), 2048);
+    amqp_pool_specify_initialization_callbacks(pool, (amqp_pool_callback_t) amqp_initialize_amqp_frame_t, (amqp_pool_callback_t) amqp_cleanup_amqp_frame_t);
+}
+

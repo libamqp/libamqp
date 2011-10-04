@@ -46,7 +46,7 @@ struct amqp_frame_t
     } type_specific;
 };
 
-extern amqp_type_t *amqp_encode_open_frame(amqp_context_t *context);
+extern amqp_frame_t *amqp_decode_frame(amqp_context_t *context, amqp_buffer_t *buffer);
 
 #ifdef __cplusplus
 }

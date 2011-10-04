@@ -23,4 +23,13 @@ SUITE(Frame)
     TEST_FIXTURE(FrameFixture, fixture_should_balance_allocations)
     {
     }
+
+    TEST_FIXTURE(FrameFixture, decode_minimal_frame)
+    {
+        test_data::minimal_frame_header.transfer_to(buffer);
+        frame = amqp_decode_frame(context, buffer);
+        CHECK_EQUAL(8U, frame->data_offset);
+        CHECK_EQUAL(0U, frame->frame_type);
+        CHECK_EQUAL(1U, frame->type_specific.word);
+    }
 }

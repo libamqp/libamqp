@@ -19,8 +19,8 @@
 
 #include "libamqp_common.h"
 #include "Context/ContextTestSupport.h"
-
 #include "Transport/Frame/Frame.h"
+#include "TestData/TestFrames.h"
 
 namespace SuiteFrame
 {
@@ -34,6 +34,5 @@ namespace SuiteFrame
         amqp_frame_t *frame;
         amqp_buffer_t *buffer;
     };
-
 }
 #endif
