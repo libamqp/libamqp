@@ -31,6 +31,9 @@ SUITE(Frame)
         CHECK_EQUAL(8U, frame->data_offset);
         CHECK_EQUAL(0U, frame->frame_type);
         CHECK_EQUAL(1U, frame->type_specific.word);
+
+        CHECK_EQUAL(8U, amqp_buffer_index(buffer));
+        CHECK_EQUAL(0, amqp_buffer_available(buffer));
     }
 
     TEST_FIXTURE(FrameFixture, decode_sasl_mechanisms_frame)
@@ -40,5 +43,7 @@ SUITE(Frame)
         CHECK_EQUAL(8U, frame->data_offset);
         CHECK_EQUAL(0U, frame->frame_type);
         CHECK_EQUAL(0U, frame->type_specific.word);
+
+
     }
 }
