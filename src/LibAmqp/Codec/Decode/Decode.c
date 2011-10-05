@@ -430,7 +430,7 @@ int amqp_decode_described_type(amqp_context_t *context, amqp_encoding_meta_data_
     type->value.described.count = 2;
     type->value.described.elements = amqp_allocate_amqp_type_t_array(context, 2);
 
-    descriptor = amqp_decode(context);
+    descriptor = amqp_decode(context, context->decode.buffer);
     if (descriptor)
     {
         type->value.described.elements[0] = descriptor;
@@ -443,7 +443,7 @@ int amqp_decode_described_type(amqp_context_t *context, amqp_encoding_meta_data_
         return false;
     }
 
-    described = amqp_decode(context);
+    described = amqp_decode(context, context->decode.buffer);
     if (described)
     {
         type->value.described.elements[1] = described;
@@ -489,7 +489,7 @@ int amqp_decode_list_list(amqp_context_t *context, amqp_encoding_meta_data_t *me
         type->value.list.elements = amqp_allocate_amqp_type_t_array(context, count);
         for (i = 0; i < count; i++)
         {
-            amqp_type_t *element = amqp_decode(context);
+            amqp_type_t *element = amqp_decode(context, context->decode.buffer);
             if (element)
             {
                 type->value.list.elements[i] = element;
@@ -545,7 +545,7 @@ static int amqp_decode_map_map(amqp_context_t *context, amqp_encoding_meta_data_
         type->value.map.entries = amqp_allocate_amqp_type_t_array(context, count);
         for (i = 0; i < type->value.map.count; i++)
         {
-            amqp_type_t *entry = amqp_decode(context);
+            amqp_type_t *entry = amqp_decode(context, context->decode.buffer);
             entry->flags.is_contained = true;
             type->value.map.entries[i] = entry;
         }
@@ -580,7 +580,7 @@ static int amqp_decode_array(amqp_context_t *context, amqp_encoding_meta_data_t 
         type->value.array.count = count;
         type->value.array.elements = amqp_allocate_amqp_type_t_array(context, count);
 
-        element_type = amqp_decode(context);
+        element_type = amqp_decode(context, context->decode.buffer);
         element_type->flags.is_contained = true;
 
         type->value.array.elements[0] = element_type;
@@ -662,14 +662,16 @@ amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_type_t *arr
     return type;
 }
 
-amqp_type_t *amqp_decode(amqp_context_t *context)
+amqp_type_t *amqp_decode(amqp_context_t *context, amqp_buffer_t *buffer)
 {
     amqp_type_t *type;
+    amqp_buffer_t *old = context->decode.buffer;
 
-    if (amqp_buffer_at_end(context->decode.buffer))
+    if (amqp_buffer_at_end(buffer))
     {
         return NULL;
     }
+    context->decode.buffer = buffer;
 
     type = amqp_allocate_type(context);
     type->context = context;
@@ -681,6 +683,7 @@ amqp_type_t *amqp_decode(amqp_context_t *context)
         decode_type_into_result(context, type);
     }
 
+    context->decode.buffer = old;
     return type;
 }
 
@@ -690,7 +693,7 @@ amqp_type_t *amqp_decode_supress_messages(amqp_context_t *context)
     int debug_level = context->debug.level;
 
     context->debug.level = 0;
-    result = amqp_decode(context);
+    result = amqp_decode(context, context->decode.buffer);
     context->debug.level = debug_level;
     
     return result;

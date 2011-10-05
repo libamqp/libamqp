@@ -41,7 +41,7 @@ SUITE(StringDecoder)
     TEST_FIXTURE(DecodeFixture, UTF8String)
     {
         load_decode_buffer(test_data::hello_world);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xa1, type->format_code);
@@ -53,7 +53,7 @@ SUITE(StringDecoder)
     TEST_FIXTURE(DecodeFixture, LongUtf8String)
     {
         load_decode_buffer(test_data::hello_big_world);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xb1, type->format_code);

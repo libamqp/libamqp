@@ -70,7 +70,7 @@ SUITE(CodecEncode)
 
         amqp_buffer_put_buffer_contents(context->decode.buffer, context->encode.buffer);
         deallocate_type(type);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
         CHECK(check_valid_array());
 
         CHECK(amqp_convert_to_boolean(type->value.array.elements[0]));

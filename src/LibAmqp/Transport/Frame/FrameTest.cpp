@@ -46,7 +46,7 @@ SUITE(Frame)
         CHECK_EQUAL(AMQP_SASL_FRAME_TYPE, frame->frame_type);
         CHECK_EQUAL(0U, frame->type_specific.word);
 
-        CHECK_EQUAL(amqp_sasl_mechanism_frame, frame->selector);
+//        CHECK_EQUAL(amqp_sasl_mechanism_frame, frame->selector);
 
         CHECK_EQUAL(amqp_empty_frame, frame->selector);
     }

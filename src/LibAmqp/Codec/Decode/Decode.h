@@ -23,12 +23,17 @@ extern "C" {
 #include "Codec/Convert.h"
 #include "Codec/Type/Type.h"
 
+#ifndef LIBAMQP_BUFFER_T_TYPE
+#define LIBAMQP_BUFFER_T_TYPE
+typedef struct amqp_buffer_t amqp_buffer_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
 #endif
 
-extern amqp_type_t *amqp_decode(amqp_context_t *);
+extern amqp_type_t *amqp_decode(amqp_context_t *context, amqp_buffer_t *buffer);
 extern amqp_type_t *amqp_decode_supress_messages(amqp_context_t *context);
 
 // validate functions

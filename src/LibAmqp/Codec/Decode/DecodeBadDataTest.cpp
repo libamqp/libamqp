@@ -35,7 +35,7 @@ SUITE(BadDataDecoder)
     TEST_FIXTURE(DecodeFixture, EndOfBuffer)
     {
         load_decode_buffer(test_data::empty_buffer);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
         CHECK_NULL(type);
     }
 

@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
         amqp_buffer_putc(context->decode.buffer, c);
     }
 
-    type = amqp_decode(context);
+    type = amqp_decode(context, context->decode.buffer);
     amqp_type_print_formatted(type);
 
     amqp_deallocate_type(context, type);

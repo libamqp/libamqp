@@ -89,7 +89,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, utf8_string)
     {
         load_decode_buffer(test_data::utf8_string);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type();
@@ -99,7 +99,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, utf8_string_formatted)
     {
         load_decode_buffer(test_data::utf8_string);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type_formatted();
@@ -109,7 +109,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, ubyte)
     {
         load_decode_buffer(test_data::neg_ubyte_1);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type();
@@ -119,7 +119,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, byte)
     {
         load_decode_buffer(test_data::byte_1);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type();
@@ -129,7 +129,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, ushort)
     {
         load_decode_buffer(test_data::ushort_2);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type();
@@ -139,7 +139,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, short)
     {
         load_decode_buffer(test_data::short_2);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type();
@@ -149,7 +149,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, Float)
     {
         load_decode_buffer(test_data::float_4);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type();
@@ -159,7 +159,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, Double)
     {
         load_decode_buffer(test_data::double_8);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type();
@@ -169,7 +169,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, Symbol)
     {
         load_decode_buffer(test_data::foo_bar_symbol_32);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type();
@@ -199,7 +199,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, PrintUdid)
     {
         load_decode_buffer(test_data::uuid_16);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type();
@@ -209,7 +209,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, PrintChar)
     {
         load_decode_buffer(test_data::utf32_char);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
 
@@ -219,7 +219,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, SmallArray)
     {
         load_decode_buffer(test_data::array_shorts);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         ASSERT_VALID(type->value.array.elements[0]);
@@ -232,7 +232,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, List)
     {
         load_decode_buffer(test_data::list);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         CHECK_LIST(type);
@@ -244,7 +244,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, empty_list)
     {
         load_decode_buffer(test_data::empty_list_8);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         CHECK_LIST(type);
@@ -256,7 +256,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, empty_list_0)
     {
         load_decode_buffer(test_data::empty_list_0);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         CHECK_LIST(type);
@@ -268,7 +268,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, Map)
     {
         load_decode_buffer(test_data::map);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         CHECK_MAP(type);
@@ -280,7 +280,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, TimeStamp)
     {
         load_decode_buffer(test_data::timestamp_8);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type();
@@ -291,7 +291,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, TimeStamp2)
     {
         load_decode_buffer(test_data::timestamp_before_epoc_8);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         print_type();
@@ -302,7 +302,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, BooleanTrue)
     {
         load_decode_buffer(test_data::true_0);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
 
@@ -313,7 +313,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, BooleanFalse)
     {
         load_decode_buffer(test_data::false_0);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
 
@@ -324,7 +324,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, BooleanOneByteEncodingTrueValue)
     {
         load_decode_buffer(test_data::true_1);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
 
@@ -335,7 +335,7 @@ SUITE(TypePrint)
     TEST_FIXTURE(TypePrintFixture, BooleanOneByteEncodingFalseValue)
     {
         load_decode_buffer(test_data::false_1);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
 

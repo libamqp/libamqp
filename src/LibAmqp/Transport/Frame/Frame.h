@@ -43,7 +43,7 @@ enum amqp_frame_types_t {
 
 typedef enum amqp_frame_type_type_t
 {
-    amqp_empty_frame,
+    amqp_empty_frame = 1,
     amqp_sasl_mechanism_frame,
 } amqp_frame_type_type_t;
 

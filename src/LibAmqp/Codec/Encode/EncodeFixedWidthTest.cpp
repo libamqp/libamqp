@@ -95,7 +95,7 @@ SUITE(CodecEncode)
 
         amqp_buffer_put_buffer_contents(context->decode.buffer, context->encode.buffer);
 
-        result = amqp_decode(context);
+        result = amqp_decode(context, context->decode.buffer);
         CHECK_NOT_NULL(result);
         ASSERT_VALID(result);
         CHECK_CLOSE(123.456f, result->value.b4._float, 0.00001);
@@ -113,7 +113,7 @@ SUITE(CodecEncode)
 
         amqp_buffer_put_buffer_contents(context->decode.buffer, context->encode.buffer);
 
-        result = amqp_decode(context);
+        result = amqp_decode(context, context->decode.buffer);
         CHECK_NOT_NULL(result);
         ASSERT_VALID(result);
         CHECK_CLOSE(123.456, result->value.b8._double, 0.00001);

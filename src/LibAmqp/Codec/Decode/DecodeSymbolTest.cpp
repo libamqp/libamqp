@@ -40,7 +40,7 @@ SUITE(SymbolDecode)
     TEST_FIXTURE(DecodeFixture, DecodeLargeSymbol)
     {
         load_decode_buffer(test_data::foo_bar_symbol_32);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xb3, type->format_code);
@@ -52,7 +52,7 @@ SUITE(SymbolDecode)
     TEST_FIXTURE(DecodeFixture, DecodeSymbol)
     {
         load_decode_buffer(test_data::foo_symbol_8);
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xa3, type->format_code);
@@ -65,7 +65,7 @@ SUITE(SymbolDecode)
     {
         load_decode_buffer(test_data::bad_symbol);
         context->debug.level = 0;
-        type = amqp_decode(context);
+        type = amqp_decode(context, context->decode.buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_INVALID_SYMBOL_CHARACTER, type->invalid_cause);

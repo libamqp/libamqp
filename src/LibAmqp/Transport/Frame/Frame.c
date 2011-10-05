@@ -47,7 +47,7 @@ static int decode_header(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fr
 
 static int decode_body(amqp_context_t *context, amqp_frame_t *frame, amqp_type_t *type)
 {
-    not_implemented(todo);
+//    not_implemented(todo);
     return true;
 }
 
@@ -61,7 +61,7 @@ static int decode_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fra
         return false;
     }
 
-    if ((type = amqp_decode(context)) == 0)
+    if ((type = amqp_decode(context, buffer)) == 0)
     {
         frame->selector = amqp_empty_frame;
         return true;
