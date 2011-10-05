@@ -180,6 +180,12 @@ bool amqp_type_is_descriptor(amqp_type_t *type)
     return type->flags.is_descriptor != 0;
 }
 
+static inline
+bool amqp_type_is_ulong(amqp_type_t *type)
+{
+    return type->flags.is_descriptor != 0;
+}
+
 
 #ifdef __cplusplus
 }

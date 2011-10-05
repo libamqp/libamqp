@@ -120,6 +120,6 @@ SUITE(ConnectionFrame)
         connection->state.frame.enable(connection);
         connection->state.frame.read(connection, buffer, 8, done_callback);
         CHECK_EQUAL("Enabled", connection->state.frame.name);
-        CHECK_EQUAL(0x23U, connection->io.frame.frame_size);
+        CHECK_EQUAL(0x15U, connection->io.frame.frame_size);
     }
 }

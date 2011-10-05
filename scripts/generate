@@ -22,6 +22,7 @@ function generate_file
 		echo "Cannot access XML file: ${source}"
 		exit 1
 	fi
+	echo "${xml_file}"
 	"$cmd" "${source}" > "${dest_dir}/${c_file}"
 }
 

@@ -29,8 +29,9 @@ SUITE(Frame)
         test_data::minimal_frame_header.transfer_to(buffer);
         frame = amqp_decode_frame(context, buffer);
         CHECK_EQUAL(8U, frame->data_offset);
-        CHECK_EQUAL(0U, frame->frame_type);
+        CHECK_EQUAL(AMQP_FRAME_TYPE, frame->frame_type);
         CHECK_EQUAL(1U, frame->type_specific.word);
+        CHECK_EQUAL(amqp_empty_frame, frame->selector);
 
         CHECK_EQUAL(8U, amqp_buffer_index(buffer));
         CHECK_EQUAL(0, amqp_buffer_available(buffer));
@@ -41,9 +42,12 @@ SUITE(Frame)
         test_data::sasl_mechanisms_frame.transfer_to(buffer);
         frame = amqp_decode_frame(context, buffer);
         CHECK_EQUAL(8U, frame->data_offset);
-        CHECK_EQUAL(0U, frame->frame_type);
+
+        CHECK_EQUAL(AMQP_SASL_FRAME_TYPE, frame->frame_type);
         CHECK_EQUAL(0U, frame->type_specific.word);
 
+        CHECK_EQUAL(amqp_sasl_mechanism_frame, frame->selector);
 
+        CHECK_EQUAL(amqp_empty_frame, frame->selector);
     }
 }

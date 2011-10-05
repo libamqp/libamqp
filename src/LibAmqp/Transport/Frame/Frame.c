@@ -16,20 +16,71 @@
 
 #include "Context/Context.h"
 #include "Transport/Frame/Frame.h"
+#include "Codec/Decode/Decode.h"
 
 #include "debug_helper.h"
+
+static int decode_header(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame)
+{
+    assert(amqp_buffer_size(buffer) >= AMQP_FRAME_HEADER_SIZE);
+
+    frame->data_offset = ((uint32_t) amqp_buffer_read_uint8(buffer, 4)) * AMQP_FRAME_HEADER_DATA_OFFSET_MULTIPLIER;
+    frame->frame_type = amqp_buffer_read_uint8(buffer, 5);
+    frame->type_specific.word = amqp_buffer_read_uint16(buffer, 6);
+
+    amqp_buffer_advance_read_index(buffer, frame->data_offset);
+
+    if (frame->data_offset < AMQP_FRAME_HEADER_SIZE)
+    {
+        amqp_error(context, AMQP_ERROR_CORRUPT_FRAME_HEADER, "Invalid data offset: %u", frame->data_offset);
+        return false;
+    }
+
+    if  (frame->frame_type != AMQP_FRAME_TYPE && frame->frame_type != AMQP_SASL_FRAME_TYPE)
+    {
+        amqp_error(context, AMQP_ERROR_INVALID_FRAME_TYPE, "Invalid frame type: %02x", frame->frame_type);
+        return false;
+    }
+
+    return true;
+}
+
+static int decode_body(amqp_context_t *context, amqp_frame_t *frame, amqp_type_t *type)
+{
+    not_implemented(todo);
+    return true;
+}
+
+static int decode_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame)
+{
+    amqp_type_t *type;
+    int rc;
+
+    if (decode_header(context, buffer, frame) == 0)
+    {
+        return false;
+    }
+
+    if ((type = amqp_decode(context)) == 0)
+    {
+        frame->selector = amqp_empty_frame;
+        return true;
+    }
+
+    rc = decode_body(context, frame, type);
+    amqp_deallocate_type(context, type);
+    return rc;
+}
 
 amqp_frame_t *amqp_decode_frame(amqp_context_t *context, amqp_buffer_t *buffer)
 {
     amqp_frame_t *result = amqp_allocate_frame(context);
 
-    assert(amqp_buffer_size(buffer) >= AMQP_FRAME_HEADER_SIZE);
-
-    result->data_offset = ((uint32_t) amqp_buffer_read_uint8(buffer, 4)) * AMQP_FRAME_HEADER_DATA_OFFSET_MULTIPLIER;
-    result->frame_type = amqp_buffer_read_uint8(buffer, 5);
-    result->type_specific.word = amqp_buffer_read_uint16(buffer, 6);
-
-    amqp_buffer_advance_read_index(buffer, AMQP_FRAME_HEADER_SIZE);
+    if (decode_frame(context, buffer, result) == 0)
+    {
+        amqp_deallocate_frame(context, result);
+        return 0;
+    }
 
     return result;
 }

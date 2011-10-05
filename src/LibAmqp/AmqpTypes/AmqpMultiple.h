@@ -13,8 +13,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#ifndef LIBAMQP_AMQP_AMQP_MULTIPLE_H
-#define LIBAMQP_AMQP_AMQP_MULTIPLE_H
+#ifndef LIBAMQP_AMQP_TYPES_AMQP_MULTIPLE_H
+#define LIBAMQP_AMQP_TYPES_AMQP_MULTIPLE_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "libamqp_common.h"
 #include "Context/Context.h"
@@ -54,7 +58,10 @@ amqp_symbol_t *amqp_multiple_symbol_get(amqp_multiple_symbol_t *multiple, int el
     return amqp_multiple_symbol_array(multiple)[element];
 }
 
+extern amqp_multiple_symbol_t *amqp_multiple_symbol_create(amqp_context_t *context, int size);
+extern void amqp_multiple_symbol_free(amqp_context_t *context, amqp_multiple_symbol_t *multiple);
 
-extern amqp_multiple_symbol_t *amqp_multiple_symbol_create(int size);
-extern void amqp_multiple_symbol_free(amqp_multiple_symbol_t *multiple);
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -17,17 +17,26 @@
 #include <assert.h>
 #include <string.h>
 
-
 #include "AmqpTypes/AmqpMultiple.h"
 #include "debug_helper.h"
 
-amqp_multiple_symbol_t *amqp_multiple_symbol_create(int size)
+amqp_multiple_symbol_t *amqp_multiple_symbol_create(amqp_context_t *context, int size)
 {
-    not_implemented(todo);
+    amqp_multiple_symbol_t *result = AMQP_MALLOC(context, amqp_multiple_symbol_t);
+    if (size > AMQP_MULTIPLE_DEFAULT_SIZE)
+    {
+        result->array.indirect = AMQP_MALLOC_ARRAY(context, amqp_symbol_t *, size);
+    }
+    return result;
 }
 
-void amqp_multiple_symbol_free(amqp_multiple_symbol_t *multiple)
+void amqp_multiple_symbol_free(amqp_context_t *context, amqp_multiple_symbol_t *multiple)
 {
-    not_implemented(todo);
+    if (multiple->size > AMQP_MULTIPLE_DEFAULT_SIZE)
+    {
+        AMQP_FREE(context, multiple->array.indirect);
+    }
+    AMQP_FREE(context, multiple);
 }
+
 

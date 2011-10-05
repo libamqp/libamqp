@@ -21,25 +21,28 @@
 
 SUITE(AmqpTypes)
 {
-    class AmqpTypesFixture
+    class AmqpTypesFixture  : public SuiteContext::ContextFixture
     {
     public:
         AmqpTypesFixture();
         ~AmqpTypesFixture();
 
     public:
+        amqp_multiple_symbol_t *multiple;
     };
 
-    AmqpTypesFixture::AmqpTypesFixture()
+    AmqpTypesFixture::AmqpTypesFixture() : multiple(0)
     {
     }
 
     AmqpTypesFixture::~AmqpTypesFixture()
     {
+        amqp_multiple_symbol_free(context, multiple);
     }
 
     TEST_FIXTURE(AmqpTypesFixture, fixture_should_balance_allocations)
     {
+        multiple = amqp_multiple_symbol_create(context, 5);
     }
 
 //    TEST_FIXTURE(AmqpTypes, decode_minimal_frame)

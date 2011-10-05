@@ -36,6 +36,17 @@ typedef struct amqp_frame_t amqp_frame_t;
 
 #define AMQP_FRAME_HEADER_DATA_OFFSET_MULTIPLIER 4
 
+enum amqp_frame_types_t {
+    AMQP_FRAME_TYPE = 0,
+    AMQP_SASL_FRAME_TYPE = 1
+};
+
+typedef enum amqp_frame_type_type_t
+{
+    amqp_empty_frame,
+    amqp_sasl_mechanism_frame,
+} amqp_frame_type_type_t;
+
 struct amqp_frame_t
 {
     uint32_t data_offset;
@@ -44,6 +55,10 @@ struct amqp_frame_t
         uint16_t word;
         uint16_t channel;
     } type_specific;
+    amqp_frame_type_type_t selector;
+    union {
+        int pad;
+    } frames;
 };
 
 extern amqp_frame_t *amqp_decode_frame(amqp_context_t *context, amqp_buffer_t *buffer);

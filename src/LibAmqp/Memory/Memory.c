@@ -74,6 +74,10 @@ void *amqp_malloc(amqp_context_t *context, size_t n)
 
     return &block->data.fragments[0];
 }
+void *amqp_malloc_array(amqp_context_t *context, size_t n, int count)
+{
+    return amqp_malloc(context, n * count);
+}
 
 static inline amqp__memory_block_t *calculate_block_start(void *p)
 {

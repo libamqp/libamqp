@@ -34,10 +34,14 @@ extern "C"
 #ifdef AMQP_FREE
 #error libamqp redefines AMQP_FREE
 #endif
+#ifdef AMQP_MALLOC_ARRAY
+#error libamqp redefines AMQP_MALLOC_ARRAY
+#endif
 
 #define AMQP_MALLOC(c, type)        ((type *) amqp_malloc((c), sizeof(type)))
 #define AMQP_REALLOC(c, p, type)        ((type *) amqp_realloc((c), p, sizeof(type)))
 #define AMQP_FREE(c, p)             (amqp_free((c), (p)), (p) = 0)
+#define AMQP_MALLOC_ARRAY(c, t, n)  ((t *) amqp_malloc_array((c), sizeof(t), (n)))
 
     typedef struct amqp_allocation_stats_t
     {
@@ -46,6 +50,7 @@ extern "C"
     } amqp_allocation_stats_t;
 
     extern void *amqp_malloc(amqp_context_t *c, size_t n);
+    extern void *amqp_malloc_array(amqp_context_t *c, size_t n, int count);
     extern void *amqp_realloc(amqp_context_t *c, void *p, size_t n);
     extern void amqp_free(amqp_context_t *c, void *p);
 
