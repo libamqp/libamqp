@@ -37,11 +37,16 @@ struct amqp_symbol_t
 {
     amqp_buffer_t *buffer;
     const unsigned char *reference;
-    size_t n;
+    size_t size;
 };
 
 extern void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const unsigned char *reference, size_t n);
 extern void amqp_symbol_cleanup(amqp_symbol_t *symbol);
+
+extern int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs);
+extern int amqp_symbol_hash(amqp_symbol_t *symbol);
+
+extern int amqp_hash(const char *data, int len);
 
 #ifdef __cplusplus
 }

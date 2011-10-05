@@ -22,14 +22,15 @@
 #include "AmqpTypes/AmqpSymbol.h"
 
 
-void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const unsigned char *reference, size_t n)
+void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const unsigned char *reference, size_t size)
 {
     if (buffer)
     {
         amqp_buffer_reference(buffer);
         symbol->buffer = buffer;
     }
-//not_implemented(todo);
+    symbol->reference = reference;
+    symbol->size = size;
 }
 
 void amqp_symbol_cleanup(amqp_symbol_t *symbol)
@@ -38,6 +39,24 @@ void amqp_symbol_cleanup(amqp_symbol_t *symbol)
     {
         amqp_buffer_release(symbol->buffer);
     }
-//not_implemented(todo);
+    symbol->reference = 0;
+    symbol->size = 0;
+}
+
+int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
+{
+    int n, rc;
+    assert(lhs && rhs);
+
+    n = lhs->size;
+    if (rhs->size < n) n = rhs->size;
+
+    rc = memcmp(lhs->reference, rhs->reference, n);
+    return rc != 0 ? rc : lhs->size - rhs->size;
+}
+
+int amqp_symbol_hash(amqp_symbol_t *symbol)
+{
+    return amqp_hash((const char *) symbol->reference, symbol->size);
 }
 

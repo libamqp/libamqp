@@ -27,10 +27,24 @@ SUITE(AmqpTypes)
         AmqpSymbolFixture();
         ~AmqpSymbolFixture();
 
+        void initialize(amqp_symbol_t *symbol, const char *s);
+        void initialize(const char *lhs, const char *rhs);
+
+        static const char *a;
+        static const char *b;
+        static const char *c;
+        static const char *d;
+        static const char *e;
     public:
         amqp_symbol_t symbol_a;
         amqp_symbol_t symbol_b;
     };
+
+    const char *AmqpSymbolFixture::a = "ABC";
+    const char *AmqpSymbolFixture::b = "ABC";
+    const char *AmqpSymbolFixture::c = "DEFGH";
+    const char *AmqpSymbolFixture::d = "IJKLM";
+    const char *AmqpSymbolFixture::e = "DEFGHIJ";
 
     AmqpSymbolFixture::AmqpSymbolFixture()
     {
@@ -44,11 +58,49 @@ SUITE(AmqpTypes)
         amqp_symbol_cleanup(&symbol_a);
     }
 
-    TEST_FIXTURE(AmqpSymbolFixture, fixture_should_balance_allocations)
+    void AmqpSymbolFixture::initialize(amqp_symbol_t *symbol, const char *s)
     {
-//        CHECK_EQUAL(256U, amqp_map_capacity(&map));
-//        CHECK_CLOSE(0.0, amqp_map_factor(&map), 0.001);
+        amqp_symbol_initialize_reference(symbol, 0, (const unsigned char *) s, strlen(s));
+    }
+    void AmqpSymbolFixture::initialize(const char *lhs, const char *rhs)
+    {
+        initialize(&symbol_a, lhs);
+        initialize(&symbol_b, rhs);
     }
 
+    TEST_FIXTURE(AmqpSymbolFixture, symbol_equality)
+    {
+        initialize(a, b);
+        CHECK(amqp_symbol_compare(&symbol_a, &symbol_b) == 0);
+    }
 
+    TEST_FIXTURE(AmqpSymbolFixture, symbol_c_lt_d)
+    {
+        initialize(c, d);
+        CHECK(amqp_symbol_compare(&symbol_a, &symbol_b) < 0);
+    }
+
+    TEST_FIXTURE(AmqpSymbolFixture, symbol_d_gt_c)
+    {
+        initialize(d, c);
+        CHECK(amqp_symbol_compare(&symbol_a, &symbol_b) > 0);
+    }
+
+    TEST_FIXTURE(AmqpSymbolFixture, symbol_c_lt_e)
+    {
+        initialize(c, e);
+        CHECK(amqp_symbol_compare(&symbol_a, &symbol_b) < 0);
+    }
+
+    TEST_FIXTURE(AmqpSymbolFixture, symbol_e_gt_c)
+    {
+        initialize(e, c);
+        CHECK(amqp_symbol_compare(&symbol_a, &symbol_b) > 0);
+    }
+
+    TEST_FIXTURE(AmqpSymbolFixture, symbol_hash)
+    {
+        initialize(a, b);
+        CHECK_EQUAL(amqp_symbol_hash(&symbol_a), amqp_symbol_hash(&symbol_b));
+    }
 }

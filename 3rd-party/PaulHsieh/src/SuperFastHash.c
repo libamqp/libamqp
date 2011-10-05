@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 // More commonly known as SuperFastHash
-uint32_t amqp_hash (const char * data, int len)
+uint32_t amqp_hash (const char *data, int len)
 {
 uint32_t hash = len, tmp;
 int rem;
