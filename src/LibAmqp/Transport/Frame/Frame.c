@@ -47,8 +47,12 @@ static int decode_header(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fr
 
 static int decode_body(amqp_context_t *context, amqp_frame_t *frame, amqp_type_t *type)
 {
-//    not_implemented(todo);
-    amqp_type_is_described(type);
+    amqp_type_t *descriptor = amqp_type_get_descriptor(type);
+    amqp_type_t *described = amqp_type_get_described(type);
+
+    assert(descriptor && described);
+
+
     return true;
 }
 

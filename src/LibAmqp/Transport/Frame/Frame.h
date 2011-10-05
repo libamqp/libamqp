@@ -23,6 +23,7 @@ extern "C" {
 
 #include "libamqp_common.h"
 #include "Context/Context.h"
+#include "Codec/Type/TypeExtension.h"
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
