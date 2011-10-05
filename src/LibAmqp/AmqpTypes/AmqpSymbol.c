@@ -33,7 +33,15 @@ void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buff
     symbol->size = size;
 }
 
-void amqp_symbol_cleanup(amqp_symbol_t *symbol)
+amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer, const unsigned char *reference, size_t size)
+{
+    amqp_symbol_t *result = AMQP_MALLOC(context, amqp_symbol_t);
+    result->on_heap = true;
+    amqp_symbol_initialize_reference(result, buffer, reference, size);
+    return result;
+}
+
+void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol)
 {
     if (symbol->buffer)
     {
@@ -41,6 +49,10 @@ void amqp_symbol_cleanup(amqp_symbol_t *symbol)
     }
     symbol->reference = 0;
     symbol->size = 0;
+    if (symbol->on_heap)
+    {
+        AMQP_FREE(context, symbol);
+    }
 }
 
 int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
