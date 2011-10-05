@@ -22,9 +22,8 @@ extern "C" {
 
 #include <stdint.h>
 #include "libamqp_common.h"
+#include "AmqpTypes/AmqpHash.h"
 #include "Context/Context.h"
-
-extern int amqp_hash(const void *data, int len);
 
 typedef struct amqp_entry_t amqp_entry_t;
 struct amqp_entry_t

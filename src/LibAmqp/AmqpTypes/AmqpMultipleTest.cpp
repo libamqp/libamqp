@@ -15,32 +15,32 @@
  */
 
 #include <TestHarness.h>
-#include "Context/ContextTestSupport.h"
+#include "AmqpTypes/AmqpTypesTestSupport.h"
 
 #include "AmqpTypes/AmqpMultiple.h"
 
 SUITE(AmqpTypes)
 {
-    class AmqpTypesFixture  : public SuiteContext::ContextFixture
+    class AmqpMultiplesFixture  : public AmqpTypesFixture
     {
     public:
-        AmqpTypesFixture();
-        ~AmqpTypesFixture();
+        AmqpMultiplesFixture();
+        ~AmqpMultiplesFixture();
 
     public:
         amqp_multiple_symbol_t *multiple;
     };
 
-    AmqpTypesFixture::AmqpTypesFixture() : multiple(0)
+    AmqpMultiplesFixture::AmqpMultiplesFixture() : multiple(0)
     {
     }
 
-    AmqpTypesFixture::~AmqpTypesFixture()
+    AmqpMultiplesFixture::~AmqpMultiplesFixture()
     {
         amqp_multiple_symbol_free(context, multiple);
     }
 
-    TEST_FIXTURE(AmqpTypesFixture, fixture_should_balance_allocations)
+    TEST_FIXTURE(AmqpMultiplesFixture, fixture_should_balance_allocations)
     {
         multiple = amqp_multiple_symbol_create(context, 5);
         CHECK_EQUAL(5, multiple->size);

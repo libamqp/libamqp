@@ -88,7 +88,7 @@ int rem;
     return hash;
 }
 
-uint32_t amqp_hash (const void *data, int len)
+uint32_t amqp_hash(const void *data, int len)
 {
     return SuperFastHash((const char *) data, len);
 }
