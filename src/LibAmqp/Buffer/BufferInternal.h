@@ -46,6 +46,7 @@ struct amqp_buffer_t
 {
     size_t capacity;
     amqp_buffer_limit_t limit;
+    size_t reference_count;
     unsigned char *fragments[AMQP_BUFFER_FRAGMENTS];
 #ifndef _MSC_VER
     struct iovec io_vectors[AMQP_BUFFER_FRAGMENTS];

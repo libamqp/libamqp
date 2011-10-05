@@ -357,5 +357,14 @@ SUITE(Buffer)
         CHECK_EQUAL((void *) 0, p[4].iov_base);
     }
 
-
+    TEST_FIXTURE(BufferFixture, reference_counts)
+    {
+        amqp_buffer_reference(buffer);
+        amqp_buffer_reference(buffer);
+        CHECK_EQUAL(2U, amqp_buffer_reference_count(buffer));
+        size_t c = amqp_buffer_release(buffer);
+        CHECK_EQUAL(1U, c);
+        c = amqp_buffer_release(buffer);
+        CHECK_EQUAL(0U, c);
+    }
 }

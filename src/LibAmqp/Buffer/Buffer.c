@@ -195,3 +195,16 @@ struct iovec *amqp_buffer_read_io_vec(amqp_buffer_t *buffer, int *iov_count)
 
     return &buffer->io_vectors[0];
 }
+
+void amqp_buffer_reference(amqp_buffer_t *buffer)
+{
+    buffer->reference_count++;
+}
+size_t amqp_buffer_reference_count(amqp_buffer_t *buffer)
+{
+    return buffer->reference_count;
+}
+size_t amqp_buffer_release(amqp_buffer_t *buffer)
+{
+    return  --buffer->reference_count;
+}
