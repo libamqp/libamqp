@@ -89,7 +89,7 @@ SUITE(Misc)
         }
     }
 
-    TEST(next_power_of_64)
+    TEST(next_power_of_2_64)
     {
         uint64_t mask = 0x8000000000000000ULL;
         while (mask > 8)
@@ -97,5 +97,11 @@ SUITE(Misc)
             CHECK_EQUAL(mask, amqp_next_power_two_64(mask - 5));
             mask = mask >> 1;
         }
+    }
+
+    TEST(next_power_of_2_overflow)
+    {
+        uint64_t mask = 0xf000000000000000ULL;
+        CHECK_EQUAL(0U, amqp_next_power_two_64(mask));
     }
 }

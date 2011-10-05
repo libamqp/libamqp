@@ -44,9 +44,11 @@ static inline int amqp_trailing_zeros_32(uint32_t value)
 #if ULONG_MAX > 4294967295ULL
 #define amqp_mask_t uint64_t
 #define amqp_trailing_zeros amqp_trailing_zeros_64
+#define amqp_next_power_two amqp_next_power_two_64
 #else
 #define amqp_mask_t uint32_t
 #define amqp_trailing_zeros amqp_trailing_zeros_32
+#define amqp_next_power_two amqp_next_power_two_32
 #endif
 
 static inline amqp_mask_t amqp_least_significant_1_bit(amqp_mask_t value)

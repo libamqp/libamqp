@@ -17,7 +17,7 @@
 #include <TestHarness.h>
 #include "Context/ContextTestSupport.h"
 
-#include "AmqpTypes/AmqpMultiple.h"
+#include "AmqpTypes/AmqpMap.h"
 
 SUITE(AmqpTypes)
 {
@@ -28,21 +28,23 @@ SUITE(AmqpTypes)
         ~AmqpMapFixture();
 
     public:
-        amqp_multiple_symbol_t *multiple;
+        amqp_map_t map;
     };
 
-    AmqpMapFixture::AmqpMapFixture() : multiple(0)
+    AmqpMapFixture::AmqpMapFixture()
     {
+        amqp_map_initialize(context, &map, 251);
     }
 
     AmqpMapFixture::~AmqpMapFixture()
     {
-//        amqp_multiple_symbol_free(context, multiple);
+        amqp_map_cleanup(context, &map);
     }
 
     TEST_FIXTURE(AmqpMapFixture, fixture_should_balance_allocations)
     {
-//        multiple = amqp_multiple_symbol_create(context, 5);
+        CHECK_EQUAL(256U, amqp_map_capacity(&map));
+        CHECK_CLOSE(0.0, amqp_map_factor(&map), 0.001);
     }
 
 //    TEST_FIXTURE(AmqpTypes, decode_minimal_frame)

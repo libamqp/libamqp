@@ -17,44 +17,21 @@
 #include <assert.h>
 #include <string.h>
 
+#include "Misc/Bits.h"
 #include "AmqpTypes/AmqpMap.h"
 #include "debug_helper.h"
 
-/*
-static void map_initialize(amqp_context_t *context, amqp_map_t *map, int size)
+void amqp_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity)
 {
-    map->size = size;
-    if (size > AMQP_MULTIPLE_DEFAULT_SIZE)
-    {
-        map->array.indirect = AMQP_MALLOC_ARRAY(context, amqp_symbol_t *, size);
-    }
-}
+    map->capacity = amqp_next_power_two(initial_capacity);
+    assert(map->capacity > 0);
 
-void amqp_map_initialize(amqp_context_t *context, amqp_map_t *map, int size)
-{
-    memset(map, '\0', sizeof(amqp_map_t));
-    map_initialize(context, map, size);
+    map->buckets = AMQP_MALLOC_ARRAY(context, void *, map->capacity);
+    map->count = 0;
 }
 
 void amqp_map_cleanup(amqp_context_t *context, amqp_map_t *map)
 {
-    if (map->size > AMQP_MULTIPLE_DEFAULT_SIZE)
-    {
-        AMQP_FREE(context, map->array.indirect);
-    }
+    AMQP_FREE(context, map->buckets);
 }
 
-amqp_map_t *amqp_map_create(amqp_context_t *context, int size)
-{
-    amqp_map_t *result = AMQP_MALLOC(context, amqp_map_t);
-    map_initialize(context, result, size);
-    return result;
-}
-
-void amqp_map_free(amqp_context_t *context, amqp_map_t *map)
-{
-    amqp_map_cleanup(context, map);
-    AMQP_FREE(context, map);
-}
-
-*/

@@ -32,8 +32,8 @@ extern "C" {
 
 typedef struct amqp_map_t
 {
-    int capacity;
-    int count;
+    size_t capacity;
+    size_t count;
     void *buckets;
 } amqp_map_t;
 
@@ -42,6 +42,20 @@ extern void amqp_map_cleanup(amqp_context_t *context, amqp_map_t *map);
 extern amqp_map_t *amqp_map_create(amqp_context_t *context, int initial_capacity);
 extern void amqp_map_free(amqp_context_t *context, amqp_map_t *map);
 
+static inline size_t amqp_map_capacity(amqp_map_t *map)
+{
+    return map->capacity;
+}
+
+static inline size_t amqp_map_count(amqp_map_t *map)
+{
+    return map->count;
+}
+
+static inline double amqp_map_factor(amqp_map_t *map)
+{
+    return map->capacity ? (double) map->count / (double) map->capacity : 0.0;
+}
 #ifdef __cplusplus
 }
 #endif
