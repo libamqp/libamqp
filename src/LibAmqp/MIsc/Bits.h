@@ -59,6 +59,9 @@ static inline int amqp_is_power_of_two(amqp_mask_t value)
     return (value & (value - 1)) == 0;
 }
 
+extern uint32_t amqp_next_power_two_32(uint32_t n);
+extern uint64_t amqp_next_power_two_64(uint64_t n);
+
 #ifdef __cplusplus
 }
 #endif

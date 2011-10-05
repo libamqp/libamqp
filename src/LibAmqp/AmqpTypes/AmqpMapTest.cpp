@@ -21,29 +21,28 @@
 
 SUITE(AmqpTypes)
 {
-    class AmqpTypesFixture  : public SuiteContext::ContextFixture
+    class AmqpMapFixture  : public SuiteContext::ContextFixture
     {
     public:
-        AmqpTypesFixture();
-        ~AmqpTypesFixture();
+        AmqpMapFixture();
+        ~AmqpMapFixture();
 
     public:
         amqp_multiple_symbol_t *multiple;
     };
 
-    AmqpTypesFixture::AmqpTypesFixture() : multiple(0)
+    AmqpMapFixture::AmqpMapFixture() : multiple(0)
     {
     }
 
-    AmqpTypesFixture::~AmqpTypesFixture()
+    AmqpMapFixture::~AmqpMapFixture()
     {
-        amqp_multiple_symbol_free(context, multiple);
+//        amqp_multiple_symbol_free(context, multiple);
     }
 
-    TEST_FIXTURE(AmqpTypesFixture, fixture_should_balance_allocations)
+    TEST_FIXTURE(AmqpMapFixture, fixture_should_balance_allocations)
     {
-        multiple = amqp_multiple_symbol_create(context, 5);
-        CHECK_EQUAL(5, multiple->size);
+//        multiple = amqp_multiple_symbol_create(context, 5);
     }
 
 //    TEST_FIXTURE(AmqpTypes, decode_minimal_frame)

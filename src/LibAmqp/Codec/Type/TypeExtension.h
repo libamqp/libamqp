@@ -48,7 +48,6 @@ amqp_type_t *amqp_type_get_described(amqp_type_t *type)
     return amqp_type_is_described(type) ? type->value.described.elements[1] : amqp_type_convert_has_failed(type);
 }
 
-
 #ifdef __cplusplus
 }
 #endif

@@ -45,13 +45,12 @@ static int decode_header(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fr
     return true;
 }
 
-static int decode_body(amqp_context_t *context, amqp_frame_t *frame, amqp_type_t *type)
+static int decode_performative(amqp_context_t *context, amqp_frame_t *frame, amqp_type_t *type)
 {
     amqp_type_t *descriptor = amqp_type_get_descriptor(type);
     amqp_type_t *described = amqp_type_get_described(type);
 
     assert(descriptor && described);
-
 
     return true;
 }
@@ -72,7 +71,7 @@ static int decode_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fra
         return true;
     }
 
-    rc = decode_body(context, frame, type);
+    rc = decode_performative(context, frame, type);
     amqp_deallocate_type(context, type);
     return rc;
 }

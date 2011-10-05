@@ -16,6 +16,7 @@
 
 #include <TestHarness.h>
 #include "Misc/Bits.h"
+#include "debug_helper.h"
 
 SUITE(Misc)
 {
@@ -75,6 +76,26 @@ SUITE(Misc)
             uint32_t b = f & -f;
             CHECK_EQUAL(trailing_zeros_by_binary_search(b), amqp_trailing_zeros_32(b));
             f = f & ~b;
+        }
+    }
+
+    TEST(next_power_of_2)
+    {
+        uint32_t mask = 0x80000000;
+        while (mask > 8)
+        {
+            CHECK_EQUAL(mask, amqp_next_power_two_32(mask - 5));
+            mask = mask >> 1;
+        }
+    }
+
+    TEST(next_power_of_64)
+    {
+        uint64_t mask = 0x8000000000000000ULL;
+        while (mask > 8)
+        {
+            CHECK_EQUAL(mask, amqp_next_power_two_64(mask - 5));
+            mask = mask >> 1;
         }
     }
 }

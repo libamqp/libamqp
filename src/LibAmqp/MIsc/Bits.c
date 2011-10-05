@@ -34,3 +34,26 @@ const uint8_t amqp_mod_67_bit_position[] = // map a bit value mod 67 to its posi
 };
 
 
+uint32_t amqp_next_power_two_32(uint32_t n)
+{
+    n = n - 1;
+    n = n | (n >> 1);
+    n = n | (n >> 2);
+    n = n | (n >> 4);
+    n = n | (n >> 8);
+    n = n | (n >> 16);
+    return n + 1;
+}
+
+uint64_t amqp_next_power_two_64(uint64_t n)
+{
+    n = n - 1;
+    n = n | (n >> 1);
+    n = n | (n >> 2);
+    n = n | (n >> 4);
+    n = n | (n >> 8);
+    n = n | (n >> 16);
+    n = n | (n >> 32);
+    return n + 1;
+}
+

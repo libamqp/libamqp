@@ -20,23 +20,40 @@
 #include "AmqpTypes/AmqpMultiple.h"
 #include "debug_helper.h"
 
-amqp_multiple_symbol_t *amqp_multiple_symbol_create(amqp_context_t *context, int size)
+
+static void multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, int size)
 {
-    amqp_multiple_symbol_t *result = AMQP_MALLOC(context, amqp_multiple_symbol_t);
+    multiple->size = size;
     if (size > AMQP_MULTIPLE_DEFAULT_SIZE)
     {
-        result->array.indirect = AMQP_MALLOC_ARRAY(context, amqp_symbol_t *, size);
+        multiple->array.indirect = AMQP_MALLOC_ARRAY(context, amqp_symbol_t *, size);
     }
-    return result;
 }
 
-void amqp_multiple_symbol_free(amqp_context_t *context, amqp_multiple_symbol_t *multiple)
+void amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, int size)
+{
+    memset(multiple, '\0', sizeof(amqp_multiple_symbol_t));
+    multiple_symbol_initialize(context, multiple, size);
+}
+
+void amqp_multiple_symbol_cleanup(amqp_context_t *context, amqp_multiple_symbol_t *multiple)
 {
     if (multiple->size > AMQP_MULTIPLE_DEFAULT_SIZE)
     {
         AMQP_FREE(context, multiple->array.indirect);
     }
-    AMQP_FREE(context, multiple);
 }
 
+amqp_multiple_symbol_t *amqp_multiple_symbol_create(amqp_context_t *context, int size)
+{
+    amqp_multiple_symbol_t *result = AMQP_MALLOC(context, amqp_multiple_symbol_t);
+    multiple_symbol_initialize(context, result, size);
+    return result;
+}
+
+void amqp_multiple_symbol_free(amqp_context_t *context, amqp_multiple_symbol_t *multiple)
+{
+    amqp_multiple_symbol_cleanup(context, multiple);
+    AMQP_FREE(context, multiple);
+}
 
