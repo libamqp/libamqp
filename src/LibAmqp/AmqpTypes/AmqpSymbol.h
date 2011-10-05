@@ -22,6 +22,8 @@ extern "C" {
 
 #include "libamqp_common.h"
 #include "Context/Context.h"
+#include "AmqpTypes/AmqpMap.h"
+
 
 #ifndef LIBAMQP_BUFFER_T_TYPE
 #define LIBAMQP_BUFFER_T_TYPE
@@ -48,7 +50,6 @@ extern void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol);
 extern int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs);
 extern int amqp_symbol_hash(amqp_symbol_t *symbol);
 
-extern int amqp_hash(const char *data, int len);
 
 #ifdef __cplusplus
 }

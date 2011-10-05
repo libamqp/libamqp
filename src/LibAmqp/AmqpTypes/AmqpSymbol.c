@@ -69,6 +69,6 @@ int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
 
 int amqp_symbol_hash(amqp_symbol_t *symbol)
 {
-    return amqp_hash((const char *) symbol->reference, symbol->size);
+    return amqp_hash((void *) symbol->reference, symbol->size);
 }
 

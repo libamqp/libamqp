@@ -42,8 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define NULL    ((void *) 0)
 #endif
 
-// More commonly known as SuperFastHash
-uint32_t amqp_hash (const char *data, int len)
+static uint32_t SuperFastHash (const char *data, int len)
 {
 uint32_t hash = len, tmp;
 int rem;
@@ -87,4 +86,9 @@ int rem;
     hash += hash >> 6;
 
     return hash;
+}
+
+uint32_t amqp_hash (const void *data, int len)
+{
+    return SuperFastHash((const char *) data, len);
 }
