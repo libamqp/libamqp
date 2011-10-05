@@ -48,6 +48,6 @@ SUITE(Frame)
 
 //        CHECK_EQUAL(amqp_sasl_mechanism_frame, frame->selector);
 
-        CHECK_EQUAL(amqp_empty_frame, frame->selector);
+//        CHECK_EQUAL(amqp_empty_frame, frame->selector);
     }
 }

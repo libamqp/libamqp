@@ -60,6 +60,7 @@ typedef struct {
     unsigned int is_contained:1;
     unsigned int is_descriptor:1;
     unsigned int has_descriptor:1;
+    unsigned int convert_failed:1;
     union {
         unsigned int is_compound;
         amqp_type_type_flags_t type;
@@ -179,13 +180,6 @@ bool amqp_type_is_descriptor(amqp_type_t *type)
 {
     return type->flags.is_descriptor != 0;
 }
-
-static inline
-bool amqp_type_is_ulong(amqp_type_t *type)
-{
-    return type->flags.is_descriptor != 0;
-}
-
 
 #ifdef __cplusplus
 }
