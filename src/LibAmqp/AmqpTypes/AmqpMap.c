@@ -33,7 +33,7 @@ void amqp_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_c
     map->compare = compare;
 }
 
-void amqp_map_cleanup(amqp_context_t *context, amqp_map_t *map)
+void amqp_map_cleanup_with_callback(amqp_context_t *context, amqp_map_t *map, amqp_free_callback_t callback)
 {
     amqp_entry_t *list = map->entry_list;
 
@@ -41,11 +41,19 @@ void amqp_map_cleanup(amqp_context_t *context, amqp_map_t *map)
     {
         amqp_entry_t *entry = list;
         list = list->entry_list.next;
-        // TODO - do we have to free key and data
+        if (callback)
+        {
+            callback(context, entry->key, entry->data);
+        }
         AMQP_FREE(context, entry);
     }
         
     AMQP_FREE(context, map->buckets);
+}
+
+void amqp_map_cleanup(amqp_context_t *context, amqp_map_t *map)
+{
+    amqp_map_cleanup_with_callback(context, map, 0);
 }
 
 static amqp_entry_t *add_entry(amqp_context_t *context, amqp_map_t *map, int index, const void *key, const void *data)
@@ -85,7 +93,12 @@ static int calculate_index(amqp_map_t *map, const void *key)
 
 int amqp_map_put(amqp_context_t *context, amqp_map_t *map, const void *key, const void *data)
 {
-    int index = calculate_index(map, key);
+    int index;
+
+    assert(map && map->hash && map->compare);
+    
+    index = calculate_index(map, key);
+
     if (map->buckets[index] != 0 && search_chain(map, map->buckets[index], key))
     {
         return false;

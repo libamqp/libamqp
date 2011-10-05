@@ -56,4 +56,11 @@ SUITE(AmqpTypes)
     {
         return amqp_hash(data, strlen(data));
     }
+    int AmqpTypesFixture::key_count()
+    {
+        int result = 0;
+        while (keys[result]) result++;
+        return result;
+    }
+
 }

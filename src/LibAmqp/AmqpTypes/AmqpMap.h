@@ -42,6 +42,7 @@ struct amqp_entry_t
 
 typedef uint32_t (*amqp_hash_fn_t)(const void *key);
 typedef int (*amqp_compare_fn_t)(const void *lhs, const void *rhs);
+typedef void (*amqp_free_callback_t)(amqp_context_t *context, const void *key, const void *data);
 
 typedef struct amqp_map_t
 {
@@ -55,6 +56,7 @@ typedef struct amqp_map_t
 
 extern void amqp_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity, amqp_hash_fn_t hash, amqp_compare_fn_t compare);
 extern void amqp_map_cleanup(amqp_context_t *context, amqp_map_t *map);
+extern void amqp_map_cleanup_with_callback(amqp_context_t *context, amqp_map_t *map, amqp_free_callback_t callback);
 
 extern amqp_map_t *amqp_map_create(amqp_context_t *context, int initial_capacity);
 extern void amqp_map_free(amqp_context_t *context, amqp_map_t *map);

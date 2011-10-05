@@ -22,7 +22,7 @@
 #include "AmqpTypes/AmqpSymbol.h"
 
 
-void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const unsigned char *reference, size_t size)
+void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const char *reference, size_t size)
 {
     if (buffer)
     {
@@ -33,7 +33,7 @@ void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buff
     symbol->size = size;
 }
 
-amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer, const unsigned char *reference, size_t size)
+amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer, const char *reference, size_t size)
 {
     amqp_symbol_t *result = AMQP_MALLOC(context, amqp_symbol_t);
     result->on_heap = true;
@@ -58,7 +58,7 @@ void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol)
 int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
 {
     int n, rc;
-    assert(lhs && rhs);
+    assert(lhs != 0 && rhs != 0);
 
     n = lhs->size;
     if (rhs->size < n) n = rhs->size;
@@ -67,8 +67,25 @@ int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
     return rc != 0 ? rc : lhs->size - rhs->size;
 }
 
-int amqp_symbol_hash(amqp_symbol_t *symbol)
+uint32_t amqp_symbol_hash(amqp_symbol_t *symbol)
 {
+    assert(symbol != 0);
     return amqp_hash((void *) symbol->reference, symbol->size);
+}
+
+void amqp_symbol_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity)
+{
+    amqp_map_initialize(context, map, initial_capacity, (amqp_hash_fn_t) amqp_symbol_hash, (amqp_compare_fn_t) amqp_symbol_compare);
+}
+
+static void cleanup_callback(amqp_context_t *context, const void *key, const void *data)
+{
+    amqp_symbol_t *symbol = (amqp_symbol_t *) key;
+    AMQP_FREE(context, symbol);
+}
+
+void amqp_symbol_map_cleanup(amqp_context_t *context, amqp_map_t *map)
+{
+    amqp_map_cleanup_with_callback(context, map, cleanup_callback);
 }
 

@@ -38,18 +38,31 @@ typedef struct amqp_buffer_t amqp_buffer_t;
 struct amqp_symbol_t
 {
     amqp_buffer_t *buffer;
-    const unsigned char *reference;
+    const char *reference;
     size_t size;
     int on_heap;
 };
 
-extern void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const unsigned char *reference, size_t size);
-extern amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer, const unsigned char *reference, size_t size);
+extern void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const char *reference, size_t size);
+extern amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer, const char *reference, size_t size);
 extern void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol);
 
 extern int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs);
-extern int amqp_symbol_hash(amqp_symbol_t *symbol);
+extern uint32_t amqp_symbol_hash(amqp_symbol_t *symbol);
 
+extern void amqp_symbol_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity);
+extern void amqp_symbol_map_cleanup(amqp_context_t *context, amqp_map_t *map);
+
+static inline
+int amqp_symbol_map_put(amqp_context_t *context, amqp_map_t *map, const amqp_symbol_t *key, const void *data)
+{
+    return amqp_map_put(context, map, key, data);
+}
+static inline
+const void *amqp_symbol_map_get(amqp_map_t *map, const amqp_symbol_t *key)
+{
+    return amqp_map_get(map, key);
+}
 
 #ifdef __cplusplus
 }

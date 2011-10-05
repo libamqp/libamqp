@@ -14,14 +14,13 @@
    limitations under the License.
  */
 
-#include <TestHarness.h>
-#include "Context/ContextTestSupport.h"
+#include "AmqpTypes/AmqpTypesTestSupport.h"
 
 #include "AmqpTypes/AmqpSymbol.h"
 
 SUITE(AmqpTypes)
 {
-    class AmqpSymbolFixture  : public SuiteContext::ContextFixture
+    class AmqpSymbolFixture  : AmqpTypesFixture
     {
     public:
         AmqpSymbolFixture();
@@ -58,7 +57,7 @@ SUITE(AmqpTypes)
 
     amqp_symbol_t *AmqpSymbolFixture::initialize(const char *s)
     {
-        return amqp_symbol_create(context, 0, (const unsigned char *) s, strlen(s));
+        return amqp_symbol_create(context, 0, s, strlen(s));
     }
     void AmqpSymbolFixture::initialize(const char *lhs, const char *rhs)
     {
