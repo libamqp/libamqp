@@ -14,20 +14,31 @@
    limitations under the License.
  */
 
-#include <assert.h>
-#include <string.h>
+#ifndef LIBAMQP_AMQP_TYPES_AMQP_STRING_H
+#define LIBAMQP_AMQP_TYPES_AMQP_STRING_H
 
-#include "Buffer/Buffer.h"
-#include "AmqpTypes/AmqpList.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+#include <stdint.h>
+#include "libamqp_common.h"
+#include "Context/Context.h"
 
-void amqp_list_initialize(amqp_context_t *context, amqp_list_t *list)
+#ifndef LIBAMQP_AMQP_STRING_TYPE_T
+#define LIBAMQP_AMQP_STRING_TYPE_T
+typedef struct amqp_string_t amqp_string_t;
+#endif
+
+struct amqp_string_t
 {
-    not_implemented(todo);
-}
+    int on_heap;
+};
 
-void amqp_list_cleanup(amqp_context_t *context, amqp_list_t *list)
-{
-    not_implemented(todo);
-}
+extern void amqp_string_initialize(amqp_context_t *context, amqp_string_t *string);
+extern void amqp_string_cleanup(amqp_context_t *context, amqp_string_t *string);
 
+#ifdef __cplusplus
+}
+#endif
+#endif

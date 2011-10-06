@@ -14,20 +14,16 @@
    limitations under the License.
  */
 
-#include <assert.h>
-#include <string.h>
+#ifndef LIBAMQP_AMQP_TYPES_TYPES_H
+#define LIBAMQP_AMQP_TYPES_TYPES_H
 
-#include "Buffer/Buffer.h"
+typedef int amqp_sasl_code_t;
+
+#include "AmqpTypes/AmqpBinary.h"
 #include "AmqpTypes/AmqpList.h"
+#include "AmqpTypes/AmqpMap.h"
+#include "AmqpTypes/AmqpMultiple.h"
+#include "AmqpTypes/AmqpString.h"
+#include "AmqpTypes/AmqpSymbol.h"
 
-
-void amqp_list_initialize(amqp_context_t *context, amqp_list_t *list)
-{
-    not_implemented(todo);
-}
-
-void amqp_list_cleanup(amqp_context_t *context, amqp_list_t *list)
-{
-    not_implemented(todo);
-}
-
+#endif

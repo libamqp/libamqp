@@ -25,6 +25,7 @@ extern "C" {
 #include "Context/Context.h"
 #include "Codec/Type/TypeExtension.h"
 
+#include "Amqp/AmqpSecurity.h"
 #include "AmqpTypes/AmqpDescriptor.h"
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
@@ -56,7 +57,16 @@ struct amqp_frame_t
     amqp_descriptor_t descriptor;
 
     union {
-        int pad;
+        union {
+            amqp_frame_sasl_mechanisms_t sasl_mechanisms;
+            amqp_frame_sasl_init_t sasl_init;
+            amqp_frame_sasl_challenge_t sasl_challenge;
+            amqp_frame_sasl_response_t sasl_response;
+            amqp_frame_sasl_outcome_t sasl_outcome;
+        } sasl;
+        union {
+            int pad;
+        } amqp;
     } frames;
 };
 

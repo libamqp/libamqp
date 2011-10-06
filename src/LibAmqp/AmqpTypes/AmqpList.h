@@ -13,8 +13,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#ifndef LIBAMQP_AMQP_TYPES_AMQP_SYMBOL_H
-#define LIBAMQP_AMQP_TYPES_AMQP_SYMBOL_H
+#ifndef LIBAMQP_AMQP_TYPES_AMQP_LIST_H
+#define LIBAMQP_AMQP_TYPES_AMQP_LIST_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,6 +33,13 @@ extern "C" {
     typedef struct amqp_list_t amqp_list_t;
 #endif
 
+struct amqp_list_t
+{
+    int on_heap;
+};
+
+extern void amqp_list_initialize(amqp_context_t *context, amqp_list_t *list);
+extern void amqp_list_cleanup(amqp_context_t *context, amqp_list_t *list);
 
 
 #ifdef __cplusplus

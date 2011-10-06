@@ -13,21 +13,31 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+#ifndef LIBAMQP_AMQP_TYPES_AMQP_BINARY_H
+#define LIBAMQP_AMQP_TYPES_AMQP_BINARY_H
 
-#include <assert.h>
-#include <string.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "Buffer/Buffer.h"
-#include "AmqpTypes/AmqpList.h"
+#include <stdint.h>
+#include "libamqp_common.h"
+#include "Context/Context.h"
 
+#ifndef LIBAMQP_AMQP_BINARY_TYPE_T
+#define LIBAMQP_AMQP_BINARY_TYPE_T
+typedef struct amqp_binary_t amqp_binary_t;
+#endif
 
-void amqp_list_initialize(amqp_context_t *context, amqp_list_t *list)
+struct amqp_binary_t
 {
-    not_implemented(todo);
-}
+    int on_heap;
+};
 
-void amqp_list_cleanup(amqp_context_t *context, amqp_list_t *list)
-{
-    not_implemented(todo);
-}
+extern void amqp_binary_initialize(amqp_context_t *context, amqp_binary_t *binary);
+extern void amqp_binary_cleanup(amqp_context_t *context, amqp_binary_t *binary);
 
+#ifdef __cplusplus
+}
+#endif
+#endif

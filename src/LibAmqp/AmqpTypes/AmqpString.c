@@ -17,16 +17,15 @@
 #include <assert.h>
 #include <string.h>
 
-#include "Buffer/Buffer.h"
-#include "AmqpTypes/AmqpList.h"
+#include "AmqpTypes/AmqpString.h"
+#include "debug_helper.h"
 
-
-void amqp_list_initialize(amqp_context_t *context, amqp_list_t *list)
+void amqp_string_initialize(amqp_context_t *context, amqp_string_t *string)
 {
     not_implemented(todo);
 }
 
-void amqp_list_cleanup(amqp_context_t *context, amqp_list_t *list)
+void amqp_string_cleanup(amqp_context_t *context, amqp_string_t *string)
 {
     not_implemented(todo);
 }

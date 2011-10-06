@@ -98,17 +98,61 @@ static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amq
     return true;
 }
 
-static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
+static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
 {
-    if (!amqp_type_is_list(type))
+    if (frame->frame_type != AMQP_SASL_FRAME_TYPE)
     {
-//        amqp_type_convert_has_failed(type);
-        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Expected list.");
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Expected a SASL frame type.");
         // TODO - dump type
         return false;
     }
 
-not_implemented(todo);
+    not_implemented(todo);
+}
+
+static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
+{
+    // Currently all accepted frames are encoded as a list.
+    if (!amqp_type_is_list(type))
+    {
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Expected a list.");
+        // TODO - dump type
+        return false;
+    }
+
+    if (frame->descriptor.domain != AMQP_DESCRIPTOR_DOMAIN)
+    {
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Unknow descriptor domain. Domain = %d", frame->descriptor.domain);
+        // TODO - dump type
+        return false;
+    }
+
+    // Check that the frame type match's the frame id.
+    switch (frame->descriptor.id)
+    {
+        case AMQP_FRAME_ID_SASL_MECHANISMS_LIST:
+            return decode_sasl_mechanisms_frame(context, buffer, frame, type);
+
+        case AMQP_FRAME_ID_OPEN_LIST:
+        case AMQP_FRAME_ID_BEGIN_LIST:
+        case AMQP_FRAME_ID_ATTACH_LIST:
+        case AMQP_FRAME_ID_FLOW_LIST:
+        case AMQP_FRAME_ID_TRANSFER_LIST:
+        case AMQP_FRAME_ID_DISPOSITION_LIST:
+        case AMQP_FRAME_ID_DETACH_LIST:
+        case AMQP_FRAME_ID_END_LIST:
+        case AMQP_FRAME_ID_CLOSE_LIST:
+        case AMQP_FRAME_ID_ERROR_LIST:
+        case AMQP_FRAME_ID_SASL_INIT_LIST:
+        case AMQP_FRAME_ID_SASL_CHALLENGE_LIST:
+        case AMQP_FRAME_ID_SASL_RESPONSE_LIST:
+        case AMQP_FRAME_ID_SASL_OUTCOME_LIST:
+
+        default:
+            amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Unsupported descriptor id. Id = %08x", frame->descriptor.id);
+            // TODO - dump type
+            return false;
+    }
 }
 
 static int decode_performative(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)

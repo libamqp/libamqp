@@ -25,7 +25,6 @@ extern "C" {
 #include "AmqpTypes/AmqpHash.h"
 #include "Context/Context.h"
 
-
 #ifndef LIBAMQP_AMQP_MAP_TYPE_T
 #define LIBAMQP_AMQP_MAP_TYPE_T
 typedef struct amqp_map_t amqp_map_t;
