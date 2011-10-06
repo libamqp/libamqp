@@ -24,10 +24,19 @@ extern "C" {
 #include "Context/Context.h"
 #include "AmqpTypes/AmqpSymbol.h"
 
+typedef enum amqp_frame_descriptor_type_t
+{
+    amqp_empty_frame = 1,
+    amqp_unsupported_descriptor,
+    amqp_amqp_descriptor,
+    amqp_sasl_descriptor,
+} amqp_frame_type_type_t;
+
 typedef struct amqp_descriptor_t
 {
     uint32_t domain;
     uint32_t id;
+    amqp_frame_type_type_t group;
 } amqp_descriptor_t;
 
 typedef struct amqp_symbolic_descriptor_t

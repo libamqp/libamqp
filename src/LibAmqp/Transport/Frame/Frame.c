@@ -45,14 +45,81 @@ static int decode_header(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fr
     return true;
 }
 
-static int decode_performative(amqp_context_t *context, amqp_frame_t *frame, amqp_type_t *type)
+void amqp_symbol_initialize_from_type(amqp_symbol_t *symbol, amqp_buffer_t *buffer, amqp_type_t *type)
 {
-    amqp_type_t *descriptor = amqp_type_get_descriptor(type);
-    amqp_type_t *described = amqp_type_get_described(type);
+    // TODO - deal with case where symbol straddles buffer fragments - not an issue for performative frames as they should fit in the smallest buffer.
+    amqp_symbol_initialize_reference(symbol, buffer, amqp_buffer_pointer(buffer, type->position.index), type->position.size);
+}
 
-    assert(descriptor && described);
+static int decode_symbolic_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
+{
+    amqp_symbol_t symbol;
+
+    amqp_descriptor_t *descriptor;
+    amqp_symbol_initialize_from_type(&symbol, buffer, type);
+    descriptor = amqp_context_descriptor_lookup(context, &symbol);
+    amqp_symbol_cleanup(context, &symbol);
+
+    if (descriptor)
+    {
+        frame->descriptor.domain = descriptor->domain;
+        frame->descriptor.id = descriptor->id;
+        frame->descriptor.group = descriptor->group;
+        return true;
+    }
+
+    amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Descriptor unknown.");
+    // TODO - dump dodgy descriptor
+    return false;
+}
+
+static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
+{
+    uint64_t code;
+
+    if (amqp_type_is_symbol(type))
+    {
+        return decode_symbolic_descriptor(context, buffer, frame, type);
+    }
+
+    code = amqp_type_to_ulong(type);
+    if (amqp_type_is_convert_failed(type))
+    {
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Descriptor is not a symbol or ulong.");
+        // TODO - dump dodgy descriptor
+        return false;
+    }
+
+    frame->descriptor.domain = code >> 32;
+    frame->descriptor.id = (uint32_t) code;
+    frame->descriptor.group = 0;
 
     return true;
+}
+
+static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
+{
+    if (!amqp_type_is_list(type))
+    {
+//        amqp_type_convert_has_failed(type);
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Expected list.");
+        // TODO - dump type
+        return false;
+    }
+
+not_implemented(todo);
+}
+
+static int decode_performative(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
+{
+    if (!amqp_type_is_valid(type))
+    {
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Frame is not a valid AMQP type");
+        return false;
+    }
+
+    return decode_descriptor(context, buffer, frame, amqp_type_get_descriptor(type)) &&
+            decode_remainder(context, buffer, frame, amqp_type_get_described(type));
 }
 
 static int decode_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame)
@@ -67,11 +134,11 @@ static int decode_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fra
 
     if ((type = amqp_decode(context, buffer)) == 0)
     {
-        frame->selector = amqp_empty_frame;
+        frame->descriptor.group = amqp_empty_frame;
         return true;
     }
 
-    rc = decode_performative(context, frame, type);
+    rc = decode_performative(context, buffer, frame, type);
     amqp_deallocate_type(context, type);
     return rc;
 }

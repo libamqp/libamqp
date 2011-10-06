@@ -25,6 +25,8 @@ extern "C" {
 #include "Context/Context.h"
 #include "Codec/Type/TypeExtension.h"
 
+#include "AmqpTypes/AmqpDescriptor.h"
+
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
@@ -42,12 +44,6 @@ enum amqp_frame_types_t {
     AMQP_SASL_FRAME_TYPE = 1
 };
 
-typedef enum amqp_frame_type_type_t
-{
-    amqp_empty_frame = 1,
-    amqp_sasl_mechanism_frame,
-} amqp_frame_type_type_t;
-
 struct amqp_frame_t
 {
     uint32_t data_offset;
@@ -56,13 +52,16 @@ struct amqp_frame_t
         uint16_t word;
         uint16_t channel;
     } type_specific;
-    amqp_frame_type_type_t selector;
+
+    amqp_descriptor_t descriptor;
+
     union {
         int pad;
     } frames;
 };
 
 extern amqp_frame_t *amqp_decode_frame(amqp_context_t *context, amqp_buffer_t *buffer);
+extern void amqp_symbol_initialize_from_type(amqp_symbol_t *symbol, amqp_buffer_t *buffer, amqp_type_t *type);
 
 #ifdef __cplusplus
 }

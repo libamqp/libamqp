@@ -22,7 +22,7 @@
 #include "AmqpTypes/AmqpSymbol.h"
 
 
-void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const char *reference, size_t size)
+void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const unsigned char *reference, size_t size)
 {
     if (buffer)
     {
@@ -34,7 +34,7 @@ void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buff
     symbol->on_heap = 0;
 }
 
-amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer, const char *reference, size_t size)
+amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer, const unsigned char *reference, size_t size)
 {
     amqp_symbol_t *result = AMQP_MALLOC(context, amqp_symbol_t);
     amqp_symbol_initialize_reference(result, buffer, reference, size);

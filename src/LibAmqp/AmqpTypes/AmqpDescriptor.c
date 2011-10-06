@@ -23,21 +23,21 @@
 static
 amqp_symbolic_descriptor_t descriptors[] =
 {
-    { "amqp:open:list", { 0x00000000, 0x00000010 }},
-    { "amqp:begin:list", { 0x00000000, 0x00000011 }},
-    { "amqp:attach:list", { 0x00000000, 0x00000012 }},
-    { "amqp:flow:list", { 0x00000000, 0x00000013 }},
-    { "amqp:transfer:list", { 0x00000000, 0x00000014 }},
-    { "amqp:disposition:list", { 0x00000000, 0x00000015 }},
-    { "amqp:detach:list", { 0x00000000, 0x00000016 }},
-    { "amqp:end:list", { 0x00000000, 0x00000017 }},
-    { "amqp:close:list", { 0x00000000, 0x00000018 }},
-    { "amqp:error:list", { 0x00000000, 0x0000001d }},
-    { "amqp:sasl-mechanisms:list", { 0x00000000, 0x00000040 }},
-    { "amqp:sasl-init:list", { 0x00000000, 0x00000041 }},
-    { "amqp:sasl-challenge:list", { 0x00000000, 0x00000042 }},
-    { "amqp:sasl-response:list", { 0x00000000, 0x00000043 }},
-    { "amqp:sasl-outcome:list", { 0x00000000, 0x00000044 }},
+    { "amqp:open:list", { 0x00000000, 0x00000010, amqp_amqp_descriptor }},
+    { "amqp:begin:list", { 0x00000000, 0x00000011, amqp_amqp_descriptor }},
+    { "amqp:attach:list", { 0x00000000, 0x00000012, amqp_amqp_descriptor }},
+    { "amqp:flow:list", { 0x00000000, 0x00000013, amqp_amqp_descriptor }},
+    { "amqp:transfer:list", { 0x00000000, 0x00000014, amqp_amqp_descriptor }},
+    { "amqp:disposition:list", { 0x00000000, 0x00000015, amqp_amqp_descriptor }},
+    { "amqp:detach:list", { 0x00000000, 0x00000016, amqp_amqp_descriptor }},
+    { "amqp:end:list", { 0x00000000, 0x00000017, amqp_amqp_descriptor }},
+    { "amqp:close:list", { 0x00000000, 0x00000018, amqp_amqp_descriptor }},
+    { "amqp:error:list", { 0x00000000, 0x0000001d, amqp_amqp_descriptor }},
+    { "amqp:sasl-mechanisms:list", { 0x00000000, 0x00000040, amqp_sasl_descriptor }},
+    { "amqp:sasl-init:list", { 0x00000000, 0x00000041, amqp_sasl_descriptor }},
+    { "amqp:sasl-challenge:list", { 0x00000000, 0x00000042, amqp_sasl_descriptor }},
+    { "amqp:sasl-response:list", { 0x00000000, 0x00000043, amqp_sasl_descriptor }},
+    { "amqp:sasl-outcome:list", { 0x00000000, 0x00000044, amqp_sasl_descriptor }},
     {0}
 };
 
@@ -54,7 +54,7 @@ amqp_map_t *amqp_load_descriptors(amqp_context_t *context)
     amqp_map_t *result = amqp_symbol_map_create(context, map_size());
     while (descriptors[i].symbolic)
     {
-        amqp_symbol_t *symbol = amqp_symbol_create(context, 0, descriptors[i].symbolic, strlen(descriptors[i].symbolic));
+        amqp_symbol_t *symbol = amqp_symbol_create(context, 0, (const unsigned char *) descriptors[i].symbolic, strlen(descriptors[i].symbolic));
         amqp_symbol_map_put(context, result, symbol, &descriptors[i].descriptor);
         i++;
     }

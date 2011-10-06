@@ -23,29 +23,60 @@
 extern "C" {
 #endif
 
+/*
 static inline
-bool amqp_type_convert_ok(amqp_type_t *type)
+bool amqp_type_is_convert_ok(amqp_type_t *type)
 {
     return type->flags.convert_failed == 0;
 }
+*/
 
 static inline
-amqp_type_t *amqp_type_convert_has_failed(amqp_type_t *type)
+bool amqp_type_is_convert_failed(amqp_type_t *type)
 {
-    type->flags.convert_failed = 1;
-    return type;
+    return type->flags.convert_failed;
+}
+
+static inline
+int amqp_type_convert_set_failed(amqp_type_t *type, int failed)
+{
+    return type->flags.convert_failed = type->flags.convert_failed || failed;
 }
 
 static inline
 amqp_type_t *amqp_type_get_descriptor(amqp_type_t *type)
 {
-    return amqp_type_is_described(type) ? type->value.described.elements[0] : amqp_type_convert_has_failed(type);
+    return amqp_type_convert_set_failed(type, amqp_type_is_described(type))
+        ? type->value.described.elements[0]
+        : type;
 }
 
 static inline
 amqp_type_t *amqp_type_get_described(amqp_type_t *type)
 {
-    return amqp_type_is_described(type) ? type->value.described.elements[1] : amqp_type_convert_has_failed(type);
+    return amqp_type_convert_set_failed(type, amqp_type_is_described(type))
+        ? type->value.described.elements[1]
+        : type;
+}
+
+static inline
+int amqp_type_is_symbol(amqp_type_t *type)
+{
+    return type->format_code == 0xa3 || type->format_code == 0xa3;
+}
+
+static inline
+int amqp_type_is_ulong(amqp_type_t *type)
+{
+    return type->format_code == 0x53 || type->format_code == 0x80 || type->format_code == 0x44;
+}
+
+static inline
+uint64_t amqp_type_to_ulong(amqp_type_t *type)
+{
+    return amqp_type_convert_set_failed(type, amqp_type_is_ulong(type))
+        ? type->value.b8._ulong
+        : 0;
 }
 
 #ifdef __cplusplus

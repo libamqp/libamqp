@@ -13,18 +13,29 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+#ifndef LIBAMQP_AMQP_TYPES_AMQP_SYMBOL_H
+#define LIBAMQP_AMQP_TYPES_AMQP_SYMBOL_H
 
-#ifndef LIBAMQP_TEST_DATA_TEST_FRAMES_H
-#define LIBAMQP_TEST_DATA_TEST_FRAMES_H
-
-#include "TestData/TestData.h"
-
-namespace test_data
-{
-    extern TestData minimal_frame_header;
-    extern TestData sasl_mechanisms_frame;
-    extern TestData sasl_mechanisms_frame_long;
-    extern TestData sasl_mechanisms_frame_symbol;
-}
+#ifdef __cplusplus
+extern "C" {
 #endif
 
+#include "libamqp_common.h"
+#include "Context/Context.h"
+
+#ifndef LIBAMQP_BUFFER_T_TYPE
+#define LIBAMQP_BUFFER_T_TYPE
+    typedef struct amqp_buffer_t amqp_buffer_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_LIST_T
+#define LIBAMQP_AMQP_LIST_T
+    typedef struct amqp_list_t amqp_list_t;
+#endif
+
+
+
+#ifdef __cplusplus
+}
+#endif
+#endif

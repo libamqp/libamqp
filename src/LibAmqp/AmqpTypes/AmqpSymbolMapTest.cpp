@@ -42,7 +42,7 @@ SUITE(AmqpTypes)
         amqp_symbol_map_initialize(context, &map, 63);
         for (int i = 0; i < key_count(); i++)
         {
-            amqp_symbol_t *symbol = amqp_symbol_create(context, 0, keys[i], strlen(keys[i]));
+            amqp_symbol_t *symbol = amqp_symbol_create(context, 0, (const unsigned char *) keys[i], strlen(keys[i]));
             amqp_map_put(context, &map, symbol, data[i]);
         }
         amqp_symbol_map_cleanup(context, &map);
@@ -51,7 +51,7 @@ SUITE(AmqpTypes)
     TEST_FIXTURE(AmqpSymbolMapFixture, symbol_map_put_and_get_are_nothing_special)
     {
         amqp_symbol_map_initialize(context, &map, 63);
-        amqp_symbol_t *symbol = amqp_symbol_create(context, 0, keys[6], strlen(keys[6]));
+        amqp_symbol_t *symbol = amqp_symbol_create(context, 0, (const unsigned char *) keys[6], strlen(keys[6]));
         CHECK(amqp_map_put(context, &map, symbol, data[6]));
         CHECK(amqp_map_put(context, &map, symbol, data[6]) == 0);
         amqp_symbol_map_cleanup(context, &map);

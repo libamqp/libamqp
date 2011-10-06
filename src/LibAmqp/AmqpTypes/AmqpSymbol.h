@@ -26,7 +26,7 @@ extern "C" {
 
 #ifndef LIBAMQP_BUFFER_T_TYPE
 #define LIBAMQP_BUFFER_T_TYPE
-typedef struct amqp_buffer_t amqp_buffer_t;
+    typedef struct amqp_buffer_t amqp_buffer_t;
 #endif
 
 #ifndef LIBAMQP_AMQP_SYMBOL_T
@@ -37,13 +37,13 @@ typedef struct amqp_buffer_t amqp_buffer_t;
 struct amqp_symbol_t
 {
     amqp_buffer_t *buffer;
-    const char *reference;
+    const unsigned char *reference;
     size_t size;
     int on_heap;
 };
 
-extern void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const char *reference, size_t size);
-extern amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer, const char *reference, size_t size);
+extern void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const unsigned char *reference, size_t size);
+extern amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer, const unsigned char *reference, size_t size);
 extern void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol);
 
 extern int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs);

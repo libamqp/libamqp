@@ -14,17 +14,11 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TEST_DATA_TEST_FRAMES_H
-#define LIBAMQP_TEST_DATA_TEST_FRAMES_H
+#include <assert.h>
+#include <string.h>
 
-#include "TestData/TestData.h"
+#include "Buffer/Buffer.h"
+#include "Misc/Bits.h"
+#include "AmqpTypes/AmqpList.h"
 
-namespace test_data
-{
-    extern TestData minimal_frame_header;
-    extern TestData sasl_mechanisms_frame;
-    extern TestData sasl_mechanisms_frame_long;
-    extern TestData sasl_mechanisms_frame_symbol;
-}
-#endif
-
+int hfkahfa;
