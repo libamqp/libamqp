@@ -36,15 +36,12 @@ SUITE(AmqpTypes)
 
     AmqpDescriptorFixture::AmqpDescriptorFixture()
     {
-        break_one();
         map = amqp_load_descriptors(context);
         amqp_symbol_initialize_reference(&symbol, 0, (const unsigned char *) descriptor, strlen(descriptor));
     }
 
     AmqpDescriptorFixture::~AmqpDescriptorFixture()
     {
-        break_two();
-
         amqp_symbol_cleanup(context, &symbol);
         amqp_descriptors_cleanup(context, map);
     }

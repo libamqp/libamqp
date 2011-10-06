@@ -19,6 +19,7 @@
 #include "Transport/Frame/FrameTestSupport.h"
 
 #include "Codec/Decode/Decode.h"
+#include "debug_helper.h"
 
 SUITE(Frame)
 {
@@ -39,19 +40,17 @@ SUITE(Frame)
         CHECK_EQUAL(0, amqp_buffer_available(buffer));
     }
 
-/*
-
     TEST_FIXTURE(FrameFixture, decode_sasl_mechanisms_frame)
     {
         test_data::sasl_mechanisms_frame.transfer_to(buffer);
-        frame = amqp_decode_frame(context, buffer);
-        CHECK_EQUAL(8U, frame->data_offset);
 
+//        break_one();
+        frame = amqp_decode_frame(context, buffer);
+
+        CHECK_EQUAL(8U, frame->data_offset);
         CHECK_EQUAL(AMQP_SASL_FRAME_TYPE, frame->frame_type);
         CHECK_EQUAL(0U, frame->type_specific.word);
 
-//        CHECK_EQUAL(amqp_sasl_mechanism_frame, frame->selector);
+    }
 
-//        CHECK_EQUAL(amqp_empty_frame, frame->selector);
-    }*/
 }

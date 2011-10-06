@@ -82,6 +82,7 @@ static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amq
         return decode_symbolic_descriptor(context, buffer, frame, type);
     }
 
+
     code = amqp_type_to_ulong(type);
     if (amqp_type_is_convert_failed(type))
     {
