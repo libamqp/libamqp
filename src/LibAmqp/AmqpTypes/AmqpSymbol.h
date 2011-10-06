@@ -50,6 +50,7 @@ extern int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs);
 extern uint32_t amqp_symbol_hash(amqp_symbol_t *symbol);
 
 extern void amqp_symbol_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity);
+extern amqp_map_t *amqp_symbol_map_create(amqp_context_t *context, int initial_capacity);
 extern void amqp_symbol_map_cleanup(amqp_context_t *context, amqp_map_t *map);
 
 static inline

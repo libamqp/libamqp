@@ -48,20 +48,20 @@ static size_t map_size()
     return size < 16 ? 16 : size;
 }
 
-void amqp_load_descriptors(amqp_context_t *context, amqp_map_t *map)
+amqp_map_t *amqp_load_descriptors(amqp_context_t *context)
 {
     int i = 0;
-
-    amqp_symbol_map_initialize(context, map, map_size());
+    amqp_map_t *result = amqp_symbol_map_create(context, map_size());
     while (descriptors[i].symbolic)
     {
         amqp_symbol_t *symbol = amqp_symbol_create(context, 0, descriptors[i].symbolic, strlen(descriptors[i].symbolic));
-        amqp_symbol_map_put(context, map, symbol, &descriptors[i].descriptor);
+        amqp_symbol_map_put(context, result, symbol, &descriptors[i].descriptor);
         i++;
     }
+    return result;
 }
 
-void amqp_descriptors_cleannup(amqp_context_t *context, amqp_map_t *map)
+void amqp_descriptors_cleanup(amqp_context_t *context, amqp_map_t *map)
 {
     amqp_symbol_map_cleanup(context, map);
 }

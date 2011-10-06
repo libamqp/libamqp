@@ -31,24 +31,42 @@ void amqp_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_c
     map->entry_list = 0;
     map->hash = hash;
     map->compare = compare;
+    map->on_heap = 0;
+}
+
+amqp_map_t *amqp_map_create(amqp_context_t *context, int initial_capacity, amqp_hash_fn_t hash, amqp_compare_fn_t compare)
+{
+    amqp_map_t *result = AMQP_MALLOC(context, amqp_map_t);
+    amqp_map_initialize(context, result, initial_capacity, hash, compare);
+    result->on_heap = 1;
+    return result;
 }
 
 void amqp_map_cleanup_with_callback(amqp_context_t *context, amqp_map_t *map, amqp_free_callback_t callback)
 {
-    amqp_entry_t *list = map->entry_list;
-
-    while (list)
+    if (map)
     {
-        amqp_entry_t *entry = list;
-        list = list->entry_list.next;
-        if (callback)
+        amqp_entry_t *list = map->entry_list;
+
+        while (list)
         {
-            callback(context, entry->key, entry->data);
+            amqp_entry_t *entry = list;
+            list = list->entry_list.next;
+            if (callback)
+            {
+                callback(context, entry->key, entry->data);
+            }
+            AMQP_FREE(context, entry);
         }
-        AMQP_FREE(context, entry);
+
+        AMQP_FREE(context, map->buckets);
+        map->buckets = 0;
+        map->entry_list = 0;
+        if (map->on_heap)
+        {
+            AMQP_FREE(context, map);
+        }
     }
-        
-    AMQP_FREE(context, map->buckets);
 }
 
 void amqp_map_cleanup(amqp_context_t *context, amqp_map_t *map)

@@ -56,6 +56,11 @@ typedef struct amqp_frame_t amqp_frame_t;
 typedef struct amqp_connection_t amqp_connection_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_MAP_TYPE_T
+#define LIBAMQP_AMQP_MAP_TYPE_T
+typedef struct amqp_map_t amqp_map_t;
+#endif
+
     typedef int amqp_debug_print_c_t(int c);
 
     typedef union amqp_outputter_arg_t
@@ -114,8 +119,15 @@ typedef struct amqp_connection_t amqp_connection_t;
 
         struct
         {
+            // TODO - move into config
             uint32_t max_frame_size;
         } limits;
+
+        struct
+        {
+            int cloned;
+            amqp_map_t *amqp_descriptors;
+        } reference;
 
         amqp_event_loop_t *thread_event_loop;
     };

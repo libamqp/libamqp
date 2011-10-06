@@ -21,6 +21,8 @@
 
 #include "Memory/Memory.h"
 #include "Memory/Pool.h"
+#include "AmqpTypes/AmqpDescriptor.h"
+
 #include "debug_helper.h"
 
 typedef struct amqp__context_with_guard_t
@@ -64,10 +66,11 @@ amqp_create_context()
 
     result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
     result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
-
     result->context.limits.max_frame_size = AMQP_DEFAULT_MAX_FRAME_SIZE;
-
     result->context.thread_event_loop = 0;
+
+    // Danger Will Robinson - using context while initialzing it so do last.
+    result->context.reference.amqp_descriptors = amqp_load_descriptors(&result->context);
 
     return (amqp_context_t *) result;
 }
@@ -95,7 +98,11 @@ amqp_context_t *amqp_context_clone(amqp_context_t *context)
 
     result->context.limits = context->limits;
 
+    result->context.reference = context->reference;
+    result->context.reference.cloned = true;
+
     result->context.thread_event_loop = 0;   // Don't clone the event loop. Need one per thread.
+
     return (amqp_context_t *) result;
 }
 
@@ -122,6 +129,11 @@ int amqp_context_destroy(amqp_context_t *context)
             amqp_fatal_program_error("Attempting to destroy a Context twice.");
         }
         ((amqp__context_with_guard_t *) context)->multiple_delete_protection = 0;
+
+        if (!context->reference.cloned)
+        {
+            amqp_descriptors_cleanup(context, context->reference.amqp_descriptors);
+        }
 
         amqp_deallocate_buffer(context, context->encode.buffer);
         amqp_deallocate_buffer(context, context->decode.buffer);

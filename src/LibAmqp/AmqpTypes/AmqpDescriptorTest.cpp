@@ -29,7 +29,7 @@ SUITE(AmqpTypes)
 
     public:
         amqp_symbol_t symbol;
-        amqp_map_t map;
+        amqp_map_t *map;
     };
 
     const char *AmqpDescriptorFixture::descriptor = "amqp:sasl-mechanisms:list";
@@ -37,7 +37,7 @@ SUITE(AmqpTypes)
     AmqpDescriptorFixture::AmqpDescriptorFixture()
     {
         break_one();
-        amqp_load_descriptors(context, &map);
+        map = amqp_load_descriptors(context);
         amqp_symbol_initialize_reference(&symbol, 0, descriptor, strlen(descriptor));
     }
 
@@ -46,12 +46,12 @@ SUITE(AmqpTypes)
         break_two();
 
         amqp_symbol_cleanup(context, &symbol);
-        amqp_descriptors_cleannup(context, &map);
+        amqp_descriptors_cleanup(context, map);
     }
 
     TEST_FIXTURE(AmqpDescriptorFixture, lookup_descriptor_using_map_api)
     {
-        amqp_descriptor_t *d = (amqp_descriptor_t *) amqp_symbol_map_get(&map, &symbol);
+        amqp_descriptor_t *d = (amqp_descriptor_t *) amqp_symbol_map_get(map, &symbol);
 
         CHECK_EQUAL(0x00000000U, d->domain);
         CHECK_EQUAL(0x00000040U, d->id);
@@ -59,7 +59,15 @@ SUITE(AmqpTypes)
 
     TEST_FIXTURE(AmqpDescriptorFixture, lookup_descriptor)
     {
-        amqp_descriptor_t *d = amqp_descriptor_lookup(&map, &symbol);
+        amqp_descriptor_t *d = amqp_descriptor_lookup(map, &symbol);
+
+        CHECK_EQUAL(0x00000000U, d->domain);
+        CHECK_EQUAL(0x00000040U, d->id);
+    }
+
+    TEST_FIXTURE(AmqpDescriptorFixture, lookup_descriptor_using_context)
+    {
+        amqp_descriptor_t *d = amqp_context_descriptor_lookup(context, &symbol);
 
         CHECK_EQUAL(0x00000000U, d->domain);
         CHECK_EQUAL(0x00000040U, d->id);

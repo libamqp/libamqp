@@ -36,9 +36,15 @@ typedef struct amqp_symbolic_descriptor_t
     amqp_descriptor_t descriptor;
 } amqp_symbolic_descriptor_t;
 
-extern void amqp_load_descriptors(amqp_context_t *context, amqp_map_t *map);
-extern void amqp_descriptors_cleannup(amqp_context_t *context, amqp_map_t *map);
+extern amqp_map_t *amqp_load_descriptors(amqp_context_t *context);
+extern void amqp_descriptors_cleanup(amqp_context_t *context, amqp_map_t *map);
 extern amqp_descriptor_t *amqp_descriptor_lookup(amqp_map_t *map, amqp_symbol_t *symbol);
+
+static inline
+amqp_descriptor_t *amqp_context_descriptor_lookup(amqp_context_t *context, amqp_symbol_t *symbol)
+{
+    return amqp_descriptor_lookup(context->reference.amqp_descriptors, symbol);
+}
 
 #ifdef __cplusplus
 }

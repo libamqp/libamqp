@@ -44,15 +44,18 @@ amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer
 
 void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol)
 {
-    if (symbol->buffer)
+    if (symbol)
     {
-        amqp_buffer_release(symbol->buffer);
-    }
-    symbol->reference = 0;
-    symbol->size = 0;
-    if (symbol->on_heap)
-    {
-        AMQP_FREE(context, symbol);
+        if (symbol->buffer)
+        {
+            amqp_buffer_release(symbol->buffer);
+        }
+        symbol->reference = 0;
+        symbol->size = 0;
+        if (symbol->on_heap)
+        {
+            AMQP_FREE(context, symbol);
+        }
     }
 }
 
@@ -77,6 +80,11 @@ uint32_t amqp_symbol_hash(amqp_symbol_t *symbol)
 void amqp_symbol_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity)
 {
     amqp_map_initialize(context, map, initial_capacity, (amqp_hash_fn_t) amqp_symbol_hash, (amqp_compare_fn_t) amqp_symbol_compare);
+}
+
+amqp_map_t *amqp_symbol_map_create(amqp_context_t *context, int initial_capacity)
+{
+    return amqp_map_create(context, initial_capacity, (amqp_hash_fn_t) amqp_symbol_hash, (amqp_compare_fn_t) amqp_symbol_compare);
 }
 
 static void cleanup_callback(amqp_context_t *context, const void *key, const void *data)

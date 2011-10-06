@@ -25,6 +25,12 @@ extern "C" {
 #include "AmqpTypes/AmqpHash.h"
 #include "Context/Context.h"
 
+
+#ifndef LIBAMQP_AMQP_MAP_TYPE_T
+#define LIBAMQP_AMQP_MAP_TYPE_T
+typedef struct amqp_map_t amqp_map_t;
+#endif
+
 typedef struct amqp_entry_t amqp_entry_t;
 struct amqp_entry_t
 {
@@ -44,7 +50,7 @@ typedef uint32_t (*amqp_hash_fn_t)(const void *key);
 typedef int (*amqp_compare_fn_t)(const void *lhs, const void *rhs);
 typedef void (*amqp_free_callback_t)(amqp_context_t *context, const void *key, const void *data);
 
-typedef struct amqp_map_t
+struct amqp_map_t
 {
     size_t capacity;
     size_t count;
@@ -52,14 +58,13 @@ typedef struct amqp_map_t
     amqp_entry_t *entry_list;
     amqp_hash_fn_t hash;
     amqp_compare_fn_t compare;
-} amqp_map_t;
+    int on_heap;
+};
 
 extern void amqp_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity, amqp_hash_fn_t hash, amqp_compare_fn_t compare);
+extern amqp_map_t *amqp_map_create(amqp_context_t *context, int initial_capacity, amqp_hash_fn_t hash, amqp_compare_fn_t compare);
 extern void amqp_map_cleanup(amqp_context_t *context, amqp_map_t *map);
 extern void amqp_map_cleanup_with_callback(amqp_context_t *context, amqp_map_t *map, amqp_free_callback_t callback);
-
-extern amqp_map_t *amqp_map_create(amqp_context_t *context, int initial_capacity);
-extern void amqp_map_free(amqp_context_t *context, amqp_map_t *map);
 
 extern int amqp_map_put(amqp_context_t *context, amqp_map_t *map, const void *key, const void *data);
 extern const void *amqp_map_get(amqp_map_t *map, const void *key);
