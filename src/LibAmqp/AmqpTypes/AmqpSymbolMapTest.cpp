@@ -15,7 +15,6 @@
  */
 
 #include "AmqpTypes/AmqpTypesTestSupport.h"
-
 #include "AmqpTypes/AmqpSymbol.h"
 
 SUITE(AmqpTypes)
@@ -38,7 +37,7 @@ SUITE(AmqpTypes)
     {
     }
 
-    TEST_FIXTURE(AmqpSymbolMapFixture, symbol_map_should_cleanup_referenced_symbols)
+    TEST_FIXTURE(AmqpSymbolMapFixture, symbol_map_should_not_trigger_allocation_errors)
     {
         amqp_symbol_map_initialize(context, &map, 63);
         for (int i = 0; i < key_count(); i++)
