@@ -20,7 +20,7 @@
 
 namespace SuiteFrame
 {
-    FrameFixture::FrameFixture() : frame(0)
+    FrameFixture::FrameFixture() : frame(0), type(0)
     {
         buffer = amqp_allocate_buffer(context);
     }
@@ -29,5 +29,6 @@ namespace SuiteFrame
     {
         amqp_deallocate_buffer(context, buffer);
         amqp_deallocate_frame(context, frame);
+        amqp_deallocate_type(context, type);
     }
 }

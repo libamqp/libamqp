@@ -32,6 +32,7 @@ namespace SuiteFrame
 
     public:
         amqp_frame_t *frame;
+        amqp_type_t *type;
         amqp_buffer_t *buffer;
     };
 }
