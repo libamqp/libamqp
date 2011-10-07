@@ -20,37 +20,16 @@
 extern "C" {
 #endif
 
-#include <stdint.h>
-#include "libamqp_common.h"
-#include "AmqpTypes/AmqpHash.h"
-#include "Context/Context.h"
+#include "AmqpTypes/AmqpLeader.h"
+#include "AmqpTypes/AmqpEntry.h"
 
-#ifndef LIBAMQP_AMQP_MAP_TYPE_T
-#define LIBAMQP_AMQP_MAP_TYPE_T
-typedef struct amqp_map_t amqp_map_t;
-#endif
-
-typedef struct amqp_entry_t amqp_entry_t;
-struct amqp_entry_t
-{
-    struct {
-        amqp_entry_t *next;
-        amqp_entry_t **prev;
-    } collision_list;
-    struct {
-        amqp_entry_t *next;
-        amqp_entry_t **prev;
-    } entry_list;
-    const void *key;
-    const void *data;
-};
-
-typedef uint32_t (*amqp_hash_fn_t)(const void *key);
-typedef int (*amqp_compare_fn_t)(const void *lhs, const void *rhs);
-typedef void (*amqp_free_callback_t)(amqp_context_t *context, const void *key, const void *data);
+//typedef uint32_t (*amqp_hash_fn_t)(const void *key);
+//typedef int (*amqp_compare_fn_t)(const void *lhs, const void *rhs);
+//typedef void (*amqp_free_callback_t)(amqp_context_t *context, const void *key, const void *data);
 
 struct amqp_map_t
 {
+    amqp_leader_t leader;
     size_t capacity;
     size_t count;
     amqp_entry_t **buckets;

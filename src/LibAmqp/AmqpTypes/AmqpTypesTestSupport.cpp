@@ -14,8 +14,6 @@
    limitations under the License.
  */
 
-#include "AmqpTypes/AmqpHash.h"
-
 #include <TestHarness.h>
 #include "AmqpTypes/AmqpTypesTestSupport.h"
 

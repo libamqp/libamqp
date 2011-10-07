@@ -20,25 +20,20 @@
 extern "C" {
 #endif
 
-#include "libamqp_common.h"
-#include "Context/Context.h"
-
-#ifndef LIBAMQP_AMQP_SYMBOL_T
-#define LIBAMQP_AMQP_SYMBOL_T
-    typedef struct amqp_symbol_t amqp_symbol_t;
-#endif
+#include "AmqpTypes/AmqpLeader.h"
 
 #define AMQP_MULTIPLE_DEFAULT_SIZE  8
 
-typedef struct amqp_multiple_symbol_t
+struct amqp_multiple_symbol_t
 {
+    amqp_leader_t leader;
     int size;
     union
     {
         amqp_symbol_t *direct[AMQP_MULTIPLE_DEFAULT_SIZE];
         amqp_symbol_t **indirect;
     } array;
-} amqp_multiple_symbol_t;
+};
 
 static inline
 int amqp_multiple_symbol_size(amqp_multiple_symbol_t *multiple)

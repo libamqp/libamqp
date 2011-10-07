@@ -19,6 +19,7 @@
 
 #include <TestHarness.h>
 #include "Context/ContextTestSupport.h"
+#include "AmqpTypes/AmqpTypes.h"
 #include "debug_helper.h"
 
 namespace SuiteAmqpTypes

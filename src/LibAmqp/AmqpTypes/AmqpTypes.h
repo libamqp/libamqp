@@ -17,13 +17,27 @@
 #ifndef LIBAMQP_AMQP_TYPES_TYPES_H
 #define LIBAMQP_AMQP_TYPES_TYPES_H
 
+#include "AmqpTypes/AmqpLeader.h"
+
 typedef int amqp_sasl_code_t;
 
 #include "AmqpTypes/AmqpBinary.h"
+#include "AmqpTypes/AmqpEntry.h"
 #include "AmqpTypes/AmqpList.h"
 #include "AmqpTypes/AmqpMap.h"
 #include "AmqpTypes/AmqpMultiple.h"
 #include "AmqpTypes/AmqpString.h"
 #include "AmqpTypes/AmqpSymbol.h"
 
+union amqp_types_t
+{
+    amqp_leader_t leader;
+    amqp_binary_t binary;
+    amqp_entry_t entry;
+    amqp_list_t list;
+    amqp_map_t map;
+    amqp_multiple_symbol_t multiple_symbol;
+    amqp_string_t string;
+    amqp_symbol_t symbol;
+};
 #endif

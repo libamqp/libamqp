@@ -13,16 +13,33 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#ifndef LIBAMQP_AMQP_TYPES_AMQP_HASH_H
-#define LIBAMQP_AMQP_TYPES_AMQP_HASH_H
+#ifndef LIBAMQP_AMQP_TYPES_AMQP_ENTRY_H
+#define LIBAMQP_AMQP_TYPES_AMQP_ENTRY_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdint.h>
+#include "AmqpTypes/AmqpLeader.h"
 
-extern uint32_t amqp_hash(const void *data, int len);
+struct amqp_entry_t
+{
+    amqp_leader_t leader;
+    struct {
+        amqp_entry_t *next;
+        amqp_entry_t **prev;
+    } collision_list;
+    struct {
+        amqp_entry_t *next;
+        amqp_entry_t **prev;
+    } entry_list;
+    const void *key;
+    const void *data;
+};
+
+typedef uint32_t (*amqp_hash_fn_t)(const void *key);
+typedef int (*amqp_compare_fn_t)(const void *lhs, const void *rhs);
+typedef void (*amqp_free_callback_t)(amqp_context_t *context, const void *key, const void *data);
 
 #ifdef __cplusplus
 }

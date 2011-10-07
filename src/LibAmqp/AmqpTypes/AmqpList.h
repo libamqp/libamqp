@@ -20,21 +20,11 @@
 extern "C" {
 #endif
 
-#include "libamqp_common.h"
-#include "Context/Context.h"
-
-#ifndef LIBAMQP_BUFFER_T_TYPE
-#define LIBAMQP_BUFFER_T_TYPE
-    typedef struct amqp_buffer_t amqp_buffer_t;
-#endif
-
-#ifndef LIBAMQP_AMQP_LIST_T
-#define LIBAMQP_AMQP_LIST_T
-    typedef struct amqp_list_t amqp_list_t;
-#endif
+#include "AmqpTypes/AmqpLeader.h"
 
 struct amqp_list_t
 {
+    amqp_leader_t leader;
     int on_heap;
 };
 

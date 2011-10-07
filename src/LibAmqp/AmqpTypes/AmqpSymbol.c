@@ -17,7 +17,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "Buffer/Buffer.h"
+#include "Context/Context.h"
 #include "Misc/Bits.h"
 #include "AmqpTypes/AmqpSymbol.h"
 

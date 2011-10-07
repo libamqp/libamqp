@@ -17,6 +17,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "Context/Context.h"
 #include "AmqpTypes/AmqpBinary.h"
 #include "debug_helper.h"
 

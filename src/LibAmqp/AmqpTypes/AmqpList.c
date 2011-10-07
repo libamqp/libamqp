@@ -18,6 +18,8 @@
 #include <string.h>
 
 #include "Buffer/Buffer.h"
+#include "Context/Context.h"
+
 #include "AmqpTypes/AmqpList.h"
 
 

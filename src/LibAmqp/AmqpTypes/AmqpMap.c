@@ -18,6 +18,8 @@
 #include <string.h>
 
 #include "Misc/Bits.h"
+#include "Context/Context.h"
+
 #include "AmqpTypes/AmqpMap.h"
 #include "debug_helper.h"
 
