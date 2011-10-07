@@ -21,6 +21,8 @@ extern "C" {
 #endif
 
 #include "Context/Context.h"
+#include "Codec/Type/Type.h"
+
 #include "AmqpTypes/AmqpLeader.h"
 
 typedef void (*amqp_dtor_t)(amqp_context_t *context, amqp_amqp_type_t *type);
