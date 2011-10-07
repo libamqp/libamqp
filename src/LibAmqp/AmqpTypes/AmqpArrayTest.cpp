@@ -48,6 +48,8 @@ SUITE(AmqpTypes)
 
     TEST_FIXTURE(AmqpArrayFixture, fixture_should_balance_allocations)
     {
+        amqp_array_initialize(context, &ref, 13);
+//        amqp_array_count(&ref);
 //        CHECK_EQUAL(32U, amqp_array_capacity(&array));
 //        CHECK_CLOSE(0.0, amqp_array_factor(&array), 0.001);
     }

@@ -27,9 +27,14 @@ struct amqp_array_t
 {
     amqp_leader_t leader;
     amqp_type_t *type;
+    size_t capacity;
+    size_t size;
+    void **elements;
 };
 
-extern void amqp_array_initialize(amqp_context_t *context, amqp_array_t *array);
+extern void amqp_array_initialize(amqp_context_t *context, amqp_array_t *array, size_t size);
+extern void amqp_array_initialize_from_type(amqp_context_t *context, amqp_array_t *array, amqp_type_t *type);
+
 static inline
 void amqp_array_cleanup(amqp_context_t *context, amqp_array_t *array)
 {

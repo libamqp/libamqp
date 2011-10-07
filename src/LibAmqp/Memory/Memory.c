@@ -74,6 +74,8 @@ void *amqp_malloc(amqp_context_t *context, size_t n)
 
     return &block->data.fragments[0];
 }
+
+// TODO - do something about fragmentation
 void *amqp_malloc_array(amqp_context_t *context, size_t n, int count)
 {
     return amqp_malloc(context, n * count);
