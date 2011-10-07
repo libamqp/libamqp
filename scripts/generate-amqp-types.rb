@@ -125,6 +125,7 @@ class Parser
     puts "struct amqp_frame_#{name}_t {"
     n.elements.each('field') {|f| field(f) }
     puts "};"
+    puts
   end
 
   def parse
@@ -133,17 +134,25 @@ class Parser
     puts(<<-eos)
 \#ifndef LIBAMQP_AMQP_AMQP_#{guard.upcase}_H
 \#define LIBAMQP_AMQP_AMQP_#{guard.upcase}_H
+\#ifdef __cplusplus
+extern "C" {
+\#endif
+
+\#include "AmqpTypes/AmqpTypes.h"
     
-\#include "AmqpTypes/Types.h"
-    
-    eos
+eos
     xml_file = File.new(@xml_file)
     document = REXML::Document.new(xml_file)
     xpath = $xpaths[guard]
     document.root.each_element(xpath) { |e| typedefs e }
     puts
     document.root.each_element(xpath) { |e| frame e }
-    puts("\#endif")
+    puts(<<-eos)
+\#ifdef __cplusplus
+}
+\#endif
+\#endif
+eos
   end
 end
 

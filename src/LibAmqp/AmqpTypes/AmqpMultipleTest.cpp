@@ -46,6 +46,12 @@ SUITE(AmqpTypes)
         CHECK_EQUAL(5, multiple->size);
     }
 
+    TEST_FIXTURE(AmqpMultiplesFixture, add_element)
+    {
+//        multiple = amqp_multiple_symbol_create(context, 5);
+//        CHECK_EQUAL(5, multiple->size);
+    }
+
 //    TEST_FIXTURE(AmqpTypes, decode_minimal_frame)
 //    {
 //        test_data::minimal_frame_header.transfer_to(buffer);

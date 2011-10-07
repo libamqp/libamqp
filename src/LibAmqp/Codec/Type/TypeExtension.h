@@ -32,6 +32,12 @@ bool amqp_type_is_convert_ok(amqp_type_t *type)
 */
 
 static inline
+int amqp_type_is_null(amqp_type_t *type)
+{
+    return type->flags.is_null;
+}
+
+static inline
 bool amqp_type_is_convert_failed(amqp_type_t *type)
 {
     return type->flags.convert_failed;

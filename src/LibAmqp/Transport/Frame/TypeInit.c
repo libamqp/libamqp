@@ -29,5 +29,22 @@ int amqp_type_to_symbol(amqp_symbol_t *symbol, amqp_buffer_t *buffer, amqp_type_
 
 int amqp_type_to_multiple_symbol(amqp_context_t *context, amqp_frame_sasl_mechanisms_t *sasl_mechanisms, amqp_buffer_t *buffer, amqp_type_t *type)
 {
-    not_implemented(todo);
+    if (amqp_type_is_null(type))
+    {
+        amqp_multiple_symbol_initialize(context, &sasl_mechanisms->sasl_server_mechanisms, 0);
+    }
+
+    if (amqp_type_is_symbol(type))
+    {
+        amqp_multiple_symbol_initialize(context, &sasl_mechanisms->sasl_server_mechanisms, 1);
+        // TODO - add the single symbol to the multiple
+        // create symbol, add symbol to multiple
+    }
+
+    if (amqp_type_is_array(type))
+    {
+        // create multiple and add each element of aray
+    }
+
+    return false;
 }

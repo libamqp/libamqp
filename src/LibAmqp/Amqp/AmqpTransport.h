@@ -19,8 +19,11 @@
  */
 #ifndef LIBAMQP_AMQP_AMQP_TRANSPORT_H
 #define LIBAMQP_AMQP_AMQP_TRANSPORT_H
-    
-#include "AmqpTypes/Types.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "AmqpTypes/AmqpTypes.h"
     
 typedef struct amqp_frame_open_t amqp_frame_open_t;
 typedef struct amqp_frame_begin_t amqp_frame_begin_t;
@@ -44,6 +47,7 @@ struct amqp_frame_open_t {
     amqp_multiple_symbol_t desired_capabilities; 
     amqp_property_fields_t properties;
 };
+
 struct amqp_frame_begin_t {
     uint16_t remote_channel; 
     amqp_transfer_number_t next_outgoing_id; /* mandatory; */
@@ -54,6 +58,7 @@ struct amqp_frame_begin_t {
     amqp_multiple_symbol_t desired_capabilities; 
     amqp_property_fields_t properties;
 };
+
 struct amqp_frame_attach_t {
     amqp_string_t name; /* mandatory; */
     uint32_t handle; /* mandatory; */
@@ -70,6 +75,7 @@ struct amqp_frame_attach_t {
     amqp_multiple_symbol_t desired_capabilities; 
     amqp_property_fields_t properties;
 };
+
 struct amqp_frame_flow_t {
     amqp_transfer_number_t next_incoming_id; 
     uint32_t incoming_window; /* mandatory; */
@@ -83,6 +89,7 @@ struct amqp_frame_flow_t {
     int echo; /* default="false"; */
     amqp_property_fields_t properties;
 };
+
 struct amqp_frame_transfer_t {
     uint32_t handle; /* mandatory; */
     amqp_delivery_number_t delivery_id; 
@@ -96,6 +103,7 @@ struct amqp_frame_transfer_t {
     int aborted; /* default="false"; */
     int batchable; /* default="false"; */
 };
+
 struct amqp_frame_disposition_t {
     amqp_role_t role; /* mandatory; */
     amqp_delivery_number_t first; /* mandatory; */
@@ -104,15 +112,22 @@ struct amqp_frame_disposition_t {
     amqp_state_t state; 
     int batchable; /* default="false"; */
 };
+
 struct amqp_frame_detach_t {
     uint32_t handle; /* mandatory; */
     int closed; /* default="false"; */
     amqp_error_t error; 
 };
+
 struct amqp_frame_end_t {
     amqp_error_t error; 
 };
+
 struct amqp_frame_close_t {
     amqp_error_t error; 
 };
+
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -14,24 +14,19 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_FRAME_TYPE_INIT_H
-#define LIBAMQP_TRANSPORT_FRAME_TYPE_INIT_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "libamqp_common.h"
-#include "Context/Context.h"
-#include "Codec/Type/TypeExtension.h"
+#include "AmqpTypes/AmqpTypesTestSupport.h"
 
 #include "AmqpTypes/AmqpTypes.h"
 
-#include "Amqp/AmqpSecurity.h"
-extern int amqp_type_to_symbol(amqp_symbol_t *symbol, amqp_buffer_t *buffer, amqp_type_t *type);
-extern int amqp_type_to_multiple_symbol(amqp_context_t *context, amqp_frame_sasl_mechanisms_t *sasl_mechanisms, amqp_buffer_t *buffer, amqp_type_t *type);
-
-#ifdef __cplusplus
+SUITE(AmqpTypes)
+{
+    TEST_FIXTURE(AmqpTypesFixture, type_sizes)
+    {
+        SOUTV(sizeof(amqp_binary_t));
+        SOUTV(sizeof(amqp_list_t));
+        SOUTV(sizeof(amqp_map_t));
+        SOUTV(sizeof(amqp_multiple_symbol_t));
+        SOUTV(sizeof(amqp_string_t));
+        SOUTV(sizeof(amqp_symbol_t));
+    }
 }
-#endif
-#endif

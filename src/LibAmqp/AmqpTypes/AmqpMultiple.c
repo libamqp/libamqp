@@ -38,7 +38,7 @@ void amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symb
 
 void amqp_multiple_symbol_cleanup(amqp_context_t *context, amqp_multiple_symbol_t *multiple)
 {
-    if (multiple->size > AMQP_MULTIPLE_DEFAULT_SIZE)
+    if (multiple && multiple->size > AMQP_MULTIPLE_DEFAULT_SIZE)
     {
         AMQP_FREE(context, multiple->array.indirect);
     }
