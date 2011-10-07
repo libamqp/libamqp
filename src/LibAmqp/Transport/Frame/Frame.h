@@ -71,7 +71,6 @@ struct amqp_frame_t
 };
 
 extern amqp_frame_t *amqp_decode_frame(amqp_context_t *context, amqp_buffer_t *buffer);
-extern void amqp_symbol_initialize_from_type(amqp_symbol_t *symbol, amqp_buffer_t *buffer, amqp_type_t *type);
 
 #ifdef __cplusplus
 }

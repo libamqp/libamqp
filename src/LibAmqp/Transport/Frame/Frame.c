@@ -16,6 +16,7 @@
 
 #include "Context/Context.h"
 #include "Transport/Frame/Frame.h"
+#include "Transport/Frame/TypeInit.h"
 #include "Codec/Decode/Decode.h"
 
 #include "debug_helper.h"
@@ -45,18 +46,12 @@ static int decode_header(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fr
     return true;
 }
 
-void amqp_symbol_initialize_from_type(amqp_symbol_t *symbol, amqp_buffer_t *buffer, amqp_type_t *type)
-{
-    // TODO - deal with case where symbol straddles buffer fragments - not an issue for performative frames as they should fit in the smallest buffer.
-    amqp_symbol_initialize_reference(symbol, buffer, amqp_buffer_pointer(buffer, type->position.index), type->position.size);
-}
-
 static int decode_symbolic_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
 {
     amqp_symbol_t symbol;
 
     amqp_descriptor_t *descriptor;
-    amqp_symbol_initialize_from_type(&symbol, buffer, type);
+    amqp_type_to_symbol(&symbol, buffer, type);
     descriptor = amqp_context_descriptor_lookup(context, &symbol);
     amqp_symbol_cleanup(context, &symbol);
 
@@ -107,7 +102,7 @@ static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *
         return false;
     }
 
-    not_implemented(todo);
+    return amqp_type_to_multiple_symbol(context, &frame->frames.sasl.sasl_mechanisms, buffer, type);
 }
 
 static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
