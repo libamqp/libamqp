@@ -13,32 +13,25 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+#ifndef LIBAMQP_AMQP_TYPES_AMQP_TYPES_INTERNAL_H
+#define LIBAMQP_AMQP_TYPES_AMQP_TYPES_INTERNAL_H
 
-#ifndef LIBAMQP_AMQP_TYPES_TYPES_H
-#define LIBAMQP_AMQP_TYPES_TYPES_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+#include "Context/Context.h"
 #include "AmqpTypes/AmqpLeader.h"
 
-typedef int amqp_sasl_code_t;
+typedef void (*amqp_dtor_t)(amqp_context_t *context, amqp_amqp_type_t *type);
 
-#include "AmqpTypes/AmqpArray.h"
-#include "AmqpTypes/AmqpBinary.h"
-#include "AmqpTypes/AmqpEntry.h"
-#include "AmqpTypes/AmqpList.h"
-#include "AmqpTypes/AmqpMap.h"
-#include "AmqpTypes/AmqpMultiple.h"
-#include "AmqpTypes/AmqpString.h"
-#include "AmqpTypes/AmqpSymbol.h"
-
-union amqp_amqp_type_t
+struct amqp_fn_table_t
 {
-    amqp_leader_t leader;
-    amqp_binary_t binary;
-    amqp_entry_t entry;
-    amqp_list_t list;
-    amqp_map_t map;
-    amqp_multiple_symbol_t multiple_symbol;
-    amqp_string_t string;
-    amqp_symbol_t symbol;
+    amqp_dtor_t dtor;
 };
+
+
+#ifdef __cplusplus
+}
+#endif
 #endif

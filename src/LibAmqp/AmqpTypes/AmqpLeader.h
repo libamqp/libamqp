@@ -28,14 +28,24 @@ extern "C" {
     typedef struct amqp_buffer_t amqp_buffer_t;
 #endif
 
-#ifndef LIBAMQP_AMQP_BINARY_TYPE_T
-#define LIBAMQP_AMQP_BINARY_TYPE_T
-typedef struct amqp_binary_t amqp_binary_t;
-#endif
-
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_TYPE_T
+#define LIBAMQP_AMQP_TYPE_T
+typedef struct amqp_type_t amqp_type_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_ARRAY_TYPE_T
+#define LIBAMQP_AMQP_ARRAY_TYPE_T
+typedef struct amqp_array_t amqp_array_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_BINARY_TYPE_T
+#define LIBAMQP_AMQP_BINARY_TYPE_T
+typedef struct amqp_binary_t amqp_binary_t;
 #endif
 
 #ifndef LIBAMQP_AMQP_ENTRY_T
@@ -70,17 +80,17 @@ typedef struct amqp_string_t amqp_string_t;
 
 #ifndef LIBAMQP_AMQP_TYPES_T
 #define LIBAMQP_AMQP_TYPES_T
-    typedef union amqp_types_t amqp_types_t;
-    typedef void (*amqp_dtor_t)(amqp_context_t *context, amqp_types_t *type);
+    typedef union amqp_amqp_type_t amqp_amqp_type_t;
+    typedef struct amqp_fn_table_t amqp_fn_table_t;
 #endif
 
 typedef struct amqp_leader_t
 {
-    amqp_dtor_t dtor;
+    amqp_fn_table_t *fn_table;
 } amqp_leader_t;
 
-
 extern uint32_t amqp_hash(const void *data, int len);
+extern void amqp_type_cleanup(amqp_context_t *context, amqp_amqp_type_t *amqp_type);
 
 #ifdef __cplusplus
 }

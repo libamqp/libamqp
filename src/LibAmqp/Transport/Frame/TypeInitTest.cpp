@@ -48,6 +48,4 @@ SUITE(Frame)
         CHECK_EQUAL(3U, type->value.array.count);
         CHECK(amqp_type_is_symbol(type->value.array.elements[0]));
     }
-
-
 }

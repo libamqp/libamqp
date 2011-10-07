@@ -14,23 +14,18 @@
    limitations under the License.
  */
 
-#include "AmqpTypes/AmqpTypesTestSupport.h"
+#include <assert.h>
+#include <string.h>
 
 #include "AmqpTypes/AmqpTypes.h"
+#include "AmqpTypes/AmqpTypesInternal.h"
+#include "debug_helper.h"
 
-SUITE(AmqpTypes)
+void amqp_type_cleanup(amqp_context_t *context, amqp_amqp_type_t *amqp_type)
 {
-    TEST_FIXTURE(AmqpTypesFixture, type_sizes)
+    if (amqp_type && amqp_type->leader.fn_table && amqp_type->leader.fn_table->dtor)
     {
-        SOUTV(sizeof(amqp_array_t));
-        SOUTV(sizeof(amqp_binary_t));
-        SOUTV(sizeof(amqp_entry_t));
-        SOUTV(sizeof(amqp_list_t));
-        SOUTV(sizeof(amqp_map_t));
-        SOUTV(sizeof(amqp_multiple_symbol_t));
-        SOUTV(sizeof(amqp_string_t));
-        SOUTV(sizeof(amqp_symbol_t));
-        SOUTV(sizeof(amqp_type_t));
-        SOUTV(sizeof(amqp_amqp_type_t));
+        amqp_type->leader.fn_table->dtor(context, amqp_type);
     }
 }
+
