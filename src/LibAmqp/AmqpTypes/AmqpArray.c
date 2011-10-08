@@ -19,6 +19,8 @@
 
 #include "AmqpTypes/AmqpTypesInternal.h"
 #include "AmqpTypes/AmqpArray.h"
+#include "Codec/Type/TypeExtension.h"
+
 #include "debug_helper.h"
 
 static void release_memory(amqp_context_t *context, void **elements, amqp_array_t *array)

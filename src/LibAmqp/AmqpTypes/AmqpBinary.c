@@ -17,17 +17,40 @@
 #include <assert.h>
 #include <string.h>
 
-#include "Context/Context.h"
+#include "AmqpTypes/AmqpTypesInternal.h"
 #include "AmqpTypes/AmqpBinary.h"
+#include "Codec/Type/TypeExtension.h"
+
 #include "debug_helper.h"
 
-void amqp_binary_initialize(amqp_context_t *context, amqp_binary_t *binary)
+
+void amqp_binary_initialize_from_type(amqp_context_t *context, amqp_binary_t *binary, amqp_type_t *type)
 {
-    not_implemented(todo);
+    assert(amqp_type_is_binary(type));
+
+    binary->leader.fn_table = 0;
+    binary->type = type;
+    binary->size = type->position.size;
 }
 
-void amqp_binary_cleanup(amqp_context_t *context, amqp_binary_t *binary)
+static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
-    not_implemented(todo);
-}
+    amqp_binary_t *binary = (amqp_binary_t *) type;
 
+    AMQP_FREE(context, binary);
+}
+amqp_binary_t *amqp_binary_create_from_type(amqp_context_t *context, amqp_type_t *type)
+{
+    static amqp_fn_table_t table = {
+        .dtor = create_dtor
+    };
+    amqp_binary_t *result = AMQP_MALLOC(context, amqp_binary_t);
+
+    assert(amqp_type_is_binary(type));
+
+    result->leader.fn_table = &table;
+    result->type = type;
+    result->size = type->position.size;
+
+    return result;
+}

@@ -105,6 +105,9 @@ struct amqp_type_t
             size_t count;
             amqp_type_t **elements;
         } described;
+        struct {
+            amqp_buffer_t *buffer;
+        } variable;
     } value;
     int invalid_cause ;
 };

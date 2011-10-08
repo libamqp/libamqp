@@ -91,6 +91,18 @@ int16_t amqp_type_to_short(amqp_type_t *type)
         : 0;
 }
 
+static inline
+int amqp_type_is_binary(amqp_type_t *type)
+{
+    return type->format_code == 0xa0 || type->format_code == 0xb0;
+}
+
+static inline
+size_t amqp_type_copy_to(amqp_type_t *type, uint8_t *buffer, size_t amount)
+{
+not_implemented(todo);
+}
+
 #ifdef __cplusplus
 }
 #endif
