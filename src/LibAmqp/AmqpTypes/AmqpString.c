@@ -17,18 +17,40 @@
 #include <assert.h>
 #include <string.h>
 
-#include "Context/Context.h"
-
+#include "AmqpTypes/AmqpTypesInternal.h"
 #include "AmqpTypes/AmqpString.h"
+#include "Codec/Type/TypeExtension.h"
+
 #include "debug_helper.h"
 
-void amqp_string_initialize(amqp_context_t *context, amqp_string_t *string)
+
+void amqp_string_initialize_from_type(amqp_context_t *context, amqp_string_t *string, amqp_type_t *type)
 {
-    not_implemented(todo);
+    assert(amqp_type_is_string(type));
+
+    string->leader.fn_table = 0;
+    string->type = type;
+    string->size = type->position.size;
 }
 
-void amqp_string_cleanup(amqp_context_t *context, amqp_string_t *string)
+static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
-    not_implemented(todo);
-}
+    amqp_string_t *string = (amqp_string_t *) type;
 
+    AMQP_FREE(context, string);
+}
+amqp_string_t *amqp_string_create_from_type(amqp_context_t *context, amqp_type_t *type)
+{
+    static amqp_fn_table_t table = {
+        .dtor = create_dtor
+    };
+    amqp_string_t *result = AMQP_MALLOC(context, amqp_string_t);
+
+    assert(amqp_type_is_string(type));
+
+    result->leader.fn_table = &table;
+    result->type = type;
+    result->size = type->position.size;
+
+    return result;
+}

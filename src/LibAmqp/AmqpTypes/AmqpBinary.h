@@ -28,7 +28,6 @@ struct amqp_binary_t
     amqp_leader_t leader;
     amqp_type_t *type;
     size_t size;
-    uint8_t *bytes;
 };
 
 extern void amqp_binary_initialize_from_type(amqp_context_t *context, amqp_binary_t *binary, amqp_type_t *type);

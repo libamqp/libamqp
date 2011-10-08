@@ -46,7 +46,6 @@ SUITE(AmqpTypes)
         amqp_binary_cleanup(context, binary);
     }
 
-
     TEST_FIXTURE(AmqpBinaryFixture, binary_type_access)
     {
         test_data::bin_8.transfer_to(buffer);
