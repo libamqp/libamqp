@@ -58,12 +58,6 @@ amqp_type_t *amqp_type_get_described(amqp_type_t *type)
 }
 
 static inline
-int amqp_type_is_symbol(amqp_type_t *type)
-{
-    return type->format_code == 0xa3 || type->format_code == 0xa3;
-}
-
-static inline
 int amqp_type_is_ulong(amqp_type_t *type)
 {
     return type->format_code == 0x53 || type->format_code == 0x80 || type->format_code == 0x44;
@@ -92,15 +86,17 @@ int16_t amqp_type_to_short(amqp_type_t *type)
 }
 
 static inline
-int amqp_type_is_binary(amqp_type_t *type)
-{
-    return type->format_code == 0xa0 || type->format_code == 0xb0;
-}
-
-static inline
 size_t amqp_type_copy_to(amqp_type_t *type, uint8_t *buffer, size_t amount)
 {
-not_implemented(todo);
+    assert(amqp_type_is_variable(type));
+
+// TODO - push into buffer and do block copy of fragments
+    size_t i, j;
+    for (i = 0, j = type->position.index; i < type->position.size && i < amount; i++, j++)
+    {
+        buffer[i] = amqp_unchecked_getc_at(type->value.variable.buffer, j);
+    }
+    return i;
 }
 
 #ifdef __cplusplus

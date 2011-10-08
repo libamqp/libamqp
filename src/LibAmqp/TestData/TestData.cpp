@@ -316,12 +316,14 @@ namespace test_data
         0xe0, 4, 1, 0x61, 0x00, 0x0c
     );
 
-    test_data_def(bin_8, 0xA0,
+    test_data_def(bin_8,
+        0xA0,
         12,
         'b', 'i', 'n', 'a', 'r', 'y', ' ', 'a', 'r', 'r', 'a', 'y'
     );
 
-    test_data_def(bin_32, 0xb0,
+    test_data_def(bin_32,
+        0xb0,
         0, 0, 0, 16,
         'b', 'i', 'g', ' ', 'b', 'i', 'n', 'a', 'r', 'y', ' ', 'a', 'r', 'r', 'a', 'y'
     );

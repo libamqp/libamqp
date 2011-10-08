@@ -58,6 +58,10 @@ typedef struct {
     unsigned int is_encoded:1;
     unsigned int is_incomplete:1;
     unsigned int is_contained:1;
+    unsigned int is_variable:1;
+    unsigned int is_binary:1;
+    unsigned int is_symbol:1;
+    unsigned int is_string:1;
     unsigned int is_descriptor:1;
     unsigned int has_descriptor:1;
     unsigned int convert_failed:1;
@@ -164,6 +168,30 @@ static inline
 bool amqp_type_is_contained(amqp_type_t *type)
 {
     return type->flags.is_contained != 0;
+}
+
+static inline
+bool amqp_type_is_variable(amqp_type_t *type)
+{
+    return type->flags.is_variable != 0;
+}
+
+static inline
+bool amqp_type_is_binary(amqp_type_t *type)
+{
+    return type->flags.is_binary != 0;
+}
+
+static inline
+bool amqp_type_is_string(amqp_type_t *type)
+{
+    return type->flags.is_string != 0;
+}
+
+static inline
+bool amqp_type_is_symbol(amqp_type_t *type)
+{
+    return type->flags.is_symbol != 0;
 }
 
 static inline
