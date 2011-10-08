@@ -16,6 +16,7 @@
 
 #include <TestHarness.h>
 #include "AmqpTypes/AmqpTypesTestSupport.h"
+#include "Context/ContextTestSupport.h"
 
 SUITE(AmqpTypes)
 {
@@ -37,12 +38,15 @@ SUITE(AmqpTypes)
         0
      };
 
-    AmqpTypesFixture::AmqpTypesFixture()
+    AmqpTypesFixture::AmqpTypesFixture() : type(0)
     {
+        buffer = amqp_allocate_buffer(context);
     }
 
     AmqpTypesFixture::~AmqpTypesFixture()
     {
+        amqp_deallocate_type(context, type);
+        amqp_deallocate_buffer(context, buffer);
     }
 
     int AmqpTypesFixture::compare(const char *lhs, const char *rhs)

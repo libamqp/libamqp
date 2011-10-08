@@ -77,6 +77,20 @@ uint64_t amqp_type_to_ulong(amqp_type_t *type)
         : 0;
 }
 
+static inline
+int amqp_type_is_short(amqp_type_t *type)
+{
+    return type->format_code == 0x61;
+}
+
+static inline
+int16_t amqp_type_to_short(amqp_type_t *type)
+{
+    return amqp_type_convert_check_failed(type, amqp_type_is_short(type))
+        ? type->value.b2._short
+        : 0;
+}
+
 #ifdef __cplusplus
 }
 #endif

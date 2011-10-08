@@ -19,6 +19,9 @@
 
 #include <TestHarness.h>
 #include "Context/ContextTestSupport.h"
+#include "Codec/Decode/Decode.h"
+#include "Codec/Type/TypeExtension.h"
+
 #include "AmqpTypes/AmqpTypes.h"
 #include "debug_helper.h"
 
@@ -37,7 +40,10 @@ namespace SuiteAmqpTypes
         static int compare(const char *lhs, const char *rhs);
         static uint32_t hash(const char *data);
 
+
     public:
+        amqp_buffer_t *buffer;
+        amqp_type_t *type;
     };
 }
 

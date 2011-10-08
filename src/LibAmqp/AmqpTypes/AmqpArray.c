@@ -80,7 +80,7 @@ static void create_with_type_dtor(amqp_context_t *context, amqp_amqp_type_t *typ
     amqp_array_t *array = (amqp_array_t *) type;
     release_memory(context, 0, array);
 }
-amqp_array_t *amqp_array_create_from_type(amqp_context_t *context, amqp_array_t *array, amqp_type_t *type)
+amqp_array_t *amqp_array_create_from_type(amqp_context_t *context, amqp_type_t *type)
 {
     static amqp_fn_table_t table = {
         .dtor = create_with_type_dtor
@@ -88,6 +88,6 @@ amqp_array_t *amqp_array_create_from_type(amqp_context_t *context, amqp_array_t 
     assert(amqp_type_is_array(type));
 
     amqp_array_t *result = AMQP_MALLOC(context, amqp_array_t);
-    initialize(array, &table, type, type->value.array.count, (void **) type->value.array.elements);
+    initialize(result, &table, type, type->value.array.count, (void **) type->value.array.elements);
     return result;
 }

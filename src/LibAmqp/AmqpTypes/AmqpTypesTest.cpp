@@ -20,17 +20,17 @@
 
 SUITE(AmqpTypes)
 {
-    TEST_FIXTURE(AmqpTypesFixture, type_sizes)
-    {
-        SOUTV(sizeof(amqp_array_t));
-        SOUTV(sizeof(amqp_binary_t));
-        SOUTV(sizeof(amqp_entry_t));
-        SOUTV(sizeof(amqp_list_t));
-        SOUTV(sizeof(amqp_map_t));
-        SOUTV(sizeof(amqp_multiple_symbol_t));
-        SOUTV(sizeof(amqp_string_t));
-        SOUTV(sizeof(amqp_symbol_t));
-        SOUTV(sizeof(amqp_type_t));
-        SOUTV(sizeof(amqp_amqp_type_t));
-    }
+//    TEST_FIXTURE(AmqpTypesFixture, type_sizes)
+//    {
+//        SOUTV(sizeof(amqp_array_t));
+//        SOUTV(sizeof(amqp_binary_t));
+//        SOUTV(sizeof(amqp_entry_t));
+//        SOUTV(sizeof(amqp_list_t));
+//        SOUTV(sizeof(amqp_map_t));
+//        SOUTV(sizeof(amqp_multiple_symbol_t));
+//        SOUTV(sizeof(amqp_string_t));
+//        SOUTV(sizeof(amqp_symbol_t));
+//        SOUTV(sizeof(amqp_type_t));
+//        SOUTV(sizeof(amqp_amqp_type_t));
+//    }
 }
