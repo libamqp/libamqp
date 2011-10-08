@@ -34,11 +34,37 @@ struct amqp_array_t
 
 extern void amqp_array_initialize(amqp_context_t *context, amqp_array_t *array, size_t size);
 extern void amqp_array_initialize_from_type(amqp_context_t *context, amqp_array_t *array, amqp_type_t *type);
+extern amqp_array_t *amqp_array_create(amqp_context_t *context, size_t size);
+extern amqp_array_t *amqp_array_create_from_type(amqp_context_t *context, amqp_array_t *array, amqp_type_t *type);
 
 static inline
 void amqp_array_cleanup(amqp_context_t *context, amqp_array_t *array)
 {
     amqp_type_cleanup(context, (amqp_amqp_type_t *) array);
+}
+
+static inline
+size_t amqp_array_capacity(amqp_array_t *array)
+{
+    return array->capacity;
+}
+
+static inline
+size_t amqp_array_count(amqp_array_t *array)
+{
+    return array->size;
+}
+
+static inline
+void amqp_array_set(amqp_array_t *array, size_t index, const void *p)
+{
+    array->elements[index] = (void *) p;
+}
+
+static inline
+void *amqp_array_get(amqp_array_t *array, size_t index)
+{
+    return array->elements[index];
 }
 
 #ifdef __cplusplus

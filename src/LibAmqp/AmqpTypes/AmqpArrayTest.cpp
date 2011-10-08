@@ -46,27 +46,34 @@ SUITE(AmqpTypes)
         amqp_array_cleanup(context, array);
     }
 
-    TEST_FIXTURE(AmqpArrayFixture, fixture_should_balance_allocations)
+    TEST_FIXTURE(AmqpArrayFixture, array_initialize)
     {
         amqp_array_initialize(context, &ref, 13);
-//        amqp_array_count(&ref);
-//        CHECK_EQUAL(32U, amqp_array_capacity(&array));
-//        CHECK_CLOSE(0.0, amqp_array_factor(&array), 0.001);
+        CHECK_EQUAL(13U, amqp_array_capacity(&ref));
+        CHECK_EQUAL(13U, amqp_array_count(&ref));
     }
 
-/*
-    TEST_FIXTURE(AmqpArrayFixture, entry_count)
+    TEST_FIXTURE(AmqpArrayFixture, array_create)
     {
-        load_array();
-        CHECK_EQUAL(39U, amqp_array_count(&array));
-        CHECK(amqp_array_factor(&array) > 1.2);
+        array = amqp_array_create(context, 13);
+        CHECK_EQUAL(13U, amqp_array_capacity(array));
+        CHECK_EQUAL(13U, amqp_array_count(array));
     }
 
-    TEST_FIXTURE(AmqpArrayFixture, add_duplicate_is_not_allowed)
+    TEST_FIXTURE(AmqpArrayFixture, array_element_access)
     {
-        load_array();
-        int rc = amqp_array_put(context, &array, keys[6], data[6]);
-        CHECK(!rc);
+        static const char *data[] = { "1", "2", "3", "4", "5"};
+        array = amqp_array_create(context, 5);
+        amqp_array_initialize(context, &ref, 5);
+        for (int i = 0; i < 5; i++)
+        {
+            amqp_array_set(array, i, data[i]);
+            amqp_array_set(&ref, i, data[i]);
+        }
+        for (int i = 0; i < 5; i++)
+        {
+            CHECK_EQUAL(data[i], amqp_array_get(array, i));
+            CHECK_EQUAL(data[i], amqp_array_get(&ref, i));
+        }
     }
-*/
 }
