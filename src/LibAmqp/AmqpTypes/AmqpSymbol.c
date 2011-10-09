@@ -17,46 +17,86 @@
 #include <assert.h>
 #include <string.h>
 
-#include "Context/Context.h"
 #include "Misc/Bits.h"
+#include "AmqpTypes/AmqpTypesInternal.h"
 #include "AmqpTypes/AmqpSymbol.h"
+#include "Codec/Type/TypeExtension.h"
 
 
-void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const unsigned char *reference, size_t size)
+uint8_t *duplicate(amqp_context_t *context, const char *data, size_t size)
 {
-    if (buffer)
-    {
-        amqp_buffer_reference(buffer);
-    }
-    symbol->buffer = buffer;
-    symbol->reference = reference;
-    symbol->size = size;
-    symbol->on_heap = 0;
-}
-
-amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer, const unsigned char *reference, size_t size)
-{
-    amqp_symbol_t *result = AMQP_MALLOC(context, amqp_symbol_t);
-    amqp_symbol_initialize_reference(result, buffer, reference, size);
-    result->on_heap = true;
+    uint8_t *result = (uint8_t *) amqp_malloc(context, size);
+    memcpy(result, data, size);
     return result;
 }
 
-void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol)
+static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
-    if (symbol)
+    amqp_symbol_t *symbol = (amqp_symbol_t *) type;
+    if (symbol->data)
     {
-        if (symbol->buffer)
-        {
-            amqp_buffer_release(symbol->buffer);
-        }
-        symbol->reference = 0;
-        symbol->size = 0;
-        if (symbol->on_heap)
-        {
-            AMQP_FREE(context, symbol);
-        }
+        AMQP_FREE(context, symbol->data);
     }
+
+    AMQP_FREE(context, symbol);
+}
+
+static void initialize_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
+{
+    amqp_symbol_t *symbol = (amqp_symbol_t *) type;
+    if (symbol->data)
+    {
+        AMQP_FREE(context, symbol->data);
+    }
+}
+
+void amqp_symbol_initialize(amqp_context_t *context, amqp_symbol_t *symbol, const char *data, size_t size)
+{
+    static amqp_fn_table_t table = {
+        .dtor = initialize_dtor
+    };
+    symbol->leader.fn_table = &table;
+    symbol->size = size;
+    symbol->type = 0;
+    symbol->data = duplicate(context, data, size);
+}
+
+amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, const char *data, size_t size)
+{
+    static amqp_fn_table_t table = {
+        .dtor = create_dtor
+    };
+
+    amqp_symbol_t *result = AMQP_MALLOC(context, amqp_symbol_t);
+    result->leader.fn_table = &table;
+    result->size = size;
+    result->type = 0;
+    result->data = duplicate(context, data, size);
+    return result;
+}
+
+void amqp_symbol_initialize_from_type(amqp_context_t *context, amqp_symbol_t *symbol, amqp_type_t *type)
+{
+    static amqp_fn_table_t table = {
+        .dtor = initialize_dtor
+    };
+    symbol->leader.fn_table = &table;
+    symbol->size = type->position.size;
+    symbol->type = type;
+    symbol->data = 0;
+}
+
+amqp_symbol_t *amqp_symbol_create_from_type(amqp_context_t *context, amqp_type_t *type)
+{
+    static amqp_fn_table_t table = {
+        .dtor = create_dtor
+    };
+    amqp_symbol_t *result = AMQP_MALLOC(context, amqp_symbol_t);
+    result->leader.fn_table = &table;
+    result->size = type->position.size;
+    result->type = type;
+    result->data = 0;
+    return result;
 }
 
 int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
@@ -67,14 +107,16 @@ int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
     n = lhs->size;
     if (rhs->size < n) n = rhs->size;
 
-    rc = memcmp(lhs->reference, rhs->reference, n);
+// TODO - delegate to type
+    rc = memcmp(lhs->data, rhs->data, n);
     return rc != 0 ? rc : lhs->size - rhs->size;
 }
 
 uint32_t amqp_symbol_hash(amqp_symbol_t *symbol)
 {
     assert(symbol != 0);
-    return amqp_hash((void *) symbol->reference, symbol->size);
+    // TODO - intrpduce a hash_type
+    return amqp_hash((void *) symbol->data, symbol->size);
 }
 
 void amqp_symbol_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity)

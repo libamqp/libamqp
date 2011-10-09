@@ -56,7 +56,7 @@ amqp_map_t *amqp_load_descriptors(amqp_context_t *context)
     amqp_map_t *result = amqp_symbol_map_create(context, map_size());
     while (descriptors[i].symbolic)
     {
-        amqp_symbol_t *symbol = amqp_symbol_create(context, 0, (const unsigned char *) descriptors[i].symbolic, strlen(descriptors[i].symbolic));
+        amqp_symbol_t *symbol = amqp_symbol_create(context, descriptors[i].symbolic, strlen(descriptors[i].symbolic));
         amqp_symbol_map_put(context, result, symbol, &descriptors[i].descriptor);
         i++;
     }

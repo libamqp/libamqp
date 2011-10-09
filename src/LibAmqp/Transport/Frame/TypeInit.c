@@ -19,11 +19,11 @@
 
 #include "debug_helper.h"
 
-
-int amqp_type_to_symbol(amqp_symbol_t *symbol, amqp_buffer_t *buffer, amqp_type_t *type)
+// TODO - remove and move into typeextension
+int amqp_type_to_symbol(amqp_context_t *context, amqp_symbol_t *symbol, amqp_type_t *type)
 {
     // TODO - deal with case where symbol straddles buffer fragments - not an issue for performative frames as they should fit in the smallest buffer.
-    amqp_symbol_initialize_reference(symbol, buffer, amqp_buffer_pointer(buffer, type->position.index), type->position.size);
+    amqp_symbol_initialize_from_type(context, symbol, type);
     return true;
 }
 

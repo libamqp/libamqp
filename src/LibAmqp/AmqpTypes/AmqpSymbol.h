@@ -26,15 +26,21 @@ extern "C" {
 struct amqp_symbol_t
 {
     amqp_leader_t leader;
-    amqp_buffer_t *buffer;
-    const unsigned char *reference;
+    amqp_type_t *type;
+    const uint8_t *data;
     size_t size;
-    int on_heap;
 };
 
-extern void amqp_symbol_initialize_reference(amqp_symbol_t *symbol, amqp_buffer_t *buffer, const unsigned char *reference, size_t size);
-extern amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, amqp_buffer_t *buffer, const unsigned char *reference, size_t size);
-extern void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol);
+extern void amqp_symbol_initialize(amqp_context_t *context, amqp_symbol_t *symbol, const char *data, size_t size);
+extern amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, const char *data, size_t size);
+extern void amqp_symbol_initialize_from_type(amqp_context_t *context, amqp_symbol_t *symbol, amqp_type_t *type);
+extern amqp_symbol_t *amqp_symbol_create_from_type(amqp_context_t *context, amqp_type_t *type);
+
+static inline
+void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol)
+{
+    amqp_type_cleanup(context, (amqp_amqp_type_t *) symbol);
+}
 
 extern int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs);
 extern uint32_t amqp_symbol_hash(amqp_symbol_t *symbol);

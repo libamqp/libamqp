@@ -57,7 +57,7 @@ SUITE(AmqpTypes)
 
     amqp_symbol_t *AmqpSymbolFixture::initialize(const char *s)
     {
-        return amqp_symbol_create(context, 0, (const unsigned char *) s, strlen(s));
+        return amqp_symbol_create(context, s, strlen(s));
     }
     void AmqpSymbolFixture::initialize(const char *lhs, const char *rhs)
     {

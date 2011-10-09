@@ -51,8 +51,8 @@ extern "C"
 
     extern void *amqp_malloc(amqp_context_t *c, size_t n);
     extern void *amqp_malloc_array(amqp_context_t *c, size_t n, int count);
-    extern void *amqp_realloc(amqp_context_t *c, void *p, size_t n);
-    extern void amqp_free(amqp_context_t *c, void *p);
+    extern void *amqp_realloc(amqp_context_t *c, const void *p, size_t n);
+    extern void amqp_free(amqp_context_t *c, const void *p);
 
     extern void amqp_reset_malloc_allocation_stats();
 

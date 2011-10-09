@@ -51,7 +51,7 @@ static int decode_symbolic_descriptor(amqp_context_t *context, amqp_buffer_t *bu
     amqp_symbol_t symbol;
 
     amqp_descriptor_t *descriptor;
-    amqp_type_to_symbol(&symbol, buffer, type);
+    amqp_type_to_symbol(context, &symbol, type); // TODO - remove
     descriptor = amqp_context_descriptor_lookup(context, &symbol);
     amqp_symbol_cleanup(context, &symbol);
 

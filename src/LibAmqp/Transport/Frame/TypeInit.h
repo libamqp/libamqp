@@ -28,7 +28,7 @@ extern "C" {
 #include "AmqpTypes/AmqpTypes.h"
 
 #include "Amqp/AmqpSecurity.h"
-extern int amqp_type_to_symbol(amqp_symbol_t *symbol, amqp_buffer_t *buffer, amqp_type_t *type);
+extern int amqp_type_to_symbol(amqp_context_t *context, amqp_symbol_t *symbol, amqp_type_t *type);
 extern int amqp_type_to_multiple_symbol(amqp_context_t *context, amqp_frame_sasl_mechanisms_t *sasl_mechanisms, amqp_buffer_t *buffer, amqp_type_t *type);
 
 #ifdef __cplusplus
