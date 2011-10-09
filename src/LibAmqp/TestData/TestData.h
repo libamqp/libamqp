@@ -129,6 +129,10 @@ namespace test_data
     extern TestData multiple_symbol_null;
     extern TestData multiple_symbol_one_value;
     extern TestData multiple_symbol_many_values;
+
+    extern TestData symbol_abcde;
+    extern TestData symbol_plain;
+
 }
 
 #endif

@@ -436,22 +436,27 @@ namespace test_data
         0x00,           // false
     );
 
-    // TODO - add decode test for this
     test_data_def(multiple_symbol_null,
         0x40,
     );
 
-    // TODO - add decode test for this
     test_data_def(multiple_symbol_one_value,
         0xA3, 0x05, 0x50, 0x4C, 0x41, 0x49, 0x4E,
     );
 
-    // TODO - add decode test for this
     test_data_def(multiple_symbol_many_values,
         0xe0, 16, 3, 0xA3,
             0x05, 0x50, 0x4C, 0x41, 0x49, 0x4E,
             0x03, 0x46, 0x6f, 0x6f,
             0x03, 0x46, 0x75, 0x6d,
+    );
+
+    test_data_def(symbol_abcde,
+        0xA3, 0x05, 'A', 'B', 'C', 'D', 'E'
+    );
+
+    test_data_def(symbol_plain,
+        0xA3, 0x05, 'P', 'L', 'A', 'I', 'N'
     );
 }
 

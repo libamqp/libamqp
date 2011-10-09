@@ -20,14 +20,11 @@
 
 SUITE(AmqpTypes)
 {
-    class AmqpSymbolFixture  : AmqpTypesFixture
+    class AmqpSymbolFixture  : public AmqpTypesFixture
     {
     public:
         AmqpSymbolFixture();
         ~AmqpSymbolFixture();
-
-        amqp_symbol_t *initialize(const char *s);
-        void initialize(const char *lhs, const char *rhs);
 
         static const char *a;
         static const char *b;
@@ -35,7 +32,7 @@ SUITE(AmqpTypes)
         static const char *d;
         static const char *e;
     public:
-        amqp_symbol_t *symbol_a;
+        amqp_symbol_t ref;
         amqp_symbol_t *symbol_b;
     };
 
@@ -45,59 +42,58 @@ SUITE(AmqpTypes)
     const char *AmqpSymbolFixture::d = "IJKLM";
     const char *AmqpSymbolFixture::e = "DEFGHIJ";
 
-    AmqpSymbolFixture::AmqpSymbolFixture() : symbol_a(0), symbol_b(0)
+    AmqpSymbolFixture::AmqpSymbolFixture() :  symbol_b(0)
     {
+        memset(&ref, '\0', sizeof(amqp_symbol_t));
     }
 
     AmqpSymbolFixture::~AmqpSymbolFixture()
     {
+        amqp_symbol_cleanup(context, &ref);
         amqp_symbol_cleanup(context, symbol_b);
-        amqp_symbol_cleanup(context, symbol_a);
-    }
-
-    amqp_symbol_t *AmqpSymbolFixture::initialize(const char *s)
-    {
-        return amqp_symbol_create(context, s, strlen(s));
-    }
-    void AmqpSymbolFixture::initialize(const char *lhs, const char *rhs)
-    {
-        symbol_a = initialize(lhs);
-        symbol_b = initialize(rhs);
     }
 
     TEST_FIXTURE(AmqpSymbolFixture, symbol_equality)
     {
-        initialize(a, b);
-        CHECK(amqp_symbol_compare(symbol_a, symbol_b) == 0);
+            amqp_symbol_initialize(context, &ref, a, strlen(a));
+        symbol_b = amqp_symbol_create(context, b, strlen(b));
+        CHECK(amqp_symbol_compare(&ref, symbol_b) == 0);
+        CHECK(amqp_symbol_compare(symbol_b, &ref) == 0);
     }
 
     TEST_FIXTURE(AmqpSymbolFixture, symbol_c_lt_d)
     {
-        initialize(c, d);
-        CHECK(amqp_symbol_compare(symbol_a, symbol_b) < 0);
+        amqp_symbol_initialize(context, &ref, c, strlen(c));
+        symbol_b = amqp_symbol_create(context, d, strlen(d));
+        CHECK(amqp_symbol_compare(&ref, symbol_b) < 0);
     }
 
     TEST_FIXTURE(AmqpSymbolFixture, symbol_d_gt_c)
     {
-        initialize(d, c);
-        CHECK(amqp_symbol_compare(symbol_a, symbol_b) > 0);
+        amqp_symbol_initialize(context, &ref, d, strlen(d));
+        symbol_b = amqp_symbol_create(context, c, strlen(c));
+
+        CHECK(amqp_symbol_compare(&ref, symbol_b) > 0);
     }
 
     TEST_FIXTURE(AmqpSymbolFixture, symbol_c_lt_e)
     {
-        initialize(c, e);
-        CHECK(amqp_symbol_compare(symbol_a, symbol_b) < 0);
+        amqp_symbol_initialize(context, &ref, c, strlen(c));
+        symbol_b = amqp_symbol_create(context, e, strlen(e));
+        CHECK(amqp_symbol_compare(&ref, symbol_b) < 0);
     }
 
     TEST_FIXTURE(AmqpSymbolFixture, symbol_e_gt_c)
     {
-        initialize(e, c);
-        CHECK(amqp_symbol_compare(symbol_a, symbol_b) > 0);
+        amqp_symbol_initialize(context, &ref, c, strlen(c));
+        symbol_b = amqp_symbol_create(context, e, strlen(e));
+        CHECK(amqp_symbol_compare(symbol_b, &ref) > 0);
     }
 
     TEST_FIXTURE(AmqpSymbolFixture, symbol_hash)
     {
-        initialize(a, b);
-        CHECK_EQUAL(amqp_symbol_hash(symbol_a), amqp_symbol_hash(symbol_b));
+         amqp_symbol_initialize(context, &ref, a, strlen(a));
+         symbol_b = amqp_symbol_create(context, b, strlen(b));
+        CHECK_EQUAL(amqp_symbol_hash(&ref), amqp_symbol_hash(symbol_b));
     }
 }
