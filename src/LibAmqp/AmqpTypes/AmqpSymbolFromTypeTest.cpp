@@ -84,38 +84,42 @@ SUITE(AmqpTypes)
 
     TEST_FIXTURE(AmqpSymbolFromTypeFixture, symbol_c_lt_d)
     {
-//        amqp_symbol_initialize(context, &ref, c, strlen(c));
-//        symbol_b = amqp_symbol_create(context, d, strlen(d));
-//        CHECK(amqp_symbol_compare(&ref, symbol_b) < 0);
+        load_array();
+        amqp_symbol_initialize_from_type(context, &ref, amqp_array_get_type(&array, 2));
+        symbol_b = amqp_symbol_create_from_type(context, amqp_array_get_type(&array, 3));
+        CHECK(amqp_symbol_compare(&ref, symbol_b) < 0);
     }
 
     TEST_FIXTURE(AmqpSymbolFromTypeFixture, symbol_d_gt_c)
     {
-//        amqp_symbol_initialize(context, &ref, d, strlen(d));
-//        symbol_b = amqp_symbol_create(context, c, strlen(c));
-//
-//        CHECK(amqp_symbol_compare(&ref, symbol_b) > 0);
+        load_array();
+        amqp_symbol_initialize_from_type(context, &ref, amqp_array_get_type(&array, 3));
+        symbol_b = amqp_symbol_create_from_type(context, amqp_array_get_type(&array, 2));
+        CHECK(amqp_symbol_compare(&ref, symbol_b) > 0);
     }
 
     TEST_FIXTURE(AmqpSymbolFromTypeFixture, symbol_c_lt_e)
     {
-//        amqp_symbol_initialize(context, &ref, c, strlen(c));
-//        symbol_b = amqp_symbol_create(context, e, strlen(e));
-//        CHECK(amqp_symbol_compare(&ref, symbol_b) < 0);
+        load_array();
+        amqp_symbol_initialize_from_type(context, &ref, amqp_array_get_type(&array, 2));
+        symbol_b = amqp_symbol_create_from_type(context, amqp_array_get_type(&array, 4));
+        CHECK(amqp_symbol_compare(&ref, symbol_b) < 0);
     }
 
     TEST_FIXTURE(AmqpSymbolFromTypeFixture, symbol_e_gt_c)
     {
-//        amqp_symbol_initialize(context, &ref, c, strlen(c));
-//        symbol_b = amqp_symbol_create(context, e, strlen(e));
-//        CHECK(amqp_symbol_compare(symbol_b, &ref) > 0);
+        load_array();
+        amqp_symbol_initialize_from_type(context, &ref, amqp_array_get_type(&array, 2));
+        symbol_b = amqp_symbol_create_from_type(context, amqp_array_get_type(&array, 4));
+        CHECK(amqp_symbol_compare(symbol_b, &ref) > 0);
     }
 
     TEST_FIXTURE(AmqpSymbolFromTypeFixture, symbol_hash)
     {
-//         amqp_symbol_initialize(context, &ref, a, strlen(a));
-//         symbol_b = amqp_symbol_create(context, b, strlen(b));
-//        CHECK_EQUAL(amqp_symbol_hash(&ref), amqp_symbol_hash(symbol_b));
+        load_array();
+        amqp_symbol_initialize_from_type(context, &ref, amqp_array_get_type(&array, 0));
+        symbol_b = amqp_symbol_create_from_type(context, amqp_array_get_type(&array, 1));
+        CHECK_EQUAL(amqp_symbol_hash(&ref), amqp_symbol_hash(symbol_b));
     }
 
 }
