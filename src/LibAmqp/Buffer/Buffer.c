@@ -21,6 +21,8 @@
 #include "Buffer/BufferInternal.h"
 #include "Memory/Memory.h"
 #include "Misc/Bits.h"
+#include "debug_helper.h"
+
 
 size_t amqp_buffer_grow(amqp_context_t *context, amqp_buffer_t *buffer, size_t new_size)
 {
@@ -49,6 +51,8 @@ void amqp_initialize_amqp_buffer_t(amqp_context_t *context, amqp_memory_pool_t *
     buffer->fragments[0] = amqp_malloc(context, AMQP_BUFFER_FRAGMENT_SIZE);
 
     buffer->capacity = AMQP_BUFFER_FRAGMENT_SIZE;
+    buffer->fragment_size = AMQP_BUFFER_FRAGMENT_SIZE;
+    buffer->n_fragments = AMQP_BUFFER_FRAGMENTS;
     buffer->limit.index = 0;
     buffer->limit.size = 0;
 }
@@ -207,4 +211,43 @@ size_t amqp_buffer_reference_count(amqp_buffer_t *buffer)
 size_t amqp_buffer_release(amqp_buffer_t *buffer)
 {
     return  --buffer->reference_count;
+}
+
+int amqp_block_compare(amqp_memory_t *lhs, size_t lhs_offset, amqp_memory_t *rhs, size_t rhs_offset, size_t n)
+{
+
+    return memcmp(lhs->fragments[0] + lhs_offset, rhs->fragments[0] + rhs_offset, n);
+
+/*
+    int result = 0;
+
+    // TODO - need tests for fragmented case
+
+    while (n >= 0 && result == 0)
+    {
+        size_t lhs_fragment = lhs_offset / lhs->header.fragment_size;
+        size_t rhs_fragment = rhs_offset / rhs->header.fragment_size;
+
+        size_t lhs_index = lhs_offset % lhs->header.fragment_size;
+        size_t rhs_index = rhs_offset % rhs->header.fragment_size;
+
+        size_t lhs_avail = lhs->header.fragment_size - lhs_index;
+        size_t rhs_avail = rhs->header.fragment_size - rhs_index;
+
+        size_t amount = n;
+        if (lhs_avail < amount)
+        {
+            amount = lhs_avail;
+        }
+        if (rhs_avail < amount)
+        {
+            amount = rhs_avail;
+        }
+        n =- amount;
+        lhs_offset += amount;
+        rhs_offset += amount;
+        result = memcmp(&lhs->fragments[lhs_fragment][lhs_offset], &rhs->fragments[rhs_fragment][rhs_offset], amount);
+    }
+    return result;
+    */
 }

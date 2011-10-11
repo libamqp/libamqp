@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 #include <stdio.h>
+#include "todo.h"
 
 // Helper function to mark breakpoints.
 extern void break_one();

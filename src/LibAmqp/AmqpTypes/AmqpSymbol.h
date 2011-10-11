@@ -23,12 +23,14 @@ extern "C" {
 #include "AmqpTypes/AmqpLeader.h"
 #include "AmqpTypes/AmqpMap.h"
 
+
 struct amqp_symbol_t
 {
     amqp_leader_t leader;
     amqp_type_t *type;
-    const uint8_t *data;
     size_t size;
+    struct amqp_block_header block;
+    const uint8_t *data;
 };
 
 extern void amqp_symbol_initialize(amqp_context_t *context, amqp_symbol_t *symbol, const char *data, size_t size);

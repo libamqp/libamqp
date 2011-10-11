@@ -14,24 +14,25 @@
    limitations under the License.
  */
 
-#include "AmqpTypes/AmqpTypesTestSupport.h"
+#ifndef LIBAMQP_TODO_H
+#define LIBAMQP_TODO_H
 
-#include "AmqpTypes/AmqpTypes.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-SUITE(AmqpTypes)
-{
-    TEST_FIXTURE(AmqpTypesFixture, type_sizes)
-    {
-        SOUTV(sizeof(amqp_array_t));
-        SOUTV(sizeof(amqp_binary_t));
-        SOUTV(sizeof(amqp_entry_t));
-        SOUTV(sizeof(amqp_list_t));
-        SOUTV(sizeof(amqp_map_t));
-        SOUTV(sizeof(amqp_multiple_symbol_t));
-        SOUTV(sizeof(amqp_string_t));
-        SOUTV(sizeof(amqp_symbol_t));
-        SOUTV(sizeof(amqp_type_t));
-        SOUTV(sizeof(amqp_amqp_type_t));
-        SOUTV(sizeof(amqp_memory_t));
-    }
+#include <assert.h>
+#include <stdio.h>
+
+#define _TODO(what)  (0)
+#define TODO(what)   {printf("%s:%d: todo - %s\n", __FILE__, __LINE__, #what); abort();}
+
+#define unsupported_operation(what)  TODO(unsupported_operation_ ## what)
+#define not_implemented(what)  TODO(not_implemented___ ## what ## ___)
+#define illegal_program_state(what)  TODO(illegal_program_state___ ## what ## ___)
+
+#ifdef __cplusplus
 }
+#endif
+#endif
+

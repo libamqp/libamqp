@@ -24,6 +24,8 @@
 extern "C" {
 #endif
 
+#include "todo.h"
+
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
@@ -93,13 +95,6 @@ extern void _vamqp_trace(amqp_context_t *context, int level, const char *filenam
 #define amqp_io_error(context, ...) _amqp_io_error(context, 1, __FILE__, __LINE__, 0, -1, "" __VA_ARGS__)
 #define amqp_io_error_code(context, ec, ...) _amqp_io_error(context, 1, __FILE__, __LINE__, 0, ec, "" __VA_ARGS__)
 extern void _amqp_io_error(amqp_context_t *context, int level, const char * filename, int line_number, const char *source, int error_code, const char *format, ...);
-
-#define _TODO(what)  (0)
-#define TODO(what)   {printf("%s:%d: todo - %s\n", __FILE__, __LINE__, #what); abort();}
-
-#define unsupported_operation(what)  TODO(unsupported_operation_ ## what)
-#define not_implemented(what)  TODO(not_implemented___ ## what ## ___)
-#define illegal_program_state(what)  TODO(illegal_program_state___ ## what ## ___)
 
 extern void amqp_api_usage_error(amqp_context_t *context, const char *message);
 extern void amqp_fatal_program_error(const char *message);

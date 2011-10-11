@@ -44,10 +44,12 @@ typedef struct amqp_buffer_limit_t
 
 struct amqp_buffer_t
 {
-    size_t capacity;
+    size_t capacity;        // TODO - use amqp_block_header_t
+    size_t fragment_size;
+    size_t n_fragments;
+    unsigned char *fragments[AMQP_BUFFER_FRAGMENTS];
     amqp_buffer_limit_t limit;
     size_t reference_count;
-    unsigned char *fragments[AMQP_BUFFER_FRAGMENTS];
 #ifndef _MSC_VER
     struct iovec io_vectors[AMQP_BUFFER_FRAGMENTS];
 #endif

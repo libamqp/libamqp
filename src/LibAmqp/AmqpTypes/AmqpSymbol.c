@@ -56,8 +56,9 @@ void amqp_symbol_initialize(amqp_context_t *context, amqp_symbol_t *symbol, cons
         .dtor = initialize_dtor
     };
     symbol->leader.fn_table = &table;
-    symbol->size = size;
     symbol->type = 0;
+    symbol->size = size;
+    amqp_block_header_initialize(&symbol->block, size, size, 1);
     symbol->data = duplicate(context, data, size);
 }
 
@@ -69,8 +70,9 @@ amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, const char *data, siz
 
     amqp_symbol_t *result = AMQP_MALLOC(context, amqp_symbol_t);
     result->leader.fn_table = &table;
-    result->size = size;
     result->type = 0;
+    result->size = size;
+    amqp_block_header_initialize(&result->block, size, size, 1);
     result->data = duplicate(context, data, size);
     return result;
 }
@@ -81,8 +83,9 @@ void amqp_symbol_initialize_from_type(amqp_context_t *context, amqp_symbol_t *sy
         .dtor = initialize_dtor
     };
     symbol->leader.fn_table = &table;
-    symbol->size = type->position.size;
     symbol->type = type;
+    symbol->size = type->position.size;
+    amqp_block_header_initialize(&symbol->block, 0, 0, 0);
     symbol->data = 0;
 }
 
@@ -93,10 +96,42 @@ amqp_symbol_t *amqp_symbol_create_from_type(amqp_context_t *context, amqp_type_t
     };
     amqp_symbol_t *result = AMQP_MALLOC(context, amqp_symbol_t);
     result->leader.fn_table = &table;
-    result->size = type->position.size;
     result->type = type;
+    result->size = type->position.size;
+    amqp_block_header_initialize(&result->block, 0, 0, 0);
     result->data = 0;
     return result;
+}
+
+static inline
+int amqp_type_compare_with_symbol(amqp_type_t *type, amqp_symbol_t *rhs, int n)
+{
+    return 0;
+//    not_implemented(todo);
+//    if (rhs->type)
+//    {
+//        return amqp_buffer_compare(type->value.variab.buffer,type->position.offset)
+//    }
+//
+//    return
+}
+static
+amqp_memory_t *data_to_block(amqp_symbol_t *symbol)
+{
+    if (symbol->type)
+    {
+        assert(amqp_type_is_variable(symbol->type));
+        return (amqp_memory_t *) symbol->type->value.variable.buffer;
+    }
+    else
+    {
+        return (amqp_memory_t *) &symbol->block;
+    }
+}
+static
+size_t data_offset(amqp_symbol_t *symbol)
+{
+    return symbol->type ? symbol->type->position.index : 0;
 }
 
 int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
@@ -107,8 +142,7 @@ int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
     n = lhs->size;
     if (rhs->size < n) n = rhs->size;
 
-// TODO - delegate to type
-    rc = memcmp(lhs->data, rhs->data, n);
+    rc = amqp_block_compare(data_to_block(lhs), data_offset(lhs), data_to_block(rhs), data_offset(rhs), n);
     return rc != 0 ? rc : lhs->size - rhs->size;
 }
 

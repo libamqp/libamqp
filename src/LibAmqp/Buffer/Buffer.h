@@ -43,6 +43,19 @@ typedef struct amqp_context_t amqp_context_t;
 #define AMQP_FRAGMENT_INDEX_MASK    (AMQP_BUFFER_FRAGMENT_SIZE - 1)
 #define AMQP_FRAGMENT_INDEX_BITS    12
 
+struct amqp_block_header
+{
+    size_t capacity;
+    size_t fragment_size;
+    size_t n_fragments;
+};
+
+typedef struct amqp_memory_t
+{
+    struct amqp_block_header header;
+    unsigned char *fragments[];
+} amqp_memory_t;
+
 extern void amqp_buffer_initialize_pool(amqp_memory_pool_t *pool);
 extern size_t amqp_buffer_grow(amqp_context_t *context, amqp_buffer_t *buffer, size_t new_size);
 
@@ -62,6 +75,15 @@ extern struct iovec *amqp_buffer_read_io_vec(amqp_buffer_t *buffer, int *iov_cou
 extern void amqp_buffer_reference(amqp_buffer_t *buffer);
 extern size_t amqp_buffer_reference_count(amqp_buffer_t *buffer);
 extern size_t amqp_buffer_release(amqp_buffer_t *buffer);
+
+static inline
+void amqp_block_header_initialize(struct amqp_block_header *header, size_t capacity, size_t fragment_size, size_t n_fragments)
+{
+    header->capacity = capacity;
+    header->fragment_size = fragment_size;
+    header->n_fragments = n_fragments;
+}
+extern int amqp_block_compare(amqp_memory_t *lhs, size_t lhs_offset, amqp_memory_t *rhs, size_t rhs_offset, size_t n);
 
 #include "Buffer/BufferInlines.h"
 

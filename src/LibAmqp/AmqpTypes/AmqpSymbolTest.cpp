@@ -18,9 +18,9 @@
 
 #include "AmqpTypes/AmqpSymbol.h"
 
-SUITE(AmqpTypes)
+SUITE(AmqpTypesSymbol)
 {
-    class AmqpSymbolFixture  : public AmqpTypesFixture
+    class AmqpSymbolFixture  : public SuiteAmqpTypes::AmqpTypesFixture
     {
     public:
         AmqpSymbolFixture();
@@ -55,7 +55,8 @@ SUITE(AmqpTypes)
 
     TEST_FIXTURE(AmqpSymbolFixture, symbol_equality)
     {
-            amqp_symbol_initialize(context, &ref, a, strlen(a));
+        break_one();
+        amqp_symbol_initialize(context, &ref, a, strlen(a));
         symbol_b = amqp_symbol_create(context, b, strlen(b));
         CHECK(amqp_symbol_compare(&ref, symbol_b) == 0);
         CHECK(amqp_symbol_compare(symbol_b, &ref) == 0);

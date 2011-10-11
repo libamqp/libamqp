@@ -50,23 +50,35 @@ SUITE(AmqpTypes)
     {
         amqp_descriptor_t *d = (amqp_descriptor_t *) amqp_symbol_map_get(map, &symbol);
 
-        CHECK_EQUAL(0x00000000U, d->domain);
-        CHECK_EQUAL(0x00000040U, d->id);
+        CHECK(d != 0);
+        if (d)
+        {
+            CHECK_EQUAL(0x00000000U, d->domain);
+            CHECK_EQUAL(0x00000040U, d->id);
+        }
     }
 
     TEST_FIXTURE(AmqpDescriptorFixture, lookup_descriptor)
     {
         amqp_descriptor_t *d = amqp_descriptor_lookup(map, &symbol);
 
-        CHECK_EQUAL(0x00000000U, d->domain);
-        CHECK_EQUAL(0x00000040U, d->id);
+        CHECK(d != 0);
+        if (d)
+        {
+            CHECK_EQUAL(0x00000000U, d->domain);
+            CHECK_EQUAL(0x00000040U, d->id);
+        }
     }
 
     TEST_FIXTURE(AmqpDescriptorFixture, lookup_descriptor_using_context)
     {
         amqp_descriptor_t *d = amqp_context_descriptor_lookup(context, &symbol);
 
-        CHECK_EQUAL(0x00000000U, d->domain);
-        CHECK_EQUAL(0x00000040U, d->id);
+        CHECK(d != 0);
+        if (d)
+        {
+            CHECK_EQUAL(0x00000000U, d->domain);
+            CHECK_EQUAL(0x00000040U, d->id);
+        }
     }
 }

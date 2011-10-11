@@ -451,12 +451,17 @@ namespace test_data
             0x03, 0x46, 0x75, 0x6d,
     );
 
-    test_data_def(symbol_abcde,
-        0xA3, 0x05, 'A', 'B', 'C', 'D', 'E'
+    test_data_def(array_of_symbols,
+        0xe0,
+        30,           // size
+        0x05,         // count
+        0xA3,
+        0x03, 'A', 'B', 'C',
+        0x03, 'A', 'B', 'C',
+        0x05, 'D', 'E', 'F', 'G', 'H',
+        0x05, 'I', 'J', 'J', 'L', 'M',
+        0x07, 'D', 'E', 'F', 'G', 'H', 'I', 'J',
     );
 
-    test_data_def(symbol_plain,
-        0xA3, 0x05, 'P', 'L', 'A', 'I', 'N'
-    );
 }
 
