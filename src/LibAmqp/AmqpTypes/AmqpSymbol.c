@@ -149,8 +149,10 @@ int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
 uint32_t amqp_symbol_hash(amqp_symbol_t *symbol)
 {
     assert(symbol != 0);
-    // TODO - intrpduce a hash_type
-    return amqp_hash((void *) symbol->data, symbol->size);
+    // TODO - introduce a hash_type
+    return symbol->type ?
+        amqp_hash((void *) amqp_buffer_pointer(symbol->type->value.variable.buffer, symbol->type->position.index), symbol->type->position.size) :
+        amqp_hash((void *) symbol->data, symbol->size);
 }
 
 void amqp_symbol_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity)
