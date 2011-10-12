@@ -16,8 +16,8 @@
 
 #include "Context/Context.h"
 #include "Transport/Frame/Frame.h"
-#include "Transport/Frame/TypeInit.h"
 #include "Codec/Decode/Decode.h"
+#include "AmqpTypes/AmqpTypes.h"
 
 #include "debug_helper.h"
 
@@ -51,7 +51,7 @@ static int decode_symbolic_descriptor(amqp_context_t *context, amqp_buffer_t *bu
     amqp_symbol_t symbol;
 
     amqp_descriptor_t *descriptor;
-    amqp_type_to_symbol(context, &symbol, type); // TODO - remove
+    amqp_symbol_initialize_from_type(context, &symbol, type);
     descriptor = amqp_context_descriptor_lookup(context, &symbol);
     amqp_symbol_cleanup(context, &symbol);
 

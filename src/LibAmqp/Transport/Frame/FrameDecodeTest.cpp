@@ -48,4 +48,17 @@ SUITE(Frame)
         CHECK_EQUAL(3U, type->value.array.count);
         CHECK(amqp_type_is_symbol(type->value.array.elements[0]));
     }
+
+    TEST_FIXTURE(FrameFixture, multiple_symbol_empty_array)
+    {
+        // TODO - FIX
+        /*
+        test_data::multiple_symbol_empty_array.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
+
+        CHECK(amqp_type_is_array(type));
+        CHECK_EQUAL(0U, type->value.array.count);
+        */
+//        CHECK(amqp_type_is_symbol(type->value.array.elements[0]));
+    }
 }

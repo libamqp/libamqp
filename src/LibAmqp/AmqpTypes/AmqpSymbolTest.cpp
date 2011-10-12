@@ -74,7 +74,6 @@ SUITE(AmqpTypesSymbol)
     
     TEST_FIXTURE(AmqpSymbolFixture, symbol_equality)
     {
-        break_one();
         amqp_symbol_initialize(context, &ref, a, strlen(a));
         symbol_b = amqp_symbol_create(context, b, strlen(b));
         CHECK(amqp_symbol_compare(&ref, symbol_b) == 0);

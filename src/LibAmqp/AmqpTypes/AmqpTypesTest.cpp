@@ -22,6 +22,7 @@ SUITE(AmqpTypes)
 {
     TEST_FIXTURE(AmqpTypesFixture, type_sizes)
     {
+    /*
         SOUTV(sizeof(amqp_array_t));
         SOUTV(sizeof(amqp_binary_t));
         SOUTV(sizeof(amqp_entry_t));
@@ -33,5 +34,6 @@ SUITE(AmqpTypes)
         SOUTV(sizeof(amqp_type_t));
         SOUTV(sizeof(amqp_amqp_type_t));
         SOUTV(sizeof(amqp_memory_t));
+        */
     }
 }

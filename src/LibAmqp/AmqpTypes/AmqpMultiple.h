@@ -21,19 +21,23 @@ extern "C" {
 #endif
 
 #include "AmqpTypes/AmqpLeader.h"
+#include "AmqpTypes/AmqpSymbol.h"
 
 #define AMQP_MULTIPLE_DEFAULT_SIZE  8
 
 struct amqp_multiple_symbol_t
 {
     amqp_leader_t leader;
+    amqp_type_t *type;
     int size;
-    union
-    {
-        amqp_symbol_t *direct[AMQP_MULTIPLE_DEFAULT_SIZE];
-        amqp_symbol_t **indirect;
-    } array;
+    amqp_symbol_t *symbols;
 };
+
+static inline
+void amqp_multiple_symbol_cleanup(amqp_context_t *context, amqp_multiple_symbol_t *multiple)
+{
+    amqp_type_cleanup(context, (amqp_amqp_type_t *) multiple);
+}
 
 static inline
 int amqp_multiple_symbol_size(amqp_multiple_symbol_t *multiple)
@@ -42,21 +46,15 @@ int amqp_multiple_symbol_size(amqp_multiple_symbol_t *multiple)
 }
 
 static inline
-amqp_symbol_t **amqp_multiple_symbol_array(amqp_multiple_symbol_t *multiple)
-{
-    return multiple->size > AMQP_MULTIPLE_DEFAULT_SIZE ? multiple->array.indirect : &multiple->array.direct[0];
-}
-
-static inline
 amqp_symbol_t *amqp_multiple_symbol_get(amqp_multiple_symbol_t *multiple, int element)
 {
-    return amqp_multiple_symbol_array(multiple)[element];
+not_implemented(todo);
+//    return amqp_multiple_symbol_array(multiple)[element];
 }
-extern void amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, int size);
-extern void amqp_multiple_symbol_cleanup(amqp_context_t *context, amqp_multiple_symbol_t *multiple);
 
-extern amqp_multiple_symbol_t *amqp_multiple_symbol_create(amqp_context_t *context, int size);
-extern void amqp_multiple_symbol_free(amqp_context_t *context, amqp_multiple_symbol_t *multiple);
+extern void amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, amqp_type_t *type);
+extern amqp_multiple_symbol_t *amqp_multiple_symbol_create(amqp_context_t *context, amqp_type_t *type);
+extern void amqp_multiple_symbol_cleanup(amqp_context_t *context, amqp_multiple_symbol_t *multiple);
 
 #ifdef __cplusplus
 }

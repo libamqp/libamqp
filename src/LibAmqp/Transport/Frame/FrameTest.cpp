@@ -42,11 +42,11 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, decode_sasl_mechanisms_frame)
     {
-//        test_data::sasl_mechanisms_frame.transfer_to(buffer);
-//
-////        break_one();
+        test_data::sasl_mechanisms_frame.transfer_to(buffer);
+
+        break_one();
 //        frame = amqp_decode_frame(context, buffer);
-//
+
 //        CHECK_EQUAL(8U, frame->data_offset);
 //        CHECK_EQUAL(AMQP_SASL_FRAME_TYPE, frame->frame_type);
 //        CHECK_EQUAL(0U, frame->type_specific.word);

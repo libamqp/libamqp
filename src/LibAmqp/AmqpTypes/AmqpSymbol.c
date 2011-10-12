@@ -103,18 +103,6 @@ amqp_symbol_t *amqp_symbol_create_from_type(amqp_context_t *context, amqp_type_t
     return result;
 }
 
-static inline
-int amqp_type_compare_with_symbol(amqp_type_t *type, amqp_symbol_t *rhs, int n)
-{
-    return 0;
-//    not_implemented(todo);
-//    if (rhs->type)
-//    {
-//        return amqp_buffer_compare(type->value.variab.buffer,type->position.offset)
-//    }
-//
-//    return
-}
 static
 amqp_memory_t *data_to_block(amqp_symbol_t *symbol)
 {
@@ -149,7 +137,7 @@ int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
 uint32_t amqp_symbol_hash(amqp_symbol_t *symbol)
 {
     assert(symbol != 0);
-    // TODO - introduce a hash_type
+    // TODO - introduce a hash for fragmented types
     return symbol->type ?
         amqp_hash((void *) amqp_buffer_pointer(symbol->type->value.variable.buffer, symbol->type->position.index), symbol->type->position.size) :
         amqp_hash((void *) symbol->data, symbol->size);

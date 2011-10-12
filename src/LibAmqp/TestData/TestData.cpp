@@ -451,6 +451,11 @@ namespace test_data
             0x03, 0x46, 0x75, 0x6d,
     );
 
+    test_data_def(multiple_symbol_empty_array,
+        0xe0, 1, 0,
+//        0xe0, 1, 0, 0xA3,     // TODO - verify which is correct
+    );
+
     test_data_def(array_of_symbols,
         0xe0,
         30,           // size
