@@ -26,14 +26,21 @@
 
 static void initialize_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
-//    amqp_multiple_symbol_t *multiple = (amqp_multiple_symbol_t *) type;
-    not_implemented(todo);
+    amqp_multiple_symbol_t *multiple = (amqp_multiple_symbol_t *) type;
+    if (multiple->symbols)
+    {
+        AMQP_FREE(context, multiple->symbols);
+    }
 }
 
 static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
-//    amqp_multiple_symbol_t *multiple = (amqp_multiple_symbol_t *) type;
-    not_implemented(todo);
+    amqp_multiple_symbol_t *multiple = (amqp_multiple_symbol_t *) type;
+    if (multiple->symbols)
+    {
+        AMQP_FREE(context, multiple->symbols);
+    }
+    AMQP_FREE(context, multiple);
 }
 
 static
@@ -46,15 +53,13 @@ void initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multi
         multiple->size = 0;
         multiple->symbols = 0;
     }
-
-    if (amqp_type_is_symbol(type))
+    else if (amqp_type_is_symbol(type))
     {
         multiple->size = 1;
         multiple->symbols = AMQP_MALLOC_ARRAY(context, amqp_symbol_t, 1);
         amqp_symbol_initialize_from_type(context, &multiple->symbols[0], type);
     }
-
-    if (amqp_type_is_array(type))
+    else if (amqp_type_is_array(type))
     {
         int i;
         multiple->size = type->value.array.count;
@@ -64,8 +69,6 @@ void initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multi
             amqp_symbol_initialize_from_type(context, &multiple->symbols[i], type);
         }
     }
-
-    multiple->size = type->position.size;
 }
 
 void amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, amqp_type_t *type)

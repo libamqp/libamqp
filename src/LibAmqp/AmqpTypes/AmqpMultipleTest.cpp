@@ -43,34 +43,40 @@ SUITE(AmqpTypes)
         amqp_multiple_symbol_cleanup(context, multiple);
     }
 
-    TEST_FIXTURE(AmqpMultiplesFixture, fixture_should_balance_allocations)
+    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_one_value)
     {
-//        multiple = amqp_multiple_symbol_create(context, 5);
-//        CHECK_EQUAL(5, multiple->size);
+        test_data::multiple_symbol_one_value.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
+
+        multiple = amqp_multiple_symbol_create(context, type);
+        CHECK_EQUAL(1, multiple->size);
+
+        amqp_multiple_symbol_initialize(context, &multiple_ref, type);
+        CHECK_EQUAL(1, multiple_ref.size);
     }
 
-    TEST_FIXTURE(AmqpMultiplesFixture, single_element)
+    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_null)
     {
-//        multiple = amqp_multiple_symbol_create(context, 5);
-//        CHECK_EQUAL(5, multiple->size);
+        test_data::multiple_symbol_null.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
+
+        multiple = amqp_multiple_symbol_create(context, type);
+        CHECK_EQUAL(0, multiple->size);
+
+        amqp_multiple_symbol_initialize(context, &multiple_ref, type);
+        CHECK_EQUAL(0, multiple_ref.size);
     }
 
-    TEST_FIXTURE(AmqpMultiplesFixture, add_element)
+    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_many_values)
     {
-//        multiple = amqp_multiple_symbol_create(context, 5);
-//        CHECK_EQUAL(5, multiple->size);
-    }
+        test_data::multiple_symbol_many_values.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
 
-//    TEST_FIXTURE(AmqpTypes, decode_minimal_frame)
-//    {
-//        test_data::minimal_frame_header.transfer_to(buffer);
-//        frame = amqp_decode_frame(context, buffer);
-//        CHECK_EQUAL(8U, frame->data_offset);
-//        CHECK_EQUAL(0U, frame->frame_type);
-//        CHECK_EQUAL(1U, frame->type_specific.word);
-//
-//        CHECK_EQUAL(8U, amqp_buffer_index(buffer));
-//        CHECK_EQUAL(0, amqp_buffer_available(buffer));
-//    }
+        multiple = amqp_multiple_symbol_create(context, type);
+        CHECK_EQUAL(3, multiple->size);
+
+        amqp_multiple_symbol_initialize(context, &multiple_ref, type);
+        CHECK_EQUAL(3, multiple_ref.size);
+    }
 
 }
