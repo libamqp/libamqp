@@ -48,8 +48,9 @@ int amqp_multiple_symbol_size(amqp_multiple_symbol_t *multiple)
 static inline
 amqp_symbol_t *amqp_multiple_symbol_get(amqp_multiple_symbol_t *multiple, int element)
 {
-not_implemented(todo);
-//    return amqp_multiple_symbol_array(multiple)[element];
+    assert(multiple != 0);
+
+    return (multiple->size > 0 && element < multiple->size) ? &multiple->symbols[element] : 0;
 }
 
 extern void amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, amqp_type_t *type);

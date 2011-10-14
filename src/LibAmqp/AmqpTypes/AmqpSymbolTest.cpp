@@ -226,4 +226,12 @@ SUITE(AmqpTypesSymbol)
         symbol_b = amqp_symbol_create(context, b, strlen(b));
         CHECK_EQUAL(amqp_symbol_hash(&ref), amqp_symbol_hash(symbol_b));
     }
+
+
+    TEST_FIXTURE(AmqpSymbolFixture, symbol_equality_with_cstr)
+    {
+        symbol_b = amqp_symbol_create(context, b, strlen(b));
+        CHECK(amqp_symbol_compare_with_cstr(symbol_b, "ABC") == 0);
+    }
+
 }

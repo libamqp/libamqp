@@ -66,7 +66,7 @@ void initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multi
         multiple->symbols = AMQP_MALLOC_ARRAY(context, amqp_symbol_t, multiple->size);
         for (i = 0; i < multiple->size; i++)
         {
-            amqp_symbol_initialize_from_type(context, &multiple->symbols[i], type);
+            amqp_symbol_initialize_from_type(context, &multiple->symbols[i], type->value.array.elements[i]);
         }
     }
 }

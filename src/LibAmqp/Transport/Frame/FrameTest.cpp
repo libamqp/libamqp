@@ -44,7 +44,7 @@ SUITE(Frame)
     {
         test_data::sasl_mechanisms_frame.transfer_to(buffer);
 
-        break_one();
+//        break_one();
 //        frame = amqp_decode_frame(context, buffer);
 
 //        CHECK_EQUAL(8U, frame->data_offset);
