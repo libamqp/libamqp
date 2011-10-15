@@ -92,6 +92,31 @@ static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amq
     return true;
 }
 
+static int decode_mandatory_multiple_symbol(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *list, int field_number)
+{
+    assert(amqp_type_is_list(list));
+
+    if (field_number >= list->value.list.count)
+    {
+        amqp_error(context, AMQP_ERROR_MULTIPLE_DECODE_FAILED, "Mandatory multiple symbol field missing");
+        // TODO - dump type
+        return false;
+    }
+    if (!amqp_multiple_symbol_initialize(context, &frame->frames.sasl.mechanisms.sasl_server_mechanisms, list->value.list.elements[field_number]))
+    {
+        amqp_error(context, AMQP_ERROR_MULTIPLE_DECODE_FAILED, "Field is not a multiple symbol.");
+        // TODO - dump type
+        return false;
+    }
+    if (frame->frames.sasl.mechanisms.sasl_server_mechanisms.size == 0)
+    {
+        amqp_error(context, AMQP_ERROR_MULTIPLE_DECODE_FAILED, "Mandatory multiple symbol field is null or empty.");
+        // TODO - dump type
+        return false;
+    }
+    return true;
+}
+
 static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
 {
     if (frame->frame_type != AMQP_SASL_FRAME_TYPE)
@@ -101,7 +126,7 @@ static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *
         return false;
     }
 
-    return amqp_multiple_symbol_initialize(context, &frame->frames.sasl.sasl_mechanisms.sasl_server_mechanisms, type);
+    return decode_mandatory_multiple_symbol(context, buffer, frame, type, 0);
 }
 
 static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
@@ -188,9 +213,49 @@ amqp_frame_t *amqp_decode_frame(amqp_context_t *context, amqp_buffer_t *buffer)
 
     if (decode_frame(context, buffer, result) == 0)
     {
-        amqp_deallocate_frame(context, result);
+        SOUTS("decode failed");
         return 0;
     }
 
     return result;
+}
+
+void amqp_frame_cleanup(amqp_context_t *context, amqp_frame_t *frame)
+{
+    if (frame == 0)
+    {
+        return;
+    }
+
+    switch (frame->descriptor.id)
+    {
+        case 0:
+            break;
+            
+        case AMQP_FRAME_ID_OPEN_LIST:
+        case AMQP_FRAME_ID_BEGIN_LIST:
+        case AMQP_FRAME_ID_ATTACH_LIST:
+        case AMQP_FRAME_ID_FLOW_LIST:
+        case AMQP_FRAME_ID_TRANSFER_LIST:
+        case AMQP_FRAME_ID_DISPOSITION_LIST:
+        case AMQP_FRAME_ID_DETACH_LIST:
+        case AMQP_FRAME_ID_END_LIST:
+        case AMQP_FRAME_ID_CLOSE_LIST:
+        case AMQP_FRAME_ID_ERROR_LIST:
+
+        case AMQP_FRAME_ID_SASL_MECHANISMS_LIST:
+            amqp_multiple_symbol_cleanup(context, &frame->frames.sasl.mechanisms.sasl_server_mechanisms);
+            break;
+
+        case AMQP_FRAME_ID_SASL_INIT_LIST:
+        case AMQP_FRAME_ID_SASL_CHALLENGE_LIST:
+        case AMQP_FRAME_ID_SASL_RESPONSE_LIST:
+        case AMQP_FRAME_ID_SASL_OUTCOME_LIST:
+
+        default:
+            amqp_error(context, AMQP_ERROR_ILLEGAL_STATE, "Cannot cleanup frame. Unsupported descriptor id. Id = %08x", frame->descriptor.id);
+            return;
+    }
+
+    amqp_deallocate_frame(context, frame);
 }

@@ -65,7 +65,7 @@ int initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multip
     {
         int i;
 
-            // TODO -  deal with an empty array
+        // TODO -  deal with an empty array
         if (type->value.array.count > 0)
         {
             multiple->size = type->value.array.count;
@@ -84,6 +84,7 @@ int initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multip
             return true;
         }
     }
+
     amqp_type_convert_set_failed(type);
     return false;
 }

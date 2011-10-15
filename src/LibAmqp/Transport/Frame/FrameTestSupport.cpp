@@ -28,7 +28,7 @@ namespace SuiteFrame
     FrameFixture::~FrameFixture()
     {
         amqp_deallocate_buffer(context, buffer);
-        amqp_deallocate_frame(context, frame);
+        amqp_frame_cleanup(context, frame);
         amqp_deallocate_type(context, type);
     }
 }

@@ -58,7 +58,7 @@ struct amqp_frame_t
 
     union {
         union {
-            amqp_frame_sasl_mechanisms_t sasl_mechanisms;
+            amqp_frame_sasl_mechanisms_t mechanisms;
             amqp_frame_sasl_init_t sasl_init;
             amqp_frame_sasl_challenge_t sasl_challenge;
             amqp_frame_sasl_response_t sasl_response;
@@ -71,6 +71,7 @@ struct amqp_frame_t
 };
 
 extern amqp_frame_t *amqp_decode_frame(amqp_context_t *context, amqp_buffer_t *buffer);
+extern void amqp_frame_cleanup(amqp_context_t *context, amqp_frame_t *frame);
 
 #ifdef __cplusplus
 }
