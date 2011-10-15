@@ -53,7 +53,7 @@ amqp_symbol_t *amqp_multiple_symbol_get(amqp_multiple_symbol_t *multiple, int el
     return (multiple->size > 0 && element < multiple->size) ? &multiple->symbols[element] : 0;
 }
 
-extern void amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, amqp_type_t *type);
+extern int amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, amqp_type_t *type);
 extern amqp_multiple_symbol_t *amqp_multiple_symbol_create(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_multiple_symbol_cleanup(amqp_context_t *context, amqp_multiple_symbol_t *multiple);
 

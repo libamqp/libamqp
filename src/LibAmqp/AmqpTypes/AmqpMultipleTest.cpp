@@ -85,6 +85,7 @@ SUITE(AmqpTypes)
         break_one();
         multiple = amqp_multiple_symbol_create(context, type);
         CHECK_EQUAL(3, multiple->size);
+        // TODO - deal with case where get returns null (compare should return false)
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 0), "PLAIN") == 0);
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 1), "Foo") == 0);
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 2), "Fum") == 0);

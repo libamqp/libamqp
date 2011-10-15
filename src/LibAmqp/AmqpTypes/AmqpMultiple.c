@@ -44,7 +44,7 @@ static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 }
 
 static
-void initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multiple, amqp_type_t *type)
+int initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multiple, amqp_type_t *type)
 {
     multiple->type = type;
 
@@ -52,32 +52,49 @@ void initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multi
     {
         multiple->size = 0;
         multiple->symbols = 0;
+        return true;
     }
     else if (amqp_type_is_symbol(type))
     {
         multiple->size = 1;
         multiple->symbols = AMQP_MALLOC_ARRAY(context, amqp_symbol_t, 1);
         amqp_symbol_initialize_from_type(context, &multiple->symbols[0], type);
+        return true;
     }
     else if (amqp_type_is_array(type))
     {
         int i;
-        multiple->size = type->value.array.count;
-        multiple->symbols = AMQP_MALLOC_ARRAY(context, amqp_symbol_t, multiple->size);
-        for (i = 0; i < multiple->size; i++)
+
+            // TODO -  deal with an empty array
+        if (type->value.array.count > 0)
         {
-            amqp_symbol_initialize_from_type(context, &multiple->symbols[i], type->value.array.elements[i]);
+            multiple->size = type->value.array.count;
+            multiple->symbols = AMQP_MALLOC_ARRAY(context, amqp_symbol_t, multiple->size);
+
+            for (i = 0; i < multiple->size; i++)
+            {
+                amqp_type_t *element = type->value.array.elements[i];
+                if (!amqp_type_is_symbol(element))
+                {
+                    // TODO - if the first element is a symbol they all should be
+                    return false;
+                }
+                amqp_symbol_initialize_from_type(context, &multiple->symbols[i], element);
+            }
+            return true;
         }
     }
+    amqp_type_convert_set_failed(type);
+    return false;
 }
 
-void amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, amqp_type_t *type)
+int amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, amqp_type_t *type)
 {
     static amqp_fn_table_t table = {
         .dtor = initialize_dtor
     };
     multiple->leader.fn_table = &table;
-    initialize_from_type(context, multiple, type);
+    return initialize_from_type(context, multiple, type);
 }
 
 amqp_multiple_symbol_t *amqp_multiple_symbol_create(amqp_context_t *context, amqp_type_t *type)

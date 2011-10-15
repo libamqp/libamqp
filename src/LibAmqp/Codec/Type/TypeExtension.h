@@ -42,6 +42,12 @@ int amqp_type_convert_check_failed(amqp_type_t *type, int convert_result)
 }
 
 static inline
+int amqp_type_convert_set_failed(amqp_type_t *type)
+{
+    return !(type->flags.convert_failed = true);
+}
+
+static inline
 amqp_type_t *amqp_type_get_descriptor(amqp_type_t *type)
 {
     return amqp_type_convert_check_failed(type, amqp_type_is_described(type))
@@ -88,15 +94,17 @@ int16_t amqp_type_to_short(amqp_type_t *type)
 static inline
 size_t amqp_type_copy_to(amqp_type_t *type, uint8_t *buffer, size_t amount)
 {
-    assert(amqp_type_is_variable(type));
-
-// TODO - push into buffer and do block copy of fragments
-    size_t i, j;
-    for (i = 0, j = type->position.index; i < type->position.size && i < amount; i++, j++)
+    if (amqp_type_convert_check_failed(type, amqp_type_is_variable(type)))
     {
-        buffer[i] = amqp_unchecked_getc_at(type->value.variable.buffer, j);
+        // TODO - push into buffer and do block copy of fragments
+        size_t i, j;
+        for (i = 0, j = type->position.index; i < type->position.size && i < amount; i++, j++)
+        {
+            buffer[i] = amqp_unchecked_getc_at(type->value.variable.buffer, j);
+        }
+        return i;
     }
-    return i;
+    return 0;
 }
 
 #ifdef __cplusplus

@@ -101,8 +101,7 @@ static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *
         return false;
     }
 
-    amqp_multiple_symbol_initialize(context, &frame->frames.sasl.sasl_mechanisms.sasl_server_mechanisms, type);
-    not_implemented(todo);
+    return amqp_multiple_symbol_initialize(context, &frame->frames.sasl.sasl_mechanisms.sasl_server_mechanisms, type);
 }
 
 static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
