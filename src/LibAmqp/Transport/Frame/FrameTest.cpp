@@ -30,7 +30,7 @@ SUITE(Frame)
     TEST_FIXTURE(FrameFixture, decode_minimal_frame)
     {
         test_data::minimal_frame_header.transfer_to(buffer);
-        frame = amqp_decode_frame(context, buffer);
+        frame = amqp_decode_amqp_frame(context, buffer);
         ASSERT(frame != 0);
 
         CHECK_EQUAL(8U, frame->data_offset);
@@ -45,7 +45,7 @@ SUITE(Frame)
     TEST_FIXTURE(FrameFixture, decode_sasl_mechanisms_frame)
     {
         test_data::sasl_mechanisms_frame.transfer_to(buffer);
-        frame = amqp_decode_frame(context, buffer);
+        frame = amqp_decode_sasl_frame(context, buffer);
         ASSERT(frame != 0);
 
         CHECK_EQUAL(8U, frame->data_offset);
@@ -59,7 +59,7 @@ SUITE(Frame)
     TEST_FIXTURE(FrameFixture, sasl_mechanisms_frame_long)
     {
         test_data::sasl_mechanisms_frame_long.transfer_to(buffer);
-        frame = amqp_decode_frame(context, buffer);
+        frame = amqp_decode_sasl_frame(context, buffer);
         ASSERT(frame != 0);
 
         CHECK_EQUAL(8U, frame->data_offset);
@@ -73,7 +73,7 @@ SUITE(Frame)
     TEST_FIXTURE(FrameFixture, sasl_mechanisms_frame_symbol)
     {
         test_data::sasl_mechanisms_frame_symbol.transfer_to(buffer);
-        frame = amqp_decode_frame(context, buffer);
+        frame = amqp_decode_sasl_frame(context, buffer);
         ASSERT(frame != 0);
 
         CHECK_EQUAL(8U, frame->data_offset);

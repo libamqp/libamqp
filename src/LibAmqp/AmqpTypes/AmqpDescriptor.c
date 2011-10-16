@@ -72,3 +72,17 @@ amqp_descriptor_t *amqp_descriptor_lookup(amqp_map_t *map, amqp_symbol_t *symbol
 {
    return (amqp_descriptor_t *) amqp_symbol_map_get(map, symbol);
 }
+
+const char *amqp_descriptor_id_to_cstr(uint32_t id)
+{
+    int i = 0;
+    while (descriptors[i].symbolic)
+    {
+        if (descriptors[i].descriptor.id == id)
+        {
+            return descriptors[i].symbolic;
+        }
+        i++;
+    }
+    return "unknown";
+}

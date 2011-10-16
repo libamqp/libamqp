@@ -45,7 +45,7 @@ typedef enum amqp_frame_descriptor_id_t
     AMQP_FRAME_ID_SASL_OUTCOME_LIST = 0x00000044
 } amqp_frame_descriptor_id_t;
 
-typedef enum amqp_frame_descriptor_type_t
+typedef enum amqp_frame_type_type_t
 {
     amqp_empty_frame = 1,
     amqp_unsupported_descriptor,
@@ -69,6 +69,7 @@ typedef struct amqp_symbolic_descriptor_t
 extern amqp_map_t *amqp_load_descriptors(amqp_context_t *context);
 extern void amqp_descriptors_cleanup(amqp_context_t *context, amqp_map_t *map);
 extern amqp_descriptor_t *amqp_descriptor_lookup(amqp_map_t *map, amqp_symbol_t *symbol);
+extern const char *amqp_descriptor_id_to_cstr(uint32_t id);
 
 static inline
 amqp_descriptor_t *amqp_context_descriptor_lookup(amqp_context_t *context, amqp_symbol_t *symbol)

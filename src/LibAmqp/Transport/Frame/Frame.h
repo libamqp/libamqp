@@ -70,7 +70,9 @@ struct amqp_frame_t
     } frames;
 };
 
-extern amqp_frame_t *amqp_decode_frame(amqp_context_t *context, amqp_buffer_t *buffer);
+extern amqp_frame_t *amqp_decode_sasl_frame(amqp_context_t *context, amqp_buffer_t *buffer);
+extern amqp_frame_t *amqp_decode_amqp_frame(amqp_context_t *context, amqp_buffer_t *buffer);
+
 extern void amqp_frame_cleanup(amqp_context_t *context, amqp_frame_t *frame);
 
 #ifdef __cplusplus

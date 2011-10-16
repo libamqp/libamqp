@@ -39,7 +39,7 @@ static int decode_header(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fr
 
     if  (frame->frame_type != AMQP_FRAME_TYPE && frame->frame_type != AMQP_SASL_FRAME_TYPE)
     {
-        amqp_error(context, AMQP_ERROR_INVALID_FRAME_TYPE, "Invalid frame type: %02x", frame->frame_type);
+        amqp_error(context, AMQP_ERROR_INVALID_FRAME_TYPE, "Unsupported frame type: %02x", frame->frame_type);
         return false;
     }
 
@@ -134,14 +134,14 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
     // Currently all accepted frames are encoded as a list.
     if (!amqp_type_is_list(type))
     {
-        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Expected a list.");
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Expected an AMQP list type.");
         // TODO - dump type
         return false;
     }
 
     if (frame->descriptor.domain != AMQP_DESCRIPTOR_DOMAIN)
     {
-        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Unknow descriptor domain. Domain = %d", frame->descriptor.domain);
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Frame is for an unsupported descriptor domain. Domain = %d", frame->descriptor.domain);
         // TODO - dump type
         return false;
     }
@@ -207,13 +207,48 @@ static int decode_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fra
     return rc;
 }
 
-amqp_frame_t *amqp_decode_frame(amqp_context_t *context, amqp_buffer_t *buffer)
+static amqp_frame_t *amqp_decode_frame(amqp_context_t *context, amqp_buffer_t *buffer)
 {
     amqp_frame_t *result = amqp_allocate_frame(context);
 
     if (decode_frame(context, buffer, result) == 0)
     {
-        SOUTS("decode failed");
+        amqp_frame_cleanup(context, result);
+        return 0;
+    }
+
+    return result;
+}
+
+amqp_frame_t *amqp_decode_sasl_frame(amqp_context_t *context, amqp_buffer_t *buffer)
+{
+    amqp_frame_t *result = amqp_decode_frame(context, buffer);
+
+    if (result && result->descriptor.id == 0)
+    {
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Received an empty frame when a SASL frame was expected.");
+        amqp_frame_cleanup(context, result);
+        return 0;
+    }
+
+    if (result && result->frame_type != AMQP_SASL_FRAME_TYPE)
+    {
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Expected a SASL frame. Decoded: %s", amqp_descriptor_id_to_cstr(result->descriptor.id));
+        amqp_frame_cleanup(context, result);
+        return 0;
+    }
+
+    return result;
+}
+
+amqp_frame_t *amqp_decode_amqp_frame(amqp_context_t *context, amqp_buffer_t *buffer)
+{
+    amqp_frame_t *result = amqp_decode_frame(context, buffer);
+
+    if (result && result->descriptor.id && result->frame_type != AMQP_FRAME_TYPE)
+    {
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Expected an AMQP frame. Decoded: %s", amqp_descriptor_id_to_cstr(result->descriptor.id));
+        amqp_frame_cleanup(context, result);
         return 0;
     }
 
