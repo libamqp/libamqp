@@ -112,5 +112,5 @@ void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type)
 
 amqp_buffer_t *amqp_type_convert_buffer(amqp_type_t *type)
 {
-    return type->flags.is_encoded ? type->context->encode.buffer : type->context->decode.buffer;
+    not_implemented(todo);
 }

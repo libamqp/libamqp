@@ -39,7 +39,7 @@ SUITE(CompoundTypeDecode)
     TEST_FIXTURE(DecodeFixture, SmallArray)
     {
         load_decode_buffer(test_data::array_shorts);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
 
@@ -68,7 +68,7 @@ SUITE(CompoundTypeDecode)
     TEST_FIXTURE(DecodeFixture, LargeList)
     {
         load_decode_buffer(test_data::list);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
 
@@ -112,13 +112,13 @@ SUITE(CompoundTypeDecode)
     TEST_FIXTURE(DecodeFixture, leak)
     {
         load_decode_buffer(test_data::list);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
     }
 
     TEST_FIXTURE(DecodeFixture, Map)
     {
         load_decode_buffer(test_data::map);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xc1, type->format_code);
@@ -140,7 +140,7 @@ SUITE(CompoundTypeDecode)
     TEST_FIXTURE(DecodeFixture, arrray_elements_are_cocntained)
     {
         load_decode_buffer(test_data::array_shorts);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
         ASSERT_VALID(type);
         CHECK(amqp_type_is_contained(type->value.array.elements[0]));
         CHECK(amqp_type_is_contained(type->value.array.elements[1]));
@@ -152,7 +152,7 @@ SUITE(CompoundTypeDecode)
     TEST_FIXTURE(DecodeFixture, list_elements_are_contained)
     {
         load_decode_buffer(test_data::list);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
         ASSERT_VALID(type);
         CHECK(amqp_type_is_contained(amqp_list_element(type, 0)));
         CHECK(amqp_type_is_contained(amqp_list_element(type, 1)));
@@ -164,7 +164,7 @@ SUITE(CompoundTypeDecode)
     TEST_FIXTURE(DecodeFixture, map_entries_are_contained)
     {
         load_decode_buffer(test_data::map);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
         ASSERT_VALID(type);
         CHECK(amqp_type_is_contained(amqp_map_element(type, 0)));
         CHECK(amqp_type_is_contained(amqp_map_element(type, 1)));
@@ -182,7 +182,7 @@ SUITE(CompoundTypeDecode)
     {
         load_decode_buffer(test_data::described_list);
 
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
         ASSERT_VALID(type);
 
         CHECK(amqp_type_is_described(type));
@@ -220,7 +220,7 @@ SUITE(CompoundTypeDecode)
     {
         context->debug.level = 0;
         load_decode_buffer(test_data::missing_descriptor);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_NO_DESCRIPTOR, type->invalid_cause);
     }
@@ -229,7 +229,7 @@ SUITE(CompoundTypeDecode)
     {
         context->debug.level = 0;
         load_decode_buffer(test_data::missing_described_type);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_NO_DESCRIBED_TYPE, type->invalid_cause);
     }
@@ -238,7 +238,7 @@ SUITE(CompoundTypeDecode)
     {
         context->debug.level = 0;
         load_decode_buffer(test_data::invalid_descriptor);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_DESCRIPTOR_INVALID, type->invalid_cause);
     }
@@ -247,7 +247,7 @@ SUITE(CompoundTypeDecode)
     {
         context->debug.level = 0;
         load_decode_buffer(test_data::invalid_described_type);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_DESCRIBED_INVALID, type->invalid_cause);
     }
@@ -255,7 +255,7 @@ SUITE(CompoundTypeDecode)
     TEST_FIXTURE(DecodeFixture, empty_map)
     {
         load_decode_buffer(test_data::empty_map);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xc1, type->format_code);
@@ -266,7 +266,7 @@ SUITE(CompoundTypeDecode)
     TEST_FIXTURE(DecodeFixture, empty_list_8)
     {
         load_decode_buffer(test_data::empty_list_8);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
         ASSERT_VALID(type);
 
         CHECK_EQUAL(0xc0, type->format_code);
@@ -277,7 +277,7 @@ SUITE(CompoundTypeDecode)
     TEST_FIXTURE(DecodeFixture, empty_list_0)
     {
         load_decode_buffer(test_data::empty_list_0);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
         ASSERT_VALID(type);
 
         CHECK_EQUAL(0x45, type->format_code);

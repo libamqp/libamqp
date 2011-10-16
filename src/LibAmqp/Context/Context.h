@@ -106,11 +106,11 @@ typedef struct amqp_map_t amqp_map_t;
             amqp_memory_pool_t amqp_frame_t_pool;
         } memory;
 
-        struct
-        {
-            amqp_buffer_t *buffer;
-        } decode;
-
+//        struct
+//        {
+//            amqp_buffer_t *buffer;
+//        } decode;
+//
         struct
         {
             amqp_buffer_t *buffer;

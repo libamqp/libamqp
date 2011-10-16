@@ -45,8 +45,8 @@ SUITE(FrameTypeDecode)
     void DecodeFixture::load(test_data::TestData &data)
     {
         load_decode_buffer(data);
-        amqp_buffer_advance_read_index(context->decode.buffer, 8);
-        type = amqp_decode(context, context->decode.buffer);
+        amqp_buffer_advance_read_index(decode_buffer, 8);
+        type = amqp_decode(context, decode_buffer);
         CHECK(amqp_type_is_valid(type));
         CHECK(amqp_type_is_described(type));
         descriptor = amqp_type_get_descriptor(type);

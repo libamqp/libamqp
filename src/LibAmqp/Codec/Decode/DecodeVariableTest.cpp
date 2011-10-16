@@ -43,7 +43,7 @@ SUITE(StringDecoder)
     TEST_FIXTURE(DecodeFixture, decode_binary)
     {
         load_decode_buffer(test_data::bin_8);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xa0, type->format_code);
@@ -57,7 +57,7 @@ SUITE(StringDecoder)
     TEST_FIXTURE(DecodeFixture, decode_large_binary)
     {
         load_decode_buffer(test_data::bin_32);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xb0, type->format_code);
@@ -71,7 +71,7 @@ SUITE(StringDecoder)
     TEST_FIXTURE(DecodeFixture, UTF8String)
     {
         load_decode_buffer(test_data::hello_world);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xa1, type->format_code);
@@ -85,7 +85,7 @@ SUITE(StringDecoder)
     TEST_FIXTURE(DecodeFixture, LongUtf8String)
     {
         load_decode_buffer(test_data::hello_big_world);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xb1, type->format_code);
@@ -99,7 +99,7 @@ SUITE(StringDecoder)
     TEST_FIXTURE(DecodeFixture, DecodeLargeSymbol)
     {
         load_decode_buffer(test_data::foo_bar_symbol_32);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xb3, type->format_code);
@@ -113,7 +113,7 @@ SUITE(StringDecoder)
     TEST_FIXTURE(DecodeFixture, DecodeSymbol)
     {
         load_decode_buffer(test_data::foo_symbol_8);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0xa3, type->format_code);
@@ -128,7 +128,7 @@ SUITE(StringDecoder)
     {
         load_decode_buffer(test_data::bad_symbol);
         context->debug.level = 0;
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_INVALID_SYMBOL_CHARACTER, type->invalid_cause);

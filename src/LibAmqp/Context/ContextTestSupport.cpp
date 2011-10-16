@@ -29,17 +29,19 @@ namespace SuiteContext
     ContextFixture::ContextFixture()
     {
         context = amqp_create_context();
+        decode_buffer = amqp_allocate_buffer(context);
     }
 
     ContextFixture::~ContextFixture()
     {
+        amqp_deallocate_buffer(context, decode_buffer);
         int memory_allocations_ok = amqp_context_destroy(context);
         CHECK(memory_allocations_ok);
     }
 
     void ContextFixture::load_decode_buffer(test_data::TestData &data)
     {
-        data.transfer_to(context->decode.buffer);
+        data.transfer_to(decode_buffer);
     }
 }
 

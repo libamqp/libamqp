@@ -68,9 +68,9 @@ SUITE(CodecEncode)
         CHECK_EQUAL(0U, type->flags.is_invalid);
         CHECK_EQUAL(1U, type->flags.container.type.is_array);
 
-        amqp_buffer_put_buffer_contents(context->decode.buffer, buffer);
+//        amqp_buffer_put_buffer_contents(context->decode.buffer, buffer);
         deallocate_type(type);
-        type = amqp_decode(context, context->decode.buffer);
+        type = amqp_decode(context, buffer);
         CHECK(check_valid_array());
 
         CHECK(amqp_convert_to_boolean(type->value.array.elements[0]));

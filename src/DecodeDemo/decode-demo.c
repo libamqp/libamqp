@@ -22,17 +22,19 @@ int main(int argc, char *argv[])
     int c;
     amqp_type_t *type;
     amqp_context_t *context = amqp_create_context();
+    amqp_buffer_t *buffer = amqp_allocate_buffer(context);
     int rc;
 
     while ((c = getc(stdin)) != -1)
     {
-        amqp_buffer_putc(context->decode.buffer, c);
+        amqp_buffer_putc(buffer, c);
     }
 
-    type = amqp_decode(context, context->decode.buffer);
+    type = amqp_decode(context, buffer);
     amqp_type_print_formatted(type);
 
     amqp_deallocate_type(context, type);
+    amqp_deallocate_buffer(context, buffer);
     rc = amqp_context_destroy(context);
 
     assert(rc);

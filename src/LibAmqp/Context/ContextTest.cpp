@@ -50,9 +50,9 @@ SUITE(Context)
 
         load_decode_buffer(test_bytes);
 
-        CHECK_EQUAL(1, amqp_buffer_getc(context->decode.buffer));
-        CHECK_EQUAL(0xa5, amqp_buffer_getc(context->decode.buffer));
-        CHECK_EQUAL(0x03, amqp_buffer_getc(context->decode.buffer));
+        CHECK_EQUAL(1, amqp_buffer_getc(decode_buffer));
+        CHECK_EQUAL(0xa5, amqp_buffer_getc(decode_buffer));
+        CHECK_EQUAL(0x03, amqp_buffer_getc(decode_buffer));
     }
 }
 
