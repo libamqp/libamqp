@@ -38,6 +38,11 @@ typedef struct amqp_context_t amqp_context_t;
 typedef struct amqp_frame_t amqp_frame_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_CONNECTION_TYPE_T
+#define LIBAMQP_AMQP_CONNECTION_TYPE_T
+typedef struct amqp_connection_t amqp_connection_t;
+#endif
+
 #define AMQP_FRAME_HEADER_DATA_OFFSET_MULTIPLIER 4
 
 enum amqp_frame_types_t {
@@ -68,6 +73,8 @@ struct amqp_frame_t
             int pad;
         } amqp;
     } frames;
+
+    void (*dispatch)(amqp_context_t *context, amqp_frame_t *frame, amqp_connection_t *connection);
 };
 
 extern amqp_frame_t *amqp_decode_sasl_frame(amqp_context_t *context, amqp_buffer_t *buffer);

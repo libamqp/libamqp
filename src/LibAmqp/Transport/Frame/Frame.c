@@ -18,6 +18,7 @@
 #include "Transport/Frame/Frame.h"
 #include "Codec/Decode/Decode.h"
 #include "AmqpTypes/AmqpTypes.h"
+#include "Transport/Connection/FrameDispatch.h"
 
 #include "debug_helper.h"
 
@@ -119,12 +120,7 @@ static int decode_mandatory_multiple_symbol(amqp_context_t *context, amqp_buffer
 
 static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
 {
-    if (frame->frame_type != AMQP_SASL_FRAME_TYPE)
-    {
-        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Expected a SASL frame type.");
-        // TODO - dump type
-        return false;
-    }
+    frame->dispatch = amqp_dispatch_sasl_mechanisms;
 
     return decode_mandatory_multiple_symbol(context, buffer, frame, type, 0);
 }
