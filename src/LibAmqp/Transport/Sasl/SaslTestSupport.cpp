@@ -22,11 +22,14 @@
 
 namespace SuiteSasl
 {
-    BaseSaslFixture::BaseSaslFixture() 
+    BaseSaslFixture::BaseSaslFixture() : type(0)
     {
+        buffer = amqp_allocate_buffer(context);
     }
 
     BaseSaslFixture::~BaseSaslFixture()
     {
+        amqp_deallocate_type(context, type);
+        amqp_deallocate_buffer(context, buffer);
     }
 }

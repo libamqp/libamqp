@@ -76,7 +76,6 @@ SUITE(AmqpTypes)
         int rc = amqp_multiple_symbol_initialize(context, &multiple_ref, type);
         ASSERT(rc);
         CHECK_EQUAL(0, multiple_ref.size);
-
     }
 
     TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_many_values)
@@ -85,9 +84,9 @@ SUITE(AmqpTypes)
         type = amqp_decode(context, buffer);
         CHECK(amqp_type_is_array(type));
 
-        break_one();
         multiple = amqp_multiple_symbol_create(context, type);
         CHECK_EQUAL(3, multiple->size);
+
         // TODO - deal with case where get returns null (compare should return false)
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 0), "PLAIN") == 0);
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 1), "Foo") == 0);

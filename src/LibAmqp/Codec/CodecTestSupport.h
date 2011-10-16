@@ -28,6 +28,7 @@
 #include "Codec/Type/Type.h"
 
 #include "Context/ContextTestSupport.h"
+#include "Codec/CodecTestSupport.h"
 #include "TestData/TestData.h"
 
 namespace SuiteCodec

@@ -16,6 +16,9 @@
 
 #include <TestHarness.h>
 #include "Transport/Sasl/SaslTestSupport.h"
+#include "Codec/CodecTestSupport.h"
+#include "AmqpTypes/AmqpSymbol.h"
+
 
 SUITE(Sasl)
 {
@@ -26,17 +29,26 @@ SUITE(Sasl)
         ~SaslMechanismsFixture();
 
     public:
+        amqp_symbol_t *symbol;
     };
 
-    SaslMechanismsFixture::SaslMechanismsFixture() 
+    SaslMechanismsFixture::SaslMechanismsFixture() : symbol(0)
     {
     }
 
     SaslMechanismsFixture::~SaslMechanismsFixture()
     {
+        amqp_symbol_cleanup(context, symbol);
     }
 
     TEST_FIXTURE(SaslMechanismsFixture, really_important_test)
     {
+        type = amqp_sasl_mechanisms_encode(context, buffer);
+        ASSERT(type);
+        CHECK(amqp_type_is_symbol(type));
+
+        symbol = amqp_symbol_create_from_type(context, type);
+        CHECK(amqp_symbol_compare_with_cstr(symbol, "PLAIN") == 0);
+
     }
 }

@@ -20,6 +20,7 @@
 #include "libamqp_common.h"
 
 #include "Context/ContextTestSupport.h"
+#include "Transport/Sasl/SaslMechanisms.h"
 
 namespace SuiteSasl
 {
@@ -30,6 +31,8 @@ namespace SuiteSasl
         ~BaseSaslFixture();
 
     public:
+        amqp_type_t *type;
+        amqp_buffer_t *buffer;
     };
 }
 #endif

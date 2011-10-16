@@ -145,6 +145,7 @@ int amqp_symbol_compare_with_cstr(amqp_symbol_t *lhs, const char *rhs)
 
     int n, rc;
     int rhs_size;
+
     assert(lhs != 0 && rhs != 0);
 
     rhs_size = strlen(rhs);

@@ -20,6 +20,7 @@
 
 #include "Transport/Sasl/SaslMechanisms.h"
 #include "Codec/Encode/Encode.h"
+#include "debug_helper.h"
 
 static amqp_sasl_mechanism_t supported_mechanisms[] =
 {
@@ -43,7 +44,7 @@ amqp_type_t *amqp_sasl_mechanisms_encode(amqp_context_t *context, amqp_buffer_t 
         count++;
     }
     assert(count > 0);
-
+break_one();
     if (count == 1)
     {
         result = amqp_encode_symbol(context, buffer, supported_mechanisms[0].name);
