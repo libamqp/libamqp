@@ -43,6 +43,7 @@ typedef int amqp_decoder_t(amqp_context_t *context, amqp_buffer_t *buffer, amqp_
 
 typedef struct amqp_type_methods_t amqp_type_methods_t;
 typedef void amqp_type_print_method_t(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer);
+// TODO -  remove unnecessary indirection. There is only the print method.
 struct amqp_type_methods_t
 {
     amqp_type_print_method_t *print;
