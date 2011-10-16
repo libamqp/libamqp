@@ -60,12 +60,12 @@ SUITE(TypePrint)
         }
         void print_type()
         {
-            amqp_type_print(type);
+            amqp_type_print(context, type, decode_buffer);
         }
     
         void print_type_formatted()
         {
-            amqp_type_print_formatted(type);
+            amqp_type_print_formatted(context, type, decode_buffer);
         }
 
         void check_output(const char *expected)

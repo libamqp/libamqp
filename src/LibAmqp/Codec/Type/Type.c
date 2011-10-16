@@ -109,8 +109,3 @@ void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type)
         snprintf(buffer, size, "name=\"unknown\"");
     }
 }
-
-amqp_buffer_t *amqp_type_convert_buffer(amqp_type_t *type)
-{
-    not_implemented(todo);
-}

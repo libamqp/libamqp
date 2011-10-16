@@ -109,7 +109,7 @@ namespace t
 
         amqp_buffer_dump_fragment(context, buffer, type->position.index, type->position.index + type->position.size);
         amqp_context_putc(context, '\n');
-        amqp_type_print_formatted(type);
+        amqp_type_print_formatted(context, type, buffer);
         amqp_context_set_print_indent(context, old_indent);
     }
 

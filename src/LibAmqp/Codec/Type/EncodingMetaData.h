@@ -42,7 +42,7 @@ typedef struct amqp_encoding_meta_data_t amqp_encoding_meta_data_t;
 typedef int amqp_decoder_t(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *, amqp_type_t *);
 
 typedef struct amqp_type_methods_t amqp_type_methods_t;
-typedef void amqp_type_print_method_t(amqp_context_t *context, amqp_type_t *type);
+typedef void amqp_type_print_method_t(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer);
 struct amqp_type_methods_t
 {
     amqp_type_print_method_t *print;
