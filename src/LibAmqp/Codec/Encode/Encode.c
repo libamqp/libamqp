@@ -107,7 +107,6 @@ static amqp_type_t *initialize_type(amqp_context_t *context, amqp_buffer_t *buff
     amqp_type_t *type = (amqp_type_t *) amqp_allocate(context, &context->memory.amqp_type_t_pool);
 
     type->format_code = meta_data->format_code;
-    type->context = context;
     type->flags.is_encoded = true;
     type->meta_data = meta_data;
 

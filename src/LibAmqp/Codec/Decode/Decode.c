@@ -666,7 +666,6 @@ amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *b
 
     type = amqp_allocate_type(context);
     
-    type->context = context;
     type->format_code = array_element_type->format_code;
     type->extension_type_code = array_element_type->extension_type_code;
     type->meta_data = array_element_type->meta_data;
@@ -686,7 +685,6 @@ amqp_type_t *amqp_decode(amqp_context_t *context, amqp_buffer_t *buffer)
     }
 
     type = amqp_allocate_type(context);
-    type->context = context;
 
     if (decode_type_constructor_into_result(context, buffer, type))
     {

@@ -73,8 +73,6 @@ typedef struct {
 
 struct amqp_type_t
 {
-    amqp_context_t *context;
-
     int format_code;
     int extension_type_code;
     amqp_encoding_meta_data_t *meta_data;
