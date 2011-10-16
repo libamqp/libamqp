@@ -24,10 +24,10 @@ SUITE(CodecEncode)
 {
     TEST_FIXTURE(EncodeFixture, EncodeLong)
     {
-        type = amqp_encode_long(context, -129);
+        type = amqp_encode_long(context, buffer, -129);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::long_8_minus_129);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::long_8_minus_129);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x08, type->position.size);
@@ -35,10 +35,10 @@ SUITE(CodecEncode)
 
     TEST_FIXTURE(EncodeFixture, EncodeLongWithSmallValueShouldEncodeSmallLong)
     {
-        type = amqp_encode_long(context, -4);
+        type = amqp_encode_long(context, buffer, -4);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::long_small);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::long_small);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
@@ -46,10 +46,10 @@ SUITE(CodecEncode)
 
     TEST_FIXTURE(EncodeFixture, EncodeLongWithZeroValueShouldEncodeShortLongWithZeroValue)
     {
-        type = amqp_encode_long(context, 0);
+        type = amqp_encode_long(context, buffer, 0);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::long_small_zero);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::long_small_zero);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
@@ -57,10 +57,10 @@ SUITE(CodecEncode)
 
     TEST_FIXTURE(EncodeFixture, EncodeSmallLong)
     {
-        type = amqp_encode_small_long(context, -4);
+        type = amqp_encode_small_long(context, buffer, -4);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::long_small);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::long_small);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
@@ -68,12 +68,12 @@ SUITE(CodecEncode)
 
     TEST_FIXTURE(EncodeFixture, explicit_encode_small_long_with_zero_value_should_encode_small_long)
     {
-        type = amqp_encode_small_long(context, 0U);
+        type = amqp_encode_small_long(context, buffer, 0U);
 
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::long_small_zero);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::long_small_zero);
     }
 }

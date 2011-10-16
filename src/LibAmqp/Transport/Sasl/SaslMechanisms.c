@@ -15,7 +15,64 @@
  */
 
 //#include "Context/Context.h"
+
+#include "string.h"
+
 #include "Transport/Sasl/SaslMechanisms.h"
+#include "Codec/Encode/Encode.h"
 
+static amqp_sasl_mechanism_t supported_mechanisms[] =
+{
+    // TODO - assert that list is sorted
+    { "PLAIN" },
+    {0}
+};
 
-int sasl_not_empty_either;
+amqp_type_t *amqp_sasl_mechanisms_encode(amqp_context_t *context, amqp_buffer_t *buffer)
+{
+    amqp_type_t *result;
+    int count = 0;
+    int length = 0;
+    int contains_long_name = false;
+
+    while (supported_mechanisms[count].name)
+    {
+        int l = strlen(supported_mechanisms[count].name);
+        length += l;
+        contains_long_name = contains_long_name || l > 254;
+        count++;
+    }
+    assert(count > 0);
+
+    if (count == 1)
+    {
+        result = amqp_encode_symbol(context, buffer, supported_mechanisms[0].name);
+    }
+    else if ((length + count) < 253)
+    {
+        int i;
+        result = amqp_encode_array_8(context, buffer);
+        for (i = 0; i < count; i++)
+        {
+            amqp_encode_symbol_sym8(context, buffer, supported_mechanisms[i].name);
+        }
+        amqp_complete_type(context, buffer, result);
+    }
+    else
+    {
+        int i;
+        result = amqp_encode_array_32(context, buffer);
+        for (i = 0; i < count; i++)
+        {
+            if (contains_long_name)
+            {
+                amqp_encode_symbol_sym32(context, buffer, supported_mechanisms[i].name);
+            }
+            {
+                amqp_encode_symbol_sym8(context, buffer, supported_mechanisms[i].name);
+            }
+        }
+        amqp_complete_type(context, buffer, result);
+    }
+    return result;
+}

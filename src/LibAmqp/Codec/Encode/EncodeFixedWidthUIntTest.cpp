@@ -24,10 +24,10 @@ SUITE(CodecEncode)
 {
     TEST_FIXTURE(EncodeFixture, EncodeUInt)
     {
-        type = amqp_encode_uint(context, 4294967294U);
+        type = amqp_encode_uint(context, buffer, 4294967294U);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::uint_4);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_4);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x04, type->position.size);
@@ -35,10 +35,10 @@ SUITE(CodecEncode)
 
     TEST_FIXTURE(EncodeFixture, EncodeUIntWithZeroValueShouldEncodeUIntZero)
     {
-        type = amqp_encode_uint(context, 0U);
+        type = amqp_encode_uint(context, buffer, 0U);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::uint_zero);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_zero);
 
         CHECK_EQUAL(0x43, type->format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
@@ -47,20 +47,20 @@ SUITE(CodecEncode)
 
     TEST_FIXTURE(EncodeFixture, EncodeUIntWithSmallValueShouldEncodeSmallUint)
     {
-        type = amqp_encode_uint(context, 254U);
+        type = amqp_encode_uint(context, buffer, 254U);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::uint_small);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_small);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
     }
 
     TEST_FIXTURE(EncodeFixture, ExplicitEncodeUintZero)
     {
-        type = amqp_encode_uint0(context);
+        type = amqp_encode_uint0(context, buffer);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::uint_zero);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_zero);
 
         CHECK_EQUAL(0x43, type->format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
@@ -69,23 +69,23 @@ SUITE(CodecEncode)
 
     TEST_FIXTURE(EncodeFixture, ExplicitEncodeSmallUInt)
     {
-        type = amqp_encode_small_uint(context, 254U);
+        type = amqp_encode_small_uint(context, buffer, 254U);
 
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::uint_small);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_small);
     }
 
     TEST_FIXTURE(EncodeFixture, explicit_encode_small_uint_with_zero_value_should_encode_small_uint_not_uint_zero)
     {
-        type = amqp_encode_small_uint(context, 0U);
+        type = amqp_encode_small_uint(context, buffer, 0U);
 
         CHECK_NOT_NULL(type);
         CHECK_EQUAL(0x52, type->format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::uint_small_zero);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_small_zero);
     }
 }

@@ -41,9 +41,8 @@ namespace SuiteCodec
         void deallocate_type(amqp_type_t *type);
         bool check_valid_array();
 
-    protected:
-        amqp_memory_pool_t *type_pool();
     public:
+        amqp_buffer_t *buffer;
         amqp_type_t *type;
     };
 }
@@ -53,8 +52,8 @@ namespace SuiteCodec
 
 namespace t
 {
-    void dump_type(amqp_type_t *type);
-    void dump_type_buffer(amqp_type_t *type);
+    void dump_type(amqp_type_t *type, amqp_buffer_t *buffer);
+    void dump_type_buffer(amqp_type_t *type, amqp_buffer_t *buffer);
 
     int compare_buffers(const unsigned char *lhs, size_t lhs_size, const unsigned char *rhs, size_t rhs_size);
     int compare_buffers(const unsigned char *expect, size_t expect_size, amqp_buffer_t *buffer);

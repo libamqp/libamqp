@@ -28,6 +28,22 @@ extern "C" {
 typedef struct amqp_context_t amqp_context_t;
 #endif
 
+#ifndef LIBAMQP_BUFFER_T_TYPE
+#define LIBAMQP_BUFFER_T_TYPE
+typedef struct amqp_buffer_t amqp_buffer_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_TYPE_T
+#define LIBAMQP_AMQP_TYPE_T
+typedef struct amqp_type_t amqp_type_t;
+#endif
+
+typedef struct amqp_sasl_mechanism_t
+{
+    const char *name;
+} amqp_sasl_mechanism_t;
+
+extern amqp_type_t *amqp_sasl_mechanisms_encode(amqp_context_t *context, amqp_buffer_t *buffer);
 
 #ifdef __cplusplus
 }

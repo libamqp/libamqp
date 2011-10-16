@@ -87,7 +87,6 @@ SUITE(CodecDecode)
 
         CHECK_EQUAL(0x56, type->value.array.elements[0]->format_code);
         CHECK_EQUAL(2U, type->value.array.count);
-//        t::dump_type(type);
         CHECK_EQUAL(2U, type->value.array.count);
         CHECK_EQUAL(0x01, type->value.array.elements[0]->value.b1._unsigned);
         CHECK(amqp_convert_to_boolean(type->value.array.elements[0]));

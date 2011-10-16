@@ -45,14 +45,14 @@ SUITE(CompoundEncoding)
     {
         amqp_type_t *t;
 
-        type = amqp_encode_array_8(context);
+        type = amqp_encode_array_8(context, buffer);
         ASSERT_INVALID(type);
         CHECK_ARRAY(type);
 
-        t = amqp_encode_short(context, 10);
+        t = amqp_encode_short(context, buffer, 10);
         CHECK(amqp_type_is_contained(t));
 
-        amqp_complete_type(context, type);
+        amqp_complete_type(context, buffer, type);
         ASSERT_VALID(type);
 
         CHECK_EQUAL((size_t) 1, (size_t) type->value.array.count);
@@ -66,25 +66,25 @@ SUITE(CompoundEncoding)
         CHECK_EQUAL(1U, type->flags.is_encoded);
         CHECK_EQUAL(1U, type->value.array.elements[0]->flags.is_encoded);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::single_element_array);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::single_element_array);
     }
 
     TEST_FIXTURE(EncodeFixture, short_array)
     {
-        type = amqp_encode_array_8(context);
+        type = amqp_encode_array_8(context, buffer);
         CHECK_NOT_NULL(type);
         ASSERT_INVALID(type);
         CHECK_ARRAY(type);
 
         CHECK_NULL(type->value.array.elements);
 
-        amqp_encode_short(context, 10);
-        amqp_encode_short(context, 11);
-        amqp_encode_short(context, 11);
-        amqp_encode_short(context, 13);
-        amqp_encode_short(context, 14);
+        amqp_encode_short(context, buffer, 10);
+        amqp_encode_short(context, buffer, 11);
+        amqp_encode_short(context, buffer, 11);
+        amqp_encode_short(context, buffer, 13);
+        amqp_encode_short(context, buffer, 14);
 
-        amqp_complete_type(context, type);
+        amqp_complete_type(context, buffer, type);
         ASSERT_VALID(type);
 
         CHECK_NOT_NULL(type->value.array.elements);
@@ -94,22 +94,22 @@ SUITE(CompoundEncoding)
 
         CHECK_EQUAL(0x61, type->value.array.elements[0]->format_code);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::array_shorts);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::array_shorts);
     }
 
     // mixing elements will mark the type as invalid and will leave the buffer in an undefined state.
     TEST_FIXTURE(EncodeFixture, invalid_array_with_mixed_types)
     {
-        type = amqp_encode_array_8(context);
+        type = amqp_encode_array_8(context, buffer);
 
         ASSERT_INVALID(type);
         CHECK_ARRAY(type);
         CHECK_NULL(type->value.array.elements);
 
-        amqp_encode_short(context, 10);
-        amqp_encode_string_utf8(context, "hello");
+        amqp_encode_short(context, buffer, 10);
+        amqp_encode_string_utf8(context, buffer, "hello");
 
-        amqp_complete_type(context, type);
+        amqp_complete_type(context, buffer, type);
         ASSERT_INVALID(type);
 
         CHECK_EQUAL((size_t) 2, (size_t) type->value.array.count);
@@ -121,18 +121,18 @@ SUITE(CompoundEncoding)
     // mixing elements will mark the type as invalid and will leave the buffer in an undefined state.
     TEST_FIXTURE(EncodeFixture, array_of_strings)
     {
-        type = amqp_encode_array_8(context);
+        type = amqp_encode_array_8(context, buffer);
         ASSERT_INVALID(type);
         CHECK_ARRAY(type);
 
         CHECK_NULL(type->value.array.elements);
 
-        amqp_encode_string_utf8(context, "the");
-        amqp_encode_string_utf8(context, "little");
-        amqp_encode_string_utf8(context, "brown");
-        amqp_encode_string_utf8(context, "fox");
+        amqp_encode_string_utf8(context, buffer, "the");
+        amqp_encode_string_utf8(context, buffer, "little");
+        amqp_encode_string_utf8(context, buffer, "brown");
+        amqp_encode_string_utf8(context, buffer, "fox");
 
-        amqp_complete_type(context, type);
+        amqp_complete_type(context, buffer, type);
         ASSERT_VALID(type);
 
         CHECK_NOT_NULL(type->value.array.elements);
@@ -143,55 +143,55 @@ SUITE(CompoundEncoding)
         CHECK_EQUAL(0xa1, type->value.array.elements[2]->format_code);
         CHECK_EQUAL(0xa1, type->value.array.elements[3]->format_code);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::string_array);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::string_array);
     }
 
     TEST_FIXTURE(EncodeFixture, amqp_encode_list_8_of_shorts)
     {
-        type = amqp_encode_list_8(context);
+        type = amqp_encode_list_8(context, buffer);
         ASSERT_INVALID(type);
 
         CHECK_LIST(type);
         CHECK_NULL(type->value.list.elements);
 
-        amqp_encode_short(context, 10);
-        amqp_encode_short(context, 11);
-        amqp_encode_short(context, 11);
-        amqp_encode_short(context, 13);
-        amqp_encode_short(context, 14);
+        amqp_encode_short(context, buffer, 10);
+        amqp_encode_short(context, buffer, 11);
+        amqp_encode_short(context, buffer, 11);
+        amqp_encode_short(context, buffer, 13);
+        amqp_encode_short(context, buffer, 14);
 
-        amqp_complete_type(context, type);
+        amqp_complete_type(context, buffer, type);
         ASSERT_VALID(type);
 
         CHECK_EQUAL((size_t) 5, (size_t) type->value.list.count);
         CHECK_EQUAL((size_t) 2, type->position.index);
         CHECK_EQUAL((size_t) 16, type->position.size);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::list_of_shorts);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::list_of_shorts);
     }
 
     TEST_FIXTURE(EncodeFixture, amqp_encode_list_32)
     {
         amqp_type_t *l;
 
-        type = amqp_encode_list_32(context);
+        type = amqp_encode_list_32(context, buffer);
         ASSERT_INVALID(type);
         CHECK_LIST(type);
         CHECK_NULL(type->value.list.elements);
 
-        amqp_encode_symbol(context, "Foo");
-        amqp_encode_double(context, 123.456);
-        amqp_encode_string_utf8(context, "Hello");
-        amqp_encode_short(context, 10);
-            l = amqp_encode_array_8(context);
-                amqp_encode_short(context, 10);
-                amqp_encode_short(context, 11);
-            amqp_complete_type(context, l);
+        amqp_encode_symbol(context, buffer, "Foo");
+        amqp_encode_double(context, buffer, 123.456);
+        amqp_encode_string_utf8(context, buffer, "Hello");
+        amqp_encode_short(context, buffer, 10);
+            l = amqp_encode_array_8(context, buffer);
+                amqp_encode_short(context, buffer, 10);
+                amqp_encode_short(context, buffer, 11);
+            amqp_complete_type(context, buffer, l);
 
-            l = amqp_encode_array_8(context);
-                amqp_encode_short(context, 12);
-            amqp_complete_type(context, l);
-        amqp_complete_type(context, type);
+            l = amqp_encode_array_8(context, buffer);
+                amqp_encode_short(context, buffer, 12);
+            amqp_complete_type(context, buffer, l);
+        amqp_complete_type(context, buffer, type);
 
         ASSERT_VALID(type);
         CHECK_LIST(type);
@@ -201,24 +201,24 @@ SUITE(CompoundEncoding)
         CHECK_EQUAL((size_t) 5, type->position.index);
         CHECK_EQUAL((size_t) 42, type->position.size);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::list);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::list);
     }
 
     TEST_FIXTURE(EncodeFixture, amqp_encode_map_8)
     {
         amqp_type_t *l;
 
-        type = amqp_encode_map_8(context);
+        type = amqp_encode_map_8(context, buffer);
         ASSERT_INVALID(type);
 
-            amqp_encode_string_utf8(context, "list:");
-            l = amqp_encode_list_8(context);
-                amqp_encode_long(context, 1);
-                amqp_encode_string_utf8(context, "two");
-                amqp_encode_double(context, 3.141593);
-                amqp_encode_null(context);
-                amqp_encode_boolean(context, false);
-            amqp_complete_type(context, l);
+            amqp_encode_string_utf8(context, buffer, "list:");
+            l = amqp_encode_list_8(context, buffer);
+                amqp_encode_long(context, buffer, 1);
+                amqp_encode_string_utf8(context, buffer, "two");
+                amqp_encode_double(context, buffer, 3.141593);
+                amqp_encode_null(context, buffer);
+                amqp_encode_boolean(context, buffer, false);
+            amqp_complete_type(context, buffer, l);
 
             ASSERT_VALID(l);
             CHECK_LIST(l);
@@ -227,19 +227,19 @@ SUITE(CompoundEncoding)
             CHECK_EQUAL((size_t) 19, l->position.size);
 
 
-            amqp_encode_null(context);
-            amqp_encode_boolean(context, true);
+            amqp_encode_null(context, buffer);
+            amqp_encode_boolean(context, buffer, true);
 
-            amqp_encode_string_utf8(context, "pi");
-            amqp_encode_double(context, 3.141593);
+            amqp_encode_string_utf8(context, buffer, "pi");
+            amqp_encode_double(context, buffer, 3.141593);
 
-            amqp_encode_string_utf8(context, "two");
-            amqp_encode_long(context, 2);
+            amqp_encode_string_utf8(context, buffer, "two");
+            amqp_encode_long(context, buffer, 2);
 
-            amqp_encode_string_utf8(context, "129");
-            amqp_encode_long(context, 129);
+            amqp_encode_string_utf8(context, buffer, "129");
+            amqp_encode_long(context, buffer, 129);
 
-        amqp_complete_type(context, type);
+        amqp_complete_type(context, buffer, type);
         ASSERT_VALID(type);
 
         CHECK_MAP(type);
@@ -249,14 +249,14 @@ SUITE(CompoundEncoding)
         CHECK_EQUAL((size_t) 2, type->position.index);
         CHECK_EQUAL((size_t) 65, type->position.size);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::map);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::map);
     }
 
     TEST_FIXTURE(EncodeFixture, empty_map)
     {
-        type = amqp_encode_map_8(context);
+        type = amqp_encode_map_8(context, buffer);
         ASSERT_INVALID(type);
-        amqp_complete_type(context, type);
+        amqp_complete_type(context, buffer, type);
         ASSERT_VALID(type);
 
         CHECK_MAP(type);
@@ -264,54 +264,54 @@ SUITE(CompoundEncoding)
 
         CHECK_EQUAL((size_t) 0, (size_t) type->value.map.count);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::empty_map);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::empty_map);
     }
 
     TEST_FIXTURE(EncodeFixture, empty_list)
     {
-        type = amqp_encode_list_8(context);
+        type = amqp_encode_list_8(context, buffer);
         ASSERT_INVALID(type);
-        amqp_complete_type(context, type);
+        amqp_complete_type(context, buffer, type);
         ASSERT_VALID(type);
 
         CHECK_LIST(type);
         CHECK_NULL(type->value.list.elements);
         CHECK_EQUAL((size_t) 0, (size_t) type->value.list.count);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::empty_list_0);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::empty_list_0);
     }
 
-    static amqp_type_t *encode_described_list(amqp_context_t *context)
+    static amqp_type_t *encode_described_list(amqp_context_t *context, amqp_buffer_t *buffer)
     {
-        amqp_type_t *result = amqp_start_encode_described_type(context);
-            amqp_encode_string_utf8(context, "List");
+        amqp_type_t *result = amqp_start_encode_described_type(context, buffer);
+            amqp_encode_string_utf8(context, buffer, "List");
             {
-                amqp_type_t *list = amqp_encode_list_8(context);
-                amqp_encode_string_utf8(context, "Pie");
+                amqp_type_t *list = amqp_encode_list_8(context, buffer);
+                amqp_encode_string_utf8(context, buffer, "Pie");
                 {
-                    amqp_type_t *pi = amqp_start_encode_described_type(context);
-                    amqp_encode_string_utf8(context, "PI");
-                    amqp_encode_double(context, 3.141593);
-                    amqp_complete_type(context, pi);
+                    amqp_type_t *pi = amqp_start_encode_described_type(context, buffer);
+                    amqp_encode_string_utf8(context, buffer, "PI");
+                    amqp_encode_double(context, buffer, 3.141593);
+                    amqp_complete_type(context, buffer, pi);
                 }
-                amqp_encode_short(context, 10);
-                amqp_complete_type(context, list);
+                amqp_encode_short(context, buffer, 10);
+                amqp_complete_type(context, buffer, list);
             }
-        amqp_complete_type(context, result);
+        amqp_complete_type(context, buffer, result);
         return result;
     }
 
     TEST_FIXTURE(EncodeFixture, described_list)
     {
-        type = encode_described_list(context);
+        type = encode_described_list(context, buffer);
 
         ASSERT_VALID(type);
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::described_list);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::described_list);
     }
 
     TEST_FIXTURE(EncodeFixture, described_list_structure)
     {
-        type = encode_described_list(context);
+        type = encode_described_list(context, buffer);
 
         ASSERT_VALID(type);
 
@@ -345,28 +345,28 @@ SUITE(CompoundEncoding)
         CHECK(amqp_type_is_contained(list->value.list.elements[1]->value.described.elements[1]));
     }
 
-    static amqp_type_t *encode_list_of_one_short(amqp_context_t *context, short value)
+    static amqp_type_t *encode_list_of_one_short(amqp_context_t *context, amqp_buffer_t *buffer, short value)
     {
-        amqp_type_t *result = amqp_encode_list_8(context);
-        amqp_encode_short(context, value);
-        amqp_complete_type(context, result);
+        amqp_type_t *result = amqp_encode_list_8(context, buffer);
+        amqp_encode_short(context, buffer, value);
+        amqp_complete_type(context, buffer, result);
         return result;
     }
 
-    static amqp_type_t *encode_an_empty_list(amqp_context_t *context)
+    static amqp_type_t *encode_an_empty_list(amqp_context_t *context, amqp_buffer_t *buffer)
     {
-        amqp_type_t *result = amqp_encode_list_8(context);
-        amqp_complete_type(context, result);
+        amqp_type_t *result = amqp_encode_list_8(context, buffer);
+        amqp_complete_type(context, buffer, result);
         return result;
     }
 
     TEST_FIXTURE(EncodeFixture, array_of_lists)
     {
-        type = amqp_encode_array_8(context);
-            encode_list_of_one_short(context, 7);
-            encode_list_of_one_short(context, 11);
-            encode_list_of_one_short(context, 13);
-        amqp_complete_type(context, type);
+        type = amqp_encode_array_8(context, buffer);
+            encode_list_of_one_short(context, buffer, 7);
+            encode_list_of_one_short(context, buffer, 11);
+            encode_list_of_one_short(context, buffer, 13);
+        amqp_complete_type(context, buffer, type);
 
         ASSERT_VALID(type);
         CHECK_ARRAY(type);
@@ -376,16 +376,16 @@ SUITE(CompoundEncoding)
         CHECK_LIST(type->value.array.elements[1]);
         CHECK_LIST(type->value.array.elements[2]);
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::array_of_lists);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::array_of_lists);
     }
 
     TEST_FIXTURE(EncodeFixture, array_of_lists_one_empty)
     {
-        type = amqp_encode_array_8(context);
-            encode_list_of_one_short(context, 7);
-            encode_list_of_one_short(context, 11);
-            encode_an_empty_list(context);
-        amqp_complete_type(context, type);
+        type = amqp_encode_array_8(context, buffer);
+            encode_list_of_one_short(context, buffer, 7);
+            encode_list_of_one_short(context, buffer, 11);
+            encode_an_empty_list(context, buffer);
+        amqp_complete_type(context, buffer, type);
 
         ASSERT_VALID(type);
         CHECK_ARRAY(type);
@@ -396,14 +396,14 @@ SUITE(CompoundEncoding)
         CHECK_LIST(type->value.array.elements[2]);
         CHECK(amqp_type_is_empty_list(type->value.array.elements[2]));
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::array_of_lists_one_empty);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::array_of_lists_one_empty);
     }
 
     TEST_FIXTURE(EncodeFixture, array_of_single_empty_list)
     {
-        type = amqp_encode_array_8(context);
-            encode_an_empty_list(context);
-        amqp_complete_type(context, type);
+        type = amqp_encode_array_8(context, buffer);
+            encode_an_empty_list(context, buffer);
+        amqp_complete_type(context, buffer, type);
 
         ASSERT_VALID(type);
         CHECK_ARRAY(type);
@@ -413,6 +413,6 @@ SUITE(CompoundEncoding)
 
         CHECK(amqp_type_is_empty_list(type->value.array.elements[0]));
 
-        ASSERT_BUFFERS_MATCH(context->encode.buffer, test_data::array_of_single_empty_list);
+        ASSERT_BUFFERS_MATCH(buffer, test_data::array_of_single_empty_list);
     }
 }

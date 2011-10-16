@@ -305,14 +305,17 @@ amqp_type_t *amqp_call_encode_binary(amqp_context_t *context, amqp_type_descript
 
 amqp_type_t *amqp_call_encode_symbol(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    const char *p = va_arg(ap, const char *);
-    return amqp_encode_symboln(context, p, description != 0 ? description->size : strlen(p));
+    abort(); return 0;
+
+//    const char *p = va_arg(ap, const char *);
+//    return amqp_encode_symboln(context, p, description != 0 ? description->size : strlen(p));
 }
 
 amqp_type_t *amqp_call_encode_string_utf8(amqp_context_t *context, amqp_type_description_t *description, va_list ap)
 {
-    const char *p = va_arg(ap, const char *);
-    return amqp_encode_string_utf8n(context, p, description != 0 ? description->size : strlen(p));
+    abort(); return 0;
+//    const char *p = va_arg(ap, const char *);
+//    return amqp_encode_string_utf8n(context, p, description != 0 ? description->size : strlen(p));
 }
 
 // s/^\(.*ampq_encode_meta_data_\)\([^ ]*\) = {/\1\2 = { amqp_type_describe_\2, /
