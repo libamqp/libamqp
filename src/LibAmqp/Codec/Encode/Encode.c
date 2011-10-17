@@ -92,7 +92,7 @@ static void push_container(amqp_context_t *context, amqp_buffer_t *buffer, amqp_
     context->encode.container = type;
 }
 
-static amqp_type_t *pop_container(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *cc)
+static amqp_type_t *pop_container(amqp_context_t *context)
 {
     amqp_type_t *result = context->encode.container;
 
@@ -645,10 +645,10 @@ amqp_type_t *complete_empty_list(amqp_context_t *context, amqp_buffer_t *buffer,
 
 amqp_type_t *amqp_complete_type(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type)
 {
-    amqp_type_t *top = pop_container(context, buffer, type);
+    amqp_type_t *top = pop_container(context);
     // TODO - check for completion of a nonexistent container
 
-    if (top != type)
+    if (type && top != type)
     {
         amqp_api_usage_error(context, "Can only complete inner most map/list/array.");
         amqp_mark_type_invalid(type, AMQP_ERROR_COMPLETE_WRONG_CONTAINER);
@@ -656,9 +656,9 @@ amqp_type_t *amqp_complete_type(amqp_context_t *context, amqp_buffer_t *buffer, 
         return 0;
     }
 
-    return (is_i_contained_within_array(context) || !amqp_type_is_empty_list(type))
-            ? complete_container_type(context, buffer, type)
-            : complete_empty_list(context, buffer, type);
+    return (is_i_contained_within_array(context) || !amqp_type_is_empty_list(top))
+            ? complete_container_type(context, buffer, top)
+            : complete_empty_list(context, buffer, top);
 }
 
 amqp_type_t *amqp_encode_list_0(amqp_context_t *context, amqp_buffer_t *buffer)
