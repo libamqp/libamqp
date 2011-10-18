@@ -96,7 +96,7 @@ static void start_while_initialized(amqp_connection_t *connection, uint32_t vers
     connection->state.writer.commence_write(connection, connection->data.handshake.buffer, write_complete);
 }
 
-// Server starts read while waiting for client's preferred version
+// Server to start read while waiting for client's preferred version
 static void wait_while_initialized(amqp_connection_t *connection, amqp_connection_negotiate_callback_f request_callback)
 {
     transition_to_waiting_on_client_request(connection);

@@ -139,7 +139,6 @@ typedef struct amqp_connection_tls_state_t
     const char *name;
     amqp_connection_action_f connect;   // Client connect
 //    amqp_connection_action_f done;
-    amqp_connection_negotiator_actions_t negotiation;
     amqp_connection_tunnel_actions_t tunnel;
 } amqp_connection_tls_state_t;
 
@@ -148,7 +147,6 @@ typedef struct amqp_connection_sasl_state_t
     const char *name;
     amqp_connection_action_f connect;
     amqp_connection_action_f done;
-    amqp_connection_negotiator_actions_t negotiation;
     amqp_connection_tunnel_actions_t tunnel;
 } amqp_connection_sasl_state_t;
 
@@ -157,15 +155,8 @@ typedef struct amqp_connection_amqp_state_t
     const char *name;
     amqp_connection_action_f connect;
     amqp_connection_action_f done;
-    amqp_connection_negotiator_actions_t negotiation;
     amqp_connection_tunnel_actions_t tunnel;
 } amqp_connection_amqp_state_t;
-
-//typedef struct amqp_connection_write_command_t // TODO - ?
-//{
-//    amqp_buffer_t *buffer;
-//    amqp_connection_action_f callback;
-//} amqp_connection_write_command_t;
 
 typedef struct amqp_connection_frame_reader_state_t
 {

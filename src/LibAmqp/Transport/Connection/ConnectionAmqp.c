@@ -153,29 +153,11 @@ static void default_tunnel_establish(amqp_connection_t *connection, uint32_t ver
     illegal_state(connection, "TunnelEstablish");
 }
 
-static void default_confirm(amqp_connection_t *connection)
-{
-    illegal_state(connection, "VersionConfirm");
-}
-
-static void default_reject(amqp_connection_t *connection, uint32_t version)
-{
-    illegal_state(connection, "VersionReject");
-}
-
-static void default_request(amqp_connection_t *connection, uint32_t version)
-{
-    illegal_state(connection, "ClientRequest");
-}
-
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
 {
     connection->state.amqp.connect = default_connect;
     connection->state.amqp.done = default_done;
 
     connection->state.amqp.tunnel.accept = default_tunnel_establish;
-    connection->state.amqp.negotiation.confirm = default_confirm;
-    connection->state.amqp.negotiation.reject = default_reject;
-    connection->state.amqp.negotiation.request = default_request;
     connection->state.amqp.name = new_state_name;
 }
