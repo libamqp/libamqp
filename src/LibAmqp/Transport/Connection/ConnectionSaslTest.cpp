@@ -46,21 +46,29 @@ SUITE(ConnectionSasl)
         CHECK_EQUAL("Initialized", connection->state.sasl.name);
     }
 
-    TEST_FIXTURE(ConnectionSaslFixture, enable_frame)
+    TEST_FIXTURE(ConnectionSaslFixture, sasl_version_rejection)
     {
+        set_test_data_for_read(test_data::sasl_protocol_1_1_0);
         connection->state.sasl.connect(connection);
 
-        t::amqp_buffer_dump(context, write_copy);
+        CHECK_EQUAL("NegotiationRejected", connection->state.negotiator.name);
+        CHECK_EQUAL("Failed", connection->state.connection.name);
+
         CHECK_BUFFERS_MATCH(write_copy, test_data::sasl_protocol_1_0_0);
+    }
 
-
-//            set_test_data(test_data::sasl_protocol_1_0_0);
-
-//        connection->state.frame.enable(connection);
-//        CHECK_EQUAL("Enabled", connection->state.frame.name);
+    TEST_FIXTURE(ConnectionSaslFixture, sasl_version_accepted)
+    {
+//        connection->trace_flags = -1;
 //
-//        connection->state.frame.stop(connection);
-//        CHECK_EQUAL("Stopped", connection->state.frame.name);
+//        set_test_data_for_read(test_data::sasl_protocol_1_1_0);
+//        connection->state.sasl.connect(connection);
+//
+//        t::amqp_buffer_dump(context, write_copy);
+//        CHECK_BUFFERS_MATCH(write_copy, test_data::sasl_protocol_1_0_0);
+//
+//        CHECK_EQUAL("NegotiationRejected", connection->state.negotiator.name);
+//        CHECK_EQUAL("Failed", connection->state.connection.name);
     }
 
 //    TEST_FIXTURE(ConnectionFrameFixture, stop_while_stopped)

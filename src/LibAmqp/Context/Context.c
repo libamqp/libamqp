@@ -159,7 +159,10 @@ amqp_type_t *amqp_allocate_type(amqp_context_t *context)
 
 void amqp_deallocate_type(amqp_context_t *context, amqp_type_t *type)
 {
-    amqp_deallocate(context, &context->memory.amqp_type_t_pool, type);
+    if (type != 0)
+    {
+        amqp_deallocate(context, &context->memory.amqp_type_t_pool, type);
+    }
 }
 
 amqp_buffer_t *amqp_allocate_buffer(amqp_context_t *context)
@@ -169,7 +172,10 @@ amqp_buffer_t *amqp_allocate_buffer(amqp_context_t *context)
 
 void amqp_deallocate_buffer(amqp_context_t *context, amqp_buffer_t *buffer)
 {
-    amqp_deallocate(context, &context->memory.amqp_buffer_t_pool, buffer);
+    if (buffer != 0)
+    {
+        amqp_deallocate(context, &context->memory.amqp_buffer_t_pool, buffer);
+    }
 }
 
 amqp_frame_t *amqp_allocate_frame(amqp_context_t *context)
@@ -179,7 +185,10 @@ amqp_frame_t *amqp_allocate_frame(amqp_context_t *context)
 
 void amqp_deallocate_frame(amqp_context_t *context, amqp_frame_t *frame)
 {
-    amqp_deallocate(context, &context->memory.amqp_frame_t_pool, frame);
+    if (frame != 0)
+    {
+        amqp_deallocate(context, &context->memory.amqp_frame_t_pool, frame);
+    }
 }
 
 // TODO - lock error output stream

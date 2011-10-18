@@ -50,6 +50,6 @@ namespace t
     void amqp_buffer_dump(amqp_context_t* context, amqp_buffer_t *buffer)
     {
         amqp_buffer_dump_fragment(context, buffer, 0, buffer->limit.size);
+        amqp_context_putc(context, '\n');
     }
-
 }

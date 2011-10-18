@@ -28,13 +28,14 @@ namespace SuiteConnectionFrame
 
     amqp_buffer_t *ConnectionFrameFixture::write_copy = 0;
 
-    void ConnectionFrameFixture::set_test_data(test_data::TestData& data)
+    void ConnectionFrameFixture::set_test_data_for_read(test_data::TestData& data)
     {
         test_data_p = &data;
     }
 
     ConnectionFrameFixture::ConnectionFrameFixture()
     {
+        write_copy = 0;
         buffer = amqp_allocate_buffer(context);
 
         connection = amqp_connection_initialize(context);
@@ -57,11 +58,14 @@ namespace SuiteConnectionFrame
         }
         amqp_buffer_reset(write_copy);
         amqp_buffer_put_buffer_contents(write_copy, buffer);
+        if (connection->trace_flags & AMQP_TRACE_CONNECTION_WRITER)
+        {
+            t::amqp_buffer_dump(connection->context, buffer);
+        }
+        write_callback(connection);
     }
     void ConnectionFrameFixture::read_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f  read_callback)
     {
-//        SOUTS("read_intercept called");
-//        SOUTV(required);
         assert(test_data_p != 0);
         if (test_data_p)
         {

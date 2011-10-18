@@ -37,6 +37,7 @@ if (connection->trace_flags & AMQP_TRACE_DISCONNECTS) \
 static void transition_to_initialized(amqp_connection_t *connection);
 static void transition_to_negotiated(amqp_connection_t *connection);
 static void transition_to_failed(amqp_connection_t *connection);
+static void transition_to_rejected(amqp_connection_t *connection);
 static void transition_to_sending_client_version(amqp_connection_t *connection);
 static void transition_to_waiting_for_broker_response(amqp_connection_t *connection);
 static void transition_to_waiting_on_client_request(amqp_connection_t *connection);
@@ -155,14 +156,14 @@ static void read_done_while_waiting_for_broker_response(amqp_connection_t *conne
 
     broker_version = amqp_negotiator_decode_version(connection->context, buffer);
 
-    transition_to_terminal_state(connection, transition_to_negotiated);
-
     if (broker_version == connection->data.handshake.preferred_version)
     {
+        transition_to_terminal_state(connection, transition_to_negotiated);
         connection->data.handshake.callbacks.confirm(connection);
     }
     else
     {
+        transition_to_terminal_state(connection, transition_to_rejected);
         connection->data.handshake.callbacks.reject(connection, broker_version);
     }
 }
@@ -258,6 +259,12 @@ static void transition_to_failed(amqp_connection_t *connection)
 {
     save_old_state();
     default_state_initialization(connection, "NegotiationFailed");
+    trace_transition(old_state_name);
+}
+static void transition_to_rejected(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "NegotiationRejected");
     trace_transition(old_state_name);
 }
 

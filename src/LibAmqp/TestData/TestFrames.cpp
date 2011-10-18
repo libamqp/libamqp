@@ -30,6 +30,16 @@ namespace test_data
         'A', 'M', 'Q', 'P', AMQP_PROTOCOL_ID, 1, 0, 0
     );
 
+    test_data_def(sasl_protocol_1_1_0,
+        'A', 'M', 'Q', 'P', AMQP_SASL_PROTOCOL_ID, 1, 1, 0
+    );
+    test_data_def(tls_protocol_1_1_0,
+        'A', 'M', 'Q', 'P', AMQP_TLS_PROTOCOL_ID, 1, 1, 0
+    );
+    test_data_def(amqp_protocol_1_1_0,
+        'A', 'M', 'Q', 'P', AMQP_PROTOCOL_ID, 1, 1, 0
+    );
+
     test_data_def(minimal_frame_header,
         0, 0, 0, 8,
         2, 0, 0, 1
