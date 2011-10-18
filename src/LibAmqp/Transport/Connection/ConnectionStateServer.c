@@ -112,17 +112,17 @@ static void establish_tunnel_after_client_request(amqp_connection_t *connection,
     {
     case AMQP_TLS_PROTOCOL_ID:
         transition_to_accepting_tls(connection);
-        call_action(connection->state.tls.tunnel.establish, connection->context, connection, requested_protocol_version);
+        call_action(connection->state.tls.tunnel.accept, connection->context, connection, requested_protocol_version);
         break;
 
     case AMQP_SASL_PROTOCOL_ID:
         transition_to_accepting_sasl(connection);
-        call_action(connection->state.sasl.tunnel.establish, connection->context, connection, requested_protocol_version);
+        call_action(connection->state.sasl.tunnel.accept, connection->context, connection, requested_protocol_version);
         break;
 
     case AMQP_PROTOCOL_ID:
         transition_to_accepting_amqp(connection);
-        call_action(connection->state.amqp.tunnel.establish, connection->context, connection, requested_protocol_version);
+        call_action(connection->state.amqp.tunnel.accept, connection->context, connection, requested_protocol_version);
         break;
 
     default:

@@ -131,7 +131,7 @@ typedef struct amqp_connection_negotiator_actions_t
 
 typedef struct amqp_connection_tunnel_actions_t
 {
-    void (*establish)(amqp_connection_t *connection, uint32_t protocol_version);
+    void (*accept)(amqp_connection_t *connection, uint32_t protocol_version);
 } amqp_connection_tunnel_actions_t;
 
 typedef struct amqp_connection_tls_state_t
@@ -277,17 +277,17 @@ struct amqp_connection_t
     struct {
         struct
         {
-            amqp_io_event_watcher_t *watcher;
             amqp_buffer_t *buffer;
             amqp_connection_action_f done_callback;
+            amqp_io_event_watcher_t *watcher;
         } write;
         struct
         {
-            amqp_io_event_watcher_t *watcher;
             amqp_buffer_t *buffer;
+            amqp_connection_read_callback_f read_callback;
+            amqp_io_event_watcher_t *watcher;
             size_t n_required;
             size_t satisfied;
-            amqp_connection_read_callback_f read_callback;
         } read;
         struct {
             amqp_buffer_t *buffer;

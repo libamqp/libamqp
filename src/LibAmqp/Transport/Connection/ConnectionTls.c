@@ -68,7 +68,7 @@ static void transition_to_initialized(amqp_connection_t *connection)
 {
     default_state_initialization(connection, "Initialized");
     connection->state.tls.connect = start_while_initialized;
-    connection->state.tls.tunnel.establish = tunnel_establish_while_initialized;
+    connection->state.tls.tunnel.accept = tunnel_establish_while_initialized;
     trace_transition("Created");
 }
 
@@ -111,7 +111,7 @@ static void default_request(amqp_connection_t *connection, uint32_t version)
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
 {
     connection->state.tls.connect = default_connect;
-    connection->state.tls.tunnel.establish = default_tunnel_establish;
+    connection->state.tls.tunnel.accept = default_tunnel_establish;
     connection->state.tls.negotiation.confirm = default_confirm;
     connection->state.tls.negotiation.reject = default_reject;
     connection->state.tls.negotiation.request = default_request;

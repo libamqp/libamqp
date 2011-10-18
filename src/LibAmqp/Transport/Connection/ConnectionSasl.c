@@ -60,7 +60,7 @@ static void sasl_done_callback(amqp_connection_t *connection)
 
 static void sasl_version_accepted(amqp_connection_t *connection)
 {
-//    amqp_connection_trace(connection, "SASL version accepted");
+    amqp_connection_trace(connection, "SASL version accepted");
     transition_to_negotiated(connection);
     connection->specification_version.supported.sasl = connection->specification_version.required.sasl;
     connection->state.connection.done(connection);
@@ -99,7 +99,7 @@ static void transition_to_initialized(amqp_connection_t *connection)
 {
     default_state_initialization(connection, "Initialized");
     connection->state.sasl.connect = sasl_connect_while_initialized;
-    connection->state.sasl.tunnel.establish = tunnel_establish_while_initialized;
+    connection->state.sasl.tunnel.accept = tunnel_establish_while_initialized;
     trace_transition("Created");
 }
 
@@ -123,7 +123,7 @@ static void transition_to_sending_header_response(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
-static void transition_to_negotiated(amqp_connection_t *connection)
+static void transition_to_negotiated(amqp_connection_t *connection) // wrong name
 {
     save_old_state();
     default_state_initialization(connection, "Negotiated");
@@ -176,7 +176,7 @@ static void default_state_initialization(amqp_connection_t *connection, const ch
     connection->state.sasl.connect = default_connect;
     connection->state.sasl.done = default_done;
 
-    connection->state.sasl.tunnel.establish = default_tunnel_establish;
+    connection->state.sasl.tunnel.accept = default_tunnel_establish;
     connection->state.sasl.negotiation.confirm = default_confirm;
     connection->state.sasl.negotiation.reject = default_reject;
     connection->state.sasl.negotiation.request = default_request;

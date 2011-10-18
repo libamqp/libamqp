@@ -16,74 +16,12 @@
 
 #include <TestHarness.h>
 
-#include "Transport/Connection/ConnectionTestSupport.h"
+#include "Transport/Connection/ConnectionFrameTestSupport.h"
 #include "TestData/TestFrames.h"
 
 #include "debug_helper.h"
 SUITE(ConnectionFrame)
 {
-    class ConnectionFrameFixture : public SuiteConnection::BaseConnectionFixture
-    {
-    public:
-        ConnectionFrameFixture();
-        ~ConnectionFrameFixture();
-
-        static void write_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback);
-        static void read_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f done_callback);
-        static void done_callback(amqp_connection_t *connection);
-
-        static test_data::TestData *test_data_p;
-    public:
-        amqp_buffer_t *buffer;
-    };
-
-    test_data::TestData *ConnectionFrameFixture::test_data_p = 0;
-
-    ConnectionFrameFixture::ConnectionFrameFixture()
-    {
-        buffer = amqp_allocate_buffer(context);
-
-        connection = amqp_connection_initialize(context);
-        connection->state.writer.commence_write = write_intercept;
-        connection->state.reader.commence_read = read_intercept;
-    }
-
-    ConnectionFrameFixture::~ConnectionFrameFixture()
-    {
-        amqp_connection_destroy(context, connection);
-        amqp_deallocate_buffer(context, buffer);
-    }
-
-    void ConnectionFrameFixture::write_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback)
-    {
-//        SOUTS("write_intercept called");
-        not_implemented(todo);
-    }
-    void ConnectionFrameFixture::read_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f done_callback)
-    {
-//        SOUTS("read_intercept called");
-//        SOUTV(required);
-        if (test_data_p)
-        {
-            if (buffer == 0)
-            {
-                buffer = amqp_allocate_buffer(connection->context);
-            }
-            size_t index = amqp_buffer_index(buffer);
-            size_t size = amqp_buffer_size(buffer) + required;
-            amqp_buffer_reset(buffer);
-            test_data_p->transfer_to(buffer);
-            amqp_buffer_advance_read_index(buffer, index);
-            amqp_buffer_set_write_point(buffer, size);
-
-            done_callback(connection, buffer, required);
-        }
-    }
-    
-    void ConnectionFrameFixture::done_callback(amqp_connection_t *connection)
-    {
-    }
-
     TEST_FIXTURE(ConnectionFrameFixture, fixture_should_balance_allocations)
     {
         CHECK(connection->state.frame.name != 0);

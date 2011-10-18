@@ -97,7 +97,7 @@ static void transition_to_initialized(amqp_connection_t *connection)
 {
     default_state_initialization(connection, "Initialized");
     connection->state.amqp.connect = amqp_connect_while_initialized;
-    connection->state.amqp.tunnel.establish = tunnel_establish_while_initialized;
+    connection->state.amqp.tunnel.accept = tunnel_establish_while_initialized;
     trace_transition("Created");
 }
 static void transition_to_failed(amqp_connection_t *connection)
@@ -173,7 +173,7 @@ static void default_state_initialization(amqp_connection_t *connection, const ch
     connection->state.amqp.connect = default_connect;
     connection->state.amqp.done = default_done;
 
-    connection->state.amqp.tunnel.establish = default_tunnel_establish;
+    connection->state.amqp.tunnel.accept = default_tunnel_establish;
     connection->state.amqp.negotiation.confirm = default_confirm;
     connection->state.amqp.negotiation.reject = default_reject;
     connection->state.amqp.negotiation.request = default_request;
