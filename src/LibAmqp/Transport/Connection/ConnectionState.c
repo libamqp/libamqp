@@ -58,9 +58,25 @@ void amqp_connection_state_initialize(amqp_connection_t *connection)
     connection->timer = amqp_timer_initialize(connection->context, timer_expiry_handler, connection);
 }
 
+void amqp__connection_allocate_scratch_buffer(amqp_connection_t *connection)
+{
+    assert(connection->data.common.buffer == 0);
+    connection->data.common.buffer = amqp_allocate_buffer(connection->context);
+}
+
+void amqp__connection_cleanup_scratch_buffer(amqp_connection_t *connection)
+{
+    if (connection->data.common.buffer)
+    {
+        amqp_deallocate_buffer(connection->context, connection->data.common.buffer);
+        connection->data.common.buffer = 0;
+    }
+}
+
 void amqp_connection_state_cleanup(amqp_connection_t *connection)
 {
     amqp_timer_destroy(connection->context, connection->timer);
+    amqp__connection_cleanup_scratch_buffer(connection);
     amqp_connection_frame_reader_cleanup(connection);
     amqp_connection_negotiator_cleanup(connection);
     amqp_connection_amqp_cleanup(connection);
@@ -157,15 +173,13 @@ static void shutdown_connection(amqp_connection_t *connection, amqp_cs_shutdown_
 
 static void done_while_stopping_output(amqp_connection_t *connection)
 {
-    amqp_buffer_t *buffer;
-
     switch (connection->data.shutdown.mode)
     {
     case amqp_cs_complete_write_drain_input_and_close_socket:
         timer_start(connection, input_drain_time);
         transition_to_draining_input(connection);
-        buffer = amqp_allocate_buffer(connection->context);
-        connection->state.reader.commence_read(connection, buffer, amqp_buffer_capacity(buffer), read_complete_callback);
+        amqp__connection_allocate_scratch_buffer(connection);
+        connection->state.reader.commence_read(connection, connection->data.shutdown.buffer, amqp_buffer_capacity(connection->data.shutdown.buffer), read_complete_callback);
         break;
 
     case amqp_cs_complete_write_and_close_socket:
@@ -199,13 +213,13 @@ static void read_done_while_draining_input(amqp_connection_t *connection, amqp_b
     if (amount > 0)
     {
         transition_to_draining_input(connection);   // TODO - transition to same state here, useful for trace
-        amqp_buffer_reset(buffer);
-        connection->state.reader.commence_read(connection, buffer, amqp_buffer_capacity(buffer), read_complete_callback);
+        amqp_buffer_reset(connection->data.shutdown.buffer);
+        connection->state.reader.commence_read(connection, connection->data.shutdown.buffer, amqp_buffer_capacity(connection->data.shutdown.buffer), read_complete_callback);
     }
     else
     {
-        amqp_deallocate_buffer(connection->context, buffer);
         transition_to_stopping(connection);
+        amqp__connection_cleanup_scratch_buffer(connection);
         connection->state.reader.stop(connection);
         connection->state.socket.shutdown(connection);
     }
@@ -213,6 +227,7 @@ static void read_done_while_draining_input(amqp_connection_t *connection, amqp_b
 static void timeout_while_draining_input(amqp_connection_t *connection)
 {
     // TODO - distinguish between peer sending forever and peer sending nothing.
+    amqp__connection_cleanup_scratch_buffer(connection);
     amqp_connection_error(connection, AMQP_ERROR_INPUT_DRAIN_TIMEOUT, "Timeout while draining input");
     handle_timeout(connection, "TimeoutDrainingInput");
 }

@@ -73,16 +73,10 @@ static void cleanup_write_watcher(amqp_connection_t *connection)
 static void call_done_callback(amqp_connection_t *connection)
 {
     amqp_connection_action_f done_callback = connection->io.write.done_callback;
+
+    assert(done_callback != 0);
+
     connection->io.write.done_callback = 0;
-
-    assert(done_callback);
-
-    if (connection->io.write.buffer)
-    {
-        amqp_deallocate_buffer(connection->context, connection->io.write.buffer);
-        connection->io.write.buffer = 0;
-    }
-
     done_callback(connection);
 }
 

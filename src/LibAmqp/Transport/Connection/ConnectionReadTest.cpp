@@ -92,7 +92,6 @@ SUITE(ConnectionRead)
         write_size(write_buffer, 1);
         amqp_buffer_putc(write_buffer, 'X');
         connection->state.writer.commence_write(connection, write_buffer, write_callback);
-        write_buffer = 0;
         connection->state.reader.commence_read(connection, read_buffer, 5, read_callback);
 
         CHECK_EQUAL("Reading", connection->state.reader.name);
@@ -119,7 +118,6 @@ SUITE(ConnectionRead)
         amqp_buffer_puts(write_buffer, (const unsigned char *) hello_world, strlen(hello_world));
 
         connection->state.writer.commence_write(connection, write_buffer, write_callback);
-        write_buffer = 0;
         connection->state.reader.commence_read(connection, read_buffer, strlen(hello_world) + 4, read_callback);
 
         while (run_loop_with_timeout() && amqp_connection_reader_is_state(connection, "Reading"));
@@ -155,7 +153,6 @@ SUITE(ConnectionRead)
         }
 
         connection->state.writer.commence_write(connection, write_buffer, write_callback);
-        write_buffer = 0;
 
         amqp_buffer_grow(context, read_buffer, size + 4);
         connection->state.reader.commence_read(connection, read_buffer, size + 4, read_callback);

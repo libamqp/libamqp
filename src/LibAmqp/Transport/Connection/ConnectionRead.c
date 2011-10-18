@@ -69,11 +69,6 @@ static void cleanup_reader(amqp_connection_t *connection)
         amqp_io_event_watcher_destroy(connection->context, connection->io.read.watcher);
         connection->io.read.watcher = 0;
     }
-    if (connection->io.read.buffer)
-    {
-        amqp_deallocate_buffer(connection->context, connection->io.read.buffer);
-        connection->io.read.buffer = 0;
-    }
 }
 
 static void call_read_callback(amqp_connection_t *connection)
@@ -170,7 +165,7 @@ static void continue_read_operation(amqp_connection_t *connection)
 
 static void commence_read_operation(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f read_callback)
 {
-    connection->io.read.buffer = buffer ? buffer : amqp_allocate_buffer(connection->context);
+    connection->io.read.buffer = buffer;
     connection->io.read.n_required = required;
     connection->io.read.satisfied = 0;
     connection->io.read.read_callback = read_callback;
@@ -229,7 +224,7 @@ static void transition_to_initialized(amqp_connection_t *connection)
 
 static void commence_read_while_enabled(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f read_callback)
 {
-    assert(read_callback);
+    assert(buffer != 0 && read_callback != 0);
     transition_to_reading(connection);
     commence_read_operation(connection, buffer, required, read_callback);
 }
@@ -253,7 +248,8 @@ static void transition_to_enabled(amqp_connection_t *connection)
 
 static void commence_read_while_eof(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f read_callback)
 {
-    assert(read_callback != 0);
+    assert(buffer != 0 && read_callback != 0);
+
     transition_to_eof_alerted(connection);
     connection->io.read.satisfied = 0;
     connection->io.read.read_callback = read_callback;

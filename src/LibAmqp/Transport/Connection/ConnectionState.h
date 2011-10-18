@@ -261,11 +261,16 @@ struct amqp_connection_t
     } state;
     union {
         struct {
+            amqp_buffer_t *buffer;
+        } common;
+        struct {
+            amqp_buffer_t *buffer;
             int protocols;
             uint32_t preferred_version;
             amqp_connection_negotiator_actions_t callbacks;
         } handshake;
         struct {
+            amqp_buffer_t *buffer;
             amqp_cs_shutdown_mode_t mode;
         } shutdown;
     } data;
@@ -304,6 +309,8 @@ extern void amqp_connection_server_state_initialize(amqp_connection_t *connectio
 extern void amqp_connection_enable_io(amqp_connection_t *connection);
 
 extern void amqp__connection_default_state_initialization(amqp_connection_t *connection, const char *new_state_name);
+extern void amqp__connection_allocate_scratch_buffer(amqp_connection_t *connection);
+extern void amqp__connection_cleanup_scratch_buffer(amqp_connection_t *connection);
 
 extern void amqp_connection_state_cleanup(amqp_connection_t *connection);
 extern int amqp_connection_is_state(const amqp_connection_t *connection, const char *state_name);
