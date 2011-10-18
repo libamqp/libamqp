@@ -77,7 +77,7 @@ static void sasl_connect_while_initialized(amqp_connection_t *connection)
     connection->state.negotiator.reset(connection);
     connection->state.negotiator.start(connection, connection->specification_version.required.sasl, sasl_version_accepted_callback, sasl_version_rejected_callback);
 }
-static void tunnel_establish_while_initialized(amqp_connection_t *connection, uint32_t requested_version)
+static void tunnel_accept_while_initialized(amqp_connection_t *connection, uint32_t requested_version)
 {
     uint32_t supported_version;
     assert(amqp_version_protocol_id(requested_version) == AMQP_SASL_PROTOCOL_ID);
@@ -99,7 +99,7 @@ static void transition_to_initialized(amqp_connection_t *connection)
 {
     default_state_initialization(connection, "Initialized");
     connection->state.sasl.connect = sasl_connect_while_initialized;
-    connection->state.sasl.tunnel.accept = tunnel_establish_while_initialized;
+    connection->state.sasl.tunnel.accept = tunnel_accept_while_initialized;
     trace_transition("Created");
 }
 

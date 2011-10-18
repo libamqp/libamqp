@@ -74,7 +74,7 @@ static void amqp_connect_while_initialized(amqp_connection_t *connection)
     connection->state.negotiator.start(connection, connection->specification_version.required.amqp, amqp_version_accepted, amqp_version_rejected);
 }
 
-static void tunnel_establish_while_initialized(amqp_connection_t *connection, uint32_t requested_version)
+static void tunnel_accept_while_initialized(amqp_connection_t *connection, uint32_t requested_version)
 {
     uint32_t supported_version;
 
@@ -97,7 +97,7 @@ static void transition_to_initialized(amqp_connection_t *connection)
 {
     default_state_initialization(connection, "Initialized");
     connection->state.amqp.connect = amqp_connect_while_initialized;
-    connection->state.amqp.tunnel.accept = tunnel_establish_while_initialized;
+    connection->state.amqp.tunnel.accept = tunnel_accept_while_initialized;
     trace_transition("Created");
 }
 static void transition_to_failed(amqp_connection_t *connection)

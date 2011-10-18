@@ -60,15 +60,15 @@ static void start_while_initialized(amqp_connection_t *connection)
 //    not_implemented(start_while_initialized);
     connection->state.negotiator.start(connection, connection->specification_version.required.tls, version_accepted, version_rejected);
 }
-static void tunnel_establish_while_initialized(amqp_connection_t *connection, uint32_t requested_version)
+static void tunnel_accept_while_initialized(amqp_connection_t *connection, uint32_t requested_version)
 {
-    not_implemented(tunnel_establish_while_initialized);
+    not_implemented(tunnel_accept_while_initialized);
 }
 static void transition_to_initialized(amqp_connection_t *connection)
 {
     default_state_initialization(connection, "Initialized");
     connection->state.tls.connect = start_while_initialized;
-    connection->state.tls.tunnel.accept = tunnel_establish_while_initialized;
+    connection->state.tls.tunnel.accept = tunnel_accept_while_initialized;
     trace_transition("Created");
 }
 
