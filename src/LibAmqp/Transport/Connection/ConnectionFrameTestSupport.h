@@ -35,9 +35,13 @@ namespace SuiteConnectionFrame
         static void read_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f done_callback);
         static void done_callback(amqp_connection_t *connection);
 
-        static test_data::TestData *test_data_p;
+        static void set_test_data(test_data::TestData& data);
     public:
         amqp_buffer_t *buffer;
+
+    private:
+        static test_data::TestData *test_data_p;
+        static amqp_buffer_t *write_copy;
     };
 
 }

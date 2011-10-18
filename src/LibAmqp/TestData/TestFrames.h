@@ -21,6 +21,10 @@
 
 namespace test_data
 {
+    extern TestData sasl_protocol_1_0_0;
+    extern TestData tls_protocol_1_0_0;
+    extern TestData amqp_protocol_1_0_0;
+
     extern TestData minimal_frame_header;
     extern TestData sasl_mechanisms_frame;
     extern TestData sasl_mechanisms_frame_long;

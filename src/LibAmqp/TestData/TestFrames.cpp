@@ -15,10 +15,21 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include "libamqp.h"
 #include "Buffer/Buffer.h"
 #include "TestData/TestFrames.h"
 namespace test_data
 {
+    test_data_def(sasl_protocol_1_0_0,
+        'A', 'M', 'Q', 'P', AMQP_SASL_PROTOCOL_ID, 1, 0, 0
+    );
+    test_data_def(tls_protocol_1_0_0,
+        'A', 'M', 'Q', 'P', AMQP_TLS_PROTOCOL_ID, 1, 0, 0
+    );
+    test_data_def(amqp_protocol_1_0_0,
+        'A', 'M', 'Q', 'P', AMQP_PROTOCOL_ID, 1, 0, 0
+    );
+
     test_data_def(minimal_frame_header,
         0, 0, 0, 8,
         2, 0, 0, 1
@@ -48,6 +59,8 @@ namespace test_data
                 0xa3, 0x19, 'a', 'm', 'q', 'p', ':', 's', 'a', 's', 'l', '-', 'm', 'e', 'c', 'h', 'a', 'n', 'i', 's', 'm', 's', ':', 'l', 'i', 's', 't',
                 0xC0, 0x0c, 0x01, 0xA3, 0x09, 'A', 'N', 'O', 'N', 'Y', 'M', 'O', 'U', 'S'
     );
+
+
 
     // SaslInit(mechanism=PLAIN, initial­response=Binary, hostname=development.mysystem.mycompany.stormmq.com)
     test_data_def(SaslInit,

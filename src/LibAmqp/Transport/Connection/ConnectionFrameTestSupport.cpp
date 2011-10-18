@@ -26,6 +26,13 @@ namespace SuiteConnectionFrame
 
     test_data::TestData *ConnectionFrameFixture::test_data_p = 0;
 
+    amqp_buffer_t *ConnectionFrameFixture::write_copy = 0;
+
+    void ConnectionFrameFixture::set_test_data(test_data::TestData& data)
+    {
+        test_data_p = &data;
+    }
+
     ConnectionFrameFixture::ConnectionFrameFixture()
     {
         buffer = amqp_allocate_buffer(context);
@@ -38,26 +45,38 @@ namespace SuiteConnectionFrame
     ConnectionFrameFixture::~ConnectionFrameFixture()
     {
         amqp_connection_destroy(context, connection);
+        amqp_deallocate_buffer(context, write_copy);
         amqp_deallocate_buffer(context, buffer);
     }
 
     void ConnectionFrameFixture::write_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f write_callback)
     {
-//        SOUTS("write_intercept called");
-        not_implemented(todo);
+        if (write_copy == 0)
+        {
+            write_copy = amqp_allocate_buffer(connection->context);
+        }
+        amqp_buffer_reset(write_copy);
+        amqp_buffer_put_buffer_contents(write_copy, buffer);
     }
     void ConnectionFrameFixture::read_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f  read_callback)
     {
 //        SOUTS("read_intercept called");
 //        SOUTV(required);
+        assert(test_data_p != 0);
         if (test_data_p)
         {
             assert(buffer != 0);
 
             size_t index = amqp_buffer_index(buffer);
             size_t size = amqp_buffer_size(buffer) + required;
+
             amqp_buffer_reset(buffer);
             test_data_p->transfer_to(buffer);
+            if (size == amqp_buffer_size(buffer))
+            {
+                test_data_p = 0;
+            }
+
             amqp_buffer_advance_read_index(buffer, index);
             amqp_buffer_set_write_point(buffer, size);
 

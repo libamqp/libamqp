@@ -48,6 +48,8 @@ SUITE(ConnectionSasl)
 
     TEST_FIXTURE(ConnectionSaslFixture, enable_frame)
     {
+//            set_test_data(test_data::sasl_mechanisms_frame);
+
         connection->state.frame.enable(connection);
         CHECK_EQUAL("Enabled", connection->state.frame.name);
 

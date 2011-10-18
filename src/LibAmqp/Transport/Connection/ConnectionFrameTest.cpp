@@ -49,7 +49,7 @@ SUITE(ConnectionFrame)
 
     TEST_FIXTURE(ConnectionFrameFixture, read_minimal_frame)
     {
-        ConnectionFrameFixture::test_data_p = &test_data::minimal_frame_header;
+        set_test_data(test_data::minimal_frame_header);
         connection->state.frame.enable(connection);
         connection->state.frame.read(connection, buffer, 8, done_callback);
         CHECK_EQUAL("Enabled", connection->state.frame.name);
@@ -58,7 +58,7 @@ SUITE(ConnectionFrame)
 
     TEST_FIXTURE(ConnectionFrameFixture, read_frame)
     {
-        ConnectionFrameFixture::test_data_p = &test_data::sasl_mechanisms_frame;
+        set_test_data(test_data::sasl_mechanisms_frame);
         connection->state.frame.enable(connection);
         connection->state.frame.read(connection, buffer, 8, done_callback);
         CHECK_EQUAL("Enabled", connection->state.frame.name);
