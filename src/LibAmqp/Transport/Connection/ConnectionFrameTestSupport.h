@@ -43,6 +43,5 @@ namespace SuiteConnectionFrame
         static test_data::TestData *test_data_p;
         static amqp_buffer_t *write_copy;
     };
-
 }
 #endif

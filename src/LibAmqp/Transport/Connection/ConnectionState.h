@@ -248,7 +248,7 @@ struct amqp_connection_t
         amqp_connection_negotiator_state_t negotiator;
         amqp_connection_frame_reader_state_t frame;
 
-        amqp_connection_action_f stopped_hook;  // not used by SM
+        amqp_connection_action_f stopped_hook;  // used by tests, not used by SM
     } state;
     union {
         struct {

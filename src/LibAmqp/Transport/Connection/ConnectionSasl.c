@@ -58,14 +58,14 @@ static void sasl_done_callback(amqp_connection_t *connection)
     connection->state.sasl.done(connection);
 }
 
-static void sasl_version_accepted(amqp_connection_t *connection)
+static void sasl_version_accepted_callback(amqp_connection_t *connection)
 {
     amqp_connection_trace(connection, "SASL version accepted");
     transition_to_negotiated(connection);
     connection->specification_version.supported.sasl = connection->specification_version.required.sasl;
     connection->state.connection.done(connection);
 }
-static void sasl_version_rejected(amqp_connection_t *connection, uint32_t version)
+static void sasl_version_rejected_callback(amqp_connection_t *connection, uint32_t version)
 {
     amqp_connection_trace(connection, "SASL version rejected");
     transition_to_failed(connection);
@@ -75,7 +75,7 @@ static void sasl_version_rejected(amqp_connection_t *connection, uint32_t versio
 static void sasl_connect_while_initialized(amqp_connection_t *connection)
 {
     connection->state.negotiator.reset(connection);
-    connection->state.negotiator.start(connection, connection->specification_version.required.sasl, sasl_version_accepted, sasl_version_rejected);
+    connection->state.negotiator.start(connection, connection->specification_version.required.sasl, sasl_version_accepted_callback, sasl_version_rejected_callback);
 }
 static void tunnel_establish_while_initialized(amqp_connection_t *connection, uint32_t requested_version)
 {
