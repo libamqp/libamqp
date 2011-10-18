@@ -38,7 +38,6 @@ extern void amqp_connection_frame_reader_cleanup(amqp_connection_t *connection);
 
 extern int amqp_connection_frame_is_state(const amqp_connection_t *connection, const char *state_name);
 
-
 #ifdef __cplusplus
 }
 #endif

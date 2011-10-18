@@ -28,6 +28,7 @@
 #endif
 
 static void transition_to_initialized(amqp_connection_t *connection);
+static void transition_to_waiting_on_sasl_mechanisms(amqp_connection_t *connection);
 static void transition_to_failed(amqp_connection_t *connection);
 static void transition_to_negotiated(amqp_connection_t *connection);
 static void transition_to_sending_header_response(amqp_connection_t *connection);
@@ -60,9 +61,10 @@ static void sasl_done_callback(amqp_connection_t *connection)
 
 static void sasl_version_accepted_callback(amqp_connection_t *connection)
 {
+    // The broker has accepted our preferred sasl version and will next send it's supported SASL mechanisms
     amqp_connection_trace(connection, "SASL version accepted");
-    transition_to_negotiated(connection);
     connection->specification_version.supported.sasl = connection->specification_version.required.sasl;
+    transition_to_waiting_on_sasl_mechanisms(connection);
     connection->state.connection.done(connection);
 }
 static void sasl_version_rejected_callback(amqp_connection_t *connection, uint32_t version)
@@ -101,6 +103,13 @@ static void transition_to_initialized(amqp_connection_t *connection)
     connection->state.sasl.connect = sasl_connect_while_initialized;
     connection->state.sasl.tunnel.accept = tunnel_accept_while_initialized;
     trace_transition("Created");
+}
+
+static void transition_to_waiting_on_sasl_mechanisms(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "WaitingOnSaslMechanisms");
+    trace_transition(old_state_name);
 }
 
 static void transition_to_failed(amqp_connection_t *connection)

@@ -51,7 +51,7 @@ SUITE(ConnectionFrame)
     {
         set_test_data_for_read(test_data::minimal_frame_header);
         connection->state.frame.enable(connection);
-        connection->state.frame.read(connection, buffer, 8, done_callback);
+        connection->state.frame.read(connection, buffer, done_callback);
         CHECK_EQUAL("Enabled", connection->state.frame.name);
         CHECK_EQUAL(8U, connection->io.frame.frame_size);
     }
@@ -60,7 +60,7 @@ SUITE(ConnectionFrame)
     {
         set_test_data_for_read(test_data::sasl_mechanisms_frame);
         connection->state.frame.enable(connection);
-        connection->state.frame.read(connection, buffer, 8, done_callback);
+        connection->state.frame.read(connection, buffer, done_callback);
         CHECK_EQUAL("Enabled", connection->state.frame.name);
         CHECK_EQUAL(0x15U, connection->io.frame.frame_size);
     }

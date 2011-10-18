@@ -53,7 +53,6 @@ void amqp_connection_negotiator_initialize(amqp_connection_t *connection)
 
 static void cleanup_resources(amqp_connection_t *connection)
 {
-    amqp__connection_cleanup_scratch_buffer(connection);
 }
 void amqp_connection_negotiator_cleanup(amqp_connection_t *connection)
 {
@@ -91,10 +90,10 @@ static void start_while_initialized(amqp_connection_t *connection, uint32_t vers
     connection->data.handshake.callbacks.reject = reject_callback;
     connection->data.handshake.callbacks.request = 0;
 
-    amqp__connection_allocate_scratch_buffer(connection);
-    amqp_negotiator_encode_version(connection->context, version, connection->data.handshake.buffer);
+    amqp_buffer_reset(connection->buffer.write);
+    amqp_negotiator_encode_version(connection->context, version, connection->buffer.write);
 
-    connection->state.writer.commence_write(connection, connection->data.handshake.buffer, write_complete);
+    connection->state.writer.commence_write(connection, connection->buffer.write, write_complete);
 }
 
 // Server to start read while waiting for client's preferred version
@@ -106,9 +105,8 @@ static void wait_while_initialized(amqp_connection_t *connection, amqp_connectio
     connection->data.handshake.callbacks.confirm = 0;
     connection->data.handshake.callbacks.reject = 0;
     connection->data.handshake.callbacks.request = request_callback;
-    amqp__connection_allocate_scratch_buffer(connection);
 
-    connection->state.reader.commence_read(connection, connection->data.handshake.buffer, AMQP_FRAME_HEADER_SIZE, read_complete);
+    connection->state.reader.commence_read(connection, connection->buffer.read, AMQP_FRAME_HEADER_SIZE, read_complete);
 }
 static void reset_while_initialized(amqp_connection_t *connection)
 {
@@ -128,8 +126,8 @@ static void transition_to_initialized(amqp_connection_t *connection)
 static void write_done_while_sending_client_version(amqp_connection_t *connection)
 {
     transition_to_waiting_for_broker_response(connection);
-    amqp_buffer_reset(connection->data.handshake.buffer);
-    connection->state.reader.commence_read(connection, connection->data.handshake.buffer, AMQP_FRAME_HEADER_SIZE, read_complete);
+    amqp_buffer_reset(connection->buffer.read);
+    connection->state.reader.commence_read(connection, connection->buffer.read, AMQP_FRAME_HEADER_SIZE, read_complete);
 }
 static void transition_to_sending_client_version(amqp_connection_t *connection)
 {
@@ -144,7 +142,7 @@ static void read_done_while_waiting_for_broker_response(amqp_connection_t *conne
 {
     uint32_t broker_version;
 
-    assert(buffer ==  connection->data.handshake.buffer);
+    assert(buffer == connection->buffer.read);
 
     if (amount == 0)
     {
@@ -180,7 +178,7 @@ static void read_done_while_waiting_on_client_request(amqp_connection_t *connect
 {
     uint32_t requested_protocol_version;
 
-    assert(buffer ==  connection->data.handshake.buffer);
+    assert(buffer ==  connection->buffer.read);
 
     if (amount == 0)
     {
@@ -214,9 +212,9 @@ static void send_while_waiting_to_send_server_response(amqp_connection_t *connec
     connection->data.handshake.callbacks.reject = 0;
     connection->data.handshake.callbacks.request = 0;
 
-    amqp_buffer_reset(connection->data.handshake.buffer);
-    amqp_negotiator_encode_version(connection->context, version, connection->data.handshake.buffer);
-    connection->state.writer.commence_write(connection, connection->data.handshake.buffer, write_complete);
+    amqp_buffer_reset(connection->buffer.write);
+    amqp_negotiator_encode_version(connection->context, version, connection->buffer.write);
+    connection->state.writer.commence_write(connection, connection->buffer.write, write_complete);
 }
 static void transition_to_waiting_to_send_server_response(amqp_connection_t *connection)
 {

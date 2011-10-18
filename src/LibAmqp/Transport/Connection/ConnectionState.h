@@ -54,6 +54,11 @@ typedef struct amqp_connection_t amqp_connection_t;
 typedef struct amqp_connections_t amqp_connections_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_FRAME_TYPE_T
+#define LIBAMQP_AMQP_FRAME_TYPE_T
+typedef struct amqp_frame_t amqp_frame_t;
+#endif
+
 enum amqp_connection_protocols
 {
     AMQP_PROTOCOL_AMQP = 0x01,
@@ -71,6 +76,8 @@ typedef void (*amqp_connection_accept_f)(amqp_connection_t *connection, int fd, 
 typedef void (*amqp_connection_error_f)(amqp_connection_t *connection, int error_code);
 typedef void (*amqp_connection_write_f)(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback);
 typedef void (*amqp_connection_read_f)(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f done_callback);
+
+typedef void (*amqp_connection_frame_available_f)(amqp_connection_t *connection, amqp_buffer_t *buffer);
 
 typedef struct amqp_connection_writer_state_t
 {
@@ -90,6 +97,7 @@ typedef struct amqp_connection_reader_state_t
     amqp_connection_action_f enable;
     amqp_connection_read_f commence_read;
     amqp_connection_action_f continue_read;
+    amqp_connection_action_f reset;             // TODO - need to review implementation, it's rather crap atm
     amqp_connection_action_f stop;
     amqp_connection_error_f fail;
 } amqp_connection_reader_state_t;
@@ -108,6 +116,7 @@ typedef struct amqp_connection_socket_state_t
 
 typedef void (*amqp_connection_fail_callback_f)(amqp_connection_t *connection, int errro_code);
 typedef void (*amqp_connection_negotiate_callback_f)(amqp_connection_t *connection, uint32_t version);
+typedef void (*amqp_message_dispatch_t)(amqp_connection_t *connection, amqp_frame_t *frame);
 
 typedef struct amqp_connection_negotiator_state_t
 {
@@ -148,6 +157,9 @@ typedef struct amqp_connection_sasl_state_t
     amqp_connection_action_f connect;
     amqp_connection_action_f done;
     amqp_connection_tunnel_actions_t tunnel;
+    struct {
+        amqp_message_dispatch_t mechanisms;
+    } messages;
 } amqp_connection_sasl_state_t;
 
 typedef struct amqp_connection_amqp_state_t
@@ -162,7 +174,7 @@ typedef struct amqp_connection_frame_reader_state_t
 {
     const char *name;
     amqp_connection_action_f enable;
-    void (*read)(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_action_f done_callback);
+    void (*read)(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_frame_available_f frame_available_callback);
     amqp_connection_read_callback_f read_done;
     amqp_connection_action_f stop;
 } amqp_connection_frame_reader_state_t;
@@ -252,19 +264,18 @@ struct amqp_connection_t
     } state;
     union {
         struct {
-            amqp_buffer_t *buffer;
-        } common;
-        struct {
-            amqp_buffer_t *buffer;
             int protocols;
             uint32_t preferred_version;
             amqp_connection_negotiator_actions_t callbacks;
         } handshake;
         struct {
-            amqp_buffer_t *buffer;
             amqp_cs_shutdown_mode_t mode;
         } shutdown;
     } data;
+    struct {
+        amqp_buffer_t *read;
+        amqp_buffer_t *write;
+    } buffer;
     struct {
         struct
         {
@@ -282,7 +293,7 @@ struct amqp_connection_t
         } read;
         struct {
             amqp_buffer_t *buffer;
-            amqp_connection_action_f done_callback;
+            amqp_connection_frame_available_f frame_available_callback;
             uint32_t frame_size;
         } frame;
     } io;
@@ -300,8 +311,6 @@ extern void amqp_connection_server_state_initialize(amqp_connection_t *connectio
 extern void amqp_connection_enable_io(amqp_connection_t *connection);
 
 extern void amqp__connection_default_state_initialization(amqp_connection_t *connection, const char *new_state_name);
-extern void amqp__connection_allocate_scratch_buffer(amqp_connection_t *connection);
-extern void amqp__connection_cleanup_scratch_buffer(amqp_connection_t *connection);
 
 extern void amqp_connection_state_cleanup(amqp_connection_t *connection);
 extern int amqp_connection_is_state(const amqp_connection_t *connection, const char *state_name);

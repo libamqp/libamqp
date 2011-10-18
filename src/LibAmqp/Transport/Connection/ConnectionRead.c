@@ -214,11 +214,16 @@ static void stop_while_initialized(amqp_connection_t *connection)
 {
     transition_to_stopped(connection);
 }
+static void reset_while_initialized(amqp_connection_t *connection)
+{
+    enable_while_initialized(connection);
+}
 static void transition_to_initialized(amqp_connection_t *connection)
 {
     default_state_initialization(connection, "Initialized");
     connection->state.reader.enable = enable_while_initialized;
     connection->state.reader.stop = stop_while_initialized;
+    connection->state.reader.reset = reset_while_initialized;
     trace_transition("Created");
 }
 
@@ -263,11 +268,17 @@ static void transition_to_eof(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
-// Here to cause a failure if application code ignores the first notification of EOF
+static void reset_while_eof_alerted(amqp_connection_t *connection)
+{
+    // Allow one more read for drain operation
+    transition_to_eof(connection);
+}
 static void transition_to_eof_alerted(amqp_connection_t *connection)
 {
+    // Here to cause a failure if application code ignores the first notification of EOF
     save_old_state();
     default_state_initialization(connection, "EofAlerted");
+    connection->state.reader.reset = reset_while_eof_alerted;
     trace_transition(old_state_name);
 }
 
@@ -276,12 +287,18 @@ static void next_read_while_reading(amqp_connection_t *connection)
     amqp_io_event_watcher_stop(connection->io.read.watcher);
     continue_read_operation(connection);
 }
+static void reset_while_reading(amqp_connection_t *connection)
+{
+    amqp_io_event_watcher_stop(connection->io.read.watcher);
+    transition_to_enabled(connection);
+}
 static void transition_to_reading(amqp_connection_t *connection)
 {
     save_old_state();
 
     default_state_initialization(connection, "Reading");
     connection->state.reader.continue_read = next_read_while_reading;
+    connection->state.reader.reset = reset_while_reading;
     connection->state.reader.stop = reader_stop;
     connection->state.reader.fail = reader_fail;
 
@@ -326,6 +343,10 @@ static void default_read_next(amqp_connection_t *connection)
     illegal_read_state(connection, "Continue read");
 }
 
+static void default_reset(amqp_connection_t *connection)
+{
+}
+
 static void default_read_stop(amqp_connection_t *connection)
 {
 }
@@ -340,6 +361,7 @@ static void default_state_initialization(amqp_connection_t *connection, const ch
     connection->state.reader.enable = default_read_enable;
     connection->state.reader.commence_read = default_commence_read;
     connection->state.reader.continue_read = default_read_next;
+    connection->state.reader.reset = default_reset;
     connection->state.reader.stop = default_read_stop;
     connection->state.reader.fail = default_read_fail;
 

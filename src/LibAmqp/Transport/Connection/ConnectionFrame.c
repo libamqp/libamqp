@@ -43,6 +43,7 @@ static void transition_to_reading_frame_body(amqp_connection_t *connection);
 
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name);
 
+
 void amqp_connection_frame_reader_initialize(amqp_connection_t *connection)
 {
     transition_to_initialized(connection);
@@ -77,12 +78,11 @@ static void transition_to_initialized(amqp_connection_t *connection)
     trace_transition("Created");
 }
 
-// TODO - required is not used
-static void read_while_enabled(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t unused, amqp_connection_action_f done_callback)
+static void read_while_enabled(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_frame_available_f frame_available_callback)
 {
     transition_to_reading_frame_header(connection);
     connection->io.frame.buffer = buffer;
-    connection->io.frame.done_callback = done_callback;
+    connection->io.frame.frame_available_callback = frame_available_callback;
     connection->state.reader.commence_read(connection, buffer, AMQP_FRAME_HEADER_SIZE, read_complete_callback);
 }
 static void transition_to_enabled(amqp_connection_t *connection)
@@ -115,12 +115,12 @@ static void read_done_while_reading_frame_header(amqp_connection_t *connection, 
     {
         // already got the minimum legal frame size
         transition_to_enabled(connection);
-        connection->io.frame.done_callback(connection);
+        connection->io.frame.frame_available_callback(connection, buffer);
         return;
     }
 
     transition_to_reading_frame_body(connection);
-    connection->state.reader.commence_read(connection, connection->io.frame.buffer, frame_size - AMQP_FRAME_HEADER_SIZE, read_complete_callback);
+    connection->state.reader.commence_read(connection, buffer, frame_size - AMQP_FRAME_HEADER_SIZE, read_complete_callback);
 }
 static void transition_to_reading_frame_header(amqp_connection_t *connection)
 {
@@ -139,7 +139,7 @@ static void read_done_while_reading_frame_body(amqp_connection_t *connection, am
     }
 
     transition_to_enabled(connection);
-    connection->io.frame.done_callback(connection);
+    connection->io.frame.frame_available_callback(connection, buffer);
 }
 static void transition_to_reading_frame_body(amqp_connection_t *connection)
 {
@@ -179,7 +179,7 @@ static void default_enable(amqp_connection_t *connection)
 {
     illegal_state(connection, "Enable");
 }
-static void default_read(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_action_f done_callback)
+static void default_read(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_frame_available_f frame_available_callback)
 {
     illegal_state(connection, "Read");
 }
