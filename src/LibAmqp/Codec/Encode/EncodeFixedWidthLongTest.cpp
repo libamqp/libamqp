@@ -27,7 +27,7 @@ SUITE(CodecEncode)
         type = amqp_encode_long(context, buffer, -129);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::long_8_minus_129);
+        CHECK_BUFFERS_MATCH(buffer, test_data::long_8_minus_129);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x08, type->position.size);
@@ -38,7 +38,7 @@ SUITE(CodecEncode)
         type = amqp_encode_long(context, buffer, -4);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::long_small);
+        CHECK_BUFFERS_MATCH(buffer, test_data::long_small);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
@@ -49,7 +49,7 @@ SUITE(CodecEncode)
         type = amqp_encode_long(context, buffer, 0);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::long_small_zero);
+        CHECK_BUFFERS_MATCH(buffer, test_data::long_small_zero);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
@@ -60,7 +60,7 @@ SUITE(CodecEncode)
         type = amqp_encode_small_long(context, buffer, -4);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::long_small);
+        CHECK_BUFFERS_MATCH(buffer, test_data::long_small);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
@@ -74,6 +74,6 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
 
-        ASSERT_BUFFERS_MATCH(buffer, test_data::long_small_zero);
+        CHECK_BUFFERS_MATCH(buffer, test_data::long_small_zero);
     }
 }

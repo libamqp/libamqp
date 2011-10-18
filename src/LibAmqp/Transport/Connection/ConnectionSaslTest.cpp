@@ -48,13 +48,19 @@ SUITE(ConnectionSasl)
 
     TEST_FIXTURE(ConnectionSaslFixture, enable_frame)
     {
-//            set_test_data(test_data::sasl_mechanisms_frame);
+        connection->state.sasl.connect(connection);
 
-        connection->state.frame.enable(connection);
-        CHECK_EQUAL("Enabled", connection->state.frame.name);
+        t::amqp_buffer_dump(context, write_copy);
+        CHECK_BUFFERS_MATCH(write_copy, test_data::sasl_protocol_1_0_0);
 
-        connection->state.frame.stop(connection);
-        CHECK_EQUAL("Stopped", connection->state.frame.name);
+
+//            set_test_data(test_data::sasl_protocol_1_0_0);
+
+//        connection->state.frame.enable(connection);
+//        CHECK_EQUAL("Enabled", connection->state.frame.name);
+//
+//        connection->state.frame.stop(connection);
+//        CHECK_EQUAL("Stopped", connection->state.frame.name);
     }
 
 //    TEST_FIXTURE(ConnectionFrameFixture, stop_while_stopped)

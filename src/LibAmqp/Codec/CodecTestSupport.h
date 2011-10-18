@@ -28,7 +28,6 @@
 #include "Codec/Type/Type.h"
 
 #include "Context/ContextTestSupport.h"
-#include "Codec/CodecTestSupport.h"
 #include "TestData/TestData.h"
 
 namespace SuiteCodec
@@ -68,7 +67,7 @@ namespace t
     CHECK_NOT_NULL(type); \
     CHECK(!amqp_type_is_valid(type))
 
-#define ASSERT_BUFFERS_MATCH(buffer, byte_array) \
+#define CHECK_BUFFERS_MATCH(buffer, byte_array) \
      CHECK(t::compare_buffers(byte_array.bytes(), byte_array.size(), buffer))
 
 #define CHECK_ARRAY(type) \

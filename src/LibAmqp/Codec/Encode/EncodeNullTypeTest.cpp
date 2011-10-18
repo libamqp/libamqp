@@ -26,7 +26,7 @@ SUITE(CodecEncode)
     {
         type = amqp_encode_null(context, buffer);
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::null_0);
+        CHECK_BUFFERS_MATCH(buffer, test_data::null_0);
 
         CHECK_EQUAL(0x40, type->format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);

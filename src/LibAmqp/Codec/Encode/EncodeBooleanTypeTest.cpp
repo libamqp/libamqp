@@ -28,7 +28,7 @@ SUITE(CodecEncode)
         type = amqp_encode_boolean(context, buffer, 1);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::true_0);
+        CHECK_BUFFERS_MATCH(buffer, test_data::true_0);
 
         CHECK_EQUAL(0x41, type->format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
@@ -44,7 +44,7 @@ SUITE(CodecEncode)
         type = amqp_encode_boolean(context, buffer, 0);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::false_0);
+        CHECK_BUFFERS_MATCH(buffer, test_data::false_0);
 
         CHECK_EQUAL(0x42, type->format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);

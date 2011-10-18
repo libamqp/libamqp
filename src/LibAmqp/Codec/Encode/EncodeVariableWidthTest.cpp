@@ -46,7 +46,7 @@ SUITE(VariableTypesEncoding)
         type = amqp_encode_string_utf8(context, buffer, "Hello World");
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::hello_world);
+        CHECK_BUFFERS_MATCH(buffer, test_data::hello_world);
 
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 0x0b, type->position.size);
@@ -57,7 +57,7 @@ SUITE(VariableTypesEncoding)
         type = amqp_encode_string_utf8(context, buffer, "Hello World");
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::hello_world);
+        CHECK_BUFFERS_MATCH(buffer, test_data::hello_world);
 
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 0x0b, type->position.size);
@@ -72,7 +72,7 @@ SUITE(VariableTypesEncoding)
         CHECK_NOT_NULL(type);
 
     //    amqp_buffer_dump(buffer, context->config.putc);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::encoded_lorem_ipsum);
+        CHECK_BUFFERS_MATCH(buffer, test_data::encoded_lorem_ipsum);
 
         CHECK_EQUAL((size_t) 0x05, type->position.index);
         CHECK_EQUAL((size_t) 257, type->position.size);
@@ -85,7 +85,7 @@ SUITE(VariableTypesEncoding)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 12, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::bin_8);
+        CHECK_BUFFERS_MATCH(buffer, test_data::bin_8);
     }
 
     TEST_FIXTURE(EncodeFixture, amqp_encode_binary_bin8)
@@ -95,7 +95,7 @@ SUITE(VariableTypesEncoding)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 12, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::bin_8);
+        CHECK_BUFFERS_MATCH(buffer, test_data::bin_8);
     }
 
     TEST_FIXTURE(EncodeFixture, amqp_encode_binary_bin32)
@@ -105,7 +105,7 @@ SUITE(VariableTypesEncoding)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x05, type->position.index);
         CHECK_EQUAL((size_t) 16, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::bin_32);
+        CHECK_BUFFERS_MATCH(buffer, test_data::bin_32);
     }
 
 
@@ -116,7 +116,7 @@ SUITE(VariableTypesEncoding)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 3, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
+        CHECK_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
     }
 
     TEST_FIXTURE(EncodeFixture, amqp_encode_symbol_sym8)
@@ -126,7 +126,7 @@ SUITE(VariableTypesEncoding)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 3, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
+        CHECK_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
     }
 
     TEST_FIXTURE(EncodeFixture, amqp_encode_symbol_sym32)
@@ -136,7 +136,7 @@ SUITE(VariableTypesEncoding)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x05, type->position.index);
         CHECK_EQUAL((size_t) 6, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::foo_bar_symbol_32);
+        CHECK_BUFFERS_MATCH(buffer, test_data::foo_bar_symbol_32);
     }
 
     TEST_FIXTURE(EncodeFixture, amqp_encode_symboln)
@@ -146,7 +146,7 @@ SUITE(VariableTypesEncoding)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 3, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
+        CHECK_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
     }
 
     TEST_FIXTURE(EncodeFixture, amqp_encode_symbol_sym8n)
@@ -156,7 +156,7 @@ SUITE(VariableTypesEncoding)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 3, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
+        CHECK_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
     }
 
     TEST_FIXTURE(EncodeFixture, amqp_encode_symbol_sym32n)
@@ -166,7 +166,7 @@ SUITE(VariableTypesEncoding)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x05, type->position.index);
         CHECK_EQUAL((size_t) 6, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::foo_bar_symbol_32);
+        CHECK_BUFFERS_MATCH(buffer, test_data::foo_bar_symbol_32);
     }
 
 }

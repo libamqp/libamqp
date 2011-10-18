@@ -27,7 +27,7 @@ SUITE(CodecEncode)
         type = amqp_encode_uint(context, buffer, 4294967294U);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_4);
+        CHECK_BUFFERS_MATCH(buffer, test_data::uint_4);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x04, type->position.size);
@@ -38,7 +38,7 @@ SUITE(CodecEncode)
         type = amqp_encode_uint(context, buffer, 0U);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_zero);
+        CHECK_BUFFERS_MATCH(buffer, test_data::uint_zero);
 
         CHECK_EQUAL(0x43, type->format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
@@ -50,7 +50,7 @@ SUITE(CodecEncode)
         type = amqp_encode_uint(context, buffer, 254U);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_small);
+        CHECK_BUFFERS_MATCH(buffer, test_data::uint_small);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
     }
@@ -60,7 +60,7 @@ SUITE(CodecEncode)
         type = amqp_encode_uint0(context, buffer);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_zero);
+        CHECK_BUFFERS_MATCH(buffer, test_data::uint_zero);
 
         CHECK_EQUAL(0x43, type->format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
@@ -74,7 +74,7 @@ SUITE(CodecEncode)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_small);
+        CHECK_BUFFERS_MATCH(buffer, test_data::uint_small);
     }
 
     TEST_FIXTURE(EncodeFixture, explicit_encode_small_uint_with_zero_value_should_encode_small_uint_not_uint_zero)
@@ -86,6 +86,6 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
 
-        ASSERT_BUFFERS_MATCH(buffer, test_data::uint_small_zero);
+        CHECK_BUFFERS_MATCH(buffer, test_data::uint_small_zero);
     }
 }

@@ -21,6 +21,9 @@
 #include "Transport/DummyBroker/EchoServer.h"
 #include "Transport/Connection/Connection.h"
 
+#include "Buffer/BufferTestSupport.h"
+#include "Codec/CodecTestSupport.h"
+
 #include "Transport/Connection/ConnectionTestSupport.h"
 
 namespace SuiteConnectionFrame
@@ -36,12 +39,12 @@ namespace SuiteConnectionFrame
         static void done_callback(amqp_connection_t *connection);
 
         static void set_test_data(test_data::TestData& data);
+        static amqp_buffer_t *write_copy;
     public:
         amqp_buffer_t *buffer;
 
     private:
         static test_data::TestData *test_data_p;
-        static amqp_buffer_t *write_copy;
     };
 }
 #endif

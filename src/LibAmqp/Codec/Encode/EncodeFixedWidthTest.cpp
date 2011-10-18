@@ -28,7 +28,7 @@ SUITE(CodecEncode)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x02, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::ushort_2);
+        CHECK_BUFFERS_MATCH(buffer, test_data::ushort_2);
     }
 
     TEST_FIXTURE(EncodeFixture, EncodeShort)
@@ -38,7 +38,7 @@ SUITE(CodecEncode)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x02, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::short_2);
+        CHECK_BUFFERS_MATCH(buffer, test_data::short_2);
     }
 
     TEST_FIXTURE(EncodeFixture, EncodeUByte)
@@ -48,7 +48,7 @@ SUITE(CodecEncode)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::ubyte_1);
+        CHECK_BUFFERS_MATCH(buffer, test_data::ubyte_1);
     }
 
     TEST_FIXTURE(EncodeFixture, EncodeByte)
@@ -58,7 +58,7 @@ SUITE(CodecEncode)
         CHECK_NOT_NULL(type);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::byte_1);
+        CHECK_BUFFERS_MATCH(buffer, test_data::byte_1);
     }
 
 
@@ -67,7 +67,7 @@ SUITE(CodecEncode)
         type = amqp_encode_timestamp(context, buffer, 1291654800000LL);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::timestamp_8);
+        CHECK_BUFFERS_MATCH(buffer, test_data::timestamp_8);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x08, type->position.size);
@@ -78,7 +78,7 @@ SUITE(CodecEncode)
         type = amqp_encode_timestamp(context, buffer, -1864105200000LL);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::timestamp_before_epoc_8);
+        CHECK_BUFFERS_MATCH(buffer, test_data::timestamp_before_epoc_8);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x08, type->position.size);
@@ -104,7 +104,7 @@ SUITE(CodecEncode)
         type = amqp_encode_double(context, buffer, 123.456);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::double_8);
+        CHECK_BUFFERS_MATCH(buffer, test_data::double_8);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x08, type->position.size);
@@ -121,7 +121,7 @@ SUITE(CodecEncode)
         type = amqp_encode_uuid(context, buffer, &uuid);
 
         CHECK_NOT_NULL(type);
-        ASSERT_BUFFERS_MATCH(buffer, test_data::uuid_16);
+        CHECK_BUFFERS_MATCH(buffer, test_data::uuid_16);
 
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x10, type->position.size);
