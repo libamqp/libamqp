@@ -61,9 +61,9 @@ int amqp_connection_frame_is_state(const amqp_connection_t *connection, const ch
     return connection->state.frame.name != 0 ? (strcmp(connection->state.frame.name, state_name) == 0) : false;
 }
 
-static void read_complete_callback(amqp_connection_t *connection, int amount)
+static void read_complete_callback(amqp_connection_t *connection, amqp_buffer_t *buffer, int amount)
 {
-    connection->state.frame.read_done(connection, amount);
+    connection->state.frame.read_done(connection, buffer, amount);
 }
 
 static void enable_while_initialized(amqp_connection_t *connection)
@@ -93,7 +93,7 @@ static void transition_to_enabled(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
-static void read_done_while_reading_frame_header(amqp_connection_t *connection, int amount)
+static void read_done_while_reading_frame_header(amqp_connection_t *connection, amqp_buffer_t *buffer, int amount)
 {
     if (amount != AMQP_FRAME_HEADER_SIZE)
     {
@@ -129,7 +129,7 @@ static void transition_to_reading_frame_header(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
-static void read_done_while_reading_frame_body(amqp_connection_t *connection, int amount)
+static void read_done_while_reading_frame_body(amqp_connection_t *connection, amqp_buffer_t *buffer, int amount)
 {
     if (amount != (connection->io.frame.frame_size - AMQP_FRAME_HEADER_SIZE))
     {
@@ -151,7 +151,7 @@ static void transition_to_reading_frame_body(amqp_connection_t *connection)
 static void stop_while_stopped(amqp_connection_t *connection)
 {
 }
-static void read_done_while_stopped(amqp_connection_t *connection, int amount)
+static void read_done_while_stopped(amqp_connection_t *connection, amqp_buffer_t *buffer, int amount)
 {
 }
 static void transition_to_stopped(amqp_connection_t *connection)
@@ -182,7 +182,7 @@ static void default_read(amqp_connection_t *connection, amqp_buffer_t *buffer, s
 {
     illegal_state(connection, "Read");
 }
-static void default_read_done(amqp_connection_t *connection, int amount)
+static void default_read_done(amqp_connection_t *connection, amqp_buffer_t *buffer, int amount)
 {
     illegal_state(connection, "ReadDone");
 }

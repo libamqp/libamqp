@@ -65,6 +65,10 @@ SUITE(ConnectionFrame)
 //        SOUTV(required);
         if (test_data_p)
         {
+            if (buffer == 0)
+            {
+                buffer = amqp_allocate_buffer(connection->context);
+            }
             size_t index = amqp_buffer_index(buffer);
             size_t size = amqp_buffer_size(buffer) + required;
             amqp_buffer_reset(buffer);
@@ -72,7 +76,7 @@ SUITE(ConnectionFrame)
             amqp_buffer_advance_read_index(buffer, index);
             amqp_buffer_set_write_point(buffer, size);
 
-            done_callback(connection, required);
+            done_callback(connection, buffer, required);
         }
     }
     

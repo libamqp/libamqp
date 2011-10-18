@@ -70,6 +70,21 @@ static void cleanup_write_watcher(amqp_connection_t *connection)
         connection->io.write.watcher = 0;
     }
 }
+static void call_done_callback(amqp_connection_t *connection)
+{
+    amqp_connection_action_f done_callback = connection->io.write.done_callback;
+    connection->io.write.done_callback = 0;
+
+    assert(done_callback);
+
+    if (connection->io.write.buffer)
+    {
+        amqp_deallocate_buffer(connection->context, connection->io.write.buffer);
+        connection->io.write.buffer = 0;
+    }
+
+    done_callback(connection);
+}
 
 static void write_what_is_available(amqp_connection_t *connection)
 {
@@ -152,11 +167,9 @@ static void writer_cleanup(amqp_connection_t *connection)
 }
 static void writer_stop(amqp_connection_t *connection, amqp_connection_action_f done_callback)
 {
+    connection->io.write.done_callback = done_callback;
     writer_cleanup(connection);
-    if (done_callback)
-    {
-        done_callback(connection);
-    }
+    call_done_callback(connection);
 }
 
 static void enable_while_initialized(amqp_connection_t *connection)
@@ -170,11 +183,9 @@ static void enable_while_initialized(amqp_connection_t *connection)
 }
 static void stop_while_initialized(amqp_connection_t *connection, amqp_connection_action_f done_callback)
 {
+    connection->io.write.done_callback = done_callback;
     transition_to_stopped(connection);
-    if (done_callback)
-    {
-        done_callback(connection);
-    }
+    call_done_callback(connection);
 }
 static void abort_while_initialized(amqp_connection_t *connection)
 {
@@ -225,16 +236,13 @@ static void next_write_while_writing(amqp_connection_t *connection)
 static void stop_while_writing(amqp_connection_t *connection, amqp_connection_action_f stop_callback)
 {
     // TODO -  start a timeout - try to complete write but not at any cost
-    transition_to_stopping(connection);
     connection->io.write.done_callback = stop_callback;
+    transition_to_stopping(connection);
 }
 static void write_complete_while_writing(amqp_connection_t *connection)
 {
     transition_to_enabled(connection);
-    if (connection->io.write.done_callback)
-    {
-        connection->io.write.done_callback(connection);
-    }
+    call_done_callback(connection);
 }
 static void transition_to_writing(amqp_connection_t *connection)
 {

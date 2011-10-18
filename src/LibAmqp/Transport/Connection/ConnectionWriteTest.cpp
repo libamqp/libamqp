@@ -32,6 +32,7 @@ SUITE(ConnectionWrite)
         ~ConnectionWriteFixture();
 
         int read_reply(size_t n);
+        static void write_callback(amqp_connection_t *connection);
 
     public:
         unsigned char *reply;
@@ -46,6 +47,10 @@ SUITE(ConnectionWrite)
     ConnectionWriteFixture::~ConnectionWriteFixture()
     {
         free(reply);
+    }
+
+    void ConnectionWriteFixture::write_callback(amqp_connection_t *connection)
+    {
     }
 
     int ConnectionWriteFixture::read_reply(size_t n)
@@ -75,7 +80,7 @@ SUITE(ConnectionWrite)
         connection->state.writer.enable(connection);
         CHECK_EQUAL("Enabled", connection->state.writer.name);
 
-        connection->state.writer.stop(connection, 0);
+        connection->state.writer.stop(connection, write_callback);
         CHECK_EQUAL("Stopped", connection->state.writer.name);
     }
 
@@ -84,10 +89,10 @@ SUITE(ConnectionWrite)
         amqp_connection_writer_initialize(connection);
         CHECK_EQUAL("Initialized", connection->state.writer.name);
 
-        connection->state.writer.stop(connection, 0);
+        connection->state.writer.stop(connection, write_callback);
         CHECK_EQUAL("Stopped", connection->state.writer.name);
 
-        connection->state.writer.stop(connection, 0);
+        connection->state.writer.stop(connection, write_callback);
         CHECK_EQUAL("Stopped", connection->state.writer.name);
     }
 
@@ -103,11 +108,11 @@ SUITE(ConnectionWrite)
 
         while (amqp_connection_writer_is_state(connection, "Writing") && run_loop_with_timeout());
 
-        connection->state.writer.commence_write(connection, write_buffer, 0);
+        connection->state.writer.commence_write(connection, write_buffer, write_callback);
         read_reply(5);
 
         CHECK_EQUAL('X', reply[4]);
-        connection->state.writer.stop(connection, 0);
+        connection->state.writer.stop(connection, write_callback);
         CHECK_EQUAL("Stopped", connection->state.writer.name);
     }
 
@@ -124,7 +129,7 @@ SUITE(ConnectionWrite)
         {
             amqp_buffer_putc(write_buffer, 19 + i % 67);
         }
-        connection->state.writer.commence_write(connection, write_buffer, 0);
+        connection->state.writer.commence_write(connection, write_buffer, write_callback);
         while (amqp_connection_writer_is_state(connection, "Writing") && run_loop_with_timeout())
         {
             printf("%s\n", connection->state.writer.name);
@@ -142,7 +147,7 @@ SUITE(ConnectionWrite)
             if (failures > 5) break;
         }
         CHECK(failures < 5);
-        connection->state.writer.stop(connection, 0);
+        connection->state.writer.stop(connection, write_callback);
         CHECK_EQUAL("Stopped", connection->state.writer.name);
     }
 }

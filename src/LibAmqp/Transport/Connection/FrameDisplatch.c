@@ -19,7 +19,7 @@
 
 #include "debug_helper.h"
 
-void amqp_dispatch_sasl_mechanisms(amqp_context_t *context, amqp_frame_t *frame, amqp_connection_t *connection)
+void amqp_dispatch_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *frame)
 {
     not_implemented(todo);
 }

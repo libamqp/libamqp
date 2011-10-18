@@ -41,7 +41,7 @@ static void transition_to_enabled(amqp_connection_t *connection);
 static void transition_to_reading(amqp_connection_t *connection);
 static void transition_to_stopped(amqp_connection_t *connection);
 static void transition_to_failed(amqp_connection_t *connection);
-static void cleanup_read_watcher(amqp_connection_t *connection);
+static void cleanup_reader(amqp_connection_t *connection);
 static void transition_to_eof(amqp_connection_t *connection);
 static void transition_to_eof_alerted(amqp_connection_t *connection);
 
@@ -51,7 +51,7 @@ void amqp_connection_reader_initialize(amqp_connection_t *connection)
 }
 void amqp_connection_reader_cleanup(amqp_connection_t *connection)
 {
-    cleanup_read_watcher(connection);
+    cleanup_reader(connection);
 }
 
 int amqp_connection_reader_is_state(const amqp_connection_t *connection, const char *state_name)
@@ -61,7 +61,7 @@ int amqp_connection_reader_is_state(const amqp_connection_t *connection, const c
     return amqp_connection_is(connection, AMQP_CONNECTION_SOCKET_CONNECTED) && strcmp(connection->state.reader.name, state_name) == 0;
 }
 
-static void cleanup_read_watcher(amqp_connection_t *connection)
+static void cleanup_reader(amqp_connection_t *connection)
 {
     if (connection->io.read.watcher)
     {
@@ -69,15 +69,20 @@ static void cleanup_read_watcher(amqp_connection_t *connection)
         amqp_io_event_watcher_destroy(connection->context, connection->io.read.watcher);
         connection->io.read.watcher = 0;
     }
+    if (connection->io.read.buffer)
+    {
+        amqp_deallocate_buffer(connection->context, connection->io.read.buffer);
+        connection->io.read.buffer = 0;
+    }
 }
 
-static void call_read_callback(amqp_connection_t *connection, amqp_connection_read_callback_f read_callback)
+static void call_read_callback(amqp_connection_t *connection)
 {
+    amqp_connection_read_callback_f read_callback = connection->io.read.read_callback;
+    amqp_buffer_t *buffer = connection->io.read.buffer;
     connection->io.read.read_callback = 0;
-    if (read_callback)
-    {
-        read_callback(connection, connection->io.read.satisfied);
-    }
+    connection->io.read.buffer = 0;
+    read_callback(connection, buffer, connection->io.read.satisfied);
 }
 static int is_partial_read(amqp_connection_t *connection)
 {
@@ -91,7 +96,7 @@ static void read_eof(amqp_connection_t *connection)
     if (is_partial_read(connection))
     {
         amqp_io_event_watcher_stop(connection->io.read.watcher);
-        cleanup_read_watcher(connection);
+        cleanup_reader(connection);
         transition_to_failed(connection);
         amqp_error(connection->context, AMQP_ERROR_PARTIAL_READ,
                 "Partial read while reading from %s:%d. Required %lu bytes but only received %lu before EOF.",
@@ -104,7 +109,7 @@ static void read_eof(amqp_connection_t *connection)
     }
 
     transition_to_eof(connection);
-    call_read_callback(connection, connection->io.read.read_callback);
+    call_read_callback(connection);
 }
 
 static void read_what_is_buffered(amqp_connection_t *connection)
@@ -155,7 +160,7 @@ static void read_what_is_buffered(amqp_connection_t *connection)
     }
 
     transition_to_enabled(connection);
-    call_read_callback(connection, connection->io.read.read_callback);
+    call_read_callback(connection);
 }
 
 static void continue_read_operation(amqp_connection_t *connection)
@@ -165,7 +170,7 @@ static void continue_read_operation(amqp_connection_t *connection)
 
 static void commence_read_operation(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f read_callback)
 {
-    connection->io.read.buffer = buffer;
+    connection->io.read.buffer = buffer ? buffer : amqp_allocate_buffer(connection->context);
     connection->io.read.n_required = required;
     connection->io.read.satisfied = 0;
     connection->io.read.read_callback = read_callback;
@@ -185,14 +190,14 @@ static void read_event_handler(amqp_event_loop_t* loop, ev_io *io, const int rev
 static void reader_stop(amqp_connection_t *connection)
 {
     amqp_io_event_watcher_stop(connection->io.read.watcher);
-    cleanup_read_watcher(connection);
+    cleanup_reader(connection);
 
     transition_to_stopped(connection);
 }
 static void reader_fail(amqp_connection_t *connection, int error_code)
 {
     amqp_io_event_watcher_stop(connection->io.read.watcher);
-    cleanup_read_watcher(connection);
+    cleanup_reader(connection);
     transition_to_failed(connection);
     amqp_io_error_code(connection->context, error_code, "Failure while reading from %s:%d", connection->socket.hostname, connection->socket.port_number);
 
@@ -224,6 +229,7 @@ static void transition_to_initialized(amqp_connection_t *connection)
 
 static void commence_read_while_enabled(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f read_callback)
 {
+    assert(read_callback);
     transition_to_reading(connection);
     commence_read_operation(connection, buffer, required, read_callback);
 }
@@ -245,11 +251,13 @@ static void transition_to_enabled(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
-static void commence_read_while_eof(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f done_callback)
+static void commence_read_while_eof(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f read_callback)
 {
+    assert(read_callback != 0);
     transition_to_eof_alerted(connection);
     connection->io.read.satisfied = 0;
-    call_read_callback(connection, connection->io.read.read_callback);
+    connection->io.read.read_callback = read_callback;
+    call_read_callback(connection);
 }
 static void transition_to_eof(amqp_connection_t *connection)
 {

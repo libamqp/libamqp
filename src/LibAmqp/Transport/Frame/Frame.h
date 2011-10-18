@@ -74,7 +74,7 @@ struct amqp_frame_t
         } amqp;
     } frames;
 
-    void (*dispatch)(amqp_context_t *context, amqp_frame_t *frame, amqp_connection_t *connection);
+    void (*dispatch)(amqp_connection_t *connection, amqp_frame_t *frame);
 };
 
 extern amqp_frame_t *amqp_decode_sasl_frame(amqp_context_t *context, amqp_buffer_t *buffer);

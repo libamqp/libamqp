@@ -43,8 +43,9 @@ amqp_type_t *amqp_sasl_mechanisms_encode(amqp_context_t *context, amqp_buffer_t 
         contains_long_name = contains_long_name || l > 254;
         count++;
     }
+    
     assert(count > 0);
-break_one();
+
     if (count == 1)
     {
         result = amqp_encode_symbol(context, buffer, supported_mechanisms[0].name);

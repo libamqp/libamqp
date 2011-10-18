@@ -67,7 +67,11 @@ SUITE(ConnectionNegotiation)
         amqp_negotiator_encode_version(connection->context, NegotiationFixture::broker_version, buffer);
         if (done_callback)
         {
-            done_callback(connection, amqp_buffer_size(buffer));
+            if (buffer == 0)
+            {
+                amqp_allocate_buffer(connection->context);
+            }
+            done_callback(connection, buffer, amqp_buffer_size(buffer));
         }
     }
 
