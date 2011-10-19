@@ -14,6 +14,8 @@ MODULES := \
 	LibAmqp/Codec \
 	LibAmqp/Thread \
 	LibAmqp/Transport \
+	LibAmqp/Plugin \
+	LibAmqp/Plugin/SaslPlain \
         DecodeDemo \
         SampleServer \
 	../3rd-party/UnitTest++/src  \

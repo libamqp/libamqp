@@ -18,6 +18,7 @@
 
 #include "string.h"
 
+#include "Transport/Frame/Frame.h"
 #include "Transport/Sasl/SaslMechanisms.h"
 #include "Codec/Encode/Encode.h"
 #include "debug_helper.h"
@@ -77,4 +78,11 @@ amqp_type_t *amqp_sasl_mechanisms_encode(amqp_context_t *context, amqp_buffer_t 
         amqp_complete_type(context, buffer, result);
     }
     return result;
+}
+
+void amqp_register_broker_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_sasl_mechanisms_t *mechanisms)
+{
+    // TODO -  save mechanisms. Search broker supported mechanisms against client plugins and use highest priority one to authenticate.
+    
+    not_implemented(amqp_register_broker_sasl_mechanisms);
 }

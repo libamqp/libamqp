@@ -64,11 +64,10 @@ amqp_create_context()
     amqp_type_initialize_pool(&result->context.memory.amqp_type_t_pool);
     amqp_frame_initialize_pool(&result->context.memory.amqp_frame_t_pool);
 
-//    result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
-//    result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
     result->context.limits.max_frame_size = AMQP_DEFAULT_MAX_FRAME_SIZE;
     result->context.thread_event_loop = 0;
 
+    result->context.reference.plugins.sasl_plugin_list = 0;
     // Danger Will Robinson - using context while initialzing it so do last.
     result->context.reference.amqp_descriptors = amqp_load_descriptors(&result->context);
 
@@ -92,9 +91,6 @@ amqp_context_t *amqp_context_clone(amqp_context_t *context)
     amqp_buffer_initialize_pool(&result->context.memory.amqp_buffer_t_pool);
     amqp_type_initialize_pool(&result->context.memory.amqp_type_t_pool);
     amqp_frame_initialize_pool(&result->context.memory.amqp_frame_t_pool);
-
-//    result->context.decode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
-//    result->context.encode.buffer = amqp_allocate_buffer((amqp_context_t *) result);
 
     result->context.limits = context->limits;
 
@@ -132,11 +128,9 @@ int amqp_context_destroy(amqp_context_t *context)
 
         if (!context->reference.cloned)
         {
+            amqp_context_free_sasl_plugins(context);
             amqp_descriptors_cleanup(context, context->reference.amqp_descriptors);
         }
-
-//        amqp_deallocate_buffer(context, context->encode.buffer);
-//        amqp_deallocate_buffer(context, context->decode.buffer);
 
         pools_ok = check_pool(context, &context->memory.amqp_buffer_t_pool) &&
                 check_pool(context, &context->memory.amqp_type_t_pool) &&

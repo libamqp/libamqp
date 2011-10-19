@@ -14,15 +14,18 @@
    limitations under the License.
  */
 
-#include "Context/Context.h"
-#include "Transport/Connection/FrameDispatch.h"
-#include "Transport/Connection/ConnectionState.h"
+#ifndef LIBAMQP_PLUGIN_SASLPLAIN_SASLPLAIN_H
+#define LIBAMQP_PLUGIN_SASLPLAIN_SASLPLAIN_H
 
-#include "debug_helper.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void amqp_dispatch_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *frame)
-{
-    amqp_message_dispatch_t dispatch = connection->state.sasl.messages.mechanisms;
-    assert(dispatch);
-    dispatch(connection, frame);
+#include <stdlib.h>
+#include "libamqp_common.h"
+#include "Plugin/Sasl.h"
+
+#ifdef __cplusplus
 }
+#endif
+#endif

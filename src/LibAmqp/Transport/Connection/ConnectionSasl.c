@@ -17,6 +17,7 @@
 #include "Context/Context.h"
 #include "Transport/Connection/Connection.h"
 #include "Transport/Connection/ConnectionTrace.h"
+#include "Transport/Frame/Frame.h"
 #include "debug_helper.h"
 
 #ifdef LIBAMQP_TRACE_CONNECT_STATE
@@ -45,7 +46,6 @@ static void cleanup_resources(amqp_connection_t *connection)
 }
 void amqp_connection_sasl_cleanup(amqp_connection_t *connection)
 {
-//    trace_cleanup();
     cleanup_resources(connection);
 }
 
@@ -54,7 +54,22 @@ int amqp_connection_sasl_is_state(const amqp_connection_t *connection, const cha
     return connection->state.sasl.name != 0 ? (strcmp(connection->state.sasl.name, state_name) == 0) : false;
 }
 
-static void sasl_done_callback(amqp_connection_t *connection)
+static
+void frame_available_from_server_callback(amqp_connection_t *connection, amqp_buffer_t *buffer)
+{
+    amqp_frame_t *frame = amqp_decode_sasl_frame(connection->context, buffer);
+
+    if (frame)
+    {
+        frame->dispatch(connection, frame);
+    }
+    else
+    {
+        amqp_connection_error(connection, AMQP_ERROR_FRAME_DECODE_FAILED, "Could not decode frame from broker");
+    }
+}
+
+static void sasl_broker_version_sent_callback(amqp_connection_t *connection)
 {
     connection->state.sasl.done(connection);
 }
@@ -65,7 +80,12 @@ static void sasl_version_accepted_callback(amqp_connection_t *connection)
     amqp_connection_trace(connection, "SASL version accepted");
     connection->specification_version.supported.sasl = connection->specification_version.required.sasl;
     transition_to_waiting_on_sasl_mechanisms(connection);
-    connection->state.connection.done(connection);
+
+    // TODO - no longer - connection->state.connection.done(connection);
+    
+    connection->state.frame.enable(connection);             // TODO - consider this redundant?
+    amqp_buffer_reset(connection->buffer.read);
+    connection->state.frame.read(connection, connection->buffer.read, frame_available_from_server_callback);
 }
 static void sasl_version_rejected_callback(amqp_connection_t *connection, uint32_t version)
 {
@@ -95,7 +115,7 @@ static void tunnel_accept_while_initialized(amqp_connection_t *connection, uint3
     }
 
     transition_to_sending_header_response(connection);
-    call_action(connection->state.negotiator.send, connection->context, connection, supported_version, sasl_done_callback);
+    call_action(connection->state.negotiator.send, connection->context, connection, supported_version, sasl_broker_version_sent_callback);
 }
 static void transition_to_initialized(amqp_connection_t *connection)
 {
@@ -104,11 +124,16 @@ static void transition_to_initialized(amqp_connection_t *connection)
     connection->state.sasl.tunnel.accept = tunnel_accept_while_initialized;
     trace_transition("Created");
 }
-
+static void sasl_mechanisms_while_waiting_on_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+//    amqp_register_broker_sasl_mechanisms(connection, &frame->frames.sasl.mechanisms);
+//    not_implemented(sasl_mechanisms_while_waiting_on_sasl_mechanisms);
+}
 static void transition_to_waiting_on_sasl_mechanisms(amqp_connection_t *connection)
 {
     save_old_state();
     default_state_initialization(connection, "WaitingOnSaslMechanisms");
+    connection->state.sasl.messages.mechanisms = sasl_mechanisms_while_waiting_on_sasl_mechanisms;
     trace_transition(old_state_name);
 }
 
@@ -121,6 +146,7 @@ static void transition_to_failed(amqp_connection_t *connection)
 
 static void done_while_sending_header_response(amqp_connection_t *connection)
 {
+    // server need to send sasl mechanisms frame
     transition_to_negotiated(connection);
     call_action(connection->state.connection.done, connection->context, connection);
 }
@@ -165,11 +191,16 @@ static void default_tunnel_establish(amqp_connection_t *connection, uint32_t ver
     illegal_state(connection, "TunnelEstablish");
 }
 
+static void default_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    illegal_state(connection, "SaslMechanisms");
+}
+
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
 {
     connection->state.sasl.connect = default_connect;
     connection->state.sasl.done = default_done;
-
     connection->state.sasl.tunnel.accept = default_tunnel_establish;
+    connection->state.sasl.messages.mechanisms = default_sasl_mechanisms;
     connection->state.sasl.name = new_state_name;
 }

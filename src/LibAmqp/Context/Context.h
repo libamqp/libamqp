@@ -61,6 +61,22 @@ typedef struct amqp_connection_t amqp_connection_t;
 typedef struct amqp_map_t amqp_map_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_SASL_PLUGIN_TYPE_T
+#define LIBAMQP_AMQP_SASL_PLUGIN_TYPE_T
+typedef struct amqp_sasl_plugin_t amqp_sasl_plugin_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_SASL_PLUGIN_NODE_TYPE_T
+#define LIBAMQP_AMQP_SASL_PLUGIN_NODE_TYPE_T
+typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_SYMBOL_T
+#define LIBAMQP_AMQP_SYMBOL_T
+    typedef struct amqp_symbol_t amqp_symbol_t;
+#endif
+
+
     typedef int amqp_debug_print_c_t(int c);
 
     typedef union amqp_outputter_arg_t
@@ -126,6 +142,10 @@ typedef struct amqp_map_t amqp_map_t;
         struct
         {
             int cloned;
+            struct
+            {
+                amqp_sasl_plugin_node_t *sasl_plugin_list;
+            } plugins;
             amqp_map_t *amqp_descriptors;
         } reference;
 
@@ -157,6 +177,10 @@ typedef struct amqp_map_t amqp_map_t;
     extern void amqp_output_to_buffer(amqp_context_t *context, char *buffer, size_t buffer_size);
 
     extern void amqp_context_set_name(amqp_context_t *context, const char *name);
+
+    extern void amqp_context_register_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin);
+    extern amqp_sasl_plugin_t *amqp_context_lookup_sasl_plugin(amqp_context_t *context, amqp_symbol_t *mechanism);
+    extern void amqp_context_free_sasl_plugins(amqp_context_t *context);
 
 #ifdef __cplusplus
 }

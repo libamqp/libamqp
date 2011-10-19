@@ -82,6 +82,8 @@ static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amq
     if (amqp_type_is_convert_failed(type))
     {
         amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Descriptor is not a symbol or ulong.");
+        amqp_context_printf(context, "Invalid frame: ....\n ");
+//        amqp_buffer_dump(context, buffer);
         // TODO - dump dodgy descriptor
         return false;
     }

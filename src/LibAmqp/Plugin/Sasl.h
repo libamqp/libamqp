@@ -14,37 +14,32 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_SASL_SASL_MECHANISMS_H
-#define LIBAMQP_TRANSPORT_SASL_SASL_MECHANISMS_H
+#ifndef LIBAMQP_PLUGIN_SASL_H
+#define LIBAMQP_PLUGIN_SASL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <ev.h>
+#include <stdlib.h>
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
-typedef struct amqp_context_t amqp_context_t;
+    typedef struct amqp_context_t amqp_context_t;
 #endif
 
-#ifndef LIBAMQP_BUFFER_T_TYPE
-#define LIBAMQP_BUFFER_T_TYPE
-typedef struct amqp_buffer_t amqp_buffer_t;
+#ifndef LIBAMQP_AMQP_SASL_PLUGIN_TYPE_T
+#define LIBAMQP_AMQP_SASL_PLUGIN_TYPE_T
+typedef struct amqp_sasl_plugin_t amqp_sasl_plugin_t;
 #endif
 
-#ifndef LIBAMQP_AMQP_TYPE_T
-#define LIBAMQP_AMQP_TYPE_T
-typedef struct amqp_type_t amqp_type_t;
-#endif
+typedef void (*amqp_sasl_plugin_cleanup_fn_t)(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin);
 
-typedef struct amqp_sasl_mechanism_t
+struct amqp_sasl_plugin_t
 {
-    const char *name;
-} amqp_sasl_mechanism_t;
-
-extern amqp_type_t *amqp_sasl_mechanisms_encode(amqp_context_t *context, amqp_buffer_t *buffer);
-//extern void amqp_register_broker_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_sasl_mechanisms_t *mechanisms);
+    const char *mechanism_name;   
+    amqp_sasl_plugin_cleanup_fn_t plugin_cleanup_callback;
+};
 
 #ifdef __cplusplus
 }

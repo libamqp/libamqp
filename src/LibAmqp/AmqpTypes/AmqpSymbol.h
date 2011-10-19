@@ -20,6 +20,8 @@
 extern "C" {
 #endif
 
+#include <string.h>
+
 #include "AmqpTypes/AmqpLeader.h"
 #include "AmqpTypes/AmqpMap.h"
 
@@ -35,6 +37,14 @@ struct amqp_symbol_t
 
 extern void amqp_symbol_initialize(amqp_context_t *context, amqp_symbol_t *symbol, const char *data, size_t size);
 extern amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, const char *data, size_t size);
+static inline void amqp_symbol_initialize_from_cstr(amqp_context_t *context, amqp_symbol_t *symbol, const char *s)
+{
+    amqp_symbol_initialize(context, symbol, s, strlen(s));
+}
+static inline amqp_symbol_t *amqp_symbol_create_from_cstr(amqp_context_t *context, const char *s)
+{
+    return amqp_symbol_create(context, s, strlen(s));
+}
 extern void amqp_symbol_initialize_from_type(amqp_context_t *context, amqp_symbol_t *symbol, amqp_type_t *type);
 extern amqp_symbol_t *amqp_symbol_create_from_type(amqp_context_t *context, amqp_type_t *type);
 

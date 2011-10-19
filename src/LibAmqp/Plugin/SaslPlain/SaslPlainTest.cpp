@@ -14,15 +14,27 @@
    limitations under the License.
  */
 
-#include "Context/Context.h"
-#include "Transport/Connection/FrameDispatch.h"
-#include "Transport/Connection/ConnectionState.h"
+#include <TestHarness.h>
+#include "Plugin/SaslPlain/SaslPlain.h"
 
-#include "debug_helper.h"
-
-void amqp_dispatch_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *frame)
+SUITE(PluginSaslPlain)
 {
-    amqp_message_dispatch_t dispatch = connection->state.sasl.messages.mechanisms;
-    assert(dispatch);
-    dispatch(connection, frame);
+    class PluginSaslPlainFixture
+    {
+    public:
+        PluginSaslPlainFixture();
+        ~PluginSaslPlainFixture();
+    private:
+    };
+
+    PluginSaslPlainFixture::PluginSaslPlainFixture()
+    {
+    }
+    PluginSaslPlainFixture::~PluginSaslPlainFixture()
+    {
+    }
+
+    TEST_FIXTURE(PluginSaslPlainFixture, really_important_test)
+    {
+    }
 }
