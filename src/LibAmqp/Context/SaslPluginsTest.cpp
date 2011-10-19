@@ -27,16 +27,20 @@ SUITE(Context)
     class SaslPluginsFixture : public ContextFixture
     {
     public:
-        SaslPluginsFixture() : s1(0), s2(0), s3(0)
+        SaslPluginsFixture()
         {
             cleanup_count = 0;
+            symbol_anonymous = amqp_symbol_create_from_cstr(context, "ANONYMOUS");
+            symbol_plain = amqp_symbol_create_from_cstr(context, "PLAIN");
+            symbol_pretty = amqp_symbol_create_from_cstr(context, "PRETTY");
         }
         ~SaslPluginsFixture()
         {
-            amqp_symbol_cleanup(context, s1);
-            amqp_symbol_cleanup(context, s2);
-            amqp_symbol_cleanup(context, s3);
+            amqp_symbol_cleanup(context, symbol_anonymous);
+            amqp_symbol_cleanup(context, symbol_plain);
+            amqp_symbol_cleanup(context, symbol_pretty);
         }
+
         amqp_sasl_plugin_t *create_and_register_plugin(const char *name)
         {
             amqp_sasl_plugin_t *p = AMQP_MALLOC(context, amqp_sasl_plugin_t);
@@ -50,38 +54,30 @@ SUITE(Context)
         static void plugin_cleanup(amqp_context_t *context, amqp_sasl_plugin_t *plugin);
 
     public:
-        amqp_symbol_t *s1;
-        amqp_symbol_t *s2;
-        amqp_symbol_t *s3;
+        amqp_symbol_t *symbol_anonymous;
+        amqp_symbol_t *symbol_plain;
+        amqp_symbol_t *symbol_pretty;
     };
 
     int SaslPluginsFixture::cleanup_count = 0;
-
 
     void SaslPluginsFixture::plugin_cleanup(amqp_context_t *context, amqp_sasl_plugin_t *plugin)
     {
         AMQP_FREE(context, plugin);
         cleanup_count++;
-        SOUTV(cleanup_count);
     }
 
     TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_lookup_and_cleanup)
     {
         amqp_sasl_plugin_t *p1 = create_and_register_plugin("ANONYMOUS");
-        s1 = amqp_symbol_create_from_cstr(context, "ANONYMOUS");
-
         amqp_sasl_plugin_t *p2 = create_and_register_plugin("PLAIN");
-        s2 = amqp_symbol_create_from_cstr(context, "PLAIN");
 
-        s3 = amqp_symbol_create_from_cstr(context, "BRETTY");
-
-        CHECK_EQUAL((void *) 0, amqp_context_lookup_sasl_plugin(context, s3));
-        CHECK_EQUAL(p2, amqp_context_lookup_sasl_plugin(context, s2));
-        CHECK_EQUAL(p1, amqp_context_lookup_sasl_plugin(context, s1));
+        CHECK_EQUAL((void *) 0, amqp_context_lookup_sasl_plugin(context, symbol_pretty));
+        CHECK_EQUAL(p2, amqp_context_lookup_sasl_plugin(context, symbol_plain));
+        CHECK_EQUAL(p1, amqp_context_lookup_sasl_plugin(context, symbol_anonymous));
 
         amqp_context_free_sasl_plugins(context);
         CHECK_EQUAL(2, cleanup_count);
     }
-
 }
 

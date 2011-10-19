@@ -44,7 +44,6 @@ typedef struct amqp_sasl_mechanism_t
 } amqp_sasl_mechanism_t;
 
 extern amqp_type_t *amqp_sasl_mechanisms_encode(amqp_context_t *context, amqp_buffer_t *buffer);
-//extern void amqp_register_broker_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_sasl_mechanisms_t *mechanisms);
 
 #ifdef __cplusplus
 }
