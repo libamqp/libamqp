@@ -14,20 +14,12 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_PLUGIN_SASLPLAIN_SASLPLAIN_H
-#define LIBAMQP_PLUGIN_SASLPLAIN_SASLPLAIN_H
+#include "Plugin/Plugin.h"
+#include "Context/Context.h"
+#include "Plugin/SaslPlain/SaslPlain.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <stdlib.h>
-#include "libamqp_common.h"
-#include "Plugin/Sasl.h"
-
-extern amqp_sasl_plugin_t *amqp_plugin_sasl_plain_create(amqp_context_t *context);
-
-#ifdef __cplusplus
+void amqp_register_default_plugins(amqp_context_t *context)
+{
+    amqp_context_register_sasl_plugin(context, amqp_plugin_sasl_plain_create(context));
 }
-#endif
-#endif
+

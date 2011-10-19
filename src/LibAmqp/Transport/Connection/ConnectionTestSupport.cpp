@@ -17,6 +17,7 @@
 #include <TestHarness.h>
 
 #include "Transport/Connection/ConnectionTestSupport.h"
+#include "Plugin/Plugin.h"
 
 #include "debug_helper.h"
 
@@ -27,6 +28,8 @@ namespace SuiteConnection
     BaseConnectionFixture::BaseConnectionFixture() : connection(0)
     {
         amqp_context_set_name(context, "client");
+        amqp_register_default_plugins(context);
+        
         loop = ev_default_loop(0);
         context->thread_event_loop = loop;
         timer = amqp_timer_initialize(context, BaseConnectionFixture::expiry_handler, 0);

@@ -14,6 +14,21 @@
    limitations under the License.
  */
 
+#include "Context/Context.h"
 #include "Plugin/SaslPlain/SaslPlain.h"
+#include "debug_helper.h"
 
-int yyy;
+static void cleanup_plugin(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)
+{
+    AMQP_FREE(context, sasl_plugin);
+}
+
+amqp_sasl_plugin_t *amqp_plugin_sasl_plain_create(amqp_context_t *context)
+{
+    amqp_sasl_plugin_t *result = AMQP_MALLOC(context, amqp_sasl_plugin_t);
+    result->mechanism_name = "PLAIN";
+    result->plugin_cleanup_callback = cleanup_plugin;
+
+
+    return result;
+}
