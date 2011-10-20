@@ -114,6 +114,7 @@ static void amqp_type_print_formatted_leader(amqp_context_t *context, amqp_type_
 
 void amqp_type_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
+    int old_auto_indent = amqp_context_set_auto_indent(context, 4);
     amqp_type_print_formatted_leader(context, type, buffer);
 
     amqp_nested_type_print(context, type, buffer);
@@ -122,6 +123,7 @@ void amqp_type_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *
     {
         amqp_context_putc(context, ';');
     }
+    amqp_context_set_auto_indent(context, old_auto_indent);
 }
 
 void amqp_type_print_formatted(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
@@ -331,18 +333,18 @@ void amqp_type_method_list_print(amqp_context_t *context, amqp_type_t *type, amq
     size_t i;
     size_t count = type->value.list.count;
 
-    amqp_type_print_formatted_leader(context, type, buffer);
-
     amqp_context_putc(context, '{');
+    amqp_context_putc(context, '\n');
     for (i = 0; i < count; i++)
     {
         if (i > 0)
         {
-            amqp_context_putc(context, ';');
-            amqp_context_putc(context, ' ');
+            amqp_context_putc(context, ',');
+            amqp_context_putc(context, '\n');
         }
         amqp_nested_type_print(context, type->value.list.elements[i], buffer);
     }
+    amqp_context_putc(context, '\n');
     amqp_context_putc(context, '}');
 }
 
@@ -351,25 +353,21 @@ void amqp_type_method_map_print(amqp_context_t *context, amqp_type_t *type, amqp
     size_t i;
     size_t count = type->value.list.count;
 
-    amqp_type_print_formatted_leader(context, type, buffer);
-
     amqp_context_putc(context, '{');
+    amqp_context_putc(context, '\n');
     for (i = 0; i < count; i += 2)
     {
         if (i > 0)
         {
-            str_print(context, ", ");
+            str_print(context, ",");
+            amqp_context_putc(context, '\n');
         }
-
-        amqp_context_putc(context, '{');
-
         amqp_nested_type_print(context, type->value.map.entries[i], buffer);
-        amqp_context_putc(context, ':');
-        amqp_context_putc(context, ':');
+        amqp_context_putc(context, '-');
+        amqp_context_putc(context, '>');
         amqp_nested_type_print(context, type->value.map.entries[i + 1], buffer);
-
-        amqp_context_putc(context, '}');
     }
+    amqp_context_putc(context, '\n');
     amqp_context_putc(context, '}');
 }
 
@@ -377,16 +375,17 @@ void amqp_type_method_array_print(amqp_context_t *context, amqp_type_t *type, am
 {
     size_t i;
 
-    if (type->value.compound.elements)
-    {
-        amqp_type_print_formatted_leader(context, type->value.array.elements[0], buffer);
-    }
-    else
-    {
-        str_print(context, "EMPTY ARRAY!");
-    }
+//    if (type->value.compound.elements)
+//    {
+//        amqp_type_print_formatted_leader(context, type->value.array.elements[0], buffer);
+//    }
+//    else
+//    {
+//        str_print(context, "EMPTY ARRAY!");
+//    }
 
     amqp_context_putc(context, '[');
+//    amqp_context_putc(context, '\n');
     for (i = 0; i < type->value.array.count; i++)
     {
         if (i > 0)
@@ -396,6 +395,7 @@ void amqp_type_method_array_print(amqp_context_t *context, amqp_type_t *type, am
         }
         amqp_nested_type_print(context, type->value.array.elements[i], buffer);
     }
+//    amqp_context_putc(context, '\n');
     amqp_context_putc(context, ']');
 }
 

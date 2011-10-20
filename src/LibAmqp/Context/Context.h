@@ -113,8 +113,8 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
             struct
             {
                 int indent;
-                int anto_indent;
-                int last_char[2];
+                int auto_indent;
+                int last_char;
             } indent;
         } debug;
 
