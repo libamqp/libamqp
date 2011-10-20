@@ -18,6 +18,8 @@
 
 #include "string.h"
 
+#include "Context/Context.h"
+#include "Transport/Connection/Connection.h"
 #include "Transport/Frame/Frame.h"
 #include "Transport/Sasl/SaslMechanisms.h"
 #include "Codec/Encode/Encode.h"
@@ -80,3 +82,16 @@ amqp_type_t *amqp_sasl_mechanisms_encode(amqp_context_t *context, amqp_buffer_t 
     return result;
 }
 
+amqp_sasl_plugin_t *amqp_sasl_select_mechanism(amqp_connection_t *connection, amqp_multiple_symbol_t *multiple)
+{
+    int i;
+    for (i = 0; i < amqp_multiple_symbol_size(multiple); i++)
+    {
+        amqp_sasl_plugin_t *result = amqp_context_lookup_sasl_plugin(connection->context, amqp_multiple_symbol_get(multiple, i));
+        if (result)
+        {
+            return result;
+        }
+    }
+    return 0;
+}

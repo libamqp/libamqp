@@ -38,12 +38,18 @@ typedef struct amqp_buffer_t amqp_buffer_t;
 typedef struct amqp_type_t amqp_type_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_MULTIPLE_SYMBOL_T
+#define LIBAMQP_AMQP_MULTIPLE_SYMBOL_T
+    typedef struct amqp_multiple_symbol_t amqp_multiple_symbol_t;
+#endif
+
 typedef struct amqp_sasl_mechanism_t
 {
     const char *name;
 } amqp_sasl_mechanism_t;
 
 extern amqp_type_t *amqp_sasl_mechanisms_encode(amqp_context_t *context, amqp_buffer_t *buffer);
+extern amqp_sasl_plugin_t *amqp_sasl_select_mechanism(amqp_connection_t *connection, amqp_multiple_symbol_t *multiple);
 
 #ifdef __cplusplus
 }

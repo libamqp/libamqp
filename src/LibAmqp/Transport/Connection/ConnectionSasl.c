@@ -18,6 +18,7 @@
 #include "Transport/Connection/Connection.h"
 #include "Transport/Connection/ConnectionTrace.h"
 #include "Transport/Frame/Frame.h"
+#include "Transport/Sasl/SaslMechanisms.h"
 #include "debug_helper.h"
 
 #ifdef LIBAMQP_TRACE_CONNECT_STATE
@@ -126,15 +127,14 @@ static void transition_to_initialized(amqp_connection_t *connection)
 }
 static void sasl_mechanisms_while_waiting_on_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_sasl_plugin_t *plugin = 0;
-//    amqp_sasl_plugin_t *plugin = amqp_sasl_select_mechanism(connection, &frame->frames.sasl.mechanisms);
+    amqp_multiple_symbol_t *multiple = &frame->frames.sasl.mechanisms.sasl_server_mechanisms;
+    amqp_sasl_plugin_t *plugin = amqp_sasl_select_mechanism(connection, multiple);
     if (plugin)
     {
         not_implemented(todo);
     }
     else
     {
-        amqp_multiple_symbol_t *multiple = &frame->frames.sasl.mechanisms.sasl_server_mechanisms;
         int space = amqp_multiple_symbol_total_length(multiple) + (amqp_multiple_symbol_size(multiple) - 1) * 2 + 1;
         char *buffer = amqp_allocate_print_buffer(connection->context, space);
         amqp_multiple_symbol_to_char_bytes(multiple, ", ", buffer, space);
