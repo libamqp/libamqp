@@ -60,11 +60,20 @@ static int amqp_type_print_ascii(amqp_context_t *context, amqp_type_t *type, amq
     return 1;
 }
 
-static int amqp_type_print_raw_data(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
+static int amqp_type_raw_dump(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    size_t i;
-    for (i = 0; i < type->position.size; i++)
+    size_t i, j;
+    for (i = 0, j = 0; i < type->position.size; i++, j++)
     {
+        if (j == 32)
+        {
+            amqp_context_putc(context, '\n');
+            j = 0;
+        }
+        else if (j > 0)
+        {
+            amqp_context_putc(context, ' ');
+        }
         int c = amqp_unchecked_getc_at(buffer, type->position.index + i);
         amqp_context_putc(context, to_hex(c >> 4));
         amqp_context_putc(context, to_hex(c & 0x0f));
@@ -73,10 +82,66 @@ static int amqp_type_print_raw_data(amqp_context_t *context, amqp_type_t *type, 
     return 1;
 }
 
+static int amqp_type_print_raw_data_line(amqp_context_t *context, size_t index, amqp_type_t *type, amqp_buffer_t *buffer)
+{
+    size_t j = 0;
+    size_t i = index;
+
+    while (i < type->position.size && j < 32)
+    {
+        int c = amqp_unchecked_getc_at(buffer, type->position.index + i);
+        amqp_context_putc(context, to_hex(c >> 4));
+        amqp_context_putc(context, to_hex(c & 0x0f));
+        amqp_context_putc(context, ' ');
+        i++;
+        j++;
+    }
+    while (j < 32)
+    {
+        amqp_context_putc(context, ' ');
+        amqp_context_putc(context, ' ');
+        amqp_context_putc(context, ' ');
+        j++;
+    }
+    amqp_context_putc(context, ' ');
+    j = 0;
+    while (index < type->position.size && j < 32)
+    {
+        int c = amqp_unchecked_getc_at(buffer, type->position.index + index);
+        amqp_context_putc(context, isprint(c) ? c : '.');
+        index++;
+        j++;
+    }
+
+    return 1;
+}
+
+static int amqp_type_print_raw_data(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
+{
+    size_t i = 0;
+
+    if (type->position.size == 0)
+    {
+        return 1;
+    }
+
+    amqp_type_print_raw_data_line(context, i, type, buffer);
+    i += 32;
+
+    while (i < type->position.size)
+    {
+        amqp_context_putc(context, '\n');
+        amqp_type_print_raw_data_line(context, i, type, buffer);
+        i += 32;
+    }
+
+    return 1;
+}
+
 static inline void print_invalid_type(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
     str_print(context, "invalid: ");
-    amqp_type_print_raw_data(context, type, buffer);
+    amqp_type_raw_dump(context, type, buffer);
 }
 
 // TODO - change return type

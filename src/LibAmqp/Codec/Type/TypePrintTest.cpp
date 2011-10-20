@@ -183,7 +183,7 @@ SUITE(TypePrint)
 
         ASSERT_INVALID(type);
         print_type();
-        check_output("invalid: 42e172");
+        check_output("invalid: 42 e1 72");
     }
 
     TEST_FIXTURE(TypePrintFixture, PrintInvalidSymbolFormatted)
@@ -193,7 +193,7 @@ SUITE(TypePrint)
 
         ASSERT_INVALID(type);
         print_type_formatted();
-        check_output("symbol-sym8: invalid: 42e172;\n");
+        check_output("symbol-sym8: invalid: 42 e1 72;\n");
     }
 
     TEST_FIXTURE(TypePrintFixture, PrintUdid)
