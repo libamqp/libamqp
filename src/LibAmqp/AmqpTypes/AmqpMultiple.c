@@ -109,3 +109,44 @@ amqp_multiple_symbol_t *amqp_multiple_symbol_create(amqp_context_t *context, amq
     return result;
 }
 
+int amqp_multiple_symbol_total_length(amqp_multiple_symbol_t *multiple)
+{
+    int result = 0;
+    int i;
+    for (i = 0; i < multiple->size; i++)
+    {
+        amqp_symbol_t *symbol = amqp_multiple_symbol_get(multiple, i);
+        result += symbol->size;
+    }
+    return result;
+}
+
+int amqp_multiple_symbol_to_char_bytes(amqp_multiple_symbol_t *multiple, const char *spacer, char *buffer, size_t buffer_size)
+{
+    int result = 0;
+    int available = buffer_size - 1;
+    int i, n;
+    char *p = buffer;
+
+    if (buffer == 0 || buffer_size == 0)
+    {
+        return 0;
+    }
+
+    for (i = 0; i < multiple->size; i++)
+    {
+        if (i > 0)
+        {
+            n = snprintf(p, available, "%s", spacer);
+            result += n;
+            p += n;
+            available -= n;
+        }
+        n = amqp_symbol_to_char_bytes(amqp_multiple_symbol_get(multiple, i), p, available);
+        result += n;
+        p += n;
+        available -= n;
+    }
+    buffer[result] = '\0';
+    return result;
+}

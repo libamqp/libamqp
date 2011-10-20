@@ -59,7 +59,6 @@ SUITE(ConnectionSasl)
 
     TEST_FIXTURE(ConnectionSaslFixture, sasl_version_accepted)
     {
-    /*
         static test_data::TestData *test_frames[] =
         {
             &test_data::sasl_protocol_1_0_0,
@@ -75,7 +74,6 @@ SUITE(ConnectionSasl)
         CHECK_EQUAL("Failed", connection->state.sasl.name);
 
         CHECK_BUFFERS_MATCH(write_copy, test_data::sasl_protocol_1_0_0);
-    */
     }
 
 //    TEST_FIXTURE(ConnectionFrameFixture, stop_while_stopped)

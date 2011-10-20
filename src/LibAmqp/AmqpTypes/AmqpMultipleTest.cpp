@@ -65,6 +65,42 @@ SUITE(AmqpTypes)
         CHECK(amqp_symbol_compare_with_cstr(symbol, "PLAIN") == 0);
     }
 
+    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_total_length)
+    {
+        test_data::multiple_symbol_many_values.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
+        CHECK(amqp_type_is_array(type));
+        multiple = amqp_multiple_symbol_create(context, type);
+        CHECK_EQUAL(3, multiple->size);
+        CHECK_EQUAL(11, amqp_multiple_symbol_total_length(multiple));
+    }
+
+    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_to_string)
+    {
+        test_data::multiple_symbol_many_values.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
+        CHECK(amqp_type_is_array(type));
+        multiple = amqp_multiple_symbol_create(context, type);
+        CHECK_EQUAL(3, multiple->size);
+
+        char buffer[512];
+        amqp_multiple_symbol_to_char_bytes(multiple, ", ", buffer, sizeof(buffer));
+        CHECK_EQUAL("PLAIN, Foo, Fum", buffer);
+    }
+
+    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_to_string_with_small_buffer)
+    {
+        test_data::multiple_symbol_many_values.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
+        CHECK(amqp_type_is_array(type));
+        multiple = amqp_multiple_symbol_create(context, type);
+        CHECK_EQUAL(3, multiple->size);
+
+        char buffer[5];
+        amqp_multiple_symbol_to_char_bytes(multiple, ", ", buffer, sizeof(buffer));
+        CHECK_EQUAL("PLAI", buffer);
+    }
+
     TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_null)
     {
         test_data::multiple_symbol_null.transfer_to(buffer);

@@ -29,7 +29,7 @@ struct amqp_multiple_symbol_t
 {
     amqp_leader_t leader;
     amqp_type_t *type;
-    int size;
+    int size;       // TODO - rename to count?
     amqp_symbol_t *symbols;
 };
 
@@ -56,7 +56,8 @@ amqp_symbol_t *amqp_multiple_symbol_get(amqp_multiple_symbol_t *multiple, int el
 extern int amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, amqp_type_t *type);
 extern amqp_multiple_symbol_t *amqp_multiple_symbol_create(amqp_context_t *context, amqp_type_t *type);
 extern void amqp_multiple_symbol_cleanup(amqp_context_t *context, amqp_multiple_symbol_t *multiple);
-
+extern int amqp_multiple_symbol_to_char_bytes(amqp_multiple_symbol_t *multiple, const char *spacer, char *buffer, size_t buffer_size);
+extern int amqp_multiple_symbol_total_length(amqp_multiple_symbol_t *multiple);
 #ifdef __cplusplus
 }
 #endif

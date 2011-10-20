@@ -65,7 +65,7 @@ void frame_available_from_server_callback(amqp_connection_t *connection, amqp_bu
     }
     else
     {
-        amqp_connection_error(connection, AMQP_ERROR_FRAME_DECODE_FAILED, "Could not decode frame from broker");
+        amqp_connection_failed(connection, AMQP_ERROR_FRAME_DECODE_FAILED, AMQP_CONNECTION_SASL_FRAME_DECODE_ERROR, "Could not decode frame from broker");
     }
 }
 
@@ -126,8 +126,21 @@ static void transition_to_initialized(amqp_connection_t *connection)
 }
 static void sasl_mechanisms_while_waiting_on_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-//    amqp_register_broker_sasl_mechanisms(connection, &frame->frames.sasl.mechanisms);
-//    not_implemented(sasl_mechanisms_while_waiting_on_sasl_mechanisms);
+    amqp_sasl_plugin_t *plugin = 0;
+//    amqp_sasl_plugin_t *plugin = amqp_sasl_select_mechanism(connection, &frame->frames.sasl.mechanisms);
+    if (plugin)
+    {
+        not_implemented(todo);
+    }
+    else
+    {
+        amqp_multiple_symbol_t *multiple = &frame->frames.sasl.mechanisms.sasl_server_mechanisms;
+        int space = amqp_multiple_symbol_total_length(multiple) + (amqp_multiple_symbol_size(multiple) - 1) * 2 + 1;
+        char *buffer = amqp_allocate_print_buffer(connection->context, space);
+        amqp_multiple_symbol_to_char_bytes(multiple, ", ", buffer, space);
+        amqp_connection_failed(connection, AMQP_ERROR_NO_SASL_MECHANISM, AMQP_CONNECTION_SASL_ERROR, "No SASL plugin matches broker mechanism list. Broker supports: %s", buffer);
+        amqp_deallocate_print_buffer(connection->context, buffer);
+    }
 }
 static void transition_to_waiting_on_sasl_mechanisms(amqp_connection_t *connection)
 {

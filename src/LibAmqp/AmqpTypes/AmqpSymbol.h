@@ -73,6 +73,8 @@ const void *amqp_symbol_map_get(amqp_map_t *map, const amqp_symbol_t *key)
     return amqp_map_get(map, key);
 }
 
+extern int amqp_symbol_to_char_bytes(amqp_symbol_t *symbol, char *buffer, size_t buffer_size);
+
 #ifdef __cplusplus
 }
 #endif
