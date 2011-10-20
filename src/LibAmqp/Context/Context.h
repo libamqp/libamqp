@@ -110,8 +110,12 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
             amqp_outputter_arg_t arg;
             amqp_outputter_t outputter;
             int level;
-            int indent;
-            int last_char;
+            struct
+            {
+                int indent;
+                int anto_indent;
+                int last_char[2];
+            } indent;
         } debug;
 
         struct
@@ -170,6 +174,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     extern int amqp_context_putc(amqp_context_t *context, int c);
     extern int amqp_context_increase_print_indent(amqp_context_t *context, int delta);
     extern int amqp_context_set_print_indent(amqp_context_t *context, int indent);
+    extern int amqp_context_set_auto_indent(amqp_context_t *context, int amount);
 
     extern void amqp_buffer_outputter(amqp_outputter_arg_t *dest, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format, va_list args);
     extern void amqp_stream_outputter(amqp_outputter_arg_t *dest, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format, va_list args);

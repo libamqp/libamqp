@@ -55,25 +55,43 @@ static void putc_repeat(amqp_context_t *context, int c, int count)
 
 int amqp_context_putc(amqp_context_t *context, int c)
 {
-    if (context->debug.last_char == '\n' && context->debug.indent > 0)
+    if (context->debug.indent.last_char[0] == '\n')
     {
-        putc_repeat(context, '\t', context->debug.indent / 8);
-        putc_repeat(context, ' ', context->debug.indent % 8);
+        if (context->debug.indent.anto_indent && (context->debug.indent.last_char[1] == '{' || context->debug.indent.last_char[1] == '['))
+        {
+            context->debug.indent.indent += context->debug.indent.anto_indent;
+        }
+        if (context->debug.indent.anto_indent && (context->debug.indent.last_char[1] == '}' || context->debug.indent.last_char[1] == ']'))
+        {
+            context->debug.indent.indent -= context->debug.indent.anto_indent;
+        }
+        if (context->debug.indent.indent > 0)
+        {
+            putc_repeat(context, '\t', context->debug.indent.indent / 8);
+            putc_repeat(context, ' ', context->debug.indent.indent % 8);
+        }
     }
-    context->debug.last_char = c;
+    context->debug.indent.last_char[1] = context->debug.indent.last_char[0];
+    context->debug.indent.last_char[0] = c;
     return (*context->config.putc)(c);
 }
 
 int amqp_context_increase_print_indent(amqp_context_t *context, int delta)
 {
-    int old_indent = context->debug.indent;
-    context->debug.indent += delta;
+    int old_indent = context->debug.indent.indent;
+    context->debug.indent.indent += delta;
+    return old_indent;
+}
+int amqp_context_set_print_indent(amqp_context_t *context, int indent)
+{
+    int old_indent = context->debug.indent.indent;
+    context->debug.indent.indent = indent;
     return old_indent;
 }
 
-int amqp_context_set_print_indent(amqp_context_t *context, int indent)
+int amqp_context_set_auto_indent(amqp_context_t *context, int amount)
 {
-    int old_indent = context->debug.indent;
-    context->debug.indent = indent;
+    int old_indent = context->debug.indent.anto_indent;
+    context->debug.indent.anto_indent = amount;
     return old_indent;
 }

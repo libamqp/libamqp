@@ -21,6 +21,7 @@
 #include "Codec/Decode/Decode.h"
 
 #include "Codec/Type/Type.h"
+#include "Codec/Type/TypePrint.h"
 #include "TestData/TestFrames.h"
 #include "Codec/Type/TypeExtension.h"
 
@@ -72,5 +73,14 @@ SUITE(FrameTypeDecode)
     {
         load(test_data::sasl_mechanisms_frame_symbol);
         CHECK(amqp_type_is_symbol(descriptor));
+    }
+
+    TEST_FIXTURE(DecodeFixture, test_decode_of_sasl_init)
+    {
+        load(test_data::sasl_init);
+        CHECK(amqp_type_is_ulong(descriptor));
+        CHECK_EQUAL(65U, amqp_type_to_ulong(descriptor));
+        amqp_type_print(context, described, decode_buffer);
+        not_implemented(todo);
     }
 }
