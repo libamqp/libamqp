@@ -14,16 +14,18 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_FRAME_FRAME_ENCODE_H
-#define LIBAMQP_TRANSPORT_FRAME_FRAME_ENCODE_H
+#ifndef LIBAMQP_PLUGIN_SASLANONYMOUS_SASLANONYMOUS_H
+#define LIBAMQP_PLUGIN_SASLANONYMOUS_SASLANONYMOUS_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "Transport/Frame/Frame.h"
+#include <stdlib.h>
+#include "libamqp_common.h"
+#include "Plugin/Sasl.h"
 
-extern void amqp_encode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer);
+extern amqp_sasl_plugin_t *amqp_plugin_sasl_anonymous_create(amqp_context_t *context);
 
 #ifdef __cplusplus
 }

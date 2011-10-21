@@ -77,10 +77,12 @@ SUITE(FrameTypeDecode)
 
     TEST_FIXTURE(DecodeFixture, test_decode_of_sasl_init)
     {
-        load(test_data::sasl_init);
+        load(test_data::sasl_init_frame);
         CHECK(amqp_type_is_ulong(descriptor));
         CHECK_EQUAL(65U, amqp_type_to_ulong(descriptor));
-        amqp_type_print(context, described, decode_buffer);
-        not_implemented(todo);
+        CHECK_EQUAL(3U, described->value.list.count);
+        CHECK(amqp_type_is_symbol(described->value.list.elements[0]));
+        CHECK(amqp_type_is_binary(described->value.list.elements[1]));
+        CHECK(amqp_type_is_string(described->value.list.elements[2]));
     }
 }

@@ -14,18 +14,21 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_FRAME_FRAME_ENCODE_H
-#define LIBAMQP_TRANSPORT_FRAME_FRAME_ENCODE_H
+#include "Context/Context.h"
+#include "Plugin/SaslAnonymous/SaslAnonymous.h"
+#include "debug_helper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "Transport/Frame/Frame.h"
-
-extern void amqp_encode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer);
-
-#ifdef __cplusplus
+static void cleanup_plugin(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)
+{
+    AMQP_FREE(context, sasl_plugin);
 }
-#endif
-#endif
+
+amqp_sasl_plugin_t *amqp_plugin_sasl_anonymous_create(amqp_context_t *context)
+{
+    amqp_sasl_plugin_t *result = AMQP_MALLOC(context, amqp_sasl_plugin_t);
+    result->mechanism_name = "ANONYMOUS";
+    result->plugin_cleanup_callback = cleanup_plugin;
+
+
+    return result;
+}

@@ -73,7 +73,7 @@ namespace test_data
 
 
     // SaslInit(mechanism=PLAIN, initial­response=Binary, hostname=development.mysystem.mycompany.stormmq.com)
-    test_data_def(sasl_init,
+    test_data_def(sasl_init_frame,
         0x00, 0x00, 0x01, 0x52,
         0x02, 0x01, 0x00, 0x00,
         0x00, 

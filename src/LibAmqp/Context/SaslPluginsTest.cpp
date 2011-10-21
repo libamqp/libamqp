@@ -79,5 +79,48 @@ SUITE(Context)
         amqp_context_free_sasl_plugins(context);
         CHECK_EQUAL(2, cleanup_count);
     }
+
+    TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_with_nothing_registered)
+    {
+        amqp_sasl_plugin_node_t *list;
+
+        CHECK_EQUAL((void *) 0, amqp_context_first_sasl_plugin(context, &list));
+
+        amqp_context_free_sasl_plugins(context);
+    }
+
+    TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_anonymous_over_plain)
+    {
+        amqp_sasl_plugin_node_t *list;
+
+        create_and_register_plugin("ANONYMOUS");
+        create_and_register_plugin("PLAIN");
+
+        amqp_sasl_plugin_t *p = amqp_context_first_sasl_plugin(context, &list);
+        CHECK_EQUAL("ANONYMOUS", p->mechanism_name);
+        p = amqp_context_next_sasl_plugin(context, &list);
+        CHECK_EQUAL("PLAIN", p->mechanism_name);
+
+        CHECK_EQUAL((void *) 0, amqp_context_next_sasl_plugin(context, &list));
+
+        amqp_context_free_sasl_plugins(context);
+    }
+
+    TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_plain_over_anonymous)
+    {
+        amqp_sasl_plugin_node_t *list;
+
+        create_and_register_plugin("PLAIN");
+        create_and_register_plugin("ANONYMOUS");
+
+        amqp_sasl_plugin_t *p = amqp_context_first_sasl_plugin(context, &list);
+        CHECK_EQUAL("PLAIN", p->mechanism_name);
+        p = amqp_context_next_sasl_plugin(context, &list);
+        CHECK_EQUAL("ANONYMOUS", p->mechanism_name);
+
+        CHECK_EQUAL((void *) 0, amqp_context_next_sasl_plugin(context, &list));
+
+        amqp_context_free_sasl_plugins(context);
+    }
 }
 

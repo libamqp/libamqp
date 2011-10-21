@@ -16,39 +16,47 @@
 
 #include "Context/Context.h"
 #include "Transport/Frame/Frame.h"
+#include "Transport/Connection/Connection.h"
 #include "Codec/Encode/Encode.h"
 #include "AmqpTypes/AmqpTypes.h"
 #include "Transport/Sasl/SaslMechanisms.h"
 
 #include "debug_helper.h"
 
+#define DEFAULT_TYPE_SPECIFIC_FIELD   0
+#define DEFAULT_FIELDS_ENCODER_ARG   0
+
+typedef void (*amqp_frame_encoder_t)(amqp_context_t *context, amqp_buffer_t *buffer, void *encoder_arg);
+
+static void amqp_sasl_mechanisms_feld_encoder(amqp_context_t *context, amqp_buffer_t *buffer, void *ignored);
+
 static inline
-void encode_frame_list(amqp_context_t *context, amqp_buffer_t *buffer)
+void encode_frame_list(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_encoder_t fields_encoder, void *fields_encoder_arg)
 {
     amqp_type_t *list = amqp_encode_list_8(context, buffer);
-    amqp_sasl_mechanisms_encode(context, buffer);
+    fields_encoder(context, buffer, fields_encoder_arg);
     amqp_complete_type(context, buffer, list);
 }
 
 static inline
-void encode_performative(amqp_context_t *context, amqp_buffer_t *buffer, uint64_t id)
+void encode_performative(amqp_context_t *context, amqp_buffer_t *buffer, uint64_t id, amqp_frame_encoder_t fields_encoder, void *encoder_arg)
 {
     amqp_type_t *frame = amqp_start_encode_described_type(context, buffer);
     amqp_encode_ulong(context, buffer, id);
-    encode_frame_list(context, buffer);
+    encode_frame_list(context, buffer, fields_encoder, encoder_arg);
     amqp_complete_type(context, buffer, frame);
     amqp_deallocate_type(context, frame);
 }
 
 static
-void amqp_encode_frame(amqp_context_t *context, amqp_buffer_t *buffer, uint64_t id, uint8_t frame_type, uint16_t frame_type_specific)
+void amqp_encode_frame(amqp_context_t *context, amqp_buffer_t *buffer, uint64_t id, uint8_t frame_type, uint16_t frame_type_specific, amqp_frame_encoder_t fields_encoder, void *encoder_arg)
 {
     size_t performativce_offset, frame_size;;
 
     amqp_buffer_advance_write_point(buffer, 8);
     performativce_offset = amqp_buffer_write_point(buffer);
 
-    encode_performative(context, buffer, id);
+    encode_performative(context, buffer, id, fields_encoder, encoder_arg);
 
     frame_size = amqp_buffer_size(buffer);
     amqp_buffer_set_write_index(buffer, 0);
@@ -59,10 +67,12 @@ void amqp_encode_frame(amqp_context_t *context, amqp_buffer_t *buffer, uint64_t 
     amqp_buffer_set_write_index(buffer, frame_size);
 }
 
-void amqp_encode_sasl_frame(amqp_context_t *context, amqp_buffer_t *buffer)
+static void amqp_sasl_mechanisms_feld_encoder(amqp_context_t *context, amqp_buffer_t *buffer, void *ignored)
 {
-    amqp_encode_frame(context, buffer, AMQP_FRAME_ID_SASL_MECHANISMS_LIST, AMQP_SASL_FRAME_TYPE, 0);
+    amqp_sasl_mechanisms_encode(context, buffer);
+}
 
-//amqp_sasl_mechanisms_encode(context, buffer);
-
+void amqp_encode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer)
+{
+    amqp_encode_frame(context, buffer, AMQP_FRAME_ID_SASL_MECHANISMS_LIST, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_mechanisms_feld_encoder, DEFAULT_FIELDS_ENCODER_ARG);
 }

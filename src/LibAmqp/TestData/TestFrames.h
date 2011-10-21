@@ -33,7 +33,7 @@ namespace test_data
     extern TestData sasl_mechanisms_frame_long;
     extern TestData sasl_mechanisms_frame_symbol;
 
-    extern TestData sasl_init;
+    extern TestData sasl_init_frame;
 }
 #endif
 

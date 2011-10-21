@@ -31,10 +31,17 @@ struct amqp_sasl_plugin_node_t
 
 void amqp_context_register_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)
 {
+    amqp_sasl_plugin_node_t **list = &context->reference.plugins.sasl_plugin_list;
+
     amqp_sasl_plugin_node_t *node = AMQP_MALLOC(context, amqp_sasl_plugin_node_t);
     node->plugin = sasl_plugin;
-    node->link = context->reference.plugins.sasl_plugin_list;
-    context->reference.plugins.sasl_plugin_list = node;
+    node->link = 0;
+
+    while (*list)
+    {
+        list = &(*list)->link;
+    }
+    *list = node;
 }
 
 amqp_sasl_plugin_t *amqp_context_lookup_sasl_plugin(amqp_context_t *context, amqp_symbol_t *mechanism)
@@ -50,6 +57,7 @@ amqp_sasl_plugin_t *amqp_context_lookup_sasl_plugin(amqp_context_t *context, amq
     }
     return 0;
 }
+
 void amqp_context_free_sasl_plugins(amqp_context_t *context)
 {
     while (context->reference.plugins.sasl_plugin_list)
@@ -60,4 +68,20 @@ void amqp_context_free_sasl_plugins(amqp_context_t *context)
         node->plugin->plugin_cleanup_callback(context, node->plugin);
         AMQP_FREE(context, node);
     }
+}
+
+amqp_sasl_plugin_t *amqp_context_first_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_node_t **sasl_plugin_node)
+{
+    *sasl_plugin_node = context->reference.plugins.sasl_plugin_list;
+    return *sasl_plugin_node ? (*sasl_plugin_node)->plugin : 0;
+}
+
+amqp_sasl_plugin_t *amqp_context_next_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_node_t **sasl_plugin_node)
+{
+    if (sasl_plugin_node == 0 || *sasl_plugin_node == 0)
+    {
+        return 0;
+    }
+    *sasl_plugin_node = (*sasl_plugin_node)->link;
+    return *sasl_plugin_node ? (*sasl_plugin_node)->plugin : 0;
 }

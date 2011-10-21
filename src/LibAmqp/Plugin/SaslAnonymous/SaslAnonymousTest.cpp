@@ -14,18 +14,27 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_FRAME_FRAME_ENCODE_H
-#define LIBAMQP_TRANSPORT_FRAME_FRAME_ENCODE_H
+#include <TestHarness.h>
+#include "Plugin/SaslAnonymous/SaslAnonymous.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+SUITE(PluginSaslAnonymous)
+{
+    class PluginSaslAnonymousFixture
+    {
+    public:
+        PluginSaslAnonymousFixture();
+        ~PluginSaslAnonymousFixture();
+    private:
+    };
 
-#include "Transport/Frame/Frame.h"
+    PluginSaslAnonymousFixture::PluginSaslAnonymousFixture()
+    {
+    }
+    PluginSaslAnonymousFixture::~PluginSaslAnonymousFixture()
+    {
+    }
 
-extern void amqp_encode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer);
-
-#ifdef __cplusplus
+    TEST_FIXTURE(PluginSaslAnonymousFixture, really_important_test)
+    {
+    }
 }
-#endif
-#endif

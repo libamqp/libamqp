@@ -15,6 +15,7 @@ MODULES := \
 	LibAmqp/Thread \
 	LibAmqp/Transport \
 	LibAmqp/Plugin \
+	LibAmqp/Plugin/SaslAnonymous \
 	LibAmqp/Plugin/SaslPlain \
         DecodeDemo \
         SampleServer \
