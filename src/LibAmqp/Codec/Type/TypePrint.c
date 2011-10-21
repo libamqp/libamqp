@@ -48,14 +48,19 @@ static void printf_type_value(amqp_context_t *context, const char *format, ...)
     str_print(context, buffer);
 }
 
-static int amqp_type_print_ascii(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
+static int amqp_type_print_ascii(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer, int quote)
 {
     size_t i;
+
+    amqp_context_putc(context, quote);
+
     for (i = 0; i < type->position.size; i++)
     {
         int c = amqp_unchecked_getc_at(buffer, type->position.index + i);
         amqp_context_putc(context, isprint(c) ? c : '?');
     }
+
+    amqp_context_putc(context, quote);
 
     return 1;
 }
@@ -119,10 +124,15 @@ static int amqp_type_print_raw_data_line(amqp_context_t *context, size_t index, 
 static int amqp_type_print_raw_data(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
     size_t i = 0;
-
+    size_t width = (33 - context->debug.indent.auto_indent) & ~1;
     if (type->position.size == 0)
     {
         return 1;
+    }
+
+    if (width < 8)
+    {
+        width = 8;
     }
 
     amqp_type_print_raw_data_line(context, i, type, buffer);
@@ -375,22 +385,22 @@ void amqp_type_method_binary_vbin32_print(amqp_context_t *context, amqp_type_t *
 
 void amqp_type_method_symbol_sym8_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    amqp_type_print_ascii(context, type, buffer);
+    amqp_type_print_ascii(context, type, buffer, '\'');
 }
 
 void amqp_type_method_symbol_sym32_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    amqp_type_print_ascii(context, type, buffer);
+    amqp_type_print_ascii(context, type, buffer, '\'');
 }
 
 void amqp_type_method_string_str8_utf8_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    amqp_type_print_ascii(context, type, buffer);
+    amqp_type_print_ascii(context, type, buffer, '\"');
 }
 
 void amqp_type_method_string_str32_utf8_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    amqp_type_print_ascii(context, type, buffer);
+    amqp_type_print_ascii(context, type, buffer, '\"');
 }
 
 void amqp_type_method_list_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
