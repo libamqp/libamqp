@@ -238,7 +238,7 @@ SUITE(TypePrint)
         CHECK_LIST(type);
 
         print_type();
-        check_output("{\n    \'Foo\',\n    123.456000,\n    \"Hello\",\n    10,\n    [10, 11],\n    [12]\n}");
+        check_output("{\n    \'Foo\',\n    123.456000,\n    \"Hello\",\n    10,\n    [10, 11],\n    [12]\n}\n");
     }
 
     TEST_FIXTURE(TypePrintFixture, empty_list)
@@ -250,7 +250,7 @@ SUITE(TypePrint)
         CHECK_LIST(type);
 
         print_type();
-        check_output("{\n}");
+        check_output("{\n}\n");
     }
 
     TEST_FIXTURE(TypePrintFixture, empty_list_0)
@@ -262,7 +262,7 @@ SUITE(TypePrint)
         CHECK_LIST(type);
 
         print_type();
-        check_output("{\n}");
+        check_output("{\n}\n");
     }
 
     TEST_FIXTURE(TypePrintFixture, Map)
@@ -274,7 +274,7 @@ SUITE(TypePrint)
         CHECK_MAP(type);
 
         print_type();
-        check_output("{\n    \"list:\"->{\n\t1,\n\t\"two\",\n\t3.141593,\n\tnull,\n\tfalse\n    },\n    null->true,\n    \"pi\"->3.141593,\n    \"two\"->2,\n    \"129\"->129\n}");
+        check_output("{\n    \"list:\"->{\n\t1,\n\t\"two\",\n\t3.141593,\n\tnull,\n\tfalse\n    },\n    null->true,\n    \"pi\"->3.141593,\n    \"two\"->2,\n    \"129\"->129\n}\n");
     }
 
     TEST_FIXTURE(TypePrintFixture, TimeStamp)

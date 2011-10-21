@@ -421,6 +421,10 @@ void amqp_type_method_list_print(amqp_context_t *context, amqp_type_t *type, amq
     }
     amqp_context_putc(context, '\n');
     amqp_context_putc(context, '}');
+    if (context->debug.indent.indent == 0)
+    {
+        amqp_context_putc(context, '\n');
+    }
 }
 
 void amqp_type_method_map_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
@@ -444,23 +448,17 @@ void amqp_type_method_map_print(amqp_context_t *context, amqp_type_t *type, amqp
     }
     amqp_context_putc(context, '\n');
     amqp_context_putc(context, '}');
+    if (context->debug.indent.indent == 0)
+    {
+        amqp_context_putc(context, '\n');
+    }
 }
 
 void amqp_type_method_array_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
     size_t i;
 
-//    if (type->value.compound.elements)
-//    {
-//        amqp_type_print_formatted_leader(context, type->value.array.elements[0], buffer);
-//    }
-//    else
-//    {
-//        str_print(context, "EMPTY ARRAY!");
-//    }
-
     amqp_context_putc(context, '[');
-//    amqp_context_putc(context, '\n');
     for (i = 0; i < type->value.array.count; i++)
     {
         if (i > 0)
@@ -470,7 +468,6 @@ void amqp_type_method_array_print(amqp_context_t *context, amqp_type_t *type, am
         }
         amqp_nested_type_print(context, type->value.array.elements[i], buffer);
     }
-//    amqp_context_putc(context, '\n');
     amqp_context_putc(context, ']');
 }
 
