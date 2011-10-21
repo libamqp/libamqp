@@ -16,6 +16,7 @@
 
 #include <TestHarness.h>
 #include "Transport/Frame/FrameTestSupport.h"
+#include "Plugin/SaslPlain/SaslPlain.h"
 #include "debug_helper.h"
 
 namespace SuiteFrame
@@ -23,6 +24,7 @@ namespace SuiteFrame
     FrameFixture::FrameFixture() : frame(0), type(0)
     {
         buffer = amqp_allocate_buffer(context);
+        amqp_context_register_sasl_plugin(context, amqp_plugin_sasl_plain_create(context));
     }
 
     FrameFixture::~FrameFixture()
