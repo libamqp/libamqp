@@ -80,12 +80,20 @@ SUITE(Context)
         CHECK_EQUAL(2, cleanup_count);
     }
 
-    TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_with_nothing_registered)
+    TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_iterate_with_nothing_registered)
     {
         amqp_sasl_plugin_node_t *list;
 
         CHECK_EQUAL((void *) 0, amqp_context_first_sasl_plugin(context, &list));
 
+        amqp_context_free_sasl_plugins(context);
+    }
+
+    TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_lookup_with_nothing_registered)
+    {
+        CHECK_EQUAL((void *) 0, amqp_context_lookup_sasl_plugin(context, symbol_pretty));
+        CHECK_EQUAL((void *) 0, amqp_context_lookup_sasl_plugin(context, symbol_plain));
+        CHECK_EQUAL((void *) 0, amqp_context_lookup_sasl_plugin(context, symbol_anonymous));
         amqp_context_free_sasl_plugins(context);
     }
 
