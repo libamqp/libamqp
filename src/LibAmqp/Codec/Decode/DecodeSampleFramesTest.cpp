@@ -57,6 +57,12 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_list(described));
     }
 
+    TEST_FIXTURE(DecodeFixture, sasl_mechanisms_frame_with_invalid_descriptor_id)
+    {
+        load(test_data::sasl_mechanisms_frame);
+        CHECK_EQUAL(63U, amqp_type_to_ulong(descriptor));
+    }
+
     TEST_FIXTURE(DecodeFixture, test_decode_of_sasl_mechanisms_frame)
     {
         load(test_data::sasl_mechanisms_frame);

@@ -29,6 +29,7 @@ namespace test_data
     extern TestData amqp_protocol_1_1_0;
 
     extern TestData minimal_frame_header;
+    extern TestData sasl_mechanisms_frame_with_invalid_descriptor_id;
     extern TestData sasl_mechanisms_frame;
     extern TestData sasl_mechanisms_frame_long;
     extern TestData sasl_mechanisms_frame_symbol;

@@ -42,6 +42,20 @@ SUITE(Frame)
         CHECK_EQUAL(0, amqp_buffer_available(buffer));
     }
 
+    TEST_FIXTURE(FrameFixture, sasl_mechanisms_frame_with_invalid_descriptor_id)
+    {
+        test_data::sasl_mechanisms_frame_with_invalid_descriptor_id.transfer_to(buffer);
+        frame = amqp_decode_sasl_frame(context, buffer);
+        ASSERT(frame != 0);
+
+        CHECK_EQUAL(8U, frame->data_offset);
+        CHECK_EQUAL(AMQP_SASL_FRAME_TYPE, frame->frame_type);
+        CHECK_EQUAL(0U, frame->type_specific.word);
+
+        amqp_multiple_symbol_t *multiple = &frame->frames.sasl.mechanisms.sasl_server_mechanisms;
+        CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 0), "PLAIN") == 0);
+    }
+
     TEST_FIXTURE(FrameFixture, decode_sasl_mechanisms_frame)
     {
         test_data::sasl_mechanisms_frame.transfer_to(buffer);
