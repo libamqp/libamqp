@@ -17,6 +17,7 @@
 #include "Context/Context.h"
 #include "Transport/Frame/Frame.h"
 #include "Codec/Decode/Decode.h"
+#include "Codec/Type/TypePrint.h"
 #include "AmqpTypes/AmqpTypes.h"
 #include "Transport/Connection/FrameDispatch.h"
 
@@ -83,8 +84,14 @@ static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amq
     {
         amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Descriptor is not a symbol or ulong.");
         amqp_context_printf(context, "Invalid frame: ....\n ");
-//        amqp_buffer_dump(context, buffer);
-        // TODO - dump dodgy descriptor
+        amqp_type_print(context, type, buffer);
+        return false;
+    }
+
+    if (frame->descriptor.domain != AMQP_DESCRIPTOR_DOMAIN)
+    {
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Frame is for an unsupported descriptor domain. Domain = %d", frame->descriptor.domain);
+        amqp_type_print(context, type, buffer);
         return false;
     }
 
@@ -97,6 +104,9 @@ static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amq
 
 static int decode_mandatory_multiple_symbol(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *list, int field_number)
 {
+    //TODO
+    //TODO - pass in multiple
+    //TODO
     assert(amqp_type_is_list(list));
 
     if (field_number >= list->value.list.count)
@@ -127,20 +137,14 @@ static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *
     return decode_mandatory_multiple_symbol(context, buffer, frame, type, 0);
 }
 
-static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
+static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *descriptor_type, amqp_type_t *type)
 {
+
     // Currently all accepted frames are encoded as a list.
     if (!amqp_type_is_list(type))
     {
         amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Expected an AMQP list type.");
-        // TODO - dump type
-        return false;
-    }
-
-    if (frame->descriptor.domain != AMQP_DESCRIPTOR_DOMAIN)
-    {
-        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Frame is for an unsupported descriptor domain. Domain = %d", frame->descriptor.domain);
-        // TODO - dump type
+        amqp_type_print(context, type, buffer);
         return false;
     }
 
@@ -167,7 +171,7 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
 
         default:
             amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Unsupported descriptor id. Id = %08x", frame->descriptor.id);
-            // TODO - dump type
+            frame->descriptor.id = 0;   // Cleanup will just deallocate frame, not it's contents
             return false;
     }
 }
@@ -181,7 +185,7 @@ static int decode_performative(amqp_context_t *context, amqp_buffer_t *buffer, a
     }
 
     return decode_descriptor(context, buffer, frame, amqp_type_get_descriptor(type)) &&
-            decode_remainder(context, buffer, frame, amqp_type_get_described(type));
+            decode_remainder(context, buffer, frame, amqp_type_get_descriptor(type), amqp_type_get_described(type));
 }
 
 static int decode_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame)
