@@ -43,6 +43,46 @@ SUITE(FrameTypeDecode)
         amqp_type_t *described;
     };
 
+
+    TEST_FIXTURE(DecodeFixture, multiple_symbol_null)
+    {
+        test_data::multiple_symbol_null.transfer_to(decode_buffer);
+        type = amqp_decode(context, decode_buffer);
+
+        CHECK(amqp_type_is_null(type));
+    }
+
+    TEST_FIXTURE(DecodeFixture, multiple_symbol_one_value)
+    {
+        test_data::multiple_symbol_one_value.transfer_to(decode_buffer);
+        type = amqp_decode(context, decode_buffer);
+
+        CHECK(amqp_type_is_symbol(type));
+    }
+
+    TEST_FIXTURE(DecodeFixture, multiple_symbol_many_values)
+    {
+        test_data::multiple_symbol_many_values.transfer_to(decode_buffer);
+        type = amqp_decode(context, decode_buffer);
+
+        CHECK(amqp_type_is_array(type));
+        CHECK_EQUAL(3U, type->value.array.count);
+        CHECK(amqp_type_is_symbol(type->value.array.elements[0]));
+    }
+
+    TEST_FIXTURE(DecodeFixture, multiple_symbol_empty_array)
+    {
+        // TODO - FIX
+        /*
+        test_data::multiple_symbol_empty_array.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
+
+        CHECK(amqp_type_is_array(type));
+        CHECK_EQUAL(0U, type->value.array.count);
+        */
+//        CHECK(amqp_type_is_symbol(type->value.array.elements[0]));
+    }
+
     void DecodeFixture::load(test_data::TestData &data)
     {
         load_decode_buffer(data);

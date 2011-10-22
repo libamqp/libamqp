@@ -47,7 +47,7 @@ SUITE(Frame)
         
         amqp_encode_sasl_init_frame(context, buffer, sasl_plugin);
 
-//        frame = amqp_decode_sasl_frame(context, buffer);
+        frame = amqp_decode_sasl_frame(context, buffer);
 //        ASSERT(frame != 0);
 //
 //        CHECK_EQUAL(8U, frame->data_offset);

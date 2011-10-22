@@ -26,3 +26,10 @@ void amqp_dispatch_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *
     assert(dispatch);
     dispatch(connection, frame);
 }
+
+void amqp_dispatch_sasl_init(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    amqp_message_dispatch_t dispatch = connection->state.sasl.messages.init;
+    assert(dispatch);
+    dispatch(connection, frame);
+}

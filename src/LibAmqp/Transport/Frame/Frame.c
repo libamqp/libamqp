@@ -102,7 +102,7 @@ static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amq
     return true;
 }
 
-static int decode_mandatory_multiple_symbol(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *list, int field_number)
+static int decode_mandatory_multiple_symbol(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *list, int field_number, amqp_multiple_symbol_t *multiple)
 {
     //TODO
     //TODO - pass in multiple
@@ -115,13 +115,13 @@ static int decode_mandatory_multiple_symbol(amqp_context_t *context, amqp_buffer
         // TODO - dump type
         return false;
     }
-    if (!amqp_multiple_symbol_initialize(context, &frame->frames.sasl.mechanisms.sasl_server_mechanisms, list->value.list.elements[field_number]))
+    if (!amqp_multiple_symbol_initialize(context, multiple, list->value.list.elements[field_number]))
     {
         amqp_error(context, AMQP_ERROR_MULTIPLE_DECODE_FAILED, "Field is not a multiple symbol.");
         // TODO - dump type
         return false;
     }
-    if (frame->frames.sasl.mechanisms.sasl_server_mechanisms.size == 0)
+    if (multiple->size == 0)
     {
         amqp_error(context, AMQP_ERROR_MULTIPLE_DECODE_FAILED, "Mandatory multiple symbol field is null or empty.");
         // TODO - dump type
@@ -130,11 +130,42 @@ static int decode_mandatory_multiple_symbol(amqp_context_t *context, amqp_buffer
     return true;
 }
 
+/*
+    <type name="sasl-mechanisms" class="composite" source="list" provides="sasl-frame">
+      <descriptor name="amqp:sasl-mechanisms:list" code="0x00000000:0x00000040"/>
+      <field name="sasl-server-mechanisms" type="symbol" mandatory="true" multiple="true"/>
+    </type>
+*/
+static void cleanup_sasl_mechanisms_frame(amqp_context_t *context, amqp_frame_t *frame)
+{
+    amqp_multiple_symbol_cleanup(context, &frame->frames.sasl.mechanisms.sasl_server_mechanisms);
+}
 static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
 {
     frame->dispatch = amqp_dispatch_sasl_mechanisms;
+    frame->cleanup = cleanup_sasl_mechanisms_frame;
 
-    return decode_mandatory_multiple_symbol(context, buffer, frame, type, 0);
+    return decode_mandatory_multiple_symbol(context, buffer, frame, type, 0, &frame->frames.sasl.mechanisms.sasl_server_mechanisms);
+}
+
+/*
+    <type name="sasl-init" class="composite" source="list" provides="sasl-frame">
+      <descriptor name="amqp:sasl-init:list" code="0x00000000:0x00000041"/>
+      <field name="mechanism" type="symbol" mandatory="true"/>
+      <field name="initial-response" type="binary"/>
+      <field name="hostname" type="string"/>
+    </type>
+*/
+static void cleanup_sasl_init_frame(amqp_context_t *context, amqp_frame_t *frame)
+{
+//    not_implemented(todo);
+}
+static int decode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
+{
+    frame->dispatch = amqp_dispatch_sasl_init;
+    frame->cleanup = cleanup_sasl_init_frame;
+
+    return 0;
 }
 
 static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *descriptor_type, amqp_type_t *type)
@@ -154,6 +185,9 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
         case AMQP_FRAME_ID_SASL_MECHANISMS_LIST:
             return decode_sasl_mechanisms_frame(context, buffer, frame, type);
 
+        case AMQP_FRAME_ID_SASL_INIT_LIST:
+            return decode_sasl_init_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_OPEN_LIST:
         case AMQP_FRAME_ID_BEGIN_LIST:
         case AMQP_FRAME_ID_ATTACH_LIST:
@@ -164,7 +198,6 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
         case AMQP_FRAME_ID_END_LIST:
         case AMQP_FRAME_ID_CLOSE_LIST:
         case AMQP_FRAME_ID_ERROR_LIST:
-        case AMQP_FRAME_ID_SASL_INIT_LIST:
         case AMQP_FRAME_ID_SASL_CHALLENGE_LIST:
         case AMQP_FRAME_ID_SASL_RESPONSE_LIST:
         case AMQP_FRAME_ID_SASL_OUTCOME_LIST:
@@ -280,17 +313,23 @@ void amqp_frame_cleanup(amqp_context_t *context, amqp_frame_t *frame)
         case AMQP_FRAME_ID_CLOSE_LIST:
         case AMQP_FRAME_ID_ERROR_LIST:
 
-        case AMQP_FRAME_ID_SASL_MECHANISMS_LIST:
-            amqp_multiple_symbol_cleanup(context, &frame->frames.sasl.mechanisms.sasl_server_mechanisms);
-            break;
-
-        case AMQP_FRAME_ID_SASL_INIT_LIST:
         case AMQP_FRAME_ID_SASL_CHALLENGE_LIST:
         case AMQP_FRAME_ID_SASL_RESPONSE_LIST:
         case AMQP_FRAME_ID_SASL_OUTCOME_LIST:
+        case AMQP_FRAME_ID_SASL_MECHANISMS_LIST:
+        case AMQP_FRAME_ID_SASL_INIT_LIST:
+            if (frame->cleanup)
+            {
+                frame->cleanup(context, frame);
+            }
+            else
+            {
+                amqp_error(context, AMQP_ERROR_ILLEGAL_STATE, "Frame does not have a cleanup method. Id: %08x", frame->descriptor.id);
+            }
+            break;
 
         default:
-            amqp_error(context, AMQP_ERROR_ILLEGAL_STATE, "Cannot cleanup frame. Unsupported descriptor id. Id = %08x", frame->descriptor.id);
+            amqp_error(context, AMQP_ERROR_ILLEGAL_STATE, "Cannot cleanup frame. Unsupported descriptor id. Id: %08x", frame->descriptor.id);
             return;
     }
 

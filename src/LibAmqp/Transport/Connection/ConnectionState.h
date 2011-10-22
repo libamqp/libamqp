@@ -156,9 +156,10 @@ typedef struct amqp_connection_sasl_state_t
     const char *name;
     amqp_connection_action_f connect;
     amqp_connection_action_f done;
-    amqp_connection_tunnel_actions_t tunnel;
+    amqp_connection_tunnel_actions_t tunnel; // TODO - rename (accept?)
     struct {
         amqp_message_dispatch_t mechanisms;
+        amqp_message_dispatch_t init;
     } messages;
 } amqp_connection_sasl_state_t;
 
