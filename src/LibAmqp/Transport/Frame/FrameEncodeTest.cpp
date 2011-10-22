@@ -40,9 +40,13 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, sasl_init_frame_encode)
     {
-//        not_implemented(todo);
-//        amqp_encode_sasl_mechanisms_frame(context, buffer);
-//
+        amqp_symbol_t *plain = amqp_symbol_create_from_cstr(context, "PLAIN");
+        amqp_sasl_plugin_t *sasl_plugin = amqp_context_lookup_sasl_plugin(context, plain);
+        amqp_symbol_cleanup(context, plain);
+        CHECK(sasl_plugin);
+        
+        amqp_encode_sasl_init_frame(context, buffer, sasl_plugin);
+
 //        frame = amqp_decode_sasl_frame(context, buffer);
 //        ASSERT(frame != 0);
 //
@@ -52,5 +56,6 @@ SUITE(Frame)
 //
 //        amqp_multiple_symbol_t *multiple = &frame->frames.sasl.mechanisms.sasl_server_mechanisms;
 //        CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 0), "PLAIN") == 0);
+        CHECK(0);
     }
 }

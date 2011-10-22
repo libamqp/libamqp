@@ -22,8 +22,10 @@ extern "C" {
 #endif
 
 #include "Transport/Frame/Frame.h"
+#include "Plugin/Sasl.h"
 
 extern void amqp_encode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer);
+extern void amqp_encode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin);
 
 #ifdef __cplusplus
 }

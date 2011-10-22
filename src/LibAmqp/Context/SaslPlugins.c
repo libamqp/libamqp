@@ -77,7 +77,7 @@ void amqp_context_free_sasl_plugins(amqp_context_t *context)
         amqp_sasl_plugin_node_t *node = context->reference.plugins.sasl_plugin_list;
         context->reference.plugins.sasl_plugin_list = context->reference.plugins.sasl_plugin_list->link;
         
-        node->plugin->plugin_cleanup_callback(context, node->plugin);
+        node->plugin->plugin_cleanup_handler(context, node->plugin);
         AMQP_FREE(context, node);
     }
 }

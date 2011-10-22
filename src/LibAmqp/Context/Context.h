@@ -186,7 +186,6 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     extern void amqp_context_register_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin);
     extern amqp_sasl_plugin_t *amqp_context_lookup_sasl_plugin(amqp_context_t *context, amqp_symbol_t *mechanism);
     extern void amqp_context_free_sasl_plugins(amqp_context_t *context);
-
     extern amqp_sasl_plugin_t *amqp_context_first_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_node_t **sasl_plugin_node);
     extern amqp_sasl_plugin_t *amqp_context_next_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_node_t **sasl_plugin_node);
     extern int amqp_context_sasl_plugin_count(amqp_context_t *context);

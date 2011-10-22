@@ -23,12 +23,17 @@ static void cleanup_plugin(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plu
     AMQP_FREE(context, sasl_plugin);
 }
 
+static amqp_binary_t *initial_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)
+{
+    not_implemented(todo);
+}
+
 amqp_sasl_plugin_t *amqp_plugin_sasl_anonymous_create(amqp_context_t *context)
 {
     amqp_sasl_plugin_t *result = AMQP_MALLOC(context, amqp_sasl_plugin_t);
     result->mechanism_name = "ANONYMOUS";
-    result->plugin_cleanup_callback = cleanup_plugin;
-
+    result->plugin_cleanup_handler = cleanup_plugin;
+    result->initial_response_handler = initial_response_handler;
 
     return result;
 }

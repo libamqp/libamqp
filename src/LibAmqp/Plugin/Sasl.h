@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 #include <stdlib.h>
+#include "AmqpTypes/AmqpBinary.h"
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
@@ -33,12 +34,14 @@ extern "C" {
 typedef struct amqp_sasl_plugin_t amqp_sasl_plugin_t;
 #endif
 
-typedef void (*amqp_sasl_plugin_cleanup_fn_t)(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin);
+typedef void (*amqp_sasl_plugin_cleanup_handler)(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin);
+typedef amqp_binary_t *(*amqp_sasl_plugin_initial_response_handler)(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin);
 
 struct amqp_sasl_plugin_t
 {
     const char *mechanism_name;   
-    amqp_sasl_plugin_cleanup_fn_t plugin_cleanup_callback;
+    amqp_sasl_plugin_cleanup_handler plugin_cleanup_handler;
+    amqp_sasl_plugin_initial_response_handler initial_response_handler;
 };
 
 #ifdef __cplusplus

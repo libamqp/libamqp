@@ -39,7 +39,7 @@ SUITE(Context)
         {
             amqp_sasl_plugin_t *p = AMQP_MALLOC(context, amqp_sasl_plugin_t);
             p->mechanism_name = name;
-            p->plugin_cleanup_callback = plugin_cleanup;
+            p->plugin_cleanup_handler = plugin_cleanup;
             amqp_context_register_sasl_plugin(context, p);
             return p;
         }

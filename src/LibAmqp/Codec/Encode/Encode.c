@@ -462,7 +462,6 @@ amqp_type_t *amqp_encode_uuid(amqp_context_t *context, amqp_buffer_t *buffer, am
     return type;
 }
 
-
 amqp_type_t *amqp_encode_binary(amqp_context_t *context, amqp_buffer_t *buffer, const unsigned char *value, size_t size)
 {
    return size < 256 ? amqp_encode_binary_vbin8(context, buffer, value, size) : amqp_encode_binary_vbin32(context, buffer, value, size);
