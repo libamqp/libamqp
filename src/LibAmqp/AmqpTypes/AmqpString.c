@@ -58,3 +58,13 @@ amqp_string_t *amqp_string_create_from_type(amqp_context_t *context, amqp_type_t
 
     return result;
 }
+
+int amqp_string_compare(amqp_string_t *lhs, amqp_string_t *rhs)
+{
+    not_implemented(todo);
+}
+
+int amqp_string_compare_with_cstr(amqp_string_t *lhs, const char *rhs)
+{
+    return 1;
+}

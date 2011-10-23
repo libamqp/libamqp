@@ -52,6 +52,9 @@ size_t amqp_string_copy_to(amqp_string_t *string, uint8_t *destination, size_t d
     return amqp_type_copy_to(string->type, destination, destination_size);
 }
 
+extern int amqp_string_compare(amqp_string_t *lhs, amqp_string_t *rhs);
+extern int amqp_string_compare_with_cstr(amqp_string_t *lhs, const char *rhs);
+
 #ifdef __cplusplus
 }
 #endif

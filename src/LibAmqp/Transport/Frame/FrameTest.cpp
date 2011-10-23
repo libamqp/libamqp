@@ -95,7 +95,13 @@ SUITE(Frame)
         CHECK(check_sasl_header());
 
         CHECK(amqp_symbol_compare_with_cstr(&frame->frames.sasl.init.mechanism, "PLAIN") == 0);
-        CHECK(0);
+
+        CHECK_EQUAL(0, amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 0));
+        CHECK_EQUAL('a', amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 1));
+        CHECK_EQUAL(0, amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 8));
+        CHECK_EQUAL('p', amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 9));
+
+        CHECK(amqp_string_compare_with_cstr(&frame->frames.sasl.init.hostname, "localhost.localdomain") == 0);
     }
 
     TEST_FIXTURE(FrameFixture, sasl_init_frame_captured)
