@@ -52,6 +52,13 @@ size_t amqp_binary_copy_to(amqp_binary_t *binary, uint8_t *buffer, size_t amount
     return amqp_type_copy_to(binary->type, buffer, amount);
 }
 
+static inline
+int amqp_binary_byte_get_at(amqp_binary_t *binary, size_t index)
+{
+    assert(binary && binary->type);
+    return amqp_type_get_byte_at(binary->type, index);
+}
+
 #ifdef __cplusplus
 }
 #endif

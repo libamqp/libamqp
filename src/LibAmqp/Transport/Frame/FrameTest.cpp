@@ -98,4 +98,16 @@ SUITE(Frame)
         CHECK(0);
     }
 
+    TEST_FIXTURE(FrameFixture, sasl_init_frame_captured)
+    {
+        test_data::sasl_init_frame.transfer_to(buffer);
+        frame = amqp_decode_sasl_frame(context, buffer);
+        ASSERT(frame != 0);
+
+        CHECK(check_sasl_header());
+
+        CHECK(amqp_symbol_compare_with_cstr(&frame->frames.sasl.init.mechanism, "PLAIN") == 0);
+        CHECK(0);
+    }
+
 }

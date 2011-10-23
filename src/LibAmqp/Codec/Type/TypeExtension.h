@@ -107,6 +107,13 @@ size_t amqp_type_copy_to(amqp_type_t *type, uint8_t *buffer, size_t amount)
     return 0;
 }
 
+static inline
+uint8_t amqp_type_get_byte_at(amqp_type_t *type, size_t index)
+{
+    assert(amqp_type_is_variable(type));
+    return amqp_unchecked_getc_at(type->value.variable.buffer, type->position.index + index);
+}
+
 #ifdef __cplusplus
 }
 #endif

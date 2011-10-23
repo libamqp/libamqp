@@ -46,19 +46,35 @@ SUITE(AmqpTypes)
         amqp_binary_cleanup(context, binary);
     }
 
-    TEST_FIXTURE(AmqpBinaryFixture, binary_type_access)
+    TEST_FIXTURE(AmqpBinaryFixture, binary_type_create_from_type)
     {
         test_data::bin_8.transfer_to(buffer);
         type = amqp_decode(context, buffer);
-
         CHECK(amqp_type_is_binary(type));
+        binary = amqp_binary_create_from_type(context, type);
+        CHECK_EQUAL(12U, amqp_binary_size(binary));
+    }
+
+    TEST_FIXTURE(AmqpBinaryFixture, binary_type_copy_to)
+    {
+        test_data::bin_8.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
         binary = amqp_binary_create_from_type(context, type);
 
         uint8_t data[32];
         memset(data, '\0', sizeof(data));
-
         amqp_binary_copy_to(binary, data, sizeof(data));
-        CHECK_EQUAL(12U, amqp_binary_size(binary));
         CHECK_EQUAL((const char *) data, "binary array");
+    }
+
+    TEST_FIXTURE(AmqpBinaryFixture, binary_type_access)
+    {
+        test_data::bin_8.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
+        binary = amqp_binary_create_from_type(context, type);
+
+        CHECK_EQUAL('b', amqp_binary_byte_get_at(binary, 0));
+        CHECK_EQUAL('i', amqp_binary_byte_get_at(binary, 1));
+        CHECK_EQUAL('y', amqp_binary_byte_get_at(binary, 11));
     }
 }
