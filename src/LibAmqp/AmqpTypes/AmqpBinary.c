@@ -24,6 +24,11 @@
 #include "debug_helper.h"
 
 
+void amqp_binary_initialize_as_null(amqp_context_t *context, amqp_binary_t *binary)
+{
+    not_implemented(todo);
+}
+
 void amqp_binary_initialize_from_type(amqp_context_t *context, amqp_binary_t *binary, amqp_type_t *type)
 {
     assert(amqp_type_is_binary(type));

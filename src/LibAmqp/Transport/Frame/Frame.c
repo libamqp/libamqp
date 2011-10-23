@@ -23,6 +23,22 @@
 
 #include "debug_helper.h"
 
+enum {
+    field_zero,
+    field_one,
+    field_two,
+    field_three,
+    field_four,
+    field_five,
+    field_six,
+    field_seven,
+    field_eight,
+};
+enum {
+    optional = false,
+    mandatory = true
+};
+
 static int decode_header(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame)
 {
     assert(amqp_buffer_size(buffer) >= AMQP_FRAME_HEADER_SIZE);
@@ -83,15 +99,12 @@ static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amq
     if (amqp_type_is_convert_failed(type))
     {
         amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Descriptor is not a symbol or ulong.");
-        amqp_context_printf(context, "Invalid frame: ....\n ");
-        amqp_type_print(context, type, buffer);
         return false;
     }
 
     if (frame->descriptor.domain != AMQP_DESCRIPTOR_DOMAIN)
     {
         amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Frame is for an unsupported descriptor domain. Domain = %d", frame->descriptor.domain);
-        amqp_type_print(context, type, buffer);
         return false;
     }
 
@@ -102,31 +115,144 @@ static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amq
     return true;
 }
 
-static int decode_mandatory_multiple_symbol(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *list, int field_number, amqp_multiple_symbol_t *multiple)
-{
-    //TODO
-    //TODO - pass in multiple
-    //TODO
-    assert(amqp_type_is_list(list));
+#define amqp_field_error(context, code, field, total, ...) _amqp_decode_field_error(context, __FILE__, __LINE__, #code, code, field, total, "" __VA_ARGS__)
+#define amqp_decode_field_error(context, field, total, ...) amqp_field_error(context, AMQP_ERROR_FRAME_FIELD_DECODE_FAILED, field, total, "" __VA_ARGS__)
+#define amqp_mandatory_field_missing_error(context, field, total, s) amqp_field_error(context, AMQP_ERROR_MULTIPLE_DECODE_FAILED, field, total, "Mandatory \"%s\" is null or missing", s)
 
-    if (field_number >= list->value.list.count)
+void _amqp_decode_field_error(amqp_context_t *context, const char *filename, int line_number, const char *error_mnemonic, int error_code, int field, int total, const char *format, ...)
+{
+    char message[256];
+    va_list args;
+
+    va_start(args, format);
+    vsnprintf(message, sizeof(message), format, args);
+    va_end(args);
+
+    _amqp_error(context, 1, filename, line_number, 0, error_mnemonic, error_code, "Failed to decode field at position %d (%d of %d). %s", field, field + 1, total, message);
+}
+
+#define amqp_decode_frame_error(context, frame_type) amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode a %s frame.", frame_type);
+
+
+static inline
+amqp_type_t *field(amqp_type_t *list, int field_number)
+{
+    return list && (field_number < list->value.list.count) ? list->value.list.elements[field_number] : 0;
+}
+static inline
+int field_is_null(amqp_type_t *field)
+{
+    return (field == 0) || amqp_type_is_null(field);
+}
+
+static int decode_multiple_symbol(int mandatory, amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_multiple_symbol_t *multiple)
+{
+    if (field_is_null(field))
     {
-        amqp_error(context, AMQP_ERROR_MULTIPLE_DECODE_FAILED, "Mandatory multiple symbol field missing");
-        // TODO - dump type
+        if (mandatory)
+        {
+            amqp_mandatory_field_missing_error(context, field_number, total_fields, "multiple symbol");
+            return false;
+        }
+        else
+        {
+            amqp_multiple_symbol_initialize_as_null(context, multiple);
+            return true;
+        }
+    }
+
+    if (!amqp_multiple_symbol_initialize(context, multiple, field))
+    {
+        amqp_decode_field_error(context, field_number, total_fields, "Field is not a valid multiple symbol.");
         return false;
     }
-    if (!amqp_multiple_symbol_initialize(context, multiple, list->value.list.elements[field_number]))
+
+    if (multiple && multiple->size == 0)
     {
-        amqp_error(context, AMQP_ERROR_MULTIPLE_DECODE_FAILED, "Field is not a multiple symbol.");
-        // TODO - dump type
+        amqp_decode_field_error(context, field_number, total_fields, "Mandatory multiple symbol field is empty.");
         return false;
     }
-    if (multiple->size == 0)
+    return true;
+}
+
+//static
+int decode_symbol(int mandatory, amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_symbol_t *symbol)
+{
+    if (field_is_null(field))
     {
-        amqp_error(context, AMQP_ERROR_MULTIPLE_DECODE_FAILED, "Mandatory multiple symbol field is null or empty.");
-        // TODO - dump type
+        if (mandatory)
+        {
+            amqp_mandatory_field_missing_error(context, field_number, total_fields, "symbol");
+            return false;
+        }
+        else
+        {
+            amqp_symbol_initialize_as_null(context, symbol);
+            return true;
+        }
+    }
+
+    if (!amqp_type_is_symbol(field))
+    {
+        amqp_decode_field_error(context, field_number, total_fields, "Expected a symbol.");
         return false;
     }
+
+    amqp_symbol_initialize_from_type(context, symbol, field);
+    return true;
+}
+
+//static
+int decode_binary(int mandatory, amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_binary_t *binary)
+{
+    if (field_is_null(field))
+    {
+        if (mandatory)
+        {
+            amqp_mandatory_field_missing_error(context, field_number, total_fields, "binary");
+            return false;
+        }
+        else
+        {
+            amqp_binary_initialize_as_null(context, binary);
+            return true;
+        }
+    }
+
+    if (!amqp_type_is_binary(field))
+    {
+        amqp_decode_field_error(context, field_number, total_fields, "Expected a binary field.");
+        return false;
+    }
+
+    amqp_binary_initialize_from_type(context, binary, field);
+    return true;
+}
+
+//static
+int decode_string(int mandatory, amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_string_t *string)
+{
+    if (field_is_null(field))
+    {
+        if (mandatory)
+        {
+            amqp_mandatory_field_missing_error(context, field_number, total_fields, "string");
+            return false;
+        }
+        else
+        {
+            amqp_string_initialize_as_null(context, string);
+            return true;
+        }
+    }
+
+    if (!amqp_type_is_string(field))
+    {
+        amqp_decode_field_error(context, field_number, total_fields, "Expected a string.");
+        return false;
+    }
+
+    amqp_string_initialize_from_type(context, string, field);
     return true;
 }
 
@@ -140,12 +266,20 @@ static void cleanup_sasl_mechanisms_frame(amqp_context_t *context, amqp_frame_t 
 {
     amqp_multiple_symbol_cleanup(context, &frame->frames.sasl.mechanisms.sasl_server_mechanisms);
 }
-static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
+static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
 {
+    int rc;
     frame->dispatch = amqp_dispatch_sasl_mechanisms;
     frame->cleanup = cleanup_sasl_mechanisms_frame;
 
-    return decode_mandatory_multiple_symbol(context, buffer, frame, type, 0, &frame->frames.sasl.mechanisms.sasl_server_mechanisms);
+    rc = decode_multiple_symbol(mandatory, context, field(field_list, field_zero), field_zero, 1, &frame->frames.sasl.mechanisms.sasl_server_mechanisms);
+
+    if (rc == 0)
+    {
+        amqp_decode_frame_error(context, "SASL Mechanisms");
+        return false;
+    }
+    return true;
 }
 
 /*
@@ -158,14 +292,27 @@ static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *
 */
 static void cleanup_sasl_init_frame(amqp_context_t *context, amqp_frame_t *frame)
 {
-//    not_implemented(todo);
+    amqp_symbol_cleanup(context, &frame->frames.sasl.init.mechanism);
+//    amqp_binary_cleanup(context, &frame->frames.sasl.init.initial_response);
+//    amqp_string_cleanup(context, &frame->frames.sasl.init.hostname);
 }
-static int decode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
+static int decode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
 {
+    const int total_frames = 3;
+    int rc;
     frame->dispatch = amqp_dispatch_sasl_init;
     frame->cleanup = cleanup_sasl_init_frame;
 
-    return 0;
+    rc = decode_symbol(mandatory, context, field(field_list, field_zero), field_zero, total_frames, &frame->frames.sasl.init.mechanism);
+//    rc = rc && decode_binary(context, field(field_list, field_one), field_one, total_frames, &frame->frames.sasl.init.initial_response);
+//    rc = rc && decode_string(context, field(field_list, field_two), field_two, total_frames, &frame->frames.sasl.init.hostname);
+
+    if (rc == 0)
+    {
+        amqp_decode_frame_error(context, "SASL Init");
+    }
+
+    return rc;
 }
 
 static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *descriptor_type, amqp_type_t *type)
@@ -188,6 +335,10 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
         case AMQP_FRAME_ID_SASL_INIT_LIST:
             return decode_sasl_init_frame(context, buffer, frame, type);
 
+        case AMQP_FRAME_ID_SASL_CHALLENGE_LIST:
+        case AMQP_FRAME_ID_SASL_RESPONSE_LIST:
+        case AMQP_FRAME_ID_SASL_OUTCOME_LIST:
+
         case AMQP_FRAME_ID_OPEN_LIST:
         case AMQP_FRAME_ID_BEGIN_LIST:
         case AMQP_FRAME_ID_ATTACH_LIST:
@@ -198,9 +349,6 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
         case AMQP_FRAME_ID_END_LIST:
         case AMQP_FRAME_ID_CLOSE_LIST:
         case AMQP_FRAME_ID_ERROR_LIST:
-        case AMQP_FRAME_ID_SASL_CHALLENGE_LIST:
-        case AMQP_FRAME_ID_SASL_RESPONSE_LIST:
-        case AMQP_FRAME_ID_SASL_OUTCOME_LIST:
 
         default:
             amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Unsupported descriptor id. Id = %08x", frame->descriptor.id);
@@ -211,14 +359,33 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
 
 static int decode_performative(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *type)
 {
+    int rc;
+
     if (!amqp_type_is_valid(type))
     {
         amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Frame is not a valid AMQP type");
+        // TODO - dump frame buffer
         return false;
     }
 
-    return decode_descriptor(context, buffer, frame, amqp_type_get_descriptor(type)) &&
-            decode_remainder(context, buffer, frame, amqp_type_get_descriptor(type), amqp_type_get_described(type));
+    rc = decode_descriptor(context, buffer, frame, amqp_type_get_descriptor(type));
+    if (rc == 0)
+    {
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame descriptor");
+    }
+
+    if (rc)
+    {
+        rc = decode_remainder(context, buffer, frame, amqp_type_get_descriptor(type), amqp_type_get_described(type));
+    }
+
+    if (rc == 0)
+    {
+        amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Dumping type...");
+        amqp_type_dump(context, 2, type, buffer);
+    }
+
+    return rc;
 }
 
 static int decode_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame)

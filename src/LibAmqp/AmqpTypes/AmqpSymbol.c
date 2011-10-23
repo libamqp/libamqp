@@ -22,6 +22,7 @@
 #include "AmqpTypes/AmqpSymbol.h"
 #include "Codec/Type/TypeExtension.h"
 
+#include "debug_helper.h"
 
 uint8_t *duplicate(amqp_context_t *context, const char *data, size_t size)
 {
@@ -44,10 +45,16 @@ static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 static void initialize_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
     amqp_symbol_t *symbol = (amqp_symbol_t *) type;
+    break_two();
     if (symbol->data)
     {
         AMQP_FREE(context, symbol->data);
     }
+}
+
+void amqp_symbol_initialize_as_null(amqp_context_t *context, amqp_symbol_t *symbol)
+{
+not_implemented(todo);
 }
 
 void amqp_symbol_initialize(amqp_context_t *context, amqp_symbol_t *symbol, const char *data, size_t size)
@@ -84,6 +91,7 @@ void amqp_symbol_initialize_from_type(amqp_context_t *context, amqp_symbol_t *sy
     };
     assert(amqp_type_is_symbol(type));
     symbol->leader.fn_table = &table;
+
     symbol->type = type;
     symbol->size = type->position.size;
     amqp_block_header_initialize(&symbol->block, 0, 0, 0);

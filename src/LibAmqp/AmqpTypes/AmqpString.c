@@ -24,6 +24,10 @@
 #include "debug_helper.h"
 
 
+void amqp_string_initialize_as_null(amqp_context_t *context, amqp_string_t *string)
+{
+    not_implemented(todo);
+}
 void amqp_string_initialize_from_type(amqp_context_t *context, amqp_string_t *string, amqp_type_t *type)
 {
     assert(amqp_type_is_string(type));

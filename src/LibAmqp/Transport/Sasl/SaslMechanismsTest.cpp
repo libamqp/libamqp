@@ -73,7 +73,6 @@ SUITE(Sasl)
     {
         amqp_context_register_sasl_plugin(context, amqp_plugin_sasl_anonymous_create(context));
 
-        break_one();
         type = amqp_sasl_mechanisms_encode(context, buffer);
         ASSERT(type);
         CHECK(amqp_type_is_array(type));

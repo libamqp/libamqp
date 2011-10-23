@@ -30,6 +30,7 @@ struct amqp_binary_t
     size_t size;
 };
 
+extern void amqp_binary_initialize_as_null(amqp_context_t *context, amqp_binary_t *binary);
 extern void amqp_binary_initialize_from_type(amqp_context_t *context, amqp_binary_t *binary, amqp_type_t *type);
 extern amqp_binary_t *amqp_binary_create_from_type(amqp_context_t *context,  amqp_type_t *type);
 

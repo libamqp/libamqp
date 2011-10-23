@@ -30,6 +30,7 @@ struct amqp_string_t
     size_t size;
 };
 
+extern void amqp_string_initialize_as_null(amqp_context_t *context, amqp_string_t *string);
 extern void amqp_string_initialize_from_type(amqp_context_t *context, amqp_string_t *string, amqp_type_t *type);
 extern amqp_string_t *amqp_string_create_from_type(amqp_context_t *context,  amqp_type_t *type);
 

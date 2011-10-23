@@ -84,6 +84,8 @@ void _vamqp_error(amqp_context_t *context, int level, const char *filename, int 
 void _amqp_error(amqp_context_t *context, int level, const char *filename, int line_number, const char *source, const char *error_mnemonic, int error_code, const char *format, ...)
 {
     va_list args;
+
+    assert(error_mnemonic != 0 && format != 0 );
     va_start(args, format);
     _vamqp_error(context, level, filename, line_number, source, error_mnemonic, error_code, format, args);
     va_end(args);

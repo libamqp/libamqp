@@ -64,10 +64,10 @@ struct amqp_frame_t
     union {
         union {
             amqp_frame_sasl_mechanisms_t mechanisms;
-            amqp_frame_sasl_init_t sasl_init;
-            amqp_frame_sasl_challenge_t sasl_challenge;
-            amqp_frame_sasl_response_t sasl_response;
-            amqp_frame_sasl_outcome_t sasl_outcome;
+            amqp_frame_sasl_init_t init;
+            amqp_frame_sasl_challenge_t challenge;
+            amqp_frame_sasl_response_t response;
+            amqp_frame_sasl_outcome_t outcome;
         } sasl;
         union {
             int pad;

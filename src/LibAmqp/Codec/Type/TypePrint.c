@@ -187,6 +187,14 @@ static void amqp_type_print_formatted_leader(amqp_context_t *context, amqp_type_
     }
 }
 
+void amqp_type_dump(amqp_context_t *context, int level, amqp_type_t *type, amqp_buffer_t *buffer)
+{
+    if (level < context->debug.level)
+    {
+        amqp_type_print(context, type, buffer);
+    }
+}
+
 void amqp_type_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
     int old_auto_indent = amqp_context_set_auto_indent(context, 4);
@@ -215,11 +223,11 @@ void amqp_type_print_formatted(amqp_context_t *context, amqp_type_t *type, amqp_
 
 void amqp_type_method_described_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    str_print(context, "{descriptor={");
+    str_print(context, "{descriptor={\n");
     amqp_type_print(context, type->value.described.elements[0], buffer);
-    str_print(context, "}, type={");
+    str_print(context, "\n}, type={\n");
     amqp_type_print(context, type->value.described.elements[1], buffer);
-    str_print(context, "}}");
+    str_print(context, "\n}}\n");
 }
 
 void amqp_type_method_null_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)

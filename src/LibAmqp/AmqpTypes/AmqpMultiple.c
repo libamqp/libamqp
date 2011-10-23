@@ -98,6 +98,17 @@ int amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbo
     return initialize_from_type(context, multiple, type);
 }
 
+void amqp_multiple_symbol_initialize_as_null(amqp_context_t *context, amqp_multiple_symbol_t *multiple)
+{
+    static amqp_fn_table_t table = {
+        .dtor = initialize_dtor
+    };
+
+    multiple->leader.fn_table = &table;
+    multiple->size = 0;
+    multiple->symbols = 0;
+}
+
 amqp_multiple_symbol_t *amqp_multiple_symbol_create(amqp_context_t *context, amqp_type_t *type)
 {
     static amqp_fn_table_t table = {

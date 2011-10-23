@@ -24,6 +24,8 @@ extern "C" {
 
 typedef int amqp_debug_printc_t(int c);
 
+extern void amqp_type_dump(amqp_context_t *context, int level, amqp_type_t *type, amqp_buffer_t *buffer);
+
 extern void amqp_type_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer);
 extern void amqp_type_print_formatted(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer);
 

@@ -27,6 +27,8 @@
 
 SUITE(FrameTypeDecode)
 {
+    // These tests ensure that the AMQP encoded part of a frame can be decoded.
+
     class DecodeFixture : public SuiteCodec::CodecFixture
     {
     public:
