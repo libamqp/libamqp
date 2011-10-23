@@ -68,7 +68,7 @@ const void *amqp_symbol_map_get(amqp_map_t *map, const amqp_symbol_t *key)
     return amqp_map_get(map, key);
 }
 
-extern int amqp_symbol_to_bytes(amqp_symbol_t *symbol, char *buffer, size_t buffer_size);
+extern int amqp_symbol_to_bytes(amqp_symbol_t *symbol, uint8_t *buffer, size_t buffer_size);
 extern int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs);
 extern int amqp_symbol_compare_with_cstr(amqp_symbol_t *lhs, const char *rhs);
 extern int amqp_symbol_compare_with_bytes(amqp_symbol_t *lhs, const uint8_t *rhs, size_t size);

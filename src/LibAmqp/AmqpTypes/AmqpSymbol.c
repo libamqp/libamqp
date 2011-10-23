@@ -122,9 +122,9 @@ void amqp_symbol_map_cleanup(amqp_context_t *context, amqp_map_t *map)
     amqp_map_cleanup_with_callback(context, map, cleanup_callback);
 }
 
-int amqp_symbol_to_bytes(amqp_symbol_t *symbol, char *buffer, size_t buffer_size)
+int amqp_symbol_to_bytes(amqp_symbol_t *symbol, uint8_t *buffer, size_t buffer_size)
 {
-    return amqp_variable_to_bytes(&symbol->v, (uint8_t *) buffer, buffer_size);
+    return amqp_variable_to_bytes(&symbol->v, buffer, buffer_size);
 }
 
 int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)

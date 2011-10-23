@@ -58,7 +58,7 @@ SUITE(AmqpTypes)
         uint8_t data[n];
         memset(data, '\0', n);
 
-        amqp_string_copy_to(string, data, n);
+        amqp_string_to_bytes(string, data, n);
         CHECK_EQUAL(257U, amqp_string_size(string));
         CHECK_EQUAL((const char *) data, test_data::lorem_ipsum);
     }

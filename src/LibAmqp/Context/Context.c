@@ -276,12 +276,12 @@ void amqp_context_set_name(amqp_context_t *context, const char *name)
     context->debug.name[n  - 1] = '\0';
 }
 
-char *amqp_allocate_print_buffer(amqp_context_t *context, size_t n)
+uint8_t *amqp_allocate_print_buffer(amqp_context_t *context, size_t n)
 {
     if (n < 128) n = 128;
-    return (char *) malloc(n);
+    return (uint8_t *) malloc(n);
 }
-void amqp_deallocate_print_buffer(amqp_context_t *context, char *buffer)
+void amqp_deallocate_print_buffer(amqp_context_t *context, uint8_t *buffer)
 {
     free(buffer);
 }

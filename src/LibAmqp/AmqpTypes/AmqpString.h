@@ -23,11 +23,13 @@ extern "C" {
 #include "AmqpTypes/AmqpLeader.h"
 #include "Codec/Type/TypeExtension.h"
 
+#include "AmqpTypes/AmqpVariable.h"
+
+
 struct amqp_string_t
 {
     amqp_leader_t leader;
-    amqp_type_t *type;
-    size_t size;
+    amqp_variable_t v;
 };
 
 extern void amqp_string_initialize_as_null(amqp_context_t *context, amqp_string_t *string);
@@ -43,17 +45,14 @@ void amqp_string_cleanup(amqp_context_t *context, amqp_string_t *string)
 static inline
 size_t amqp_string_size(amqp_string_t *string)
 {
-    return string->size;
+    return string->v.size;
 }
 
-static inline
-size_t amqp_string_copy_to(amqp_string_t *string, uint8_t *destination, size_t destination_size)
-{
-    return amqp_type_copy_to(string->type, destination, destination_size);
-}
-
+extern int amqp_string_to_bytes(amqp_string_t *string, uint8_t *buffer, size_t buffer_size);
 extern int amqp_string_compare(amqp_string_t *lhs, amqp_string_t *rhs);
 extern int amqp_string_compare_with_cstr(amqp_string_t *lhs, const char *rhs);
+extern int amqp_string_compare_with_bytes(amqp_string_t *lhs, const uint8_t *rhs, size_t size);
+extern uint32_t amqp_string_hash(amqp_string_t *string);
 
 #ifdef __cplusplus
 }

@@ -62,7 +62,7 @@ amqp_multiple_symbol_t *amqp_multiple_symbol_create_from_type(amqp_context_t *co
     return amqp_multiple_symbol_create(context, type);
 }
 extern void amqp_multiple_symbol_cleanup(amqp_context_t *context, amqp_multiple_symbol_t *multiple);
-extern int amqp_multiple_symbol_to_char_bytes(amqp_multiple_symbol_t *multiple, const char *spacer, char *buffer, size_t buffer_size);
+extern int amqp_multiple_symbol_to_char_bytes(amqp_multiple_symbol_t *multiple, const char *spacer, uint8_t *buffer, size_t buffer_size);
 extern int amqp_multiple_symbol_total_length(amqp_multiple_symbol_t *multiple);
 #ifdef __cplusplus
 }

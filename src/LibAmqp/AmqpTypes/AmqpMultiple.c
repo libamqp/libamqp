@@ -132,12 +132,12 @@ int amqp_multiple_symbol_total_length(amqp_multiple_symbol_t *multiple)
     return result;
 }
 
-int amqp_multiple_symbol_to_char_bytes(amqp_multiple_symbol_t *multiple, const char *spacer, char *buffer, size_t buffer_size)
+int amqp_multiple_symbol_to_char_bytes(amqp_multiple_symbol_t *multiple, const char *spacer, uint8_t *buffer, size_t buffer_size)
 {
     int result = 0;
     int available = buffer_size - 1;
     int i, n;
-    char *p = buffer;
+    uint8_t *p = buffer;
 
     if (buffer == 0 || buffer_size == 0)
     {
@@ -148,7 +148,7 @@ int amqp_multiple_symbol_to_char_bytes(amqp_multiple_symbol_t *multiple, const c
     {
         if (i > 0)
         {
-            n = snprintf(p, available, "%s", spacer);
+            n = snprintf((char *) p, available, "%s", spacer);
             result += n;
             p += n;
             available -= n;

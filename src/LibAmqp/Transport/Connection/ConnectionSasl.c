@@ -136,7 +136,7 @@ static void sasl_mechanisms_while_waiting_on_sasl_mechanisms(amqp_connection_t *
     else
     {
         int space = amqp_multiple_symbol_total_length(multiple) + (amqp_multiple_symbol_size(multiple) - 1) * 2 + 1;
-        char *buffer = amqp_allocate_print_buffer(connection->context, space);
+        uint8_t *buffer = amqp_allocate_print_buffer(connection->context, space);
         amqp_multiple_symbol_to_char_bytes(multiple, ", ", buffer, space);
         amqp_connection_failed(connection, AMQP_ERROR_NO_SASL_MECHANISM, AMQP_CONNECTION_SASL_ERROR, "No SASL plugin matches broker mechanism list. Broker supports: %s", buffer);
         amqp_deallocate_print_buffer(connection->context, buffer);

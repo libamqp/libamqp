@@ -190,8 +190,8 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     extern amqp_sasl_plugin_t *amqp_context_next_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_node_t **sasl_plugin_node);
     extern int amqp_context_sasl_plugin_count(amqp_context_t *context);
 
-    extern char *amqp_allocate_print_buffer(amqp_context_t *context, size_t n);
-    extern void amqp_deallocate_print_buffer(amqp_context_t *context, char *buffer);
+    extern uint8_t *amqp_allocate_print_buffer(amqp_context_t *context, size_t n);
+    extern void amqp_deallocate_print_buffer(amqp_context_t *context, uint8_t *buffer);
 #ifdef __cplusplus
 }
 #endif

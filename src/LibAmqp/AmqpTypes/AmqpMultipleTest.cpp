@@ -83,9 +83,9 @@ SUITE(AmqpTypes)
         multiple = amqp_multiple_symbol_create(context, type);
         CHECK_EQUAL(3, multiple->size);
 
-        char buffer[512];
+        uint8_t buffer[512];
         amqp_multiple_symbol_to_char_bytes(multiple, ", ", buffer, sizeof(buffer));
-        CHECK_EQUAL("PLAIN, Foo, Fum", buffer);
+        CHECK_EQUAL("PLAIN, Foo, Fum", (char *) buffer);
     }
 
     TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_to_string_with_small_buffer)
@@ -96,9 +96,9 @@ SUITE(AmqpTypes)
         multiple = amqp_multiple_symbol_create(context, type);
         CHECK_EQUAL(3, multiple->size);
 
-        char buffer[5];
+        uint8_t buffer[5];
         amqp_multiple_symbol_to_char_bytes(multiple, ", ", buffer, sizeof(buffer));
-        CHECK_EQUAL("PLAI", buffer);
+        CHECK_EQUAL("PLAI", (char *) buffer);
     }
 
     TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_null)
