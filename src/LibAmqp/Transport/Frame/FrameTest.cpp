@@ -94,7 +94,6 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, sasl_init_frame)
     {
-        SOUTS("sasl_init_frame");
         test_data::sasl_init_frame.transfer_to(buffer);
         frame = amqp_decode_sasl_frame(context, buffer);
         ASSERT(frame != 0);

@@ -45,7 +45,6 @@ static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 static void initialize_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
     amqp_symbol_t *symbol = (amqp_symbol_t *) type;
-    break_two();
     if (symbol->data)
     {
         AMQP_FREE(context, symbol->data);
