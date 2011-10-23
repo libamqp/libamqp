@@ -20,7 +20,8 @@
 #include "Misc/Bits.h"
 #include "AmqpTypes/AmqpTypesInternal.h"
 #include "AmqpTypes/AmqpVariable.h"
-#include "Codec/Type/TypeExtension.h"
+
+#include "AmqpTypes/AmqpVariableInternal.h"
 
 #include "debug_helper.h"
 

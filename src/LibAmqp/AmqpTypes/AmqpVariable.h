@@ -20,11 +20,7 @@
 extern "C" {
 #endif
 
-#include <string.h>
-
 #include "AmqpTypes/AmqpLeader.h"
-#include "Codec/Type/Type.h"
-#include "Codec/Type/TypeExtension.h"
 
 typedef struct amqp_variable_t
 {
@@ -33,17 +29,6 @@ typedef struct amqp_variable_t
     struct amqp_block_header block;
     const uint8_t *data;
 } amqp_variable_t;
-
-extern int amqp_variable_compare(amqp_variable_t *lhs, amqp_variable_t *rhs);
-extern int amqp_variable_compare_with_cstr(amqp_variable_t *lhs, const char *rhs);
-extern int amqp_variable_compare_with_bytes(amqp_variable_t *lhs, const uint8_t *rhs, size_t size);
-extern uint32_t amqp_variable_hash(amqp_variable_t *variable);
-
-static inline
-int amqp_variable_to_char_bytes(amqp_variable_t *variable, uint8_t *buffer, size_t buffer_size)
-{
-    return amqp_type_copy_to(variable->type, buffer, buffer_size);
-}
 
 #ifdef __cplusplus
 }

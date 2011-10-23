@@ -55,9 +55,6 @@ void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol)
     amqp_type_cleanup(context, (amqp_amqp_type_t *) symbol);
 }
 
-extern int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs);
-extern int amqp_symbol_compare_with_cstr(amqp_symbol_t *lhs, const char *rhs);
-extern uint32_t amqp_symbol_hash(amqp_symbol_t *symbol);
 
 extern void amqp_symbol_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity);
 extern amqp_map_t *amqp_symbol_map_create(amqp_context_t *context, int initial_capacity);
@@ -74,7 +71,11 @@ const void *amqp_symbol_map_get(amqp_map_t *map, const amqp_symbol_t *key)
     return amqp_map_get(map, key);
 }
 
-extern int amqp_symbol_to_char_bytes(amqp_symbol_t *symbol, char *buffer, size_t buffer_size);
+extern int amqp_symbol_to_bytes(amqp_symbol_t *symbol, char *buffer, size_t buffer_size);
+extern int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs);
+extern int amqp_symbol_compare_with_cstr(amqp_symbol_t *lhs, const char *rhs);
+extern int amqp_symbol_compare_with_bytes(amqp_symbol_t *lhs, const uint8_t *rhs, size_t size);
+extern uint32_t amqp_symbol_hash(amqp_symbol_t *symbol);
 
 #ifdef __cplusplus
 }

@@ -197,7 +197,7 @@ void amqp_symbol_map_cleanup(amqp_context_t *context, amqp_map_t *map)
     amqp_map_cleanup_with_callback(context, map, cleanup_callback);
 }
 
-int amqp_symbol_to_char_bytes(amqp_symbol_t *symbol, char *buffer, size_t buffer_size)
+int amqp_symbol_to_bytes(amqp_symbol_t *symbol, char *buffer, size_t buffer_size)
 {
     int i;
     for (i = 0; i < symbol->size && i < buffer_size; i++)

@@ -153,7 +153,7 @@ int amqp_multiple_symbol_to_char_bytes(amqp_multiple_symbol_t *multiple, const c
             p += n;
             available -= n;
         }
-        n = amqp_symbol_to_char_bytes(amqp_multiple_symbol_get(multiple, i), p, available);
+        n = amqp_symbol_to_bytes(amqp_multiple_symbol_get(multiple, i), p, available);
         result += n;
         p += n;
         available -= n;
