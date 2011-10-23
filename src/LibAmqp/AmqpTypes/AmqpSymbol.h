@@ -24,15 +24,13 @@ extern "C" {
 
 #include "AmqpTypes/AmqpLeader.h"
 #include "AmqpTypes/AmqpMap.h"
+#include "AmqpTypes/AmqpVariable.h"
 
 
 struct amqp_symbol_t
 {
     amqp_leader_t leader;
-    amqp_type_t *type;
-    size_t size;
-    struct amqp_block_header block;
-    const uint8_t *data;
+    amqp_variable_t v;
 };
 
 extern void amqp_symbol_initialize_as_null(amqp_context_t *context, amqp_symbol_t *symbol);
@@ -54,7 +52,6 @@ void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol)
 {
     amqp_type_cleanup(context, (amqp_amqp_type_t *) symbol);
 }
-
 
 extern void amqp_symbol_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity);
 extern amqp_map_t *amqp_symbol_map_create(amqp_context_t *context, int initial_capacity);

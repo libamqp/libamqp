@@ -30,6 +30,7 @@ typedef struct amqp_variable_t
     const uint8_t *data;
 } amqp_variable_t;
 
+
 #ifdef __cplusplus
 }
 #endif

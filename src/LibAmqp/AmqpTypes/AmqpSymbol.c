@@ -21,6 +21,7 @@
 #include "AmqpTypes/AmqpTypesInternal.h"
 #include "AmqpTypes/AmqpSymbol.h"
 #include "Codec/Type/TypeExtension.h"
+#include "AmqpTypes/AmqpVariableInternal.h"
 
 #include "debug_helper.h"
 
@@ -34,9 +35,9 @@ uint8_t *duplicate(amqp_context_t *context, const char *data, size_t size)
 static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
     amqp_symbol_t *symbol = (amqp_symbol_t *) type;
-    if (symbol->data)
+    if (symbol->v.data)
     {
-        AMQP_FREE(context, symbol->data);
+        AMQP_FREE(context, symbol->v.data);
     }
 
     AMQP_FREE(context, symbol);
@@ -45,9 +46,9 @@ static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 static void initialize_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
     amqp_symbol_t *symbol = (amqp_symbol_t *) type;
-    if (symbol->data)
+    if (symbol->v.data)
     {
-        AMQP_FREE(context, symbol->data);
+        AMQP_FREE(context, symbol->v.data);
     }
 }
 
@@ -62,10 +63,7 @@ void amqp_symbol_initialize(amqp_context_t *context, amqp_symbol_t *symbol, cons
         .dtor = initialize_dtor
     };
     symbol->leader.fn_table = &table;
-    symbol->type = 0;
-    symbol->size = size;
-    amqp_block_header_initialize(&symbol->block, size, size, 1);
-    symbol->data = duplicate(context, data, size);
+    amqp_variable_initialize(&symbol->v, amqp_duplicate(context, (const uint8_t *) data, size), size);
 }
 
 amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, const char *data, size_t size)
@@ -76,10 +74,7 @@ amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, const char *data, siz
 
     amqp_symbol_t *result = AMQP_MALLOC(context, amqp_symbol_t);
     result->leader.fn_table = &table;
-    result->type = 0;
-    result->size = size;
-    amqp_block_header_initialize(&result->block, size, size, 1);
-    result->data = duplicate(context, data, size);
+    amqp_variable_initialize(&result->v, amqp_duplicate(context, (const uint8_t *) data, size), size);
     return result;
 }
 
@@ -90,11 +85,7 @@ void amqp_symbol_initialize_from_type(amqp_context_t *context, amqp_symbol_t *sy
     };
     assert(amqp_type_is_symbol(type));
     symbol->leader.fn_table = &table;
-
-    symbol->type = type;
-    symbol->size = type->position.size;
-    amqp_block_header_initialize(&symbol->block, 0, 0, 0);
-    symbol->data = 0;
+    amqp_variable_initialize_from_type(&symbol->v, type);
 }
 
 amqp_symbol_t *amqp_symbol_create_from_type(amqp_context_t *context, amqp_type_t *type)
@@ -105,76 +96,10 @@ amqp_symbol_t *amqp_symbol_create_from_type(amqp_context_t *context, amqp_type_t
     amqp_symbol_t *result = AMQP_MALLOC(context, amqp_symbol_t);
     assert(amqp_type_is_symbol(type));
     result->leader.fn_table = &table;
-    result->type = type;
-    result->size = type->position.size;
-    amqp_block_header_initialize(&result->block, 0, 0, 0);
-    result->data = 0;
+    amqp_variable_initialize_from_type(&result->v, type);
     return result;
 }
 
-static
-amqp_memory_t *data_to_block(amqp_symbol_t *symbol)
-{
-    if (symbol->type)
-    {
-        assert(amqp_type_is_variable(symbol->type));
-        return (amqp_memory_t *) symbol->type->value.variable.buffer;
-    }
-    else
-    {
-        return (amqp_memory_t *) &symbol->block;
-    }
-}
-static
-size_t data_offset(amqp_symbol_t *symbol)
-{
-    return symbol->type ? symbol->type->position.index : 0;
-}
-
-int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
-{
-    int n, rc;
-    assert(lhs != 0 && rhs != 0);
-
-    n = lhs->size;
-    if (rhs->size < n) n = rhs->size;
-
-    rc = amqp_block_compare(data_to_block(lhs), data_offset(lhs), data_to_block(rhs), data_offset(rhs), n);
-    return rc != 0 ? rc : lhs->size - rhs->size;
-}
-
-int amqp_symbol_compare_with_cstr(amqp_symbol_t *lhs, const char *rhs)
-{
-    struct {
-        struct amqp_block_header header;
-        unsigned char *rhs;
-    } block;
-
-    int n, rc;
-    int rhs_size;
-
-    assert(lhs != 0 && rhs != 0);
-
-    rhs_size = strlen(rhs);
-    block.header.capacity = block.header.fragment_size = rhs_size;
-    block.header.n_fragments = 1;
-    block.rhs = (uint8_t *) rhs;
-
-    n = lhs->size;
-    if (rhs_size < n) n = rhs_size;
-
-    rc = amqp_block_compare(data_to_block(lhs), data_offset(lhs), (amqp_memory_t *) &block, 0, n);
-    return rc != 0 ? rc : lhs->size - rhs_size;
-}
-
-uint32_t amqp_symbol_hash(amqp_symbol_t *symbol)
-{
-    assert(symbol != 0);
-    // TODO - introduce a hash for fragmented types
-    return symbol->type ?
-        amqp_hash((void *) amqp_buffer_pointer(symbol->type->value.variable.buffer, symbol->type->position.index), symbol->type->position.size) :
-        amqp_hash((void *) symbol->data, symbol->size);
-}
 
 void amqp_symbol_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity)
 {
@@ -199,10 +124,26 @@ void amqp_symbol_map_cleanup(amqp_context_t *context, amqp_map_t *map)
 
 int amqp_symbol_to_bytes(amqp_symbol_t *symbol, char *buffer, size_t buffer_size)
 {
-    int i;
-    for (i = 0; i < symbol->size && i < buffer_size; i++)
-    {
-        buffer[i] = symbol->type ? amqp_unchecked_getc_at(symbol->type->value.variable.buffer, symbol->type->position.index + i) : symbol->data[i];
-    }
-    return i;
+    return amqp_variable_to_bytes(&symbol->v, (uint8_t *) buffer, buffer_size);
 }
+
+int amqp_symbol_compare(amqp_symbol_t *lhs, amqp_symbol_t *rhs)
+{
+    return amqp_variable_compare(&lhs->v, &rhs->v);
+}
+
+int amqp_symbol_compare_with_cstr(amqp_symbol_t *lhs, const char *rhs)
+{
+    return amqp_variable_compare_with_cstr(&lhs->v, rhs);
+}
+
+int amqp_symbol_compare_with_bytes(amqp_symbol_t *lhs, const uint8_t *rhs, size_t size)
+{
+    return amqp_variable_compare_with_bytes(&lhs->v, rhs, size);
+}
+
+uint32_t amqp_symbol_hash(amqp_symbol_t *symbol)
+{
+    return amqp_variable_hash(&symbol->v);
+}
+

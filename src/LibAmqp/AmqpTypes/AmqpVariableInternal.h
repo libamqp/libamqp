@@ -29,7 +29,26 @@ extern "C" {
 #include "AmqpTypes/AmqpVariable.h"
 
 static inline
-int amqp_variable_to_char_bytes(amqp_variable_t *variable, uint8_t *buffer, size_t buffer_size)
+void amqp_variable_initialize_from_type(amqp_variable_t *variable, amqp_type_t *type)
+{
+    variable->type = type;
+    variable->size = type->position.size;
+    amqp_block_header_initialize(&variable->block, 0, 0, 0);
+    variable->data = 0;
+}
+static inline
+void amqp_variable_initialize(amqp_variable_t *variable, const uint8_t *data, size_t size)
+{
+    variable->type = 0;
+    variable->size = size;
+    amqp_block_header_initialize(&variable->block, size, size, 1);
+    variable->data = data;
+}
+
+extern uint8_t *amqp_duplicate(amqp_context_t *context, const uint8_t *data, size_t size);
+
+static inline
+int amqp_variable_to_bytes(amqp_variable_t *variable, uint8_t *buffer, size_t buffer_size)
 {
     return amqp_type_copy_to(variable->type, buffer, buffer_size);
 }

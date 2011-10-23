@@ -127,7 +127,7 @@ int amqp_multiple_symbol_total_length(amqp_multiple_symbol_t *multiple)
     for (i = 0; i < multiple->size; i++)
     {
         amqp_symbol_t *symbol = amqp_multiple_symbol_get(multiple, i);
-        result += symbol->size;
+        result += symbol->v.size;
     }
     return result;
 }

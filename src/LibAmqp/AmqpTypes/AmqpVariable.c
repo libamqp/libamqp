@@ -25,7 +25,7 @@
 
 #include "debug_helper.h"
 
-uint8_t *duplicate(amqp_context_t *context, const char *data, size_t size)
+uint8_t *amqp_duplicate(amqp_context_t *context, const uint8_t *data, size_t size)
 {
     uint8_t *result = (uint8_t *) amqp_malloc(context, size);
     memcpy(result, data, size);
@@ -64,7 +64,7 @@ int amqp_variable_compare(amqp_variable_t *lhs, amqp_variable_t *rhs)
     return rc != 0 ? rc : lhs->size - rhs->size;
 }
 
-int amqp_variable_compare_with_cstr(amqp_variable_t *lhs, const char *rhs)
+int amqp_variable_compare_with_bytes(amqp_variable_t *lhs, const uint8_t *rhs, size_t rhs_size)
 {
     struct {
         struct amqp_block_header header;
@@ -72,11 +72,9 @@ int amqp_variable_compare_with_cstr(amqp_variable_t *lhs, const char *rhs)
     } block;
 
     int n, rc;
-    int rhs_size;
 
     assert(lhs != 0 && rhs != 0);
 
-    rhs_size = strlen(rhs);
     block.header.capacity = block.header.fragment_size = rhs_size;
     block.header.n_fragments = 1;
     block.rhs = (uint8_t *) rhs;
@@ -87,6 +85,13 @@ int amqp_variable_compare_with_cstr(amqp_variable_t *lhs, const char *rhs)
     rc = amqp_block_compare(data_to_block(lhs), data_offset(lhs), (amqp_memory_t *) &block, 0, n);
     return rc != 0 ? rc : lhs->size - rhs_size;
 }
+
+int amqp_variable_compare_with_cstr(amqp_variable_t *lhs, const char *rhs)
+{
+    assert(lhs != 0 && rhs != 0);
+    return amqp_variable_compare_with_bytes(lhs, (const uint8_t *) rhs, strlen(rhs));
+}
+
 
 uint32_t amqp_variable_hash(amqp_variable_t *variable)
 {
