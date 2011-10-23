@@ -143,4 +143,15 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_binary(described->value.list.elements[1]));
         CHECK(amqp_type_is_string(described->value.list.elements[2]));
     }
+
+    TEST_FIXTURE(DecodeFixture, sasl_outcome_frame_auth_error)
+    {
+        load(test_data::sasl_outcome_frame_auth_error);
+
+        CHECK(amqp_type_is_ulong(descriptor));
+        CHECK_EQUAL(68U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(2U, described->value.list.count);
+        CHECK(amqp_type_is_ubyte(described->value.list.elements[0]));
+        CHECK(amqp_type_is_binary(described->value.list.elements[1]));
+    }
 }

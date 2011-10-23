@@ -136,4 +136,16 @@ SUITE(Frame)
         CHECK(amqp_binary_is_null(&frame->frames.sasl.outcome.additional_data));
     }
 
+    TEST_FIXTURE(FrameFixture, sasl_outcome_frame_auth_error)
+    {
+        test_data::sasl_outcome_frame_auth_error.transfer_to(buffer);
+        frame = amqp_decode_sasl_frame(context, buffer);
+        ASSERT(frame != 0);
+
+        CHECK(check_sasl_header());
+        CHECK_EQUAL((unsigned) amqp_sasl_code_auth_error, frame->frames.sasl.outcome.code);
+        CHECK(!amqp_binary_is_null(&frame->frames.sasl.outcome.additional_data));
+        CHECK_EQUAL(4U, amqp_binary_size(&frame->frames.sasl.outcome.additional_data));
+    }
+
 }

@@ -38,6 +38,7 @@ namespace test_data
     extern TestData sasl_init_frame_captured;
 
     extern TestData sasl_outcome_frame;
+    extern TestData sasl_outcome_frame_auth_error;
 }
 #endif
 
