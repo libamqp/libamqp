@@ -33,4 +33,23 @@ namespace SuiteFrame
         amqp_frame_cleanup(context, frame);
         amqp_deallocate_type(context, type);
     }
+
+    int FrameFixture::check_header(uint8_t frame_type, uint16_t frame_specific)
+    {
+        if ((8U == frame->data_offset) && (frame_type == frame->frame_type) && (frame_specific == frame->type_specific.word))
+        {
+            return true;
+        }
+
+        SOUTV(frame->data_offset);
+        SOUTV(frame->frame_type);
+        SOUTV(frame->type_specific.word);
+        return false;
+    }
+
+    int FrameFixture::check_sasl_header()
+    {
+        return check_header(AMQP_SASL_FRAME_TYPE, 0U);
+    }
+
 }

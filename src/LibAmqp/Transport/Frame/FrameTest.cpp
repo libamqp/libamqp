@@ -56,9 +56,7 @@ SUITE(Frame)
         frame = amqp_decode_sasl_frame(context, buffer);
         ASSERT(frame != 0);
 
-        CHECK_EQUAL(8U, frame->data_offset);
-        CHECK_EQUAL(AMQP_SASL_FRAME_TYPE, frame->frame_type);
-        CHECK_EQUAL(0U, frame->type_specific.word);
+        CHECK(check_sasl_header());
 
         amqp_multiple_symbol_t *multiple = &frame->frames.sasl.mechanisms.sasl_server_mechanisms;
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 0), "PLAIN") == 0);
@@ -70,9 +68,7 @@ SUITE(Frame)
         frame = amqp_decode_sasl_frame(context, buffer);
         ASSERT(frame != 0);
 
-        CHECK_EQUAL(8U, frame->data_offset);
-        CHECK_EQUAL(AMQP_SASL_FRAME_TYPE, frame->frame_type);
-        CHECK_EQUAL(0U, frame->type_specific.word);
+        CHECK(check_sasl_header());
 
         amqp_multiple_symbol_t *multiple = &frame->frames.sasl.mechanisms.sasl_server_mechanisms;
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 0), "PLAIN") == 0);
@@ -84,9 +80,7 @@ SUITE(Frame)
         frame = amqp_decode_sasl_frame(context, buffer);
         ASSERT(frame != 0);
 
-        CHECK_EQUAL(8U, frame->data_offset);
-        CHECK_EQUAL(AMQP_SASL_FRAME_TYPE, frame->frame_type);
-        CHECK_EQUAL(0U, frame->type_specific.word);
+        CHECK(check_sasl_header());
 
         amqp_multiple_symbol_t *multiple = &frame->frames.sasl.mechanisms.sasl_server_mechanisms;
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 0), "ANONYMOUS") == 0);
@@ -97,15 +91,11 @@ SUITE(Frame)
         test_data::sasl_init_frame.transfer_to(buffer);
         frame = amqp_decode_sasl_frame(context, buffer);
         ASSERT(frame != 0);
-//
-//        CHECK(0);
-//        CHECK_EQUAL(8U, frame->data_offset);
-//        CHECK_EQUAL(AMQP_SASL_FRAME_TYPE, frame->frame_type);
-//        CHECK_EQUAL(0U, frame->type_specific.word);
-//
-//        amqp_multiple_symbol_t *multiple = &frame->frames.sasl.mechanisms.sasl_server_mechanisms;
-//        CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 0), "PLAIN") == 0);
-//        CHECK(0);
+
+        CHECK(check_sasl_header());
+
+        CHECK(amqp_symbol_compare_with_cstr(&frame->frames.sasl.init.mechanism, "PLAIN") == 0);
+        CHECK(0);
     }
 
 }

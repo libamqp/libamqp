@@ -30,6 +30,9 @@ namespace SuiteFrame
         FrameFixture();
         ~FrameFixture();
 
+    int check_header(uint8_t frame_type, uint16_t frame_specific);
+    int check_sasl_header();
+
     public:
         amqp_frame_t *frame;
         amqp_type_t *type;

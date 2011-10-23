@@ -29,8 +29,8 @@ static int decode_multiple_symbol(int mandatory, amqp_context_t *context, amqp_t
     return true;
 }
 
-//static
-int decode_string(int mandatory, amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_string_t *string)
+/* What an expanded FIELD_DECODE_FN(string) looks like
+static int decode_string(int mandatory, amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_string_t *string)
 {
     if (field_is_null(field))
     {
@@ -55,6 +55,7 @@ int decode_string(int mandatory, amqp_context_t *context, amqp_type_t *field, in
     amqp_string_initialize_from_type(context, string, field);
     return true;
 }
+*/
 
 #define FIELD_DECODE_FN(ft) \
 static int decode_ ## ft( \
@@ -83,4 +84,5 @@ amqp_ ## ft ## _t *ft) \
     return true; \
 }
 FIELD_DECODE_FN(symbol)
-//FIELD_DECODE_FN(binary)
+FIELD_DECODE_FN(binary)
+FIELD_DECODE_FN(string)

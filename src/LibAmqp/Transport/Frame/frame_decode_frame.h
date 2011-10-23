@@ -36,8 +36,8 @@ static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *
 static void cleanup_sasl_init_frame(amqp_context_t *context, amqp_frame_t *frame)
 {
     amqp_symbol_cleanup(context, &frame->frames.sasl.init.mechanism);
-//    amqp_binary_cleanup(context, &frame->frames.sasl.init.initial_response);
-//    amqp_string_cleanup(context, &frame->frames.sasl.init.hostname);
+    amqp_binary_cleanup(context, &frame->frames.sasl.init.initial_response);
+    amqp_string_cleanup(context, &frame->frames.sasl.init.hostname);
 }
 static int decode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
 {
@@ -47,8 +47,8 @@ static int decode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer
     frame->cleanup = cleanup_sasl_init_frame;
 
     rc = decode_symbol(mandatory, context, field(field_list, field_zero), field_zero, total_frames, &frame->frames.sasl.init.mechanism);
-//    rc = rc && decode_binary(context, field(field_list, field_one), field_one, total_frames, &frame->frames.sasl.init.initial_response);
-//    rc = rc && decode_string(context, field(field_list, field_two), field_two, total_frames, &frame->frames.sasl.init.hostname);
+    rc = rc && decode_binary(optional, context, field(field_list, field_one), field_one, total_frames, &frame->frames.sasl.init.initial_response);
+    rc = rc && decode_string(optional, context, field(field_list, field_two), field_two, total_frames, &frame->frames.sasl.init.hostname);
 
     if (rc == 0)
     {
