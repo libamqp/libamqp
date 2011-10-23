@@ -106,14 +106,34 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, sasl_init_frame_captured)
     {
-        test_data::sasl_init_frame.transfer_to(buffer);
+        test_data::sasl_init_frame_captured.transfer_to(buffer);
         frame = amqp_decode_sasl_frame(context, buffer);
         ASSERT(frame != 0);
 
         CHECK(check_sasl_header());
 
         CHECK(amqp_symbol_compare_with_cstr(&frame->frames.sasl.init.mechanism, "PLAIN") == 0);
-        CHECK(0);
+
+        CHECK_EQUAL(262U, amqp_binary_size(&frame->frames.sasl.init.initial_response));
+        CHECK_EQUAL(0, amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 0));
+        CHECK_EQUAL('r', amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 1));
+        CHECK_EQUAL('a', amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 2));
+        CHECK_EQUAL('p', amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 3));
+        CHECK_EQUAL('h', amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 4));
+        CHECK_EQUAL(0, amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 5));
+
+        CHECK(amqp_string_compare_with_cstr(&frame->frames.sasl.init.hostname, "development.mysystem.mycompany.stormmq.com") == 0);
+    }
+
+    TEST_FIXTURE(FrameFixture, sasl_outcome_frame)
+    {
+        test_data::sasl_outcome_frame.transfer_to(buffer);
+        frame = amqp_decode_sasl_frame(context, buffer);
+        ASSERT(frame != 0);
+
+        CHECK(check_sasl_header());
+        CHECK_EQUAL(0U, frame->frames.sasl.outcome.code);
+        CHECK(amqp_binary_is_null(&frame->frames.sasl.outcome.additional_data));
     }
 
 }

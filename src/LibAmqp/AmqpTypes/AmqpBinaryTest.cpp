@@ -63,7 +63,7 @@ SUITE(AmqpTypes)
 
         uint8_t data[32];
         memset(data, '\0', sizeof(data));
-        amqp_binary_copy_to(binary, data, sizeof(data));
+        amqp_binary_to_bytes(binary, data, sizeof(data));
         CHECK_EQUAL((const char *) data, "binary array");
     }
 

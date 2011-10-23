@@ -33,3 +33,24 @@ void amqp_dispatch_sasl_init(amqp_connection_t *connection, amqp_frame_t *frame)
     assert(dispatch);
     dispatch(connection, frame);
 }
+
+void amqp_dispatch_sasl_challenge(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    amqp_message_dispatch_t dispatch = connection->state.sasl.messages.challenge;
+    assert(dispatch);
+    dispatch(connection, frame);
+}
+
+void amqp_dispatch_sasl_response(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    amqp_message_dispatch_t dispatch = connection->state.sasl.messages.response;
+    assert(dispatch);
+    dispatch(connection, frame);
+}
+
+void amqp_dispatch_sasl_outcome(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    amqp_message_dispatch_t dispatch = connection->state.sasl.messages.outcome;
+    assert(dispatch);
+    dispatch(connection, frame);
+}

@@ -27,7 +27,8 @@
 
 void amqp_string_initialize_as_null(amqp_context_t *context, amqp_string_t *string)
 {
-    not_implemented(todo);
+    string->leader.fn_table = 0;
+    amqp_variable_initialize_as_null(&string->v);
 }
 
 static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)

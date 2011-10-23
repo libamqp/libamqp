@@ -86,3 +86,31 @@ amqp_ ## ft ## _t *ft) \
 FIELD_DECODE_FN(symbol)
 FIELD_DECODE_FN(binary)
 FIELD_DECODE_FN(string)
+
+#define NO_DEFAULT_VALUE    0
+#define PRIMITIVE_FIELD_DECODE_FN(ft, t) \
+static int \
+decode_ ## ft(int mandatory, amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, t *result, t default_value) \
+{ \
+    if (field_is_null(field)) \
+    { \
+        if (mandatory) \
+        { \
+            amqp_mandatory_field_missing_error(context, field_number, total_fields, #ft); \
+            return false; \
+        } \
+        else \
+        { \
+            *result = default_value; \
+            return true; \
+        } \
+    } \
+    if (!amqp_type_is_ ## ft(field)) \
+    { \
+        amqp_decode_field_error(context, field_number, total_fields, "Expected a field of type " #ft "."); \
+        return false;  \
+    } \
+    *result = amqp_type_to_ ## ft(field); \
+    return true; \
+}
+PRIMITIVE_FIELD_DECODE_FN(ubyte, uint8_t)

@@ -22,27 +22,33 @@ extern "C" {
 
 #include <string.h>
 
+#include "libamqp_common.h"
 #include "AmqpTypes/AmqpLeader.h"
 #include "Codec/Type/Type.h"
 #include "Codec/Type/TypeExtension.h"
 
 #include "AmqpTypes/AmqpVariable.h"
 
-static inline
-void amqp_variable_initialize_from_type(amqp_variable_t *variable, amqp_type_t *type)
+static inline void amqp_variable_initialize_from_type(amqp_variable_t *variable, amqp_type_t *type)
 {
     variable->type = type;
     variable->size = type->position.size;
     amqp_block_header_initialize(&variable->block, 0, 0, 0);
     variable->data = 0;
 }
-static inline
-void amqp_variable_initialize(amqp_variable_t *variable, const uint8_t *data, size_t size)
+static inline void amqp_variable_initialize(amqp_variable_t *variable, const uint8_t *data, size_t size)
 {
     variable->type = 0;
     variable->size = size;
     amqp_block_header_initialize(&variable->block, size, size, 1);
     variable->data = data;
+}
+static inline void amqp_variable_initialize_as_null(amqp_variable_t *variable)
+{
+    variable->type = 0;
+    variable->size = 0;
+    amqp_block_header_initialize(&variable->block, 0, 0, 0);
+    variable->data = 0;
 }
 
 extern uint8_t *amqp_duplicate(amqp_context_t *context, const uint8_t *data, size_t size);

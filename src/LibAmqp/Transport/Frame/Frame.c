@@ -169,8 +169,13 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
             return decode_sasl_init_frame(context, buffer, frame, type);
 
         case AMQP_FRAME_ID_SASL_CHALLENGE_LIST:
+            return decode_sasl_challenge_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_SASL_RESPONSE_LIST:
+            return decode_sasl_response_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_SASL_OUTCOME_LIST:
+            return decode_sasl_outcome_frame(context, buffer, frame, type);
 
         case AMQP_FRAME_ID_OPEN_LIST:
         case AMQP_FRAME_ID_BEGIN_LIST:

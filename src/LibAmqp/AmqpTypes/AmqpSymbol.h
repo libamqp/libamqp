@@ -34,6 +34,11 @@ struct amqp_symbol_t
 };
 
 extern void amqp_symbol_initialize_as_null(amqp_context_t *context, amqp_symbol_t *symbol);
+static inline
+int amqp_symbol_is_null(amqp_symbol_t *symbol)
+{
+    return symbol->v.type == 0 && symbol->v.data == 0;
+}
 extern void amqp_symbol_initialize(amqp_context_t *context, amqp_symbol_t *symbol, const char *data, size_t size);
 extern amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, const char *data, size_t size);
 static inline void amqp_symbol_initialize_from_cstr(amqp_context_t *context, amqp_symbol_t *symbol, const char *s)

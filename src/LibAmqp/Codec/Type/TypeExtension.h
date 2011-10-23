@@ -114,6 +114,20 @@ uint8_t amqp_type_get_byte_at(amqp_type_t *type, size_t index)
     return amqp_unchecked_getc_at(type->value.variable.buffer, type->position.index + index);
 }
 
+static inline
+int amqp_type_is_ubyte(amqp_type_t *type)
+{
+    return type->format_code == 0x50;
+}
+
+static inline
+uint8_t amqp_type_to_ubyte(amqp_type_t *type)
+{
+    return amqp_type_convert_check_failed(type, amqp_type_is_ubyte(type))
+        ? type->value.b1._unsigned
+        : 0;
+}
+
 #ifdef __cplusplus
 }
 #endif

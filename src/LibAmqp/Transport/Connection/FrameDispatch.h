@@ -40,6 +40,9 @@ typedef struct amqp_connection_t amqp_connection_t;
 
 extern void amqp_dispatch_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *frame);
 extern void amqp_dispatch_sasl_init(amqp_connection_t *connection, amqp_frame_t *frame);
+extern void amqp_dispatch_sasl_challenge(amqp_connection_t *connection, amqp_frame_t *frame);
+extern void amqp_dispatch_sasl_response(amqp_connection_t *connection, amqp_frame_t *frame);
+extern void amqp_dispatch_sasl_outcome(amqp_connection_t *connection, amqp_frame_t *frame);
 
 #ifdef __cplusplus
 }

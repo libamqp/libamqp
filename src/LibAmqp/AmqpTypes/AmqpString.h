@@ -33,6 +33,12 @@ struct amqp_string_t
 };
 
 extern void amqp_string_initialize_as_null(amqp_context_t *context, amqp_string_t *string);
+static inline
+int amqp_string_is_null(amqp_string_t *string)
+{
+    return string->v.type == 0 && string->v.data == 0;
+}
+
 extern void amqp_string_initialize_from_type(amqp_context_t *context, amqp_string_t *string, amqp_type_t *type);
 extern amqp_string_t *amqp_string_create_from_type(amqp_context_t *context,  amqp_type_t *type);
 

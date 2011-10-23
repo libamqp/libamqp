@@ -160,6 +160,9 @@ typedef struct amqp_connection_sasl_state_t
     struct {
         amqp_message_dispatch_t mechanisms;
         amqp_message_dispatch_t init;
+        amqp_message_dispatch_t challenge;
+        amqp_message_dispatch_t response;
+        amqp_message_dispatch_t outcome;
     } messages;
 } amqp_connection_sasl_state_t;
 

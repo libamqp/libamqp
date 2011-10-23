@@ -17,9 +17,10 @@
 #ifndef LIBAMQP_AMQP_TYPES_TYPES_H
 #define LIBAMQP_AMQP_TYPES_TYPES_H
 
+#include <stdlib.h>
 #include "AmqpTypes/AmqpLeader.h"
 
-typedef int amqp_sasl_code_t;
+typedef uint8_t amqp_sasl_code_t;
 
 #include "AmqpTypes/AmqpArray.h"
 #include "AmqpTypes/AmqpBinary.h"
@@ -41,4 +42,13 @@ union amqp_amqp_type_t
     amqp_string_t string;
     amqp_symbol_t symbol;
 };
+
+enum {
+    amqp_sasl_code_ok,
+    amqp_sasl_code_auth_error,
+    amqp_sasl_code_system_error,
+    amqp_sasl_code_perm_system_error,
+    amqp_sasl_code_temp_system_error
+};
+
 #endif

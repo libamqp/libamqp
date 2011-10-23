@@ -83,10 +83,10 @@ namespace test_data
         0x02, 0x01, 0x00, 0x00,
         0x00, 
 	    0x53, 0x41,
-	    0xc0, 46, 3,
+	    0xc0, 45, 3,
 	        0xA3, 5, 'P', 'L', 'A', 'I', 'N',
 	        0xa0, 15, 0, 'a', 'u', 't', 'h', 'c', 'i', 'd', 0, 'p', 'a', 's', 's', 'w', 'd',
-                0xa1, 22, 'l', 'o', 'c', 'a', 'l', 'h', 'o', 's', 't', '.', 'l', 'o', 'c', 'a', 'l', 'd', 'o', 'd', 'm', 'a', 'i', 'n'
+                0xa1, 21, 'l', 'o', 'c', 'a', 'l', 'h', 'o', 's', 't', '.', 'l', 'o', 'c', 'a', 'l', 'd', 'o', 'm', 'a', 'i', 'n'
     );
 
     // SaslInit(mechanism=PLAIN, initial­response=Binary, hostname=development.mysystem.mycompany.stormmq.com)
@@ -99,7 +99,7 @@ namespace test_data
     );
 
 //SaslOutcome(code=SaslCode(ok, additional­data=:NULL:)
-    test_data_def(frame_SaslOutcome,
+    test_data_def(sasl_outcome_frame,
         0x00, 0x00, 0x00, 0x10, 
 	0x02, 0x01, 0x00, 0x00, 
 	    0x00, 

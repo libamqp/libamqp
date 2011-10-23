@@ -23,14 +23,22 @@ extern "C" {
 #include "AmqpTypes/AmqpLeader.h"
 #include "Codec/Type/TypeExtension.h"
 
+#include "AmqpTypes/AmqpVariable.h"
+
+
 struct amqp_binary_t
 {
     amqp_leader_t leader;
-    amqp_type_t *type;
-    size_t size;
+    amqp_variable_t v;
 };
 
 extern void amqp_binary_initialize_as_null(amqp_context_t *context, amqp_binary_t *binary);
+static inline
+int amqp_binary_is_null(amqp_binary_t *binary)
+{
+    return binary->v.type == 0 && binary->v.data == 0;
+}
+
 extern void amqp_binary_initialize_from_type(amqp_context_t *context, amqp_binary_t *binary, amqp_type_t *type);
 extern amqp_binary_t *amqp_binary_create_from_type(amqp_context_t *context,  amqp_type_t *type);
 
@@ -43,20 +51,19 @@ void amqp_binary_cleanup(amqp_context_t *context, amqp_binary_t *binary)
 static inline
 size_t amqp_binary_size(amqp_binary_t *binary)
 {
-    return binary->size;
+    return binary->v.size;
 }
 
-static inline
-size_t amqp_binary_copy_to(amqp_binary_t *binary, uint8_t *buffer, size_t amount)
-{
-    return amqp_type_copy_to(binary->type, buffer, amount);
-}
+extern int amqp_binary_to_bytes(amqp_binary_t *binary, uint8_t *buffer, size_t buffer_size);
+extern int amqp_binary_compare(amqp_binary_t *lhs, amqp_binary_t *rhs);
+extern int amqp_binary_compare_with_bytes(amqp_binary_t *lhs, const uint8_t *rhs, size_t size);
+extern uint32_t amqp_binary_hash(amqp_binary_t *binary);
 
 static inline
 int amqp_binary_byte_get_at(amqp_binary_t *binary, size_t index)
 {
-    assert(binary && binary->type);
-    return amqp_type_get_byte_at(binary->type, index);
+    assert(binary && binary->v.type);
+    return amqp_type_get_byte_at(binary->v.type, index);
 }
 
 #ifdef __cplusplus

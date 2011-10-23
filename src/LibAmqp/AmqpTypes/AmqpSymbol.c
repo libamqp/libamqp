@@ -25,13 +25,6 @@
 
 #include "debug_helper.h"
 
-uint8_t *duplicate(amqp_context_t *context, const char *data, size_t size)
-{
-    uint8_t *result = (uint8_t *) amqp_malloc(context, size);
-    memcpy(result, data, size);
-    return result;
-}
-
 static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
     amqp_symbol_t *symbol = (amqp_symbol_t *) type;
@@ -54,7 +47,8 @@ static void initialize_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 
 void amqp_symbol_initialize_as_null(amqp_context_t *context, amqp_symbol_t *symbol)
 {
-not_implemented(todo);
+    symbol->leader.fn_table = 0;
+    amqp_variable_initialize_as_null(&symbol->v);
 }
 
 void amqp_symbol_initialize(amqp_context_t *context, amqp_symbol_t *symbol, const char *data, size_t size)

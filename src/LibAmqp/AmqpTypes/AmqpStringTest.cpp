@@ -62,4 +62,16 @@ SUITE(AmqpTypes)
         CHECK_EQUAL(257U, amqp_string_size(string));
         CHECK_EQUAL((const char *) data, test_data::lorem_ipsum);
     }
+
+    TEST_FIXTURE(AmqpStringFixture, string_compare)
+    {
+        test_data::hello_world.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
+
+        CHECK(amqp_type_is_string(type));
+        string = amqp_string_create_from_type(context, type);
+
+        CHECK_EQUAL(11U, amqp_string_size(string));
+        CHECK(amqp_string_compare_with_cstr(string, "Hello World") == 0);
+    }
 }
