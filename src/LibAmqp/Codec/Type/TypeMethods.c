@@ -28,11 +28,7 @@ amqp_type_methods_t amqp_methods_byte = { amqp_type_method_byte_print };
 amqp_type_methods_t amqp_methods_ushort = { amqp_type_method_ushort_print };
 amqp_type_methods_t amqp_methods_short = { amqp_type_method_short_print };
 amqp_type_methods_t amqp_methods_uint = { amqp_type_method_uint_print };
-//amqp_type_methods_t amqp_methods_uint0 = { amqp_type_method_uint0_print };
 amqp_type_methods_t amqp_methods_int = { amqp_type_method_int_print };
-
-//amqp_type_methods_t amqp_methods_small_uint = { amqp_type_method_small_uint_print };
-amqp_type_methods_t amqp_methods_small_int = { amqp_type_method_small_int_print };
 
 amqp_type_methods_t amqp_methods_float = { amqp_type_method_float_print };
 amqp_type_methods_t amqp_methods_char = { amqp_type_method_char_print };
@@ -41,12 +37,8 @@ amqp_type_methods_t amqp_methods_decimal32 = { amqp_type_method_decimal32_print 
 amqp_type_methods_t amqp_methods_decimal64 = { amqp_type_method_decimal64_print };
 amqp_type_methods_t amqp_methods_decimal128 = { amqp_type_method_decimal128_print };
 
-amqp_type_methods_t amqp_methods_ulong0 = { amqp_type_method_ulong0_print };
 amqp_type_methods_t amqp_methods_ulong = { amqp_type_method_ulong_print };
 amqp_type_methods_t amqp_methods_long = { amqp_type_method_long_print };
-
-amqp_type_methods_t amqp_methods_small_ulong = { amqp_type_method_small_ulong_print };
-amqp_type_methods_t amqp_methods_small_long = { amqp_type_method_small_long_print };
 
 amqp_type_methods_t amqp_methods_double = { amqp_type_method_double_print };
 amqp_type_methods_t amqp_methods_timestamp = { amqp_type_method_timestamp_print };

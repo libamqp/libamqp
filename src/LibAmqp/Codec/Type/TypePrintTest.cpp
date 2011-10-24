@@ -113,7 +113,7 @@ SUITE(TypePrint)
 
         ASSERT_VALID(type);
         print_type();
-        check_output("195");
+        check_output("(ubyte) 195");
     }
 
     TEST_FIXTURE(TypePrintFixture, byte)
@@ -123,7 +123,7 @@ SUITE(TypePrint)
 
         ASSERT_VALID(type);
         print_type();
-        check_output("-2");
+        check_output("(byte) -2");
     }
 
     TEST_FIXTURE(TypePrintFixture, ushort)
@@ -133,7 +133,7 @@ SUITE(TypePrint)
 
         ASSERT_VALID(type);
         print_type();
-        check_output("65534");
+        check_output("(ushort) 65534");
     }
 
     TEST_FIXTURE(TypePrintFixture, short)
@@ -143,7 +143,7 @@ SUITE(TypePrint)
 
         ASSERT_VALID(type);
         print_type();
-        check_output("-2");
+        check_output("(short) -2");
     }
 
     TEST_FIXTURE(TypePrintFixture, Float)
@@ -153,7 +153,7 @@ SUITE(TypePrint)
 
         ASSERT_VALID(type);
         print_type();
-        check_output("123.455994");
+        check_output("(float) 123.455994");
     }
 
     TEST_FIXTURE(TypePrintFixture, Double)
@@ -163,7 +163,7 @@ SUITE(TypePrint)
 
         ASSERT_VALID(type);
         print_type();
-        check_output("123.456000");
+        check_output("(double) 123.456000");
     }
 
     TEST_FIXTURE(TypePrintFixture, Symbol)
@@ -226,7 +226,7 @@ SUITE(TypePrint)
 
         CHECK_EQUAL(0x61, type->value.array.elements[0]->format_code);
         print_type();
-        check_output("[10, 11, 11, 13, 14]");
+        check_output("[(short) 10, 11, 11, 13, 14]");
     }
 
     TEST_FIXTURE(TypePrintFixture, List)
@@ -238,7 +238,7 @@ SUITE(TypePrint)
         CHECK_LIST(type);
 
         print_type();
-        check_output("{\n    \'Foo\',\n    123.456000,\n    \"Hello\",\n    10,\n    [10, 11],\n    [12]\n}\n");
+        check_output("{\n    \'Foo\',\n    (double) 123.456000,\n    \"Hello\",\n    (short) 10,\n    [(short) 10, 11],\n    [(short) 12]\n}\n");
     }
 
     TEST_FIXTURE(TypePrintFixture, empty_list)
@@ -274,7 +274,7 @@ SUITE(TypePrint)
         CHECK_MAP(type);
 
         print_type();
-        check_output("{\n    \"list:\"->{\n\t1,\n\t\"two\",\n\t3.141593,\n\tnull,\n\tfalse\n    },\n    null->true,\n    \"pi\"->3.141593,\n    \"two\"->2,\n    \"129\"->129\n}\n");
+        check_output("{\n    \"list:\"->{\n\t(long) 1,\n\t\"two\",\n\t(double) 3.141593,\n\tnull,\n\tfalse\n    },\n    null->true,\n    \"pi\"->(double) 3.141593,\n    \"two\"->(long) 2,\n    \"129\"->(long) 129\n}\n");
     }
 
     TEST_FIXTURE(TypePrintFixture, TimeStamp)

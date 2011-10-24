@@ -121,6 +121,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
                 int auto_indent;
                 int last_char;
             } indent;
+            int type_print_inside_array_flag;
         } debug;
 
         struct

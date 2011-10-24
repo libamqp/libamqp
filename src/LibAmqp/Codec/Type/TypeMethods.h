@@ -35,9 +35,6 @@ extern amqp_type_methods_t amqp_methods_short;
 extern amqp_type_methods_t amqp_methods_uint;
 extern amqp_type_methods_t amqp_methods_int;
 
-extern amqp_type_methods_t amqp_methods_small_uint;
-extern amqp_type_methods_t amqp_methods_small_int;
-
 extern amqp_type_methods_t amqp_methods_float;
 extern amqp_type_methods_t amqp_methods_char;
 
@@ -45,12 +42,8 @@ extern amqp_type_methods_t amqp_methods_decimal32;
 extern amqp_type_methods_t amqp_methods_decimal64;
 extern amqp_type_methods_t amqp_methods_decimal128;
 
-extern amqp_type_methods_t amqp_methods_ulong0;
 extern amqp_type_methods_t amqp_methods_ulong;
 extern amqp_type_methods_t amqp_methods_long;
-
-extern amqp_type_methods_t amqp_methods_small_ulong;
-extern amqp_type_methods_t amqp_methods_small_long;
 
 extern amqp_type_methods_t amqp_methods_double;
 extern amqp_type_methods_t amqp_methods_timestamp;
