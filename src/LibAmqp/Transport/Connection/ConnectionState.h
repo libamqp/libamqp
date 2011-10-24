@@ -172,6 +172,17 @@ typedef struct amqp_connection_amqp_state_t
     amqp_connection_action_f connect;
     amqp_connection_action_f done;
     amqp_connection_tunnel_actions_t tunnel;
+    struct {
+        amqp_message_dispatch_t open;
+        amqp_message_dispatch_t begin;
+        amqp_message_dispatch_t attach;
+        amqp_message_dispatch_t flow;
+        amqp_message_dispatch_t transfer;
+        amqp_message_dispatch_t disposition;
+        amqp_message_dispatch_t detach;
+        amqp_message_dispatch_t end;
+        amqp_message_dispatch_t close;
+    } messages;
 } amqp_connection_amqp_state_t;
 
 typedef struct amqp_connection_frame_reader_state_t

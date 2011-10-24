@@ -178,15 +178,34 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
             return decode_sasl_outcome_frame(context, buffer, frame, type);
 
         case AMQP_FRAME_ID_OPEN_LIST:
+            return decode_amqp_open_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_BEGIN_LIST:
+//            return decode_amqp_begin_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_ATTACH_LIST:
+//            return decode_amqp_attach_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_FLOW_LIST:
+//            return decode_amqp_flow_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_TRANSFER_LIST:
+//            return decode_amqp_transfer_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_DISPOSITION_LIST:
+//            return decode_amqp_disposition_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_DETACH_LIST:
+//            return decode_amqp_detach_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_END_LIST:
+//            return decode_amqp_end_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_CLOSE_LIST:
+//            return decode_amqp_close_frame(context, buffer, frame, type);
+
         case AMQP_FRAME_ID_ERROR_LIST:
+            not_implemented(todo);
 
         default:
             amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Unsupported descriptor id. Id = %08x", frame->descriptor.id);

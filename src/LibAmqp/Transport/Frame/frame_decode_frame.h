@@ -143,3 +143,41 @@ static int decode_sasl_outcome_frame(amqp_context_t *context, amqp_buffer_t *buf
 
     return rc;
 }
+
+/*
+    <type name="open" class="composite" source="list" provides="frame">
+      <descriptor name="amqp:open:list" code="0x00000000:0x00000010"/>
+      <field name="container-id" type="string" mandatory="true"/>
+      <field name="hostname" type="string"/>
+      <field name="max-frame-size" type="uint" default="4294967295"/>
+      <field name="channel-max" type="ushort" default="65535"/>
+      <field name="idle-time-out" type="milliseconds"/>
+      <field name="outgoing-locales" type="ietf-language-tag" multiple="true"/>
+      <field name="incoming-locales" type="ietf-language-tag" multiple="true"/>
+      <field name="offered-capabilities" type="symbol" multiple="true"/>
+      <field name="desired-capabilities" type="symbol" multiple="true"/>
+      <field name="properties" type="fields"/>
+    </type>
+*/
+static void cleanup_amqp_open_frame(amqp_context_t *context, amqp_frame_t *frame)
+{
+//    amqp_binary_cleanup(context, &frame->frames.amqp.open.additional_data);
+}
+static int decode_amqp_open_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
+{
+//    const int total_fields = 10;
+    int rc;
+
+    frame->dispatch = amqp_dispatch_amqp_open;
+    frame->cleanup = cleanup_amqp_open_frame;
+
+//    rc = decode_ubyte(mandatory, context, field(field_list, field_zero), field_zero, total_fields, &frame->frames.amqp.open.code, NO_DEFAULT_VALUE);
+//    rc = rc && decode_binary(optional, context, field(field_list, field_one), field_one, total_fields, &frame->frames.amqp.open.additional_data);
+
+    if (rc == 0)
+    {
+        amqp_decode_frame_error(context, "AMQP Open");
+    }
+
+    return rc;
+}
