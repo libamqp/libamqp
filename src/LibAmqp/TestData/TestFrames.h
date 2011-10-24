@@ -44,6 +44,18 @@ namespace test_data
     extern TestData broker_open_frame;
     extern TestData client_begin_frame;
     extern TestData broker_begin_frame;
+
+    extern TestData client_attach_frame;
+    extern TestData broker_attach_frame;
+    extern TestData flow_frame;
+    extern TestData broker_flow_frame;
+    extern TestData ya_flow_frame;
+    extern TestData transfer_frame_id_0;
+    extern TestData transfer_frame_id_256;
+    extern TestData transfer_frame_id_677;
+    extern TestData close_frame;
+    extern TestData close_confirm_frame;
+
 }
 #endif
 

@@ -13,5 +13,5 @@ cd src
 make -f Makefile.util scrub 
 
 # Build everything and generate test report in XML for the xUnit plugin.
-make TEST_RUNNER_ARGS=--xml=../output/test-result.xml ci-build
+make TEST_RUNNER_ARGS=--xml=../output/test-result.xml ci-build BUILD_OPTIONS=-DJENKINS_BUILD
 

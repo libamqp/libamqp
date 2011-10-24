@@ -35,6 +35,12 @@ extern void break_two();
 #define SOUTVF(v)   printf("%s:%d: soutvf: %s = %f\n" , __FILE__, __LINE__, #v, (double) v);
 #define SOUTS(v)    printf("%s:%d: souts: %s\n", __FILE__, __LINE__, v);
 
+#ifndef JENKINS_BUILD
+#define RETURN_UNLESS_JENKINS() if (1) return;
+#else
+#define RETURN_UNLESS_JENKINS()
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -229,7 +229,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(17U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(8U, described->value.list.count);
 
-        amqp_type_print(context,  described, decode_buffer);
+//        amqp_type_print(context,  described, decode_buffer);
 
         int field = 0;
         CHECK(amqp_type_is_ushort(described->value.list.elements[field])); field++;
@@ -242,5 +242,172 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
 
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, client_attach_frame)
+    {
+        load(test_data::client_attach_frame);
+
+        CHECK_EQUAL(0x12U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(14U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+        CHECK(0);
+
+        int field = 0;
+        CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, broker_attach_frame)
+    {
+        load(test_data::broker_attach_frame);
+
+        CHECK_EQUAL(0x12U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(14U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+        CHECK(0);
+
+        int field = 0;
+        CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, flow_frame)
+    {
+        load(test_data::flow_frame);
+        CHECK_EQUAL(0x13U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(11U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+
+        int field = 0;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, broker_flow_frame)
+    {
+        load(test_data::broker_flow_frame);
+
+        CHECK_EQUAL(0x13U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(11U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+
+        int field = 0;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, ya_flow_frame)
+    {
+        load(test_data::ya_flow_frame);
+
+        CHECK_EQUAL(0x13U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(11U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+
+        int field = 0;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, transfer_frame_id_0)
+    {
+        load(test_data::transfer_frame_id_0);
+
+        CHECK_EQUAL(0x14U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(6U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+        CHECK(0);
+
+        int field = 0;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, transfer_frame_id_256)
+    {
+        load(test_data::transfer_frame_id_256);
+
+        CHECK_EQUAL(0x14U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(6U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+        CHECK(0);
+
+        int field = 0;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, transfer_frame_id_677)
+    {
+        load(test_data::transfer_frame_id_677);
+
+        CHECK_EQUAL(0x14U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(6U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+        CHECK(0);
+
+        int field = 0;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, close_frame)
+    {
+        load(test_data::close_frame);
+
+        CHECK_EQUAL(0x18U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(1U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+        CHECK(0);
+
+        int field = 0;
+        CHECK(amqp_type_is_described(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, close_confirm_frame)
+    {
+        load(test_data::close_confirm_frame);
+
+        CHECK_EQUAL(0x18U, amqp_type_to_ulong(descriptor));
+
+        RETURN_UNLESS_JENKINS();
+//        amqp_type_print(context,  described, decode_buffer);
+
+        CHECK_EQUAL(1U, described->value.list.count);
+
+//        int field = 0;
+//        CHECK(amqp_type_is_described(described->value.list.elements[field])); field++;
     }
 }

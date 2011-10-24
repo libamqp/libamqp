@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include "AmqpTypes/AmqpLeader.h"
 
-
 #include "AmqpTypes/AmqpArray.h"
 #include "AmqpTypes/AmqpBinary.h"
 #include "AmqpTypes/AmqpEntry.h"

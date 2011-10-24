@@ -156,6 +156,19 @@ uint8_t amqp_type_to_uint(amqp_type_t *type)
         : 0;
 }
 
+static inline
+int amqp_type_is_boolean(amqp_type_t *type)
+{
+    return type->format_code == 0x41 || type->format_code == 0x42 || type->format_code == 0x56;
+}
+
+static inline
+uint8_t amqp_type_to_boolean(amqp_type_t *type)
+{
+    assert(amqp_type_is_boolean(type));
+    not_implemented(todo);
+}
+
 #ifdef __cplusplus
 }
 #endif
