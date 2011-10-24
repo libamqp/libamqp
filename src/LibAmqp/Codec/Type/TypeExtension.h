@@ -145,7 +145,7 @@ uint8_t amqp_type_to_ushort(amqp_type_t *type)
 static inline
 int amqp_type_is_uint(amqp_type_t *type)
 {
-    return type->format_code == 0x70;
+    return type->format_code == 0x70 || type->format_code == 0x52 || type->format_code == 0x43;
 }
 
 static inline

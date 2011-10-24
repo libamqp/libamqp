@@ -25,9 +25,12 @@
 #include "TestData/TestFrames.h"
 #include "Codec/Type/TypeExtension.h"
 
+#include "debug_helper.h"
+
 SUITE(FrameTypeDecode)
 {
-    // These tests ensure that the AMQP encoded part of a frame can be decoded.
+    // These tests ensure that the AMQP encoded part of a frame can be decoded. If these
+    // fail the problem is most likely the test data, not the frame decoder
 
     class DecodeFixture : public SuiteCodec::CodecFixture
     {
@@ -126,7 +129,6 @@ SUITE(FrameTypeDecode)
     TEST_FIXTURE(DecodeFixture, test_decode_of_sasl_init)
     {
         load(test_data::sasl_init_frame);
-        CHECK(amqp_type_is_ulong(descriptor));
         CHECK_EQUAL(65U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(3U, described->value.list.count);
         CHECK(amqp_type_is_symbol(described->value.list.elements[0]));
@@ -136,7 +138,6 @@ SUITE(FrameTypeDecode)
     TEST_FIXTURE(DecodeFixture, test_decode_of_sasl_init_frame_captured)
     {
         load(test_data::sasl_init_frame_captured);
-        CHECK(amqp_type_is_ulong(descriptor));
         CHECK_EQUAL(65U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(3U, described->value.list.count);
         CHECK(amqp_type_is_symbol(described->value.list.elements[0]));
@@ -148,10 +149,98 @@ SUITE(FrameTypeDecode)
     {
         load(test_data::sasl_outcome_frame_auth_error);
 
-        CHECK(amqp_type_is_ulong(descriptor));
         CHECK_EQUAL(68U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(2U, described->value.list.count);
         CHECK(amqp_type_is_ubyte(described->value.list.elements[0]));
         CHECK(amqp_type_is_binary(described->value.list.elements[1]));
+    }
+
+    TEST_FIXTURE(DecodeFixture, client_open_frame)
+    {
+        load(test_data::client_open_frame);
+
+        CHECK_EQUAL(16U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(10U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+
+        int field = 0;
+        CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_ushort(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+
+    }
+
+    TEST_FIXTURE(DecodeFixture, broker_open_frame)
+    {
+        load(test_data::broker_open_frame);
+
+        CHECK_EQUAL(16U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(10U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+
+        int field = 0;
+        CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_ushort(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, client_begin_frame)
+    {
+        load(test_data::client_begin_frame);
+
+        CHECK_EQUAL(17U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(8U, described->value.list.count);
+
+//        amqp_type_print(context,  described, decode_buffer);
+
+        int field = 0;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, broker_begin_frame)
+    {
+        load(test_data::broker_begin_frame);
+
+        CHECK_EQUAL(17U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(8U, described->value.list.count);
+
+        amqp_type_print(context,  described, decode_buffer);
+
+        int field = 0;
+        CHECK(amqp_type_is_ushort(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
     }
 }

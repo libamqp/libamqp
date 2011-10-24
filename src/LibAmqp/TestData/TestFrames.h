@@ -39,6 +39,11 @@ namespace test_data
 
     extern TestData sasl_outcome_frame;
     extern TestData sasl_outcome_frame_auth_error;
+
+    extern TestData client_open_frame;
+    extern TestData broker_open_frame;
+    extern TestData client_begin_frame;
+    extern TestData broker_begin_frame;
 }
 #endif
 
