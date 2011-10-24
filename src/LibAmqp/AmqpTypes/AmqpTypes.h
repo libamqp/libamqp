@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include "AmqpTypes/AmqpLeader.h"
 
-typedef uint8_t amqp_sasl_code_t;
 
 #include "AmqpTypes/AmqpArray.h"
 #include "AmqpTypes/AmqpBinary.h"
@@ -50,5 +49,21 @@ enum {
     amqp_sasl_code_perm_system_error,
     amqp_sasl_code_temp_system_error
 };
+
+typedef uint8_t amqp_sasl_code_t;
+typedef amqp_multiple_symbol_t amqp_multiple_ietf_language_tag_t;
+typedef uint32_t amqp_milliseconds_t;
+typedef uint32_t amqp_transfer_number_t; // RFC-1982 sequence number
+typedef int amqp_role_t;
+typedef int amqp_sequence_no_t;
+typedef int amqp_delivery_number_t;
+typedef int amqp_error_t;
+typedef int amqp_sender_settle_mode_t;
+typedef int amqp_delivery_tag_t;
+typedef int amqp_state_t;
+typedef int amqp_receiver_settle_mode_t;
+typedef int amqp_source_t;
+typedef int amqp_target_t;
+typedef amqp_map_t amqp_property_fields_t;
 
 #endif

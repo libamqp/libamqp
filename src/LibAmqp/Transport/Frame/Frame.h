@@ -26,6 +26,7 @@ extern "C" {
 #include "Codec/Type/TypeExtension.h"
 
 #include "Amqp/AmqpSecurity.h"
+#include "Amqp/AmqpTransport.h"
 #include "AmqpTypes/AmqpDescriptor.h"
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
@@ -70,7 +71,15 @@ struct amqp_frame_t
             amqp_frame_sasl_outcome_t outcome;
         } sasl;
         union {
-            int pad;
+            amqp_frame_open_t open;
+            amqp_frame_begin_t begin;
+            amqp_frame_attach_t attach;
+            amqp_frame_flow_t flow;
+            amqp_frame_transfer_t transfer;
+            amqp_frame_disposition_t disposition;
+            amqp_frame_detach_t detach;
+            amqp_frame_end_t end;
+            amqp_frame_close_t close;
         } amqp;
     } frames;
 

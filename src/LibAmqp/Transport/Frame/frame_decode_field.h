@@ -86,6 +86,7 @@ amqp_ ## ft ## _t *ft) \
 FIELD_DECODE_FN(symbol)
 FIELD_DECODE_FN(binary)
 FIELD_DECODE_FN(string)
+FIELD_DECODE_FN(map)
 
 #define NO_DEFAULT_VALUE    0
 #define PRIMITIVE_FIELD_DECODE_FN(ft, t) \
@@ -114,3 +115,5 @@ decode_ ## ft(int mandatory, amqp_context_t *context, amqp_type_t *field, int fi
     return true; \
 }
 PRIMITIVE_FIELD_DECODE_FN(ubyte, uint8_t)
+PRIMITIVE_FIELD_DECODE_FN(ushort, uint16_t)
+PRIMITIVE_FIELD_DECODE_FN(uint, uint32_t)

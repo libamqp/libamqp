@@ -128,6 +128,34 @@ uint8_t amqp_type_to_ubyte(amqp_type_t *type)
         : 0;
 }
 
+static inline
+int amqp_type_is_ushort(amqp_type_t *type)
+{
+    return type->format_code == 0x60;
+}
+
+static inline
+uint8_t amqp_type_to_ushort(amqp_type_t *type)
+{
+    return amqp_type_convert_check_failed(type, amqp_type_is_ushort(type))
+        ? type->value.b2._ushort
+        : 0;
+}
+
+static inline
+int amqp_type_is_uint(amqp_type_t *type)
+{
+    return type->format_code == 0x70;
+}
+
+static inline
+uint8_t amqp_type_to_uint(amqp_type_t *type)
+{
+    return amqp_type_convert_check_failed(type, amqp_type_is_uint(type))
+        ? type->value.b4._uint
+        : 0;
+}
+
 #ifdef __cplusplus
 }
 #endif
