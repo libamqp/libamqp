@@ -5,6 +5,7 @@
 .idea
 .project
 .cproject
+.settings
 
 *.o
 *.a
