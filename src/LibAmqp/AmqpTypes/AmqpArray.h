@@ -21,16 +21,24 @@
 extern "C" {
 #endif
 
+#include "Codec/Type/Type.h"
 #include "AmqpTypes/AmqpLeader.h"
 
 struct amqp_array_t
 {
     amqp_leader_t leader;
     amqp_type_t *type;
-    size_t capacity;
     size_t size;
     void **elements;
 };
+
+extern void amqp_array_initialize_as_null(amqp_context_t *context, amqp_array_t *array);
+
+static inline
+int amqp_array_is_null(amqp_array_t *array)
+{
+    return array->type == 0 && array->elements == 0;
+}
 
 extern void amqp_array_initialize(amqp_context_t *context, amqp_array_t *array, size_t size);
 extern void amqp_array_initialize_from_type(amqp_context_t *context, amqp_array_t *array, amqp_type_t *type);
@@ -41,12 +49,6 @@ static inline
 void amqp_array_cleanup(amqp_context_t *context, amqp_array_t *array)
 {
     amqp_type_cleanup(context, (amqp_amqp_type_t *) array);
-}
-
-static inline
-size_t amqp_array_capacity(amqp_array_t *array)
-{
-    return array->capacity;
 }
 
 static inline
@@ -65,14 +67,15 @@ void amqp_array_set(amqp_array_t *array, size_t index, const void *p)
 static inline
 void *amqp_array_get(amqp_array_t *array, size_t index)
 {
-    return array->elements[index];
+    assert(array->size > index);
+    return array->type ? array->type->value.array.elements[index] : array->elements[index];
 }
 
 static inline
 amqp_type_t *amqp_array_get_type(amqp_array_t *array, size_t index)
 {
     assert(array->type);
-    return (amqp_type_t *) array->elements[index];
+    return (amqp_type_t *) amqp_array_get(array, index);
 }
 
 #ifdef __cplusplus

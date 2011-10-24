@@ -23,7 +23,7 @@ extern "C" {
 #include <string.h>
 
 #include "AmqpTypes/AmqpLeader.h"
-#include "AmqpTypes/AmqpMap.h"
+#include "AmqpTypes/AmqpHashTable.h"
 #include "AmqpTypes/AmqpVariable.h"
 
 
@@ -58,19 +58,19 @@ void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol)
     amqp_type_cleanup(context, (amqp_amqp_type_t *) symbol);
 }
 
-extern void amqp_symbol_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity);
-extern amqp_map_t *amqp_symbol_map_create(amqp_context_t *context, int initial_capacity);
-extern void amqp_symbol_map_cleanup(amqp_context_t *context, amqp_map_t *map);
+extern void amqp_symbol_hash_table_initialize(amqp_context_t *context, amqp_hash_table_t *map, int initial_capacity);
+extern amqp_hash_table_t *amqp_symbol_hash_table_create(amqp_context_t *context, int initial_capacity);
+extern void amqp_symbol_hash_table_cleanup(amqp_context_t *context, amqp_hash_table_t *map);
 
 static inline
-int amqp_symbol_map_put(amqp_context_t *context, amqp_map_t *map, const amqp_symbol_t *key, const void *data)
+int amqp_symbol_hash_table_put(amqp_context_t *context, amqp_hash_table_t *map, const amqp_symbol_t *key, const void *data)
 {
-    return amqp_map_put(context, map, key, data);
+    return amqp_hash_table_put(context, map, key, data);
 }
 static inline
-const void *amqp_symbol_map_get(amqp_map_t *map, const amqp_symbol_t *key)
+const void *amqp_symbol_hash_table_get(amqp_hash_table_t *map, const amqp_symbol_t *key)
 {
-    return amqp_map_get(map, key);
+    return amqp_hash_table_get(map, key);
 }
 
 extern int amqp_symbol_to_bytes(amqp_symbol_t *symbol, uint8_t *buffer, size_t buffer_size);

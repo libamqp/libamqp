@@ -13,6 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+
 #ifndef LIBAMQP_AMQP_TYPES_AMQP_MAP_H
 #define LIBAMQP_AMQP_TYPES_AMQP_MAP_H
 
@@ -20,49 +21,83 @@
 extern "C" {
 #endif
 
+#include "Codec/Type/Type.h"
 #include "AmqpTypes/AmqpLeader.h"
-#include "AmqpTypes/AmqpEntry.h"
-
-//typedef uint32_t (*amqp_hash_fn_t)(const void *key);
-//typedef int (*amqp_compare_fn_t)(const void *lhs, const void *rhs);
-//typedef void (*amqp_free_callback_t)(amqp_context_t *context, const void *key, const void *data);
 
 struct amqp_map_t
 {
     amqp_leader_t leader;
-    size_t capacity;
-    size_t count;
-    amqp_entry_t **buckets;
-    amqp_entry_t *entry_list;
-    amqp_hash_fn_t hash;
-    amqp_compare_fn_t compare;
-    int on_heap;
+    amqp_type_t *type;
+    size_t size;
+    void **entries;
 };
 
-extern void amqp_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity, amqp_hash_fn_t hash, amqp_compare_fn_t compare);
-extern amqp_map_t *amqp_map_create(amqp_context_t *context, int initial_capacity, amqp_hash_fn_t hash, amqp_compare_fn_t compare);
-extern void amqp_map_cleanup(amqp_context_t *context, amqp_map_t *map);
-extern void amqp_map_cleanup_with_callback(amqp_context_t *context, amqp_map_t *map, amqp_free_callback_t callback);
+extern void amqp_map_initialize_as_null(amqp_context_t *context, amqp_map_t *map);
+static inline
+int amqp_map_is_null(amqp_map_t *map)
+{
+    return map->type == 0 && map->entries == 0;
+}
 
-extern int amqp_map_put(amqp_context_t *context, amqp_map_t *map, const void *key, const void *data);
-extern const void *amqp_map_get(amqp_map_t *map, const void *key);
+extern void amqp_map_initialize(amqp_context_t *context, amqp_map_t *map, size_t size);
+extern void amqp_map_initialize_from_type(amqp_context_t *context, amqp_map_t *map, amqp_type_t *type);
+extern amqp_map_t *amqp_map_create(amqp_context_t *context, size_t size);
+extern amqp_map_t *amqp_map_create_from_type(amqp_context_t *context, amqp_type_t *type);
 
 static inline
-size_t amqp_map_capacity(amqp_map_t *map)
+void amqp_map_cleanup(amqp_context_t *context, amqp_map_t *map)
 {
-    return map->capacity;
+    amqp_type_cleanup(context, (amqp_amqp_type_t *) map);
 }
 
 static inline
 size_t amqp_map_count(amqp_map_t *map)
 {
-    return map->count;
+    return map->size >> 1;
 }
 
 static inline
-double amqp_map_factor(amqp_map_t *map)
+void amqp_map_key_set(amqp_map_t *map, size_t index, const void *p)
 {
-    return map->capacity ? (double) map->count / (double) map->capacity : 0.0;
+    assert(map->size > index && map->type == 0);
+    map->entries[(index << 1)] = (void *) p;
+}
+
+static inline
+void amqp_map_value_set(amqp_map_t *map, size_t index, const void *p)
+{
+    assert(map->size > index && map->type == 0);
+    map->entries[(index << 1) + 1] = (void *) p;
+}
+
+static inline
+void *amqp_map_key_get(amqp_map_t *map, size_t index)
+{
+    assert(map->size > index);
+    index <<= 1;
+    return map->type ? (void *) map->type->value.map.entries[index] : map->entries[index];
+}
+
+static inline
+void *amqp_map_value_get(amqp_map_t *map, size_t index)
+{
+    assert(map->size > index);
+    index = (index << 1) + 1;
+    return map->type ? map->type->value.map.entries[index] : map->entries[index];
+}
+
+static inline
+amqp_type_t *amqp_map_key_get_as_type(amqp_map_t *map, size_t index)
+{
+    assert(map->type);
+    return (amqp_type_t *) amqp_map_key_get(map, index);
+}
+
+static inline
+amqp_type_t *amqp_map_value_get_as_type(amqp_map_t *map, size_t index)
+{
+    assert(map->type);
+    return (amqp_type_t *) amqp_map_value_get(map, index);
 }
 
 #ifdef __cplusplus

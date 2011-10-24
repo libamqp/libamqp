@@ -50,27 +50,27 @@ static size_t map_size()
     return size < 16 ? 16 : size;
 }
 
-amqp_map_t *amqp_load_descriptors(amqp_context_t *context)
+amqp_hash_table_t *amqp_load_descriptors(amqp_context_t *context)
 {
     int i = 0;
-    amqp_map_t *result = amqp_symbol_map_create(context, map_size());
+    amqp_hash_table_t *result = amqp_symbol_hash_table_create(context, map_size());
     while (descriptors[i].symbolic)
     {
         amqp_symbol_t *symbol = amqp_symbol_create(context, descriptors[i].symbolic, strlen(descriptors[i].symbolic));
-        amqp_symbol_map_put(context, result, symbol, &descriptors[i].descriptor);
+        amqp_symbol_hash_table_put(context, result, symbol, &descriptors[i].descriptor);
         i++;
     }
     return result;
 }
 
-void amqp_descriptors_cleanup(amqp_context_t *context, amqp_map_t *map)
+void amqp_descriptors_cleanup(amqp_context_t *context, amqp_hash_table_t *map)
 {
-    amqp_symbol_map_cleanup(context, map);
+    amqp_symbol_hash_table_cleanup(context, map);
 }
 
-amqp_descriptor_t *amqp_descriptor_lookup(amqp_map_t *map, amqp_symbol_t *symbol)
+amqp_descriptor_t *amqp_descriptor_lookup(amqp_hash_table_t *map, amqp_symbol_t *symbol)
 {
-   return (amqp_descriptor_t *) amqp_symbol_map_get(map, symbol);
+   return (amqp_descriptor_t *) amqp_symbol_hash_table_get(map, symbol);
 }
 
 const char *amqp_descriptor_id_to_cstr(uint32_t id)

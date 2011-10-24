@@ -49,14 +49,12 @@ SUITE(AmqpTypes)
     TEST_FIXTURE(AmqpArrayFixture, array_initialize)
     {
         amqp_array_initialize(context, &ref, 13);
-        CHECK_EQUAL(13U, amqp_array_capacity(&ref));
         CHECK_EQUAL(13U, amqp_array_count(&ref));
     }
 
     TEST_FIXTURE(AmqpArrayFixture, array_create)
     {
         array = amqp_array_create(context, 13);
-        CHECK_EQUAL(13U, amqp_array_capacity(array));
         CHECK_EQUAL(13U, amqp_array_count(array));
     }
 

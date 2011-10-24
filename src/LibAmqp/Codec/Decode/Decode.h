@@ -80,9 +80,6 @@ int amqp_decode_array_32(amqp_context_t *context, amqp_buffer_t *buffer, amqp_en
 
 int amqp_decode_extension_type(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type);
 
-extern amqp_type_t *amqp_list_element(amqp_type_t *type, size_t index);
-extern amqp_type_t *amqp_map_element(amqp_type_t *type, size_t index);
-
 #ifdef __cplusplus
 }
 #endif

@@ -95,14 +95,14 @@ amqp_symbol_t *amqp_symbol_create_from_type(amqp_context_t *context, amqp_type_t
 }
 
 
-void amqp_symbol_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity)
+void amqp_symbol_hash_table_initialize(amqp_context_t *context, amqp_hash_table_t *map, int initial_capacity)
 {
-    amqp_map_initialize(context, map, initial_capacity, (amqp_hash_fn_t) amqp_symbol_hash, (amqp_compare_fn_t) amqp_symbol_compare);
+    amqp_hash_table_initialize(context, map, initial_capacity, (amqp_hash_fn_t) amqp_symbol_hash, (amqp_compare_fn_t) amqp_symbol_compare);
 }
 
-amqp_map_t *amqp_symbol_map_create(amqp_context_t *context, int initial_capacity)
+amqp_hash_table_t *amqp_symbol_hash_table_create(amqp_context_t *context, int initial_capacity)
 {
-    return amqp_map_create(context, initial_capacity, (amqp_hash_fn_t) amqp_symbol_hash, (amqp_compare_fn_t) amqp_symbol_compare);
+    return amqp_hash_table_create(context, initial_capacity, (amqp_hash_fn_t) amqp_symbol_hash, (amqp_compare_fn_t) amqp_symbol_compare);
 }
 
 static void cleanup_callback(amqp_context_t *context, const void *key, const void *data)
@@ -111,9 +111,9 @@ static void cleanup_callback(amqp_context_t *context, const void *key, const voi
     amqp_symbol_cleanup(context, symbol);
 }
 
-void amqp_symbol_map_cleanup(amqp_context_t *context, amqp_map_t *map)
+void amqp_symbol_hash_table_cleanup(amqp_context_t *context, amqp_hash_table_t *map)
 {
-    amqp_map_cleanup_with_callback(context, map, cleanup_callback);
+    amqp_hash_table_cleanup_with_callback(context, map, cleanup_callback);
 }
 
 int amqp_symbol_to_bytes(amqp_symbol_t *symbol, uint8_t *buffer, size_t buffer_size)

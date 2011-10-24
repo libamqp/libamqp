@@ -17,6 +17,8 @@
 #ifndef LIBAMQP_CODEC_TYPE_TYPE_H
 #define LIBAMQP_CODEC_TYPE_TYPE_H
 
+#include <assert.h>
+
 #include "libamqp_common.h"
 #include "Codec/Type/EncodingMetaData.h"
 #include "Context/Context.h"
@@ -206,6 +208,20 @@ static inline
 bool amqp_type_is_descriptor(amqp_type_t *type)
 {
     return type->flags.is_descriptor != 0;
+}
+
+static inline
+amqp_type_t *amqp_type_list_element(amqp_type_t *type, size_t index)
+{
+    assert(amqp_type_is_list(type) && type->value.list.count > index);
+    return type->value.list.elements[index];
+}
+
+static inline
+amqp_type_t *amqp_type_map_element(amqp_type_t *type, size_t index)
+{
+    assert(amqp_type_is_map(type) && type->value.map.count > index);
+    return type->value.map.entries[index];
 }
 
 #ifdef __cplusplus

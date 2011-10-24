@@ -27,7 +27,7 @@ SUITE(AmqpTypes)
         SOUTV(sizeof(amqp_binary_t));
         SOUTV(sizeof(amqp_entry_t));
         SOUTV(sizeof(amqp_list_t));
-        SOUTV(sizeof(amqp_map_t));
+        SOUTV(sizeof(amqp_hash_table_t));
         SOUTV(sizeof(amqp_multiple_symbol_t));
         SOUTV(sizeof(amqp_string_t));
         SOUTV(sizeof(amqp_symbol_t));

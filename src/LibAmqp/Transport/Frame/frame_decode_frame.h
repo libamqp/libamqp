@@ -15,7 +15,7 @@ static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *
     frame->dispatch = amqp_dispatch_sasl_mechanisms;
     frame->cleanup = cleanup_sasl_mechanisms_frame;
 
-    rc = decode_multiple_symbol(mandatory, context, field(field_list, field_zero), field_zero, 1, &frame->frames.sasl.mechanisms.sasl_server_mechanisms);
+    rc = decode_multiple_symbol(mandatory, context, field(field_list, 0), 0, 1, &frame->frames.sasl.mechanisms.sasl_server_mechanisms);
 
     if (rc == 0)
     {
@@ -42,14 +42,16 @@ static void cleanup_sasl_init_frame(amqp_context_t *context, amqp_frame_t *frame
 static int decode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
 {
     const int total_fields = 3;
+    int field_number = 0;
     int rc;
     frame->dispatch = amqp_dispatch_sasl_init;
     frame->cleanup = cleanup_sasl_init_frame;
 
-    rc = decode_symbol(mandatory, context, field(field_list, field_zero), field_zero, total_fields, &frame->frames.sasl.init.mechanism);
-    rc = rc && decode_binary(optional, context, field(field_list, field_one), field_one, total_fields, &frame->frames.sasl.init.initial_response);
-    rc = rc && decode_string(optional, context, field(field_list, field_two), field_two, total_fields, &frame->frames.sasl.init.hostname);
+    rc = decode_symbol(mandatory, context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.init.mechanism); field_number++;
+    rc = rc && decode_binary(optional, context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.init.initial_response); field_number++;
+    rc = rc && decode_string(optional, context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.init.hostname); field_number++;
 
+    assert(field_number = total_fields);
     if (rc == 0)
     {
         amqp_decode_frame_error(context, "SASL Init");
@@ -76,7 +78,7 @@ static int decode_sasl_challenge_frame(amqp_context_t *context, amqp_buffer_t *b
     frame->dispatch = amqp_dispatch_sasl_challenge;
     frame->cleanup = cleanup_sasl_challenge_frame;
 
-    rc = decode_binary(mandatory, context, field(field_list, field_one), field_one, total_fields, &frame->frames.sasl.challenge.challenge);
+    rc = decode_binary(mandatory, context, field(field_list, 0), 0, total_fields, &frame->frames.sasl.challenge.challenge);
 
     if (rc == 0)
     {
@@ -104,7 +106,7 @@ static int decode_sasl_response_frame(amqp_context_t *context, amqp_buffer_t *bu
     frame->dispatch = amqp_dispatch_sasl_response;
     frame->cleanup = cleanup_sasl_response_frame;
 
-    rc = decode_binary(mandatory, context, field(field_list, field_one), field_one, total_fields, &frame->frames.sasl.response.response);
+    rc = decode_binary(mandatory, context, field(field_list, 0), 0, total_fields, &frame->frames.sasl.response.response);
 
     if (rc == 0)
     {
@@ -128,14 +130,16 @@ static void cleanup_sasl_outcome_frame(amqp_context_t *context, amqp_frame_t *fr
 static int decode_sasl_outcome_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
 {
     const int total_fields = 2;
+    int field_number = 0;
     int rc;
 
     frame->dispatch = amqp_dispatch_sasl_outcome;
     frame->cleanup = cleanup_sasl_outcome_frame;
 
-    rc = decode_ubyte(mandatory, context, field(field_list, field_zero), field_zero, total_fields, &frame->frames.sasl.outcome.code, NO_DEFAULT_VALUE);
-    rc = rc && decode_binary(optional, context, field(field_list, field_one), field_one, total_fields, &frame->frames.sasl.outcome.additional_data);
+    rc = decode_ubyte(mandatory, context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.outcome.code, NO_DEFAULT_VALUE); field_number++;
+    rc = rc && decode_binary(optional, context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.outcome.additional_data); field_number++;
 
+    assert(field_number = total_fields);
     if (rc == 0)
     {
         amqp_decode_frame_error(context, "SASL Outcome");

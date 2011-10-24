@@ -17,7 +17,7 @@
 #include <TestHarness.h>
 #include "AmqpTypes/AmqpTypesTestSupport.h"
 
-#include "AmqpTypes/AmqpMap.h"
+#include "AmqpTypes/AmqpHashTable.h"
 #include "debug_helper.h"
 
 SUITE(AmqpTypes)
@@ -31,17 +31,17 @@ SUITE(AmqpTypes)
         int load_map();
 
     public:
-        amqp_map_t map;
+        amqp_hash_table_t map;
     };
 
     AmqpMapFixture::AmqpMapFixture()
     {
-        amqp_map_initialize(context, &map, 31, (amqp_hash_fn_t) hash, (amqp_compare_fn_t) compare);
+        amqp_hash_table_initialize(context, &map, 31, (amqp_hash_fn_t) hash, (amqp_compare_fn_t) compare);
     }
 
     AmqpMapFixture::~AmqpMapFixture()
     {
-        amqp_map_cleanup(context, &map);
+        amqp_hash_table_cleanup(context, &map);
     }
 
     int AmqpMapFixture::load_map()
@@ -49,28 +49,28 @@ SUITE(AmqpTypes)
         int i;
         for (i = 0; data[i]; i++)
         {
-            amqp_map_put(context, &map, keys[i], data[i]);
+            amqp_hash_table_put(context, &map, keys[i], data[i]);
         }
         return i;
     }
 
     TEST_FIXTURE(AmqpMapFixture, fixture_should_balance_allocations)
     {
-        CHECK_EQUAL(32U, amqp_map_capacity(&map));
-        CHECK_CLOSE(0.0, amqp_map_factor(&map), 0.001);
+        CHECK_EQUAL(32U, amqp_hash_table_capacity(&map));
+        CHECK_CLOSE(0.0, amqp_hash_table_factor(&map), 0.001);
     }
 
     TEST_FIXTURE(AmqpMapFixture, entry_count)
     {
         load_map();
-        CHECK_EQUAL(39U, amqp_map_count(&map));
-        CHECK(amqp_map_factor(&map) > 1.2);
+        CHECK_EQUAL(39U, amqp_hash_table_count(&map));
+        CHECK(amqp_hash_table_factor(&map) > 1.2);
     }
 
     TEST_FIXTURE(AmqpMapFixture, add_duplicate_is_not_allowed)
     {
         load_map();
-        int rc = amqp_map_put(context, &map, keys[6], data[6]);
+        int rc = amqp_hash_table_put(context, &map, keys[6], data[6]);
         CHECK(!rc);
     }
 
@@ -79,7 +79,7 @@ SUITE(AmqpTypes)
         load_map();
         for (int i = 0; keys[i]; i++)
         {
-            const void *answer = amqp_map_get(&map, keys[i]);
+            const void *answer = amqp_hash_table_get(&map, keys[i]);
             CHECK(strcmp(data[i], (const char *) answer) == 0);
         }
     }

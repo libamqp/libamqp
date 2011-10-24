@@ -53,6 +53,11 @@ typedef struct amqp_binary_t amqp_binary_t;
 typedef struct amqp_entry_t amqp_entry_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_HASH_TABLE_TYPE_T
+#define LIBAMQP_AMQP_HASH_TABLE_TYPE_T
+typedef struct amqp_hash_table_t amqp_hash_table_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_LIST_T
 #define LIBAMQP_AMQP_LIST_T
     typedef struct amqp_list_t amqp_list_t;

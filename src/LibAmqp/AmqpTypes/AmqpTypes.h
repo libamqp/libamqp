@@ -26,6 +26,7 @@
 #include "AmqpTypes/AmqpEntry.h"
 #include "AmqpTypes/AmqpList.h"
 #include "AmqpTypes/AmqpMap.h"
+#include "AmqpTypes/AmqpHashTable.h"
 #include "AmqpTypes/AmqpMultiple.h"
 #include "AmqpTypes/AmqpString.h"
 #include "AmqpTypes/AmqpSymbol.h"
@@ -37,6 +38,7 @@ union amqp_amqp_type_t
     amqp_entry_t entry;
     amqp_list_t list;
     amqp_map_t map;
+    amqp_hash_table_t hash_table;
     amqp_multiple_symbol_t multiple_symbol;
     amqp_string_t string;
     amqp_symbol_t symbol;

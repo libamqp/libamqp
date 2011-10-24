@@ -24,17 +24,6 @@
 #include "debug_helper.h"
 
 enum {
-    field_zero,
-    field_one,
-    field_two,
-    field_three,
-    field_four,
-    field_five,
-    field_six,
-    field_seven,
-    field_eight,
-};
-enum {
     optional = false,
     mandatory = true
 };
@@ -181,7 +170,7 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
             return decode_amqp_open_frame(context, buffer, frame, type);
 
         case AMQP_FRAME_ID_BEGIN_LIST:
-//            return decode_amqp_begin_frame(context, buffer, frame, type);
+            return decode_amqp_begin_frame(context, buffer, frame, type);
 
         case AMQP_FRAME_ID_ATTACH_LIST:
 //            return decode_amqp_attach_frame(context, buffer, frame, type);

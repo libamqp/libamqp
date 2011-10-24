@@ -17,121 +17,97 @@
 #include <assert.h>
 #include <string.h>
 
-#include "Misc/Bits.h"
-#include "Context/Context.h"
-
+#include "AmqpTypes/AmqpTypesInternal.h"
 #include "AmqpTypes/AmqpMap.h"
+#include "Codec/Type/TypeExtension.h"
+
 #include "debug_helper.h"
 
-void amqp_map_initialize(amqp_context_t *context, amqp_map_t *map, int initial_capacity, amqp_hash_fn_t hash, amqp_compare_fn_t compare)
-{
-    map->capacity = amqp_next_power_two(initial_capacity);
-    assert(map->capacity > 0);
 
-    map->count = 0;
-    map->buckets = AMQP_MALLOC_ARRAY(context, amqp_entry_t *, map->capacity);
-    map->entry_list = 0;
-    map->hash = hash;
-    map->compare = compare;
-    map->on_heap = 0;
+void amqp_map_initialize_as_null(amqp_context_t *context, amqp_map_t *map)
+{
+    map->leader.fn_table = 0;
+    map->type = 0;
+    map->size = 0;
+    map->entries = 0;
 }
 
-amqp_map_t *amqp_map_create(amqp_context_t *context, int initial_capacity, amqp_hash_fn_t hash, amqp_compare_fn_t compare)
+static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
+    amqp_map_t *map = (amqp_map_t *) type;
+    if (map->entries)
+    {
+        AMQP_FREE(context, map->entries);
+    }
+
+    AMQP_FREE(context, map);
+}
+
+static void initialize_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
+{
+    amqp_map_t *map = (amqp_map_t *) type;
+    if (map->entries)
+    {
+        AMQP_FREE(context, map->entries);
+    }
+}
+
+void amqp_map_initialize(amqp_context_t *context, amqp_map_t *map, size_t size)
+{
+    static amqp_fn_table_t table = {
+        .dtor = initialize_dtor
+    };
+
+    assert(size == (size & ~1));
+
+    map->leader.fn_table = &table;
+    map->type = 0;
+    map->size = size;
+    map->entries = AMQP_MALLOC_ARRAY(context, void *, size);
+}
+
+void amqp_map_initialize_from_type(amqp_context_t *context, amqp_map_t *map, amqp_type_t *type)
+{
+    static amqp_fn_table_t table = {
+        .dtor = initialize_dtor
+    };
+
+    assert(amqp_type_is_map(type));
+
+    map->leader.fn_table = &table;
+    map->type = type;
+    map->size = type->value.map.count;
+    map->entries = 0;
+}
+
+amqp_map_t *amqp_map_create(amqp_context_t *context, size_t size)
+{
+    static amqp_fn_table_t table = {
+        .dtor = create_dtor
+    };
+
+    assert(size == (size & ~1));
+
     amqp_map_t *result = AMQP_MALLOC(context, amqp_map_t);
-    amqp_map_initialize(context, result, initial_capacity, hash, compare);
-    result->on_heap = 1;
+    result->leader.fn_table = &table;
+    result->type = 0;
+    result->size = size;
+    result->entries = AMQP_MALLOC_ARRAY(context, void *, size);
     return result;
 }
 
-void amqp_map_cleanup_with_callback(amqp_context_t *context, amqp_map_t *map, amqp_free_callback_t callback)
+amqp_map_t *amqp_map_create_from_type(amqp_context_t *context, amqp_type_t *type)
 {
-    if (map)
-    {
-        amqp_entry_t *list = map->entry_list;
+    static amqp_fn_table_t table = {
+        .dtor = create_dtor
+    };
 
-        while (list)
-        {
-            amqp_entry_t *entry = list;
-            list = list->entry_list.next;
-            if (callback)
-            {
-                callback(context, entry->key, entry->data);
-            }
-            AMQP_FREE(context, entry);
-        }
+    assert(amqp_type_is_map(type));
 
-        AMQP_FREE(context, map->buckets);
-        map->buckets = 0;
-        map->entry_list = 0;
-        if (map->on_heap)
-        {
-            AMQP_FREE(context, map);
-        }
-    }
-}
-
-void amqp_map_cleanup(amqp_context_t *context, amqp_map_t *map)
-{
-    amqp_map_cleanup_with_callback(context, map, 0);
-}
-
-static amqp_entry_t *add_entry(amqp_context_t *context, amqp_map_t *map, int index, const void *key, const void *data)
-{
-    amqp_entry_t *entry = AMQP_MALLOC(context, amqp_entry_t);
-    entry->key = key;
-    entry->data = data;
-
-    entry->collision_list.next = map->buckets[index];
-    entry->collision_list.prev = &map->buckets[index];
-    map->buckets[index] = entry;
-
-    entry->entry_list.next = map->entry_list;
-    entry->entry_list.prev = &map->entry_list;
-    map->entry_list = entry;
-
-    map->count++;
-    return entry;
-}
-
-static amqp_entry_t *search_chain(amqp_map_t *map, amqp_entry_t *chain, const void *key)
-{
-    while (chain && map->compare(chain->key, key) != 0)
-    {
-        chain = chain->collision_list.next;
-    }
-    return chain;
-}
-
-static int calculate_index(amqp_map_t *map, const void *key)
-{
-    uint32_t hash = map->hash(key);
-    uint32_t mask = map->capacity - 1;
-
-    return hash & mask;
-}
-
-int amqp_map_put(amqp_context_t *context, amqp_map_t *map, const void *key, const void *data)
-{
-    int index;
-
-    assert(map && map->hash && map->compare);
-    
-    index = calculate_index(map, key);
-
-    if (map->buckets[index] != 0 && search_chain(map, map->buckets[index], key))
-    {
-        return false;
-    }
-
-    add_entry(context, map, index, key, data);
-
-    return true;
-}
-
-const void *amqp_map_get(amqp_map_t *map, const void *key)
-{
-    int index = calculate_index(map, key);
-    amqp_entry_t *entry = search_chain(map, map->buckets[index], key);
-    return entry ? entry->data : 0;
+    amqp_map_t *result = AMQP_MALLOC(context, amqp_map_t);
+    result->leader.fn_table = &table;
+    result->type = type;
+    result->size = type->value.map.count;
+    result->entries = 0;
+    return result;
 }

@@ -29,7 +29,7 @@ SUITE(AmqpTypes)
 
     public:
         amqp_symbol_t symbol;
-        amqp_map_t *map;
+        amqp_hash_table_t *map;
     };
 
     const char *AmqpDescriptorFixture::descriptor = "amqp:sasl-mechanisms:list";
@@ -48,7 +48,7 @@ SUITE(AmqpTypes)
 
     TEST_FIXTURE(AmqpDescriptorFixture, lookup_descriptor_using_map_api)
     {
-        amqp_descriptor_t *d = (amqp_descriptor_t *) amqp_symbol_map_get(map, &symbol);
+        amqp_descriptor_t *d = (amqp_descriptor_t *) amqp_symbol_hash_table_get(map, &symbol);
 
         CHECK(d != 0);
         if (d)

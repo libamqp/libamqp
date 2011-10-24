@@ -56,6 +56,11 @@ typedef struct amqp_frame_t amqp_frame_t;
 typedef struct amqp_connection_t amqp_connection_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_HASH_TABLE_TYPE_T
+#define LIBAMQP_AMQP_HASH_TABLE_TYPE_T
+typedef struct amqp_hash_table_t amqp_hash_table_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_MAP_TYPE_T
 #define LIBAMQP_AMQP_MAP_TYPE_T
 typedef struct amqp_map_t amqp_map_t;
@@ -150,7 +155,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
             {
                 amqp_sasl_plugin_node_t *sasl_plugin_list;
             } plugins;
-            amqp_map_t *amqp_descriptors;
+            amqp_hash_table_t *amqp_descriptors;
         } reference;
 
         amqp_event_loop_t *thread_event_loop;

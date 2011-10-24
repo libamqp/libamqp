@@ -23,73 +23,86 @@
 
 #include "debug_helper.h"
 
-static void release_memory(amqp_context_t *context, void **elements, amqp_array_t *array)
+void amqp_array_initialize_as_null(amqp_context_t *context, amqp_array_t *array)
 {
-    if (elements)
-    {
-        AMQP_FREE(context, elements);
-    }
-    if (array)
-    {
-        AMQP_FREE(context, array);
-    }
-}
-
-static void initialize(amqp_array_t *array, amqp_fn_table_t *table, amqp_type_t *type, size_t size, void **elements)
-{
-    array->leader.fn_table = table;
-    array->type = type;
-    array->capacity = array->size = size;
-    array->elements = elements;
-}
-
-static void initialize_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
-{
-    amqp_array_t *array = (amqp_array_t *) type;
-    release_memory(context, array->elements, 0);
-}
-void amqp_array_initialize(amqp_context_t *context, amqp_array_t *array, size_t size)
-{
-    static amqp_fn_table_t table = {
-        .dtor = initialize_dtor
-    };
-    initialize(array, &table, 0, size, AMQP_MALLOC_ARRAY(context, void *, size));
-}
-
-void amqp_array_initialize_from_type(amqp_context_t *context, amqp_array_t *array, amqp_type_t *type)
-{
-    assert(amqp_type_is_array(type));
-    initialize(array, 0, type, type->value.array.count, (void **) type->value.array.elements);
+    array->leader.fn_table = 0;
+    array->type = 0;
+    array->size = 0;
+    array->elements = 0;
 }
 
 static void create_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
 {
     amqp_array_t *array = (amqp_array_t *) type;
-    release_memory(context, array->elements, array);
+    if (array->elements)
+    {
+        AMQP_FREE(context, array->elements);
+    }
+
+    AMQP_FREE(context, array);
 }
+
+static void initialize_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
+{
+    amqp_array_t *array = (amqp_array_t *) type;
+    if (array->elements)
+    {
+        AMQP_FREE(context, array->elements);
+    }
+}
+
+void amqp_array_initialize(amqp_context_t *context, amqp_array_t *array, size_t size)
+{
+    static amqp_fn_table_t table = {
+        .dtor = initialize_dtor
+    };
+
+    array->leader.fn_table = &table;
+    array->type = 0;
+    array->size = size;
+    array->elements = AMQP_MALLOC_ARRAY(context, void *, size);
+}
+
+void amqp_array_initialize_from_type(amqp_context_t *context, amqp_array_t *array, amqp_type_t *type)
+{
+    static amqp_fn_table_t table = {
+        .dtor = initialize_dtor
+    };
+
+    assert(amqp_type_is_array(type));
+
+    array->leader.fn_table = &table;
+    array->type = type;
+    array->size = type->value.array.count;
+    array->elements = 0;
+}
+
 amqp_array_t *amqp_array_create(amqp_context_t *context, size_t size)
 {
     static amqp_fn_table_t table = {
         .dtor = create_dtor
     };
+
     amqp_array_t *result = AMQP_MALLOC(context, amqp_array_t);
-    initialize(result, &table, 0, size, AMQP_MALLOC_ARRAY(context, void *, size));
+    result->leader.fn_table = &table;
+    result->type = 0;
+    result->size = size;
+    result->elements = AMQP_MALLOC_ARRAY(context, void *, size);
     return result;
 }
 
-static void create_with_type_dtor(amqp_context_t *context, amqp_amqp_type_t *type)
-{
-    amqp_array_t *array = (amqp_array_t *) type;
-    release_memory(context, 0, array);
-}
 amqp_array_t *amqp_array_create_from_type(amqp_context_t *context, amqp_type_t *type)
 {
     static amqp_fn_table_t table = {
-        .dtor = create_with_type_dtor
+        .dtor = create_dtor
     };
+
     assert(amqp_type_is_array(type));
 
     amqp_array_t *result = AMQP_MALLOC(context, amqp_array_t);
-    initialize(result, &table, type, type->value.array.count, (void **) type->value.array.elements);
+    result->leader.fn_table = &table;
+    result->type = type;
+    result->size = type->value.array.count;
+    result->elements = 0;
     return result;
 }

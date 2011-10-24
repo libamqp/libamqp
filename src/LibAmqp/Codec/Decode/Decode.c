@@ -705,17 +705,3 @@ amqp_type_t *amqp_decode_supress_messages(amqp_context_t *context, amqp_buffer_t
     
     return result;
 }
-
-amqp_type_t *amqp_list_element(amqp_type_t *type, size_t index)
-{
-    assert(amqp_type_is_list(type));
-    assert(type->value.list.count > index);
-    return type->value.list.elements[index];
-}
-
-amqp_type_t *amqp_map_element(amqp_type_t *type, size_t index)
-{
-    assert(amqp_type_is_map(type));
-    assert(type->value.map.count > index);
-    return type->value.map.entries[index];
-}
