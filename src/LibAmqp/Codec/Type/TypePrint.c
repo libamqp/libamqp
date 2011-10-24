@@ -48,6 +48,18 @@ static void printf_type_value(amqp_context_t *context, const char *format, ...)
     str_print(context, buffer);
 }
 
+static void printf_numeric_type_value(amqp_context_t *context, const char *format, ...)
+{
+    char buffer[64];
+
+    va_list args;
+    va_start(args, format);
+
+    vsnprintf(buffer, sizeof(buffer), format, args);
+
+    str_print(context, buffer);
+}
+
 static int amqp_type_print_ascii(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer, int quote)
 {
     size_t i;
@@ -254,42 +266,37 @@ void amqp_type_method_boolean_print(amqp_context_t *context, amqp_type_t *type, 
 
 void amqp_type_method_ubyte_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%u", type->value.b1._unsigned);
+    printf_numeric_type_value(context, "%u", type->value.b1._unsigned);
 }
 
 void amqp_type_method_byte_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%d", type->value.b1._signed);
+    printf_numeric_type_value(context, "%d", type->value.b1._signed);
 }
 
 void amqp_type_method_ushort_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%u", type->value.b2._ushort);
+    printf_numeric_type_value(context, "%u", type->value.b2._ushort);
 }
 
 void amqp_type_method_short_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%d", type->value.b2._short);
+    printf_numeric_type_value(context, "%d", type->value.b2._short);
 }
 
 void amqp_type_method_uint_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%u", type->value.b4._uint);
-}
-
-void amqp_type_method_uint0_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
-{
-    amqp_type_method_uint_print(context, type, buffer);
+    printf_numeric_type_value(context, "%u", type->value.b4._uint);
 }
 
 void amqp_type_method_int_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%d", type->value.b4._int);
+    printf_numeric_type_value(context, "%d", type->value.b4._int);
 }
 
 void amqp_type_method_ulong_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%lu", type->value.b8._ulong);
+    printf_numeric_type_value(context, "%lu", type->value.b8._ulong);
 }
 
 void amqp_type_method_ulong0_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
@@ -299,42 +306,37 @@ void amqp_type_method_ulong0_print(amqp_context_t *context, amqp_type_t *type, a
 
 void amqp_type_method_long_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%ld", type->value.b8._long);
-}
-
-void amqp_type_method_small_uint_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
-{
-    printf_type_value(context, "%u", type->value.b4._uint);
+    printf_numeric_type_value(context, "%ld", type->value.b8._long);
 }
 
 void amqp_type_method_small_int_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%d", type->value.b4._int);
+    printf_numeric_type_value(context, "%d", type->value.b4._int);
 }
 
 void amqp_type_method_small_ulong_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%lu", type->value.b8._ulong);
+    printf_numeric_type_value(context, "%lu", type->value.b8._ulong);
 }
 
 void amqp_type_method_small_long_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%ld", type->value.b8._ulong);
+    printf_numeric_type_value(context, "%ld", type->value.b8._ulong);
 }
 
 void amqp_type_method_float_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%f", type->value.b4._float);
+    printf_numeric_type_value(context, "%f", type->value.b4._float);
 }
 
 void amqp_type_method_double_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "%f", type->value.b8._double);
+    printf_numeric_type_value(context, "%f", type->value.b8._double);
 }
 
 void amqp_type_method_char_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_type_value(context, "U%60x", type->value.b4._wchar);
+    printf_numeric_type_value(context, "U%60x", type->value.b4._wchar);
 }
 
 void amqp_type_method_decimal32_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
