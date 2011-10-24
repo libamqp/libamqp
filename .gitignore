@@ -15,9 +15,9 @@
 *.tar
 *.tar.gz
 *.swp
+*.log
 
 3rd-party/UnitTest++/TestUnitTest++
-Documentation/amqp.pdf
 src/test-runner
 src/decode-demo
 src/sample-server
