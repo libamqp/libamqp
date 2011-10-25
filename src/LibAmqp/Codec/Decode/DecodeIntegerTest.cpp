@@ -39,7 +39,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeVariedULong)
     {
         load_decode_buffer(test_data::varied_ulong_8);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(1154895135052768677ULL, type->value.b8._ulong);
@@ -48,7 +48,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeULong)
     {
         load_decode_buffer(test_data::ulong_8);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(18446744073709551614ULL, type->value.b8._ulong);
@@ -57,7 +57,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeUInt)
     {
         load_decode_buffer(test_data::uint_4);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(4294967294U, type->value.b4._uint);
@@ -66,7 +66,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeSmallULong)
     {
         load_decode_buffer(test_data::ulong_small);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(254UL, type->value.b8._ulong);
@@ -75,7 +75,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeSmallUInt)
     {
         load_decode_buffer(test_data::uint_small);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(254U, type->value.b4._uint);
@@ -84,7 +84,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeUintZero)
     {
         load_decode_buffer(test_data::uint_zero);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0U, type->value.b4._uint);
@@ -93,7 +93,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeULongZero)
     {
         load_decode_buffer(test_data::ulong_zero);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0UL, type->value.b8._ulong);
@@ -102,7 +102,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeUShort)
     {
         load_decode_buffer(test_data::ushort_2);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(65534, type->value.b2._ushort);
@@ -111,7 +111,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeUByte)
     {
         load_decode_buffer(test_data::ubyte_1);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(254, type->value.b1._unsigned);
@@ -120,7 +120,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeLong)
     {
         load_decode_buffer(test_data::long_8);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(-2, type->value.b8._long);
@@ -129,7 +129,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeInt)
     {
         load_decode_buffer(test_data::int_4);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(-2, type->value.b4._int);
@@ -138,7 +138,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeSmallLong)
     {
         load_decode_buffer(test_data::long_small);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(-4, type->value.b8._long);
@@ -147,7 +147,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeSmallInt)
     {
         load_decode_buffer(test_data::int_1);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(-3, type->value.b4._int);
@@ -156,7 +156,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeShort)
     {
         load_decode_buffer(test_data::short_2);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(-2, type->value.b2._short);
@@ -165,7 +165,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, DecodeByte)
     {
         load_decode_buffer(test_data::byte_1);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(-2, type->value.b1._signed);
@@ -174,7 +174,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, TimeStamp)
     {
         load_decode_buffer(test_data::timestamp_8);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(1291654800000LL, type->value.b8._timestamp);
@@ -183,7 +183,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, TimeStamp2)
     {
         load_decode_buffer(test_data::timestamp_before_epoc_8);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(-1864105200000LL, type->value.b8._timestamp);
@@ -192,7 +192,7 @@ SUITE(IntegerDecode)
     TEST_FIXTURE(DecodeFixture, wchar)
     {
         load_decode_buffer(test_data::utf32_char);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_EQUAL(0x000020ac, type->value.b4._wchar);

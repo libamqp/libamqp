@@ -27,6 +27,8 @@ static void event_thread_handler(void *argument)
         event_thread->loop = private_loop = ev_loop_new(0);
     }
 
+    event_thread->context->thread_event_loop = event_thread->loop; // TODO - Inclined to forget this and errors are not obvious
+
     (*event_thread->handler)(event_thread);
 
     if (private_loop != 0)
@@ -54,15 +56,25 @@ void amqp_event_thread_run_loop(amqp_event_thread_t *event_thread)
     ev_async_stop(event_thread->loop, async_watcher);
 }
 
-amqp_event_thread_t *amqp_event_thread_initialize(amqp_context_t *context, amqp_event_thread_handler_t handler, amqp_event_loop_t *loop, void *argument)
+void amqp_event_thread_run_loop_with_shutdown_hook(amqp_event_thread_t *event_thread, amqp_connection_shutdown_hook_t hook, amqp_accept_handler_arguments_t *argument)
+{
+    assert(hook != 0);
+
+    amqp_event_thread_run_loop(event_thread);
+    (*hook)(event_thread->context, event_thread->loop, argument);
+}
+
+amqp_event_thread_t *amqp_event_thread_initialize(amqp_context_t *context, amqp_event_thread_handler_t handler, amqp_event_loop_t *loop, void *thread_arguments, const char *context_name)
 {
     amqp_event_thread_t *result = AMQP_MALLOC(context, amqp_event_thread_t);
     amqp_semaphore_initialize(&result->thread_running_semaphore);
 
     result->handler = handler;
     result->loop = loop;
-    result->argument = argument;
+    result->thread_arguments = thread_arguments;
     result->context = amqp_context_clone(context);
+
+    amqp_context_set_name(result->context, context_name);
 
     result->thread = amqp_thread_start(event_thread_handler, result);
 

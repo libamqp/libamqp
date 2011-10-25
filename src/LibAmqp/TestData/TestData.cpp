@@ -316,12 +316,14 @@ namespace test_data
         0xe0, 4, 1, 0x61, 0x00, 0x0c
     );
 
-    test_data_def(bin_8, 0xA0,
+    test_data_def(bin_8,
+        0xA0,
         12,
         'b', 'i', 'n', 'a', 'r', 'y', ' ', 'a', 'r', 'r', 'a', 'y'
     );
 
-    test_data_def(bin_32, 0xb0,
+    test_data_def(bin_32,
+        0xb0,
         0, 0, 0, 16,
         'b', 'i', 'g', ' ', 'b', 'i', 'n', 'a', 'r', 'y', ' ', 'a', 'r', 'r', 'a', 'y'
     );
@@ -362,13 +364,15 @@ namespace test_data
     );
 
     test_data_def(described_list,
-        0x00, 0xa1, 0x04, 'L', 'i', 's', 't', 0xc0,
-        0x17,
-        0x03,
-        0xa1, 0x03, 'P', 'i', 'e',    // string
-        0x00, 0xa1, 0x02, 'P', 'I',
-            0x82, 0x40, 0x09, 0x21, 0xfb, 0x82, 0xc2, 0xbd, 0x7f,
-        0x61, 0x00, 0x0a,       // short
+        0x00,
+            0xa1, 0x04, 'L', 'i', 's', 't',
+            0xc0,
+            0x17,
+            0x03,
+            0xa1, 0x03, 'P', 'i', 'e',    // string
+            0x00, 0xa1, 0x02, 'P', 'I',
+                0x82, 0x40, 0x09, 0x21, 0xfb, 0x82, 0xc2, 0xbd, 0x7f,
+            0x61, 0x00, 0x0a,       // short
     );
 
     test_data_def(missing_descriptor,
@@ -434,29 +438,37 @@ namespace test_data
         0x00,           // false
     );
 
-    // TODO - add decode test for this
-    test_data_def(multiple_true_symbol_null,
-        0x00, 0x41, 0x40,
+    test_data_def(multiple_symbol_null,
+        0x40,
     );
 
-    // TODO - add decode test for this
-    test_data_def(multiple_true_symbol_one_value,
-        0x00, 0x41, 0xa3, 0x03, 0x46, 0x6f, 0x6f,
+    test_data_def(multiple_symbol_one_value,
+        0xA3, 0x05, 0x50, 0x4C, 0x41, 0x49, 0x4E,
     );
 
-    // TODO - add decode test for this
-    test_data_def(multiple_true_symbol_many_valuesx,
-        0x00, 0x41,
-            0xd0, 0x00, 0x00, 0x00, 0x0e, 0x00, 0x00, 0x00, 0x02,
-                0xa3, 0x03, 0x46, 0x6f, 0x6f,
-                0xa3, 0x03, 0x46, 0x75, 0x6d,
+    test_data_def(multiple_symbol_many_values,
+        0xe0, 16, 3, 0xA3,
+            0x05, 0x50, 0x4C, 0x41, 0x49, 0x4E, // PLAIN
+            0x03, 0x46, 0x6f, 0x6f, // Foo
+            0x03, 0x46, 0x75, 0x6d, // Fum
     );
-    // TODO - add decode test for this
-    test_data_def(multiple_true_symbol_many_values,
-        0x00, 0x41,
-            0xc0, 0x0b, 0x02,
-                0xa3, 0x03, 0x46, 0x6f, 0x6f,
-                0xa3, 0x03, 0x46, 0x75, 0x6d,
+
+    test_data_def(multiple_symbol_empty_array,
+//        0xe0, 1, 0,
+        0xe0, 2, 0, 0xA3,     // TODO - verify which is correct
     );
+
+    test_data_def(array_of_symbols,
+        0xe0,
+        30,           // size
+        0x05,         // count
+        0xA3,
+        0x03, 'A', 'B', 'C',
+        0x03, 'A', 'B', 'C',
+        0x05, 'D', 'E', 'F', 'G', 'H',
+        0x05, 'I', 'J', 'J', 'L', 'M',
+        0x07, 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+    );
+
 }
 

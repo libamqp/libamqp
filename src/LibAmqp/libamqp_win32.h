@@ -17,6 +17,8 @@
 #ifndef LIBAMQP_WIN32_H
 #define LIBAMQP_WIN32_H
 
+#define LIBAMQP_DISABLE_BUFFER_INLINE 1
+
 #include <windows.h>
 
 typedef __int8 int8_t;

@@ -17,6 +17,8 @@
 #ifndef LIBAMQP_CODEC_TYPE_TYPE_H
 #define LIBAMQP_CODEC_TYPE_TYPE_H
 
+#include <assert.h>
+
 #include "libamqp_common.h"
 #include "Codec/Type/EncodingMetaData.h"
 #include "Context/Context.h"
@@ -58,8 +60,13 @@ typedef struct {
     unsigned int is_encoded:1;
     unsigned int is_incomplete:1;
     unsigned int is_contained:1;
+    unsigned int is_variable:1;
+    unsigned int is_binary:1;
+    unsigned int is_symbol:1;
+    unsigned int is_string:1;
     unsigned int is_descriptor:1;
     unsigned int has_descriptor:1;
+    unsigned int convert_failed:1;
     union {
         unsigned int is_compound;
         amqp_type_type_flags_t type;
@@ -68,8 +75,6 @@ typedef struct {
 
 struct amqp_type_t
 {
-    amqp_context_t *context;
-
     int format_code;
     int extension_type_code;
     amqp_encoding_meta_data_t *meta_data;
@@ -82,7 +87,7 @@ struct amqp_type_t
         amqp_four_byte_t b4;
         amqp_two_byte_t b2;
         amqp_one_byte_t b1;
-        const unsigned char *uuid;
+        unsigned char uuid[16];
         struct {
             size_t count;
             amqp_type_t **elements;
@@ -104,6 +109,9 @@ struct amqp_type_t
             size_t count;
             amqp_type_t **elements;
         } described;
+        struct {
+            amqp_buffer_t *buffer;
+        } variable;
     } value;
     int invalid_cause ;
 };
@@ -117,8 +125,6 @@ extern amqp_type_t **amqp_realloc_amqp_type_t_array(amqp_context_t *c, amqp_type
 extern int amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs);
 extern void amqp_mark_type_invalid(amqp_type_t *type, int cause);
 extern void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type);
-
-extern amqp_buffer_t *amqp_type_convert_buffer(amqp_type_t *type);
 
 static inline
 bool amqp_type_is_container(amqp_type_t *type)
@@ -163,6 +169,30 @@ bool amqp_type_is_contained(amqp_type_t *type)
 }
 
 static inline
+bool amqp_type_is_variable(amqp_type_t *type)
+{
+    return type->flags.is_variable != 0;
+}
+
+static inline
+bool amqp_type_is_binary(amqp_type_t *type)
+{
+    return type->flags.is_binary != 0;
+}
+
+static inline
+bool amqp_type_is_string(amqp_type_t *type)
+{
+    return type->flags.is_string != 0;
+}
+
+static inline
+bool amqp_type_is_symbol(amqp_type_t *type)
+{
+    return type->flags.is_symbol != 0;
+}
+
+static inline
 bool amqp_type_is_described(amqp_type_t *type)
 {
     return type->flags.container.type.is_described != 0;
@@ -180,6 +210,19 @@ bool amqp_type_is_descriptor(amqp_type_t *type)
     return type->flags.is_descriptor != 0;
 }
 
+static inline
+amqp_type_t *amqp_type_list_element(amqp_type_t *type, size_t index)
+{
+    assert(amqp_type_is_list(type) && type->value.list.count > index);
+    return type->value.list.elements[index];
+}
+
+static inline
+amqp_type_t *amqp_type_map_element(amqp_type_t *type, size_t index)
+{
+    assert(amqp_type_is_map(type) && type->value.map.count > index);
+    return type->value.map.entries[index];
+}
 
 #ifdef __cplusplus
 }

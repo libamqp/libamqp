@@ -45,8 +45,6 @@ namespace test_data
     };
 }
 
-
-
 namespace test_data
 {
     extern TestData empty_buffer;
@@ -128,9 +126,13 @@ namespace test_data
     extern TestData array_of_single_empty_list;
     extern TestData boolean_array;
 
-    extern TestData multiple_true_symbol_null;
-    extern TestData multiple_true_symbol_one_value;
-    extern TestData multiple_true_symbol_many_values;
+    extern TestData multiple_symbol_null;
+    extern TestData multiple_symbol_one_value;
+    extern TestData multiple_symbol_many_values;
+    extern TestData multiple_symbol_empty_array;
+
+    extern TestData array_of_symbols;
+
 }
 
 #endif

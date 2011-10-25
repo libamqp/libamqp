@@ -23,8 +23,13 @@ extern "C" {
 
 #include <limits.h>
 
+#ifndef CHAR_BIT
+/* Danger, Will Robinson. 8 bits per byte is almost always correct. Almost always! */
+#define CHAR_BIT    8
+#endif
+
 #ifndef LONG_BIT
-#define LONG_BIT (sizeof(long) * 8)
+#define LONG_BIT (sizeof(long) * CHAR_BIT)
 #endif
 
 #ifdef __cplusplus

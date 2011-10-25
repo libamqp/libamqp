@@ -31,7 +31,7 @@
 
 #define All_ONES_MASK ((unsigned long) -1)
 
-#ifndef DISABLE_MEMORY_POOL
+#ifndef LIBAMQP_DISABLE_MEMORY_POOL
 void amqp_pool_break()
 {
     // nothing to do here
@@ -151,7 +151,7 @@ void *amqp_allocate(amqp_context_t *c, amqp_memory_pool_t *pool)
     assert(pool->initialized);
     assert(pool->initializer_callback != null);
 
-#ifdef DISABLE_MEMORY_POOL
+#ifdef LIBAMQP_DISABLE_MEMORY_POOL
     result = amqp_malloc(c, pool->object_size);
 #else
     assert(pool->object_size_in_fragments != 0);
@@ -166,7 +166,7 @@ void *amqp_allocate(amqp_context_t *c, amqp_memory_pool_t *pool)
     return result;
 }
 
-#ifndef DISABLE_MEMORY_POOL
+#ifndef LIBAMQP_DISABLE_MEMORY_POOL
 
 static
 amqp_memory_allocation_t *calculate_allocation_ptr_from_object_ptr(amqp_memory_pool_t *pool, void *pooled_object)
@@ -228,7 +228,7 @@ void amqp_deallocate(amqp_context_t *c, amqp_memory_pool_t *pool, void *pooled_o
     if (pooled_object != 0)
     {
         (*pool->destroyer_callback)(c, pool, pooled_object);
-#ifdef DISABLE_MEMORY_POOL
+#ifdef LIBAMQP_DISABLE_MEMORY_POOL
         amqp_free(c, pooled_object);
 #else
         delete_object(c, pool, pooled_object);
@@ -243,7 +243,7 @@ void default_callback(amqp_context_t *c, amqp_memory_pool_t *pool, void *object)
     // nothing to see here, move along
 }
 
-#ifndef DISABLE_MEMORY_POOL
+#ifndef LIBAMQP_DISABLE_MEMORY_POOL
 
 static
 size_t calculate_block_offset_to_first_allocation()
@@ -305,7 +305,7 @@ size_t preferred_block_size()
 void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t pooled_object_size, size_t suggested_block_size)
 {
     memset(pool, '\0', sizeof(amqp_memory_pool_t));
-#ifndef DISABLE_MEMORY_POOL
+#ifndef LIBAMQP_DISABLE_MEMORY_POOL
     pool->block_size = adjust_block_size(suggested_block_size);
 
     pool->offset_to_first_allocation = calculate_block_offset_to_first_allocation();

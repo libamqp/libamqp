@@ -35,14 +35,14 @@ SUITE(BadDataDecoder)
     TEST_FIXTURE(DecodeFixture, EndOfBuffer)
     {
         load_decode_buffer(test_data::empty_buffer);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
         CHECK_NULL(type);
     }
 
     TEST_FIXTURE(DecodeFixture, BadFormatCode)
     {
         load_decode_buffer(test_data::bad_format_code);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_UNKNOWN_FORMAT_CODE, type->invalid_cause);
     }
@@ -54,7 +54,7 @@ SUITE(BadDataDecoder)
         );
 
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_UNKNOWN_FORMAT_CODE, type->invalid_cause);
@@ -66,7 +66,7 @@ SUITE(BadDataDecoder)
             0x3f,
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_UNKNOWN_FORMAT_CODE, type->invalid_cause);
@@ -78,7 +78,7 @@ SUITE(BadDataDecoder)
             0x80, 0x10, 0x07, 0x03, 0x01
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -90,7 +90,7 @@ SUITE(BadDataDecoder)
             0x70, 0xff, 0xff
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -102,7 +102,7 @@ SUITE(BadDataDecoder)
             0x60, 0xff,
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -114,7 +114,7 @@ SUITE(BadDataDecoder)
             0x50
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -126,7 +126,7 @@ SUITE(BadDataDecoder)
             0x81, 0x10, 0x07, 0x03, 0x01
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -138,7 +138,7 @@ SUITE(BadDataDecoder)
             0x71, 0xff, 0xff
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -150,7 +150,7 @@ SUITE(BadDataDecoder)
             0x61, 0xff,
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -162,7 +162,7 @@ SUITE(BadDataDecoder)
             0x51
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -174,7 +174,7 @@ SUITE(BadDataDecoder)
             0xa3, 3, 'F', 'o'
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -186,7 +186,7 @@ SUITE(BadDataDecoder)
             0xb3, 0, 0, 0, 6, 'F', 'o', 'o', 'B', 'a'
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -198,7 +198,7 @@ SUITE(BadDataDecoder)
             0x72, 0x42, 0xf6, 0xe9
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -210,7 +210,7 @@ SUITE(BadDataDecoder)
             0x82, 0x42, 0xf6, 0xe9
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
@@ -222,7 +222,7 @@ SUITE(BadDataDecoder)
             0xA1, 0x0B, 'B', 'a', 'd', ' ', 'W', 'o', 'r', 'l', 'd'
         );
         load_decode_buffer(bad_data);
-        type = amqp_decode_supress_messages(context);
+        type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
         CHECK_EQUAL(1U, type->flags.is_invalid);

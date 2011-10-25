@@ -25,7 +25,7 @@ SUITE(CodecDecode)
     TEST_FIXTURE(DecodeFixture, Null)
     {
         load_decode_buffer(test_data::null_0);
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         CHECK_NOT_NULL(type);
         CHECK_EQUAL(0x40, type->format_code);

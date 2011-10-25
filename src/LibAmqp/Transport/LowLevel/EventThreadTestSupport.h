@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_EVENT_THREAD_TEST_SUPPORT_H
-#define LIBAMQP_TRANSPORT_EVENT_THREAD_TEST_SUPPORT_H
+#ifndef LIBAMQP_TRANSPORT_LOW_LEVEL_EVENT_THREAD_TEST_SUPPORT_H
+#define LIBAMQP_TRANSPORT_LOW_LEVEL_EVENT_THREAD_TEST_SUPPORT_H
 
 #include "Transport/LowLevel/EventThread.h"
 #include "Context/ContextTestSupport.h"

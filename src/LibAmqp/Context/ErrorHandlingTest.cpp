@@ -26,14 +26,14 @@ SUITE(Context)
     //    CHECK(AMQP_ERROR_CODE_BASE > sys_nerr);
     //}
 
-    TEST(spike)
-    {
+//    TEST(spike)
+//    {
     //    const char *s = strerror(1000);
     //    SOUTS(s);
     //    SOUTV(sys_nerr);
     //
     //    read(4, 0, 0);
     //    amqp_io_error(context, "ooops");
-    }
+//    }
 
 }

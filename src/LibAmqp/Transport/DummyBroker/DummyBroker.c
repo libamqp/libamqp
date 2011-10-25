@@ -14,77 +14,42 @@
    limitations under the License.
  */
 
+#ifndef _MSC_VER
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
+#endif
+
 #include "Context/Context.h"
-#include "Transport/LowLevel/EventLoop.h"
-#include "Transport/LowLevel/EventThread.h"
-#include "Transport/LowLevel/Listener.h"
-#include "Transport/LowLevel/Socket.h"
+#include "Transport/Connection/Connection.h"
 #include "Transport/DummyBroker/DummyBroker.h"
 
 #include "debug_helper.h"
 
-struct arguments
+static int accept_handler(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t address_size, amqp_accept_handler_arguments_t *accept_handler_arguments)
 {
-    int port_number;
-    amqp_accept_event_handle_t accept_handler;
-};
+    amqp_context_t *context = me->context;
 
-static int write_all(int fd, const char *buffer, size_t n)
-{
-    int count = n;
-    int written;
-    while ((written = write(fd, buffer, count)) >= 0 || errno == EINTR)
-    {
-        buffer += written;
-        count -= written;
-	if (count == 0)
-	{
-	    return n;
-	}
-    }
-    return written;
-}
+    assert(context && context->thread_event_loop);
+    assert(accept_handler_arguments && accept_handler_arguments->connections);
+    amqp_connection_accept(context, fd, client_address, address_size, accept_handler_arguments);
 
-static int default_accept_new_connection_handler(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
-{
-    char buffer[128];
-    int n;
-
-    amqp_set_socket_to_blocking(fd);
-
-    while ((n = read(fd, buffer, sizeof(buffer) -1)) > 0)
-    {
-        write_all(fd, buffer, n);
-    }
-    close(fd);
     return 0;
 }
 
-static void dummy_broker_thread_handler(amqp_event_thread_t *event_thread)
+amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context, int listen_port_number, amqp_connection_test_hook_t *test_hooks)
 {
-    struct arguments *arguments = (struct arguments *) event_thread->argument;
+    amqp_event_loop_t *default_event_loop = 0;
 
-    amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(event_thread->context, event_thread->loop, arguments->port_number, arguments->accept_handler);
-
-    amqp_event_thread_run_loop(event_thread);
-
-    amqp_listener_destroy(event_thread->context, accept_watcher);
-}
-
-amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context, int listen_port_number, amqp_accept_event_handle_t accept_handler)
-{
-    amqp_dummy_broker_t *broker = AMQP_MALLOC(context, amqp_dummy_broker_t);
-    struct arguments arguments = {
-        .port_number = listen_port_number,
-        .accept_handler = accept_handler != 0 ? accept_handler : default_accept_new_connection_handler
-    };
-
-    broker->thread =  amqp_event_thread_initialize(context, dummy_broker_thread_handler, 0, &arguments);
-    return broker;
+    amqp_dummy_broker_t *result = AMQP_MALLOC(context, amqp_dummy_broker_t);
+    result->accept_handler_arguments = amqp_accept_handler_arguments_initialize(context, test_hooks);
+    result->listener_thread = amqp_listener_thread_initialize(context, default_event_loop, listen_port_number, accept_handler, "dummy-broker", result->accept_handler_arguments);
+    return result;
 }
 
 void amqp_dummy_broker_destroy(amqp_context_t *context, amqp_dummy_broker_t *broker)
 {
-    amqp_event_thread_destroy(context, broker->thread);
+    amqp_listener_thread_destroy(context, broker->listener_thread);
+    amqp_accept_handler_arguments_destroy(context, broker->accept_handler_arguments);
     AMQP_FREE(context, broker);
 }

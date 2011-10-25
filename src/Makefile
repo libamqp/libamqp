@@ -6,12 +6,17 @@
 MODULES := \
 	LibAmqp/TestData \
 	LibAmqp \
-	LibAmqp/Memory \
+	LibAmqp/Misc \
+	LibAmqp/AmqpTypes \
 	LibAmqp/Buffer \
+	LibAmqp/Memory \
 	LibAmqp/Context \
 	LibAmqp/Codec \
 	LibAmqp/Thread \
 	LibAmqp/Transport \
+	LibAmqp/Plugin \
+	LibAmqp/Plugin/SaslAnonymous \
+	LibAmqp/Plugin/SaslPlain \
         DecodeDemo \
         SampleServer \
 	../3rd-party/UnitTest++/src  \
@@ -26,19 +31,25 @@ TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
 TEST_RUNNER_ARGS := --exclude SlowRunning
+
 SAMPLE_SRC :=
 
-.PHONY:	all trace libs tests check check-all debug targets
+.PHONY:	all trace libs tests check check-all debug targets quick coverge
 all:	trace libs samples targets tests
 ci-build:   scrub all check
 targets::
 
-# BUILD_OPTIONS += -DDISABLE_MEMORY_POOL
+BUILD_OPTIONS += -DLIBAMQP_DISABLE_BUFFER_INLINE
+# BUILD_OPTIONS += -DLIBAMQP_DISABLE_MEMORY_POOL
 # BUILD_OPTIONS += -DLIBAMQP_DISABLE_FAST_MUTEX
-CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES)) $(BUILD_OPTIONS)
-CFLAGS = -g -O3 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -fasm
+# BUILD_OPTIONS += -DLIBAMQP_DISABLE_TEST_HOOKS
+BUILD_OPTIONS += -DLIBAMQP_TRACE_CONNECT_STATE
+
+CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES)) $(BUILD_OPTIONS) 
+# CFLAGS += -g -O3 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -fasm
+CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -fasm $(COVERAGE_CFLAGS)
 CXXFLAGS = -g -Wall
-LDFLAGS += -lev -lpthread
+LDFLAGS = -lev -lpthread $(COVERAGE_LDFLAGS)
 
 LIBAMQP_LIB := libamqp.a
 LIBS += $(LIBAMQP_LIB)
@@ -67,10 +78,17 @@ check-all:	all
 	./test-runner 
 
 quick:
-	make AR=./ar.serialize --jobs 2 check
+	time make AR=./ar.serialize --jobs 3 check
 
 test-runner:	$(TEST_OBJ) $(OBJ) $(LIBS)
 	g++ -L. $(TEST_OBJ) $(patsubst lib%.a,-l%,$(LIBS)) $(LDFLAGS) -o $@
+
+coverage:
+	find . \( -name \*.[aoi] -or -name \*.orig \) -print | xargs rm -f
+	find . \( -name \*.gcov -o -name \*.gcda -o -name \*.gcno \) -print | xargs rm -f
+	make COVERAGE_CFLAGS+="-fprofile-arcs -ftest-coverage" COVERAGE_LDFLAGS+="-lgcov" test-runner 
+	./test-runner
+	./run-gcov.sh
 
 $(OBJ) $(TEST_OBJ): Makefile
 
@@ -137,3 +155,8 @@ scrub::
 	$(MAKE) -f Makefile.util scrub
 
 samples: $(SAMPLE_OBJ)
+
+.PHONY:	generate
+generate:
+	../scripts/generate
+

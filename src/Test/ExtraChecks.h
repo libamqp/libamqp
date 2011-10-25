@@ -27,6 +27,10 @@
     #error UnitTest++ redefines CHECK_NOT_NULL
 #endif
 
+#ifdef ASSERT
+    #error Test harness refefines ASSERT
+#endif
+
 #define CHECK_NULL(value) \
     do \
     { \
@@ -65,5 +69,10 @@
         } \
     } while (0)
 
+#define ASSERT(x) \
+{ \
+    CHECK(x); \
+    if (!(x)) return; \
+}
 
 #endif

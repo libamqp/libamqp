@@ -28,19 +28,15 @@ SUITE(Type)
         TypeFixture() : type(0) {}
         ~TypeFixture()
         {
-            deallocate_type(type);
+            amqp_deallocate_type(context, type);
+        }
+        amqp_type_t *allocate_type()
+        {
+            return amqp_allocate_type(context);
         }
         amqp_memory_pool_t *type_pool()
         {
             return &context->memory.amqp_type_t_pool;
-        }
-        amqp_type_t *allocate_type()
-        {
-            return (amqp_type_t *) amqp_allocate(context, type_pool());
-        }
-        void deallocate_type(amqp_type_t *type)
-        {
-            amqp_deallocate(context, type_pool(), type);
         }
 
     public:
@@ -55,7 +51,7 @@ SUITE(Type)
     
         for (i = 0; i < 15; i++)
         {
-            array_1[i] = allocate_type();
+            array_1[i] = amqp_allocate_type(context);
             array_2[i] = array_1[i];
         }
     

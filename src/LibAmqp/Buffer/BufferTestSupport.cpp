@@ -15,6 +15,7 @@
  */
 
 #include "Buffer/BufferTestSupport.h"
+#include "Buffer/BufferInternal.h"
 #include "Context/Context.h"
 
 namespace t
@@ -28,7 +29,7 @@ namespace t
         old_indent = amqp_context_increase_print_indent(context, 4);
         for (i = start, count = 0; i < end; i++, count++)
         {
-            int c = buffer->bytes[i];
+            int c = amqp_unchecked_getc_at(buffer, i);
             if ((count & 0x0f) == 0)
             {
                 amqp_context_putc(context, '\n');
@@ -49,8 +50,6 @@ namespace t
     void amqp_buffer_dump(amqp_context_t* context, amqp_buffer_t *buffer)
     {
         amqp_buffer_dump_fragment(context, buffer, 0, buffer->limit.size);
+        amqp_context_putc(context, '\n');
     }
-
 }
-
-

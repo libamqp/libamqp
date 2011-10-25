@@ -32,6 +32,7 @@ namespace SuiteContext
         void load_decode_buffer(test_data::TestData &data);
     public:
         amqp_context_t *context;
+        amqp_buffer_t *decode_buffer;
     };
 }
 

@@ -20,11 +20,15 @@
 #include "Buffer/Buffer.h"
 #include "Codec/Type/Type.h"
 #include "Codec/Decode/Decode.h"
+#include "Codec/Type/TypeExtension.h"
 
+
+// TODO - get rid of this - or push it into teat code
 char *amqp_convert_bytes_to_cstr(amqp_context_t *c, amqp_type_t *type)
 {
-    char *result = amqp_malloc(c, type->position.size + 1);
-    strncpy(result, (const char *) &amqp_type_convert_buffer(type)->bytes[type->position.index], type->position.size);
+    size_t n = type->position.size + 1;
+    char *result = amqp_malloc(c, n);
+    amqp_type_copy_to(type, (uint8_t *) result, n);
     return result;
 }
 

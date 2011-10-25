@@ -18,6 +18,9 @@
 
 #include "Context/ContextTestSupport.h"
 
+// TODO - these tests should not be looking into buffer internals
+#include "Buffer/BufferInternal.h"
+
 SUITE(Context)
 {
     TEST_FIXTURE(ContextFixture, fixture_dtor_should_not_raise_an_exception)
@@ -47,9 +50,9 @@ SUITE(Context)
 
         load_decode_buffer(test_bytes);
 
-        CHECK_EQUAL(1, context->decode.buffer->bytes[0]);
-        CHECK_EQUAL(0xa5, context->decode.buffer->bytes[1]);
-        CHECK_EQUAL(0x03, context->decode.buffer->bytes[2]);
+        CHECK_EQUAL(1, amqp_buffer_getc(decode_buffer));
+        CHECK_EQUAL(0xa5, amqp_buffer_getc(decode_buffer));
+        CHECK_EQUAL(0x03, amqp_buffer_getc(decode_buffer));
     }
 }
 

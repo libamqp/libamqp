@@ -25,29 +25,26 @@
 
 namespace SuiteCodec
 {
-    CodecFixture::CodecFixture() : type(0) {}
+    CodecFixture::CodecFixture() : type(0)
+    {
+        buffer = amqp_allocate_buffer(context);
+    }
     CodecFixture::~CodecFixture()
     {
         deallocate_type(type);
-    }
-
-    amqp_memory_pool_t *
-    CodecFixture::type_pool()
-    {
-        return &context->memory.amqp_type_t_pool;
+        amqp_deallocate_buffer(context, buffer);
     }
 
     amqp_type_t *
     CodecFixture::allocate_type()
     {
-        return (amqp_type_t *) amqp_allocate(context, type_pool());
+        return amqp_allocate_type(context);
     }
 
     void
     CodecFixture::deallocate_type(amqp_type_t *type)
     {
-
-        amqp_deallocate(context, type_pool(), type);
+        amqp_deallocate_type(context, type);
     }
 
     bool
@@ -74,27 +71,25 @@ namespace t
         return not_first;
     }
 
-    void dump_type_flags(amqp_type_t *type)
+    void dump_type_flags(amqp_context_t *context, amqp_type_t *type)
     {
         int not_first = false;
-        amqp_context_printf(type->context, "flags");
-        not_first = dump_flag(type->context, type->flags.is_null, "is_null", not_first);
-        not_first = dump_flag(type->context, type->flags.is_invalid, "is_invalid", not_first);
-        not_first = dump_flag(type->context, type->flags.is_encoded, "is_encoded", not_first);
-        not_first = dump_flag(type->context, type->flags.is_incomplete, "is_incomplete", not_first);
-        not_first = dump_flag(type->context, type->flags.is_contained, "is_contained", not_first);
-        not_first = dump_flag(type->context, type->flags.is_descriptor, "is_descriptor", not_first);
-        not_first = dump_flag(type->context, type->flags.has_descriptor, "has_descriptor", not_first);
-        not_first = dump_flag(type->context, type->flags.container.type.is_array, "is_array", not_first);
-        not_first = dump_flag(type->context, type->flags.container.type.is_list, "is_list", not_first);
-        dump_flag(type->context, type->flags.container.type.is_map, "is_map", not_first);
-        amqp_context_putc(type->context, '\n');
+        amqp_context_printf(context, "flags");
+        not_first = dump_flag(context, type->flags.is_null, "is_null", not_first);
+        not_first = dump_flag(context, type->flags.is_invalid, "is_invalid", not_first);
+        not_first = dump_flag(context, type->flags.is_encoded, "is_encoded", not_first);
+        not_first = dump_flag(context, type->flags.is_incomplete, "is_incomplete", not_first);
+        not_first = dump_flag(context, type->flags.is_contained, "is_contained", not_first);
+        not_first = dump_flag(context, type->flags.is_descriptor, "is_descriptor", not_first);
+        not_first = dump_flag(context, type->flags.has_descriptor, "has_descriptor", not_first);
+        not_first = dump_flag(context, type->flags.container.type.is_array, "is_array", not_first);
+        not_first = dump_flag(context, type->flags.container.type.is_list, "is_list", not_first);
+        dump_flag(context, type->flags.container.type.is_map, "is_map", not_first);
+        amqp_context_putc(context, '\n');
     }
 
-    void dump_type(amqp_type_t *type)
+    void dump_type(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
     {
-        amqp_context_t *context = type->context;
-        amqp_buffer_t *buffer = type->flags.is_encoded ? context->encode.buffer : context->decode.buffer;
         int old_indent;
 
         amqp_context_printf(context, "format code: 0x%02x\n", type->format_code);
@@ -109,18 +104,17 @@ namespace t
             amqp_context_putc(context, '\n');
         }
 
-        dump_type_flags(type);
+        dump_type_flags(context, type);
 
         amqp_buffer_dump_fragment(context, buffer, type->position.index, type->position.index + type->position.size);
         amqp_context_putc(context, '\n');
-        amqp_type_print_formatted(type);
+        amqp_type_print_formatted(context, type, buffer);
         amqp_context_set_print_indent(context, old_indent);
     }
 
-    void dump_type_buffer(amqp_type_t *type)
+    void dump_type_buffer(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
     {
-        amqp_context_t *context = type->context;
-        amqp_buffer_dump(context, type->flags.is_encoded ? context->encode.buffer : context->decode.buffer);
+        amqp_buffer_dump(context, buffer);
         amqp_context_putc(context, '\n');
     }
 
@@ -143,5 +137,10 @@ namespace t
             }
         }
         return 1;
+    }
+
+    int compare_buffers(const unsigned char *expect, size_t expect_size, amqp_buffer_t *buffer)
+    {
+        return compare_buffers(expect, expect_size, amqp_buffer_pointer(buffer, 0), amqp_buffer_size(buffer));
     }
 }

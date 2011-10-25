@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 #include <stdio.h>
+#include "todo.h"
 
 // Helper function to mark breakpoints.
 extern void break_one();
@@ -31,11 +32,17 @@ extern void break_two();
 #define SOUTV(v)    printf("%s:%d: soutv: %s = %ld\n" , __FILE__, __LINE__, #v, (long) v);
 #define SOUTVP(v)   printf("%s:%d: soutvp: %s = %p\n" , __FILE__, __LINE__, #v, (void *) v);
 #define SOUTVX(v)   printf("%s:%d: soutvx: %s = %lx\n" , __FILE__, __LINE__, #v, (long) v);
+#define SOUTVF(v)   printf("%s:%d: soutvf: %s = %f\n" , __FILE__, __LINE__, #v, (double) v);
 #define SOUTS(v)    printf("%s:%d: souts: %s\n", __FILE__, __LINE__, v);
+
+#ifndef JENKINS_BUILD
+#define RETURN_UNLESS_JENKINS() if (1) return;
+#else
+#define RETURN_UNLESS_JENKINS()
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 #endif
-
 

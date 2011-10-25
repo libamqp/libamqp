@@ -21,7 +21,6 @@
 #include "Transport/LowLevel/EventThreadTestSupport.h"
 #include "Transport/LowLevel/Listener.h"
 #include "Transport/LowLevel/Connect.h"
-#include "Transport/DummyBroker/DummyBroker.h"
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -47,7 +46,7 @@ SUITE(Transport)
 
         static amqp_event_thread_t *thread_create(amqp_context_t *context);
         static void listen_thread_handler(amqp_event_thread_t *event_thread);
-        static int accept_new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size);
+        static int accept_new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t address_size, amqp_accept_handler_arguments_t *arguments);
     };
 
     const int ListenerFixture::port_number = 7654;
@@ -55,10 +54,10 @@ SUITE(Transport)
     amqp_event_thread_t *ListenerFixture::thread_create(amqp_context_t *context)
     {
         struct ev_loop *loop = ev_default_loop(0);
-        return amqp_event_thread_initialize(context, ListenerFixture::listen_thread_handler, loop, 0);
+        return amqp_event_thread_initialize(context, ListenerFixture::listen_thread_handler, loop, 0, "listener-test");
     }
 
-    int ListenerFixture::accept_new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t adress_size)
+    int ListenerFixture::accept_new_connection(amqp_io_event_watcher_t *me, amqp_event_loop_t *loop, int fd, struct sockaddr_storage *client_address, socklen_t address_size, amqp_accept_handler_arguments_t *arguments)
     {
         char buffer[128];
         int n;
@@ -75,7 +74,7 @@ SUITE(Transport)
 
     void ListenerFixture::listen_thread_handler(amqp_event_thread_t *event_thread)
     {
-        amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(event_thread->context, event_thread->loop, ListenerFixture::port_number, ListenerFixture::accept_new_connection);
+        amqp_io_event_watcher_t *accept_watcher = amqp_listener_initialize(event_thread->context, event_thread->loop, ListenerFixture::port_number, ListenerFixture::accept_new_connection, 0);
 
         amqp_event_thread_run_loop(event_thread);
 
@@ -140,29 +139,5 @@ SUITE(Transport)
     {
         int fd = amqp_blocking_tcp_connect_to("localhost", port_number);
         ListenerFixture::client_send_and_receive(fd);
-    }
-
-    TEST(use_dummy_broker_to_listen)
-    {
-        amqp_context_t *context = amqp_create_context();
-        amqp_dummy_broker_t *broker = amqp_dummy_broker_initialize(context, ListenerFixture::port_number, ListenerFixture::accept_new_connection);
-
-        int fd = amqp_blocking_tcp_connect_to("localhost", ListenerFixture::port_number);
-
-        const char *message = "Hello there";
-        write(fd, message, strlen(message));
-
-        char buffer[128];
-        bzero(buffer, sizeof(buffer));
-        int n = read(fd, buffer, sizeof(buffer) - 1);
-        buffer[n > 0 ? n : 0] = '\0';
-
-        CHECK_EQUAL(message, buffer);
-
-        int rc = close(fd);
-        CHECK(rc != -1);
-
-        amqp_dummy_broker_destroy(context, broker);
-        amqp_context_destroy(context);
     }
 }

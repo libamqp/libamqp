@@ -75,6 +75,12 @@ void *amqp_malloc(amqp_context_t *context, size_t n)
     return &block->data.fragments[0];
 }
 
+// TODO - do something about fragmentation
+void *amqp_malloc_array(amqp_context_t *context, size_t n, int count)
+{
+    return amqp_malloc(context, n * count);
+}
+
 static inline amqp__memory_block_t *calculate_block_start(void *p)
 {
     static amqp__memory_block_t layout;
@@ -103,9 +109,9 @@ static void assert_trailing_guard_correct(amqp__memory_block_t *block)
     }
 }
 
-void *amqp_realloc(amqp_context_t *context, void *p, size_t n)
+void *amqp_realloc(amqp_context_t *context, const void *p, size_t n)
 {
-    amqp__memory_block_t *old_block = calculate_block_start(p);
+    amqp__memory_block_t *old_block = calculate_block_start((void *) p);
     size_t old_count;
     size_t count;
     amqp__memory_block_t *block;
@@ -117,7 +123,7 @@ void *amqp_realloc(amqp_context_t *context, void *p, size_t n)
     count = byte_count_rounded_to_size_t_array_size(n);
     if (count <= old_count)
     {
-        return p;
+        return (void *) p;
     }
 
     block = (amqp__memory_block_t *) realloc(old_block, calculate_bytes_to_allocate(count));
@@ -133,13 +139,13 @@ void *amqp_realloc(amqp_context_t *context, void *p, size_t n)
     return &block->data.fragments[0];
 }
 
-void amqp_free(amqp_context_t *context, void *p)
+void amqp_free(amqp_context_t *context, const void *p)
 {
     amqp__memory_block_t *block;
 
     if (p)
     {
-        block = calculate_block_start(p);
+        block = calculate_block_start((void *) p);
 
         assert_leading_guard_correct(block);
         assert_trailing_guard_correct(block);

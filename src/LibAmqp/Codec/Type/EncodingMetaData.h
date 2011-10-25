@@ -28,16 +28,22 @@ extern "C" {
 typedef struct amqp_context_t amqp_context_t;
 #endif
 
+#ifndef LIBAMQP_BUFFER_T_TYPE
+#define LIBAMQP_BUFFER_T_TYPE
+typedef struct amqp_buffer_t amqp_buffer_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_TYPE_T
 #define LIBAMQP_AMQP_TYPE_T
 typedef struct amqp_type_t amqp_type_t;
 #endif
 
 typedef struct amqp_encoding_meta_data_t amqp_encoding_meta_data_t;
-typedef int amqp_decoder_t(amqp_context_t *context, amqp_encoding_meta_data_t *, amqp_type_t *);
+typedef int amqp_decoder_t(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *, amqp_type_t *);
 
 typedef struct amqp_type_methods_t amqp_type_methods_t;
-typedef void amqp_type_print_method_t(amqp_context_t *context, amqp_type_t *type);
+typedef void amqp_type_print_method_t(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer);
+// TODO -  remove unnecessary indirection. There is only the print method.
 struct amqp_type_methods_t
 {
     amqp_type_print_method_t *print;

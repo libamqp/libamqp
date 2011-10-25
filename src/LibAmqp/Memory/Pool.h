@@ -33,7 +33,7 @@ typedef struct amqp_memory_block_t amqp_memory_block_t;
 
 struct amqp_memory_pool_t
 {
-#ifndef DISABLE_MEMORY_POOL
+#ifndef LIBAMQP_DISABLE_MEMORY_POOL
     amqp_memory_block_t *block_list;
     int allocations_per_block;
     unsigned long allocations_mask;

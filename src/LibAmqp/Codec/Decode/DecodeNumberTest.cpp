@@ -38,7 +38,7 @@ SUITE(NumericDecode)
     {
         load_decode_buffer(test_data::float_4);
 
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_CLOSE(123.456f, type->value.b4._float, 0.00005);
@@ -48,7 +48,7 @@ SUITE(NumericDecode)
     {
         load_decode_buffer(test_data::double_8);
 
-        type = amqp_decode(context);
+        type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
         CHECK_CLOSE(123.456, type->value.b8._double, 0.00005);
