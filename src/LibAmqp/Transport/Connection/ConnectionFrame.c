@@ -33,7 +33,7 @@ if (connection->trace_flags & AMQP_TRACE_DISCONNECTS) \
 #else
 #define save_old_state()
 #define trace_transition(old_state_name)
-#define trace_disconnect(context, format,  ...)
+#define trace_disconnect(context, ...)
 #endif
 
 static void transition_to_initialized(amqp_connection_t *connection);
