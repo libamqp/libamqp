@@ -151,50 +151,47 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
     // Check that the frame type match's the frame id.
     switch (frame->descriptor.id)
     {
-        case AMQP_FRAME_ID_SASL_MECHANISMS_LIST:
+        case amqp_sasl_mechanisms_list_descriptor:
             return decode_sasl_mechanisms_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_SASL_INIT_LIST:
+        case amqp_sasl_init_list_descriptor:
             return decode_sasl_init_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_SASL_CHALLENGE_LIST:
+        case amqp_sasl_challenge_list_descriptor:
             return decode_sasl_challenge_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_SASL_RESPONSE_LIST:
+        case amqp_sasl_response_list_descriptor:
             return decode_sasl_response_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_SASL_OUTCOME_LIST:
+        case amqp_sasl_outcome_list_descriptor:
             return decode_sasl_outcome_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_OPEN_LIST:
+        case amqp_open_list_descriptor:
             return decode_amqp_open_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_BEGIN_LIST:
+        case amqp_begin_list_descriptor:
             return decode_amqp_begin_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_ATTACH_LIST:
+        case amqp_attach_list_descriptor:
 //            return decode_amqp_attach_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_FLOW_LIST:
+        case amqp_flow_list_descriptor:
 //            return decode_amqp_flow_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_TRANSFER_LIST:
+        case amqp_transfer_list_descriptor:
 //            return decode_amqp_transfer_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_DISPOSITION_LIST:
+        case amqp_disposition_list_descriptor:
 //            return decode_amqp_disposition_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_DETACH_LIST:
+        case amqp_detach_list_descriptor:
 //            return decode_amqp_detach_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_END_LIST:
+        case amqp_end_list_descriptor:
 //            return decode_amqp_end_frame(context, buffer, frame, type);
 
-        case AMQP_FRAME_ID_CLOSE_LIST:
+        case amqp_close_list_descriptor:
 //            return decode_amqp_close_frame(context, buffer, frame, type);
-
-        case AMQP_FRAME_ID_ERROR_LIST:
-            not_implemented(todo);
 
         default:
             amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Unsupported descriptor id. Id = %08x", frame->descriptor.id);
@@ -310,40 +307,16 @@ void amqp_frame_cleanup(amqp_context_t *context, amqp_frame_t *frame)
         return;
     }
 
-    switch (frame->descriptor.id)
+    if (frame->descriptor.id != 0)
     {
-        case 0:
-            break;
-            
-        case AMQP_FRAME_ID_OPEN_LIST:
-        case AMQP_FRAME_ID_BEGIN_LIST:
-        case AMQP_FRAME_ID_ATTACH_LIST:
-        case AMQP_FRAME_ID_FLOW_LIST:
-        case AMQP_FRAME_ID_TRANSFER_LIST:
-        case AMQP_FRAME_ID_DISPOSITION_LIST:
-        case AMQP_FRAME_ID_DETACH_LIST:
-        case AMQP_FRAME_ID_END_LIST:
-        case AMQP_FRAME_ID_CLOSE_LIST:
-        case AMQP_FRAME_ID_ERROR_LIST:
-
-        case AMQP_FRAME_ID_SASL_CHALLENGE_LIST:
-        case AMQP_FRAME_ID_SASL_RESPONSE_LIST:
-        case AMQP_FRAME_ID_SASL_OUTCOME_LIST:
-        case AMQP_FRAME_ID_SASL_MECHANISMS_LIST:
-        case AMQP_FRAME_ID_SASL_INIT_LIST:
-            if (frame->cleanup)
-            {
-                frame->cleanup(context, frame);
-            }
-            else
-            {
-                amqp_error(context, AMQP_ERROR_ILLEGAL_STATE, "Frame does not have a cleanup method. Id: %08x", frame->descriptor.id);
-            }
-            break;
-
-        default:
-            amqp_error(context, AMQP_ERROR_ILLEGAL_STATE, "Cannot cleanup frame. Unsupported descriptor id. Id: %08x", frame->descriptor.id);
-            return;
+        if (frame->cleanup)
+        {
+            frame->cleanup(context, frame);
+        }
+        else
+        {
+            amqp_error(context, AMQP_ERROR_ILLEGAL_STATE, "Frame does not have a cleanup method. Id: %08x", frame->descriptor.id);
+        }
     }
 
     amqp_deallocate_frame(context, frame);

@@ -69,6 +69,10 @@ end
 
 $mappings = {}
 $mappings['boolean'] = SimpleMapper.new('int')
+$mappings['int'] = SimpleMapper.new('int32_t')
+$mappings['byte'] = SimpleMapper.new('int8_t')
+$mappings['short'] = SimpleMapper.new('int16_t')
+$mappings['long'] = SimpleMapper.new('int64_t')
 $mappings['uint'] = SimpleMapper.new('uint32_t')
 $mappings['ubyte'] = SimpleMapper.new('uint8_t')
 $mappings['ushort'] = SimpleMapper.new('uint16_t')

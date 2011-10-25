@@ -28,29 +28,65 @@ extern "C" {
 
 typedef enum amqp_frame_descriptor_id_t
 {
-    AMQP_FRAME_ID_OPEN_LIST = 0x00000010,
-    AMQP_FRAME_ID_BEGIN_LIST = 0x00000011,
-    AMQP_FRAME_ID_ATTACH_LIST = 0x00000012,
-    AMQP_FRAME_ID_FLOW_LIST = 0x00000013,
-    AMQP_FRAME_ID_TRANSFER_LIST = 0x00000014,
-    AMQP_FRAME_ID_DISPOSITION_LIST = 0x00000015,
-    AMQP_FRAME_ID_DETACH_LIST = 0x00000016,
-    AMQP_FRAME_ID_END_LIST = 0x00000017,
-    AMQP_FRAME_ID_CLOSE_LIST = 0x00000018,
-    AMQP_FRAME_ID_ERROR_LIST = 0x0000001d,
-    AMQP_FRAME_ID_SASL_MECHANISMS_LIST = 0x00000040,
-    AMQP_FRAME_ID_SASL_INIT_LIST = 0x00000041,
-    AMQP_FRAME_ID_SASL_CHALLENGE_LIST = 0x00000042,
-    AMQP_FRAME_ID_SASL_RESPONSE_LIST = 0x00000043,
-    AMQP_FRAME_ID_SASL_OUTCOME_LIST = 0x00000044
+    amqp_open_list_descriptor = 0x00000010,
+    amqp_begin_list_descriptor = 0x00000011,
+    amqp_attach_list_descriptor = 0x00000012,
+    amqp_flow_list_descriptor = 0x00000013,
+    amqp_transfer_list_descriptor = 0x00000014,
+    amqp_disposition_list_descriptor = 0x00000015,
+    amqp_detach_list_descriptor = 0x00000016,
+    amqp_end_list_descriptor = 0x00000017,
+    amqp_close_list_descriptor = 0x00000018,
+
+    amqp_error_list_descriptor = 0x0000001d,
+
+    amqp_received_list_descriptor = 0x00000023,
+    amqp_accepted_list_descriptor = 0x00000024,
+    amqp_rejected_list_descriptor = 0x00000025,
+    amqp_released_list_descriptor = 0x00000026,
+    amqp_modified_list_descriptor = 0x00000027,
+    amqp_source_list_descriptor = 0x00000028,
+    amqp_target_list_descriptor = 0x00000029,
+    amqp_delete_on_close_list_descriptor = 0x0000002b,
+    amqp_delete_on_no_links_list_descriptor = 0x0000002c,
+    amqp_delete_on_no_messages_list_descriptor = 0x0000002d,
+    amqp_delete_on_no_links_or_messages_list_descriptor = 0x0000002e,
+
+    amqp_coordinator_list_descriptor = 0x00000030,
+    amqp_declare_list_descriptor = 0x00000031,
+    amqp_discharge_list_descriptor = 0x00000032,
+    amqp_declared_list_descriptor = 0x00000033,
+    amqp_transactional_state_list_descriptor = 0x00000034,
+
+    amqp_sasl_mechanisms_list_descriptor = 0x00000040,
+    amqp_sasl_init_list_descriptor = 0x00000041,
+    amqp_sasl_challenge_list_descriptor = 0x00000042,
+    amqp_sasl_response_list_descriptor = 0x00000043,
+    amqp_sasl_outcome_list_descriptor = 0x00000044,
+
+    amqp_header_list_descriptor = 0x00000070,
+    amqp_delivery_annotations_map_descriptor = 0x00000071,
+    amqp_message_annotations_map_descriptor = 0x00000072,
+    amqp_properties_list_descriptor = 0x00000073,
+    amqp_application_properties_map_descriptor = 0x00000074,
+    amqp_data_binary_descriptor = 0x00000075,
+    amqp_amqp_sequence_list_descriptor = 0x00000076,
+    amqp_amqp_value_wildcard_descriptor = 0x00000077,
+    amqp_footer_map_descriptor = 0x00000078,
 } amqp_frame_descriptor_id_t;
 
 typedef enum amqp_frame_type_type_t
 {
     amqp_empty_frame = 1,
     amqp_unsupported_descriptor,
-    amqp_amqp_descriptor,
-    amqp_sasl_descriptor,
+    amqp_transport_descriptor_space,
+    amqp_sasl_descriptor_space,
+    amqp_addressing_descriptor_space,
+    amqp_definition_descriptor_space,
+    amqp_delivery_state_descriptor_space,
+    amqp_message_format_descriptor_space,
+    amqp_transactions_descriptor_space,
+
 } amqp_frame_type_type_t;
 
 typedef struct amqp_descriptor_t
