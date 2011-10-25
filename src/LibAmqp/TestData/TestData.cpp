@@ -454,8 +454,8 @@ namespace test_data
     );
 
     test_data_def(multiple_symbol_empty_array,
-        0xe0, 1, 0,
-//        0xe0, 1, 0, 0xA3,     // TODO - verify which is correct
+//        0xe0, 1, 0,
+        0xe0, 2, 0, 0xA3,     // TODO - verify which is correct
     );
 
     test_data_def(array_of_symbols,

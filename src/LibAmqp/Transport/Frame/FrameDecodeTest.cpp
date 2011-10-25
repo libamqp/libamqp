@@ -78,12 +78,13 @@ SUITE(FrameTypeDecode)
     TEST_FIXTURE(DecodeFixture, multiple_symbol_empty_array)
     {
         test_data::multiple_symbol_empty_array.transfer_to(decode_buffer);
-
+// TODO - fix bug in decoding empty array
         RETURN_UNLESS_JENKINS();
         type = amqp_decode(context, decode_buffer);
         amqp_type_print(context, type, decode_buffer);
         CHECK(amqp_type_is_array(type));
         CHECK_EQUAL(0U, type->value.array.count);
+        CHECK(0);
     }
 
     void DecodeFixture::load(test_data::TestData &data)
@@ -242,6 +243,29 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
     }
 
+    TEST_FIXTURE(DecodeFixture, close_frame)
+    {
+        load(test_data::close_frame);
+
+        CHECK_EQUAL(0x18U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(1U, described->value.list.count);
+
+        amqp_type_print(context,  described, decode_buffer);
+        CHECK(0);
+
+        int field = 0;
+        CHECK(amqp_type_is_described(described->value.list.elements[field])); field++;
+    }
+
+    TEST_FIXTURE(DecodeFixture, close_confirm_frame)
+    {
+        load(test_data::close_confirm_frame);
+
+        CHECK_EQUAL(0x18U, amqp_type_to_ulong(descriptor));
+        CHECK_EQUAL(0U, described->value.list.count);
+
+    }
+
     TEST_FIXTURE(DecodeFixture, client_attach_frame)
     {
         load(test_data::client_attach_frame);
@@ -380,26 +404,4 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
     }
 
-    TEST_FIXTURE(DecodeFixture, close_frame)
-    {
-        load(test_data::close_frame);
-
-        CHECK_EQUAL(0x18U, amqp_type_to_ulong(descriptor));
-        CHECK_EQUAL(1U, described->value.list.count);
-
-//        amqp_type_print(context,  described, decode_buffer);
-        CHECK(0);
-
-        int field = 0;
-        CHECK(amqp_type_is_described(described->value.list.elements[field])); field++;
-    }
-
-    TEST_FIXTURE(DecodeFixture, close_confirm_frame)
-    {
-        load(test_data::close_confirm_frame);
-
-        CHECK_EQUAL(0x18U, amqp_type_to_ulong(descriptor));
-        CHECK_EQUAL(0U, described->value.list.count);
-
-    }
 }
