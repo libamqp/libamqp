@@ -44,3 +44,7 @@ Release
 *.vcproj
 *.vcproj.*.user
 *.cache
+
+*.gcov
+*.gcno
+*.gcda
