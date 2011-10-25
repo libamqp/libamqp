@@ -48,7 +48,6 @@ SUITE(FrameTypeDecode)
         amqp_type_t *described;
     };
 
-
     TEST_FIXTURE(DecodeFixture, multiple_symbol_null)
     {
         test_data::multiple_symbol_null.transfer_to(decode_buffer);
@@ -161,8 +160,6 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(16U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(10U, described->value.list.count);
 
-//        amqp_type_print(context,  described, decode_buffer);
-
         int field = 0;
         CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
@@ -184,8 +181,6 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(16U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(10U, described->value.list.count);
 
-//        amqp_type_print(context,  described, decode_buffer);
-
         int field = 0;
         CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
@@ -206,18 +201,14 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(17U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(8U, described->value.list.count);
 
-//        amqp_type_print(context,  described, decode_buffer);
-
         int field = 0;
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
-
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
-
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
     }
 
@@ -228,18 +219,14 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(17U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(8U, described->value.list.count);
 
-//        amqp_type_print(context,  described, decode_buffer);
-
         int field = 0;
         CHECK(amqp_type_is_ushort(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
-
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
-
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
     }
 
@@ -249,9 +236,6 @@ SUITE(FrameTypeDecode)
 
         CHECK_EQUAL(0x18U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(1U, described->value.list.count);
-
-//        amqp_type_print(context,  described, decode_buffer);
-//        CHECK(0);
 
         int field = 0;
         CHECK(amqp_type_is_described(described->value.list.elements[field])); field++;
@@ -274,7 +258,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(14U, described->value.list.count);
 
 //        amqp_type_print(context,  described, decode_buffer);
-//        CHECK(0);
+        CHECK(0);
 
         int field = 0;
         CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
@@ -288,7 +272,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(14U, described->value.list.count);
 
 //        amqp_type_print(context,  described, decode_buffer);
-//        CHECK(0);
+        CHECK(0);
 
         int field = 0;
         CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
@@ -323,8 +307,6 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(0x13U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(11U, described->value.list.count);
 
-//        amqp_type_print(context,  described, decode_buffer);
-
         int field = 0;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
@@ -345,8 +327,6 @@ SUITE(FrameTypeDecode)
 
         CHECK_EQUAL(0x13U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(11U, described->value.list.count);
-
-//        amqp_type_print(context,  described, decode_buffer);
 
         int field = 0;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
@@ -370,7 +350,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(6U, described->value.list.count);
 
 //        amqp_type_print(context,  described, decode_buffer);
-//        CHECK(0);
+        CHECK(0);
 
         int field = 0;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
@@ -384,7 +364,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(6U, described->value.list.count);
 
 //        amqp_type_print(context,  described, decode_buffer);
-//        CHECK(0);
+        CHECK(0);
 
         int field = 0;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
@@ -398,7 +378,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(6U, described->value.list.count);
 
 //        amqp_type_print(context,  described, decode_buffer);
-//        CHECK(0);
+        CHECK(0);
 
         int field = 0;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;

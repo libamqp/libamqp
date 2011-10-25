@@ -28,6 +28,7 @@ SUITE(AmqpTypes)
 {
     // If a field is added to a generated type one of these will fail.
     // These may become annoying if types change frequently
+    // TODO - delete these once AMQP becomes an Oasis specification
 
     TEST_FIXTURE(AmqpTypesFixture, type_sizes)
     {
