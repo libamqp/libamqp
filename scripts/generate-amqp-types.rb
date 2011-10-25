@@ -62,39 +62,52 @@ end
 class WildcardMapper
   include Outputters
   def output(n, t, o = {})
-    puts "    amqp_#{n}_t #{n}; #{comment(o)}" 
+    # puts "    amqp_#{n}_t #{n}; #{comment(o)}" 
+    puts "    amqp_wildcard_t #{n}; #{comment(o)}" 
   end
 end
 
 $mappings = {}
 $mappings['boolean'] = SimpleMapper.new('int')
 $mappings['uint'] = SimpleMapper.new('uint32_t')
+$mappings['ubyte'] = SimpleMapper.new('uint8_t')
 $mappings['ushort'] = SimpleMapper.new('uint16_t')
 $mappings['ulong'] = SimpleMapper.new('uint64_t')
 $mappings['string'] = TypedefedMapper.new('string')
 $mappings['binary'] = TypedefedMapper.new('binary')
 $mappings['milliseconds'] = TypedefedMapper.new('milliseconds')
+$mappings['seconds'] = TypedefedMapper.new('seconds')
 $mappings['ietf_language_tag'] = TypedefedMapper.new('ietf_language_tag')
 $mappings['symbol'] = TypedefedMapper.new('symbol')
-$mappings['fields'] = TypedefedMapper.new('symbol')
+$mappings['fields'] = TypedefedMapper.new('fields')
+$mappings['node_properties'] = TypedefedMapper.new('fields')
 $mappings['transfer_number'] = TypedefedMapper.new('transfer_number')
 $mappings['handle'] = SimpleMapper.new('uint32_t')
 $mappings['role'] = TypedefedMapper.new('role')
 $mappings['sender_settle_mode'] = TypedefedMapper.new('sender_settle_mode')
 $mappings['receiver_settle_mode'] = TypedefedMapper.new('receiver_settle_mode')
-# $mappings['sender_settle_mode'] = TypedefedMapper.new('settle_mode')
-# $mappings['receiver_settle_mode'] = TypedefedMapper.new('settle_mode')
 $mappings['*'] = WildcardMapper.new
 $mappings['map'] = TypedefedMapper.new('map')
-$mappings['sequence_no'] = TypedefedMapper.new('sequence_no')     # Why none a primitive type
-$mappings['error'] = TypedefedMapper.new('error')
+$mappings['list'] = TypedefedMapper.new('list')
+$mappings['array'] = TypedefedMapper.new('array')
+$mappings['sequence_no'] = TypedefedMapper.new('sequence_no')
+$mappings['error'] = TypedefedMapper.new('definition_error')
 $mappings['delivery_number'] = TypedefedMapper.new('delivery_number')
 $mappings['delivery_tag'] = TypedefedMapper.new('delivery_tag')
 $mappings['sasl_code'] = TypedefedMapper.new('sasl_code')
+$mappings['timestamp'] = TypedefedMapper.new('timestamp')
+$mappings['terminus_durability'] = TypedefedMapper.new('terminus_durability')
+$mappings['terminus_expiry_policy'] = TypedefedMapper.new('terminus_expiry_policy')
+$mappings['filter_set'] = TypedefedMapper.new('filter_set')
 
 $xpaths = {}
-$xpaths['transport'] = '//section[@name=\'performatives\']/type[@provides=\'frame\']'
-$xpaths['security'] = '//section[@name=\'sasl\']/type[@provides=\'sasl-frame\']'
+$xpaths['transport'] = '//section[@name=\'performatives\']/type[descriptor]'
+$xpaths['security'] = '//section[@name=\'sasl\']/type[descriptor]'
+$xpaths['definition'] = '//section[@name=\'definitions\']/type[descriptor]'
+$xpaths['messaging'] = '//section[@name=\'message-format\']/type[descriptor]'
+$xpaths['delivery-state'] = '//section[@name=\'delivery-state\']/type'
+$xpaths['addressing'] = '//section[@name=\'addressing\']/type[descriptor]'
+$xpaths['txn'] = '//section[@name=\'coordination\']/type[descriptor]'
 
 class Parser
   def initialize(xml_file)
@@ -113,19 +126,27 @@ class Parser
     options[:multiple] = f.attributes['multiple'] == 'true'
     options[:default] = f.attributes['default']
     options[:requires] = f.attributes['requires']
-    emit_field(name, type, options) unless name == 'properties' and type == 'fields'
-    puts("    amqp_property_fields_t properties;") if  name == 'properties' and type == 'fields'
+    emit_field(name, type, options) 
   end
-  def typedefs(n)
+  def typedefs(n, prefix)
     name = n.attributes['name'].gsub(/-/, '_')
-    puts "typedef struct amqp_frame_#{name}_t amqp_frame_#{name}_t;"
+    puts "typedef struct amqp_#{prefix}_#{name}_t amqp_#{prefix}_#{name}_t;"
   end 
-  def frame(n)
-    name = n.attributes['name'].gsub(/-/, '_')
-    puts "struct amqp_frame_#{name}_t {"
-    n.elements.each('field') {|f| field(f) }
-    puts "};"
+  def described e, d
+    puts "    // described #{d.attributes['name']}" 
+    emit_field(e.attributes['name'].gsub(/-/,'_'), d.attributes['name'].split(':').last)
+  end
+  def struct(n, prefix)
     puts
+    name = n.attributes['name'].gsub(/-/, '_')
+    puts "struct amqp_#{prefix}_#{name}_t {"
+    if n.elements.count == 1
+      described n, n.elements.first
+    else
+      puts "    // #{n.elements.count - 1} fields"
+      n.elements.each('field') {|f| field(f) }
+    end
+    puts "};"
   end
 
   def parse
@@ -143,10 +164,11 @@ extern "C" {
 eos
     xml_file = File.new(@xml_file)
     document = REXML::Document.new(xml_file)
-    xpath = $xpaths[guard]
-    document.root.each_element(xpath) { |e| typedefs e }
-    puts
-    document.root.each_element(xpath) { |e| frame e }
+    $xpaths.each do |key, value| 
+      prefix = key.gsub(/-/,'_')
+      document.root.each_element(value) { |e| typedefs e, prefix }
+      document.root.each_element(value) { |e| struct e, prefix }
+    end
     puts(<<-eos)
 \#ifdef __cplusplus
 }

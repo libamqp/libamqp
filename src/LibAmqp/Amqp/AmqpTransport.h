@@ -25,17 +25,26 @@ extern "C" {
 
 #include "AmqpTypes/AmqpTypes.h"
     
-typedef struct amqp_frame_open_t amqp_frame_open_t;
-typedef struct amqp_frame_begin_t amqp_frame_begin_t;
-typedef struct amqp_frame_attach_t amqp_frame_attach_t;
-typedef struct amqp_frame_flow_t amqp_frame_flow_t;
-typedef struct amqp_frame_transfer_t amqp_frame_transfer_t;
-typedef struct amqp_frame_disposition_t amqp_frame_disposition_t;
-typedef struct amqp_frame_detach_t amqp_frame_detach_t;
-typedef struct amqp_frame_end_t amqp_frame_end_t;
-typedef struct amqp_frame_close_t amqp_frame_close_t;
+typedef struct amqp_definition_error_t amqp_definition_error_t;
 
-struct amqp_frame_open_t {
+struct amqp_definition_error_t {
+    // 3 fields
+    amqp_symbol_t condition; /* mandatory; */
+    amqp_string_t description; 
+    amqp_fields_t info; 
+};
+typedef struct amqp_transport_open_t amqp_transport_open_t;
+typedef struct amqp_transport_begin_t amqp_transport_begin_t;
+typedef struct amqp_transport_attach_t amqp_transport_attach_t;
+typedef struct amqp_transport_flow_t amqp_transport_flow_t;
+typedef struct amqp_transport_transfer_t amqp_transport_transfer_t;
+typedef struct amqp_transport_disposition_t amqp_transport_disposition_t;
+typedef struct amqp_transport_detach_t amqp_transport_detach_t;
+typedef struct amqp_transport_end_t amqp_transport_end_t;
+typedef struct amqp_transport_close_t amqp_transport_close_t;
+
+struct amqp_transport_open_t {
+    // 10 fields
     amqp_string_t container_id; /* mandatory; */
     amqp_string_t hostname; 
     uint32_t max_frame_size; /* default="4294967295"; */
@@ -45,10 +54,11 @@ struct amqp_frame_open_t {
     amqp_multiple_ietf_language_tag_t incoming_locales; 
     amqp_multiple_symbol_t offered_capabilities; 
     amqp_multiple_symbol_t desired_capabilities; 
-    amqp_property_fields_t properties;
+    amqp_fields_t properties; 
 };
 
-struct amqp_frame_begin_t {
+struct amqp_transport_begin_t {
+    // 8 fields
     uint16_t remote_channel; 
     amqp_transfer_number_t next_outgoing_id; /* mandatory; */
     uint32_t incoming_window; /* mandatory; */
@@ -56,27 +66,29 @@ struct amqp_frame_begin_t {
     uint32_t handle_max; /* default="4294967295"; */
     amqp_multiple_symbol_t offered_capabilities; 
     amqp_multiple_symbol_t desired_capabilities; 
-    amqp_property_fields_t properties;
+    amqp_fields_t properties; 
 };
 
-struct amqp_frame_attach_t {
+struct amqp_transport_attach_t {
+    // 14 fields
     amqp_string_t name; /* mandatory; */
     uint32_t handle; /* mandatory; */
     amqp_role_t role; /* mandatory; */
     amqp_sender_settle_mode_t snd_settle_mode; /* default="mixed"; */
     amqp_receiver_settle_mode_t rcv_settle_mode; /* default="first"; */
-    amqp_source_t source; 
-    amqp_target_t target; 
+    amqp_wildcard_t source; 
+    amqp_wildcard_t target; 
     amqp_map_t unsettled; 
     int incomplete_unsettled; /* default="false"; */
     amqp_sequence_no_t initial_delivery_count; 
     uint64_t max_message_size; 
     amqp_multiple_symbol_t offered_capabilities; 
     amqp_multiple_symbol_t desired_capabilities; 
-    amqp_property_fields_t properties;
+    amqp_fields_t properties; 
 };
 
-struct amqp_frame_flow_t {
+struct amqp_transport_flow_t {
+    // 11 fields
     amqp_transfer_number_t next_incoming_id; 
     uint32_t incoming_window; /* mandatory; */
     amqp_transfer_number_t next_outgoing_id; /* mandatory; */
@@ -87,10 +99,11 @@ struct amqp_frame_flow_t {
     uint32_t available; 
     int drain; /* default="false"; */
     int echo; /* default="false"; */
-    amqp_property_fields_t properties;
+    amqp_fields_t properties; 
 };
 
-struct amqp_frame_transfer_t {
+struct amqp_transport_transfer_t {
+    // 11 fields
     uint32_t handle; /* mandatory; */
     amqp_delivery_number_t delivery_id; 
     amqp_delivery_tag_t delivery_tag; 
@@ -98,35 +111,38 @@ struct amqp_frame_transfer_t {
     int settled; 
     int more; /* default="false"; */
     amqp_receiver_settle_mode_t rcv_settle_mode; 
-    amqp_state_t state; 
+    amqp_wildcard_t state; 
     int resume; /* default="false"; */
     int aborted; /* default="false"; */
     int batchable; /* default="false"; */
 };
 
-struct amqp_frame_disposition_t {
+struct amqp_transport_disposition_t {
+    // 6 fields
     amqp_role_t role; /* mandatory; */
     amqp_delivery_number_t first; /* mandatory; */
     amqp_delivery_number_t last; 
     int settled; /* default="false"; */
-    amqp_state_t state; 
+    amqp_wildcard_t state; 
     int batchable; /* default="false"; */
 };
 
-struct amqp_frame_detach_t {
+struct amqp_transport_detach_t {
+    // 3 fields
     uint32_t handle; /* mandatory; */
     int closed; /* default="false"; */
-    amqp_error_t error; 
+    amqp_definition_error_t error; 
 };
 
-struct amqp_frame_end_t {
-    amqp_error_t error; 
+struct amqp_transport_end_t {
+    // 1 fields
+    amqp_definition_error_t error; 
 };
 
-struct amqp_frame_close_t {
-    amqp_error_t error; 
+struct amqp_transport_close_t {
+    // 1 fields
+    amqp_definition_error_t error; 
 };
-
 #ifdef __cplusplus
 }
 #endif
