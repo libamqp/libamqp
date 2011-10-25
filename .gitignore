@@ -16,6 +16,7 @@
 *.tar
 *.tar.gz
 *.swp
+*.log
 
 3rd-party/UnitTest++/TestUnitTest++
 src/test-runner
