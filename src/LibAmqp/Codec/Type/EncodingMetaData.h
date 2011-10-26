@@ -87,6 +87,7 @@ typedef enum {
 
     amqp_is_encoded = 0x02000000,
     amqp_is_incomplete = 0x04000000,
+    amqp_is_contained = 0x08000000,
 } amqp_typedef_flags_t;
 
 struct amqp_encoding_meta_data_t
@@ -97,7 +98,7 @@ struct amqp_encoding_meta_data_t
     amqp_type_methods_t *methods;
     const char *name;
     const char *encoding_name;
-    amqp_typedef_flags_t flags;
+    amqp_typedef_flags_t typedef_flags;
     int category_name_index;
 };
 

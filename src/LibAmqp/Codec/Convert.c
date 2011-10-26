@@ -23,7 +23,7 @@
 #include "Codec/Type/TypeExtension.h"
 
 
-// TODO - get rid of this - or push it into teat code
+// TODO - get rid of this - or push it into test code
 char *amqp_convert_bytes_to_cstr(amqp_context_t *c, amqp_type_t *type)
 {
     size_t n = type->position.size + 1;

@@ -93,7 +93,7 @@ SUITE(FrameTypeDecode)
         amqp_buffer_advance_read_index(decode_buffer, 8);
         type = amqp_decode(context, decode_buffer);
         CHECK(amqp_type_is_valid(type));
-        CHECK(amqp_type_is_described(type));
+        CHECK(amqp_type_is_composite(type));
         descriptor = amqp_type_get_descriptor(type);
         CHECK(amqp_type_is_ulong(descriptor) || amqp_type_is_symbol(descriptor));
 
@@ -239,7 +239,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(1U, described->value.list.count);
 
         int field = 0;
-        CHECK(amqp_type_is_described(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_composite(described->value.list.elements[field])); field++;
     }
 
     TEST_FIXTURE(DecodeFixture, close_confirm_frame)

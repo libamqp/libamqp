@@ -25,10 +25,6 @@ extern "C" {
 
 extern char *amqp_convert_bytes_to_cstr(amqp_context_t *c, amqp_type_t *);
 
-inline static int amqp_convert_to_boolean(amqp_type_t *type)
-{
-    return type->format_code == 0x41 || (type->format_code == 0x56 && type->value.b1._unsigned == 1);
-}
 
 
 #ifdef __cplusplus

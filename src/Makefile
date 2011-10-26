@@ -30,7 +30,9 @@ INCLUDES :=
 TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
-TEST_RUNNER_ARGS := --exclude SlowRunning
+# TEST_RUNNER_ARGS := --exclude SlowRunning
+#TEST_RUNNER_ARGS := BasicDecode BooleanDecode IntegerDecode NumericDecode VariableTypeDecoder CompoundTypeDecode BadDataDecoder
+TEST_RUNNER_ARGS := BasicDecode BooleanDecode IntegerDecode NumericDecode VariableTypeDecoder CompoundTypeDecode
 JENKINS_BUILD_OPTIONS :=
 
 SAMPLE_SRC :=
@@ -91,7 +93,7 @@ coverage:
 	./test-runner
 	./run-gcov.sh
 
-$(OBJ) $(TEST_OBJ): Makefile
+# $(OBJ) $(TEST_OBJ): Makefile
 
 print:
 	@echo TEST_HARNESS_INCLUDES=$(TEST_HARNESS_INCLUDES)

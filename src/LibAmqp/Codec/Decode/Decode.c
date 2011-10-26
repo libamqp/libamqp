@@ -440,6 +440,7 @@ int amqp_decode_described_type(amqp_context_t *context, amqp_buffer_t *buffer, a
     type->position.index = amqp_buffer_index(buffer);
     type->position.size = 0;
     type->flags.container.type.is_described = true;
+    type->typedef_flags |= amqp_is_composite;
 
     type->value.described.count = 2;
     type->value.described.elements = amqp_allocate_amqp_type_t_array(context, 2);
@@ -448,6 +449,8 @@ int amqp_decode_described_type(amqp_context_t *context, amqp_buffer_t *buffer, a
     if (descriptor)
     {
         type->value.described.elements[0] = descriptor;
+        type->typedef_flags |= (amqp_is_contained | amqp_is_descriptor);
+
         descriptor->flags.is_contained = true;
         descriptor->flags.is_descriptor = true;
     }
@@ -461,6 +464,8 @@ int amqp_decode_described_type(amqp_context_t *context, amqp_buffer_t *buffer, a
     if (described)
     {
         type->value.described.elements[1] = described;
+        type->typedef_flags |= (amqp_is_contained | amqp_is_described);
+
         described->flags.is_contained = true;
         described->flags.has_descriptor = true;
     }
@@ -596,6 +601,7 @@ static int amqp_decode_array(amqp_context_t *context, amqp_buffer_t *buffer, amq
 
         element_type = amqp_decode(context, buffer);
         element_type->flags.is_contained = true;
+        element_type->typedef_flags |= amqp_is_contained;
 
         type->value.array.elements[0] = element_type;
 
@@ -603,6 +609,8 @@ static int amqp_decode_array(amqp_context_t *context, amqp_buffer_t *buffer, amq
         {
             amqp_type_t *element = amqp_decode_array_element(context, buffer, element_type);
             element->flags.is_contained = true;
+            element_type->typedef_flags |= amqp_is_contained;
+
             type->value.array.elements[i] = element;
         }
 
@@ -641,6 +649,7 @@ decode_type_constructor_into_result(amqp_context_t *context, amqp_buffer_t *buff
     }
 
     type->meta_data = meta_data;
+    type->typedef_flags = meta_data->typedef_flags;
 
     return 1;
 }
@@ -669,6 +678,7 @@ amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *b
     type->format_code = array_element_type->format_code;
     type->extension_type_code = array_element_type->extension_type_code;
     type->meta_data = array_element_type->meta_data;
+    type->typedef_flags = array_element_type->typedef_flags;
 
     decode_type_into_result(context, buffer, type);
 

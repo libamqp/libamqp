@@ -25,7 +25,7 @@
 #include "Codec/Type/Type.h"
 
 
-SUITE(StringDecoder)
+SUITE(VariableTypeDecoder)
 {
     class DecodeFixture : public SuiteCodec::CodecFixture
     {

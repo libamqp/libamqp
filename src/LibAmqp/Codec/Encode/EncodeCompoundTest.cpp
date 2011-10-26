@@ -315,31 +315,31 @@ SUITE(CompoundEncoding)
 
         ASSERT_VALID(type);
 
-        CHECK(amqp_type_is_described(type));
+        CHECK(amqp_type_is_composite(type));
         CHECK(!amqp_type_is_descriptor(type));
-        CHECK(!amqp_type_has_descriptor(type));
+        CHECK(!amqp_type_is_described(type));
 
         CHECK_EQUAL((size_t) 2, type->value.described.count);
 
         amqp_type_t *descriptor = type->value.described.elements[0];
         amqp_type_t *list = type->value.described.elements[1];
 
-        CHECK(!amqp_type_is_described(descriptor));
+        CHECK(!amqp_type_is_composite(descriptor));
         CHECK(amqp_type_is_descriptor(descriptor));
-        CHECK(!amqp_type_has_descriptor(descriptor));
+        CHECK(!amqp_type_is_described(descriptor));
 
-        CHECK(!amqp_type_is_described(list));
+        CHECK(!amqp_type_is_composite(list));
         CHECK(!amqp_type_is_descriptor(list));
-        CHECK(amqp_type_has_descriptor(list));
+        CHECK(amqp_type_is_described(list));
 
         CHECK_LIST(list);
 
-        CHECK(amqp_type_is_described(list->value.list.elements[1]));
+        CHECK(amqp_type_is_composite(list->value.list.elements[1]));
         CHECK(!amqp_type_is_descriptor(list->value.list.elements[1]));
-        CHECK(!amqp_type_has_descriptor(list->value.list.elements[1]));
+        CHECK(!amqp_type_is_described(list->value.list.elements[1]));
 
         CHECK(amqp_type_is_descriptor(list->value.list.elements[1]->value.described.elements[0]));
-        CHECK(amqp_type_has_descriptor(list->value.list.elements[1]->value.described.elements[1]));
+        CHECK(amqp_type_is_described(list->value.list.elements[1]->value.described.elements[1]));
 
         CHECK(amqp_type_is_contained(list->value.list.elements[1]->value.described.elements[0]));
         CHECK(amqp_type_is_contained(list->value.list.elements[1]->value.described.elements[1]));

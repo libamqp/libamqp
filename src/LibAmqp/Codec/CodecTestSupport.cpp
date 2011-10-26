@@ -75,7 +75,7 @@ namespace t
     {
         int not_first = false;
         amqp_context_printf(context, "flags");
-        not_first = dump_flag(context, type->flags.is_null, "is_null", not_first);
+        not_first = dump_flag(context, amqp_type_is_null(type), "is_null", not_first);
         not_first = dump_flag(context, type->flags.is_invalid, "is_invalid", not_first);
         not_first = dump_flag(context, type->flags.is_encoded, "is_encoded", not_first);
         not_first = dump_flag(context, type->flags.is_incomplete, "is_incomplete", not_first);

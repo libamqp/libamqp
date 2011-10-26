@@ -24,7 +24,7 @@
 #include "Codec/Encode/Encode.h"
 #include "Context/Context.h"
 
-static const amqp_type_type_flags_t not_a_compound_type = {0};
+#define NO_EXTRA_TYPEDEF_FLAGS  0
 
 /*
     constructor is not emitted for array elements after the first
@@ -61,15 +61,17 @@ static inline void amqp_add_element_to_container(amqp_context_t *context, amqp_b
             }
         }
 
-        if (amqp_type_is_described(context->encode.container))
+        if (amqp_type_is_composite(context->encode.container))
         {
             switch (count)
             {
             case 0:
+                type->typedef_flags |= amqp_is_descriptor;
                 type->flags.is_descriptor = true;
                 break;
 
             case 1:
+                type->typedef_flags |= amqp_is_described;
                 type->flags.has_descriptor = true;
                 break;
             }
@@ -102,15 +104,13 @@ static amqp_type_t *pop_container(amqp_context_t *context)
     return result;
 }
 
-static amqp_type_t *initialize_type(amqp_context_t *context, amqp_buffer_t *buffer, const amqp_type_type_flags_t type_flags, amqp_encoding_meta_data_t *meta_data)
+static amqp_type_t *initialize_type(amqp_context_t *context, amqp_buffer_t *buffer, const amqp_typedef_flags_t extra_typedef_flags, amqp_encoding_meta_data_t *meta_data)
 {
     amqp_type_t *type = (amqp_type_t *) amqp_allocate(context, &context->memory.amqp_type_t_pool);
 
     type->format_code = meta_data->format_code;
-    type->flags.is_encoded = true;
     type->meta_data = meta_data;
-
-    type->flags.container.type = type_flags;
+    type->typedef_flags = meta_data->typedef_flags | amqp_is_encoded | extra_typedef_flags;
 
     if (emit_constructor(context, buffer))
     {
@@ -136,7 +136,7 @@ static amqp_type_t *amqp_encode_fixed(amqp_context_t *context, amqp_buffer_t *bu
         return NULL;
     }
 
-    type = initialize_type(context, buffer, not_a_compound_type, meta_data);
+    type = initialize_type(context, buffer, NO_EXTRA_TYPEDEF_FLAGS, meta_data);
 
     type->position.index = amqp_buffer_size(buffer);
     type->position.size = meta_data->width;
@@ -160,8 +160,7 @@ static amqp_type_t *amqp_encode_simple_variable(amqp_context_t *context, amqp_bu
         return NULL;
     }
 
-    type = initialize_type(context, buffer, not_a_compound_type, meta_data);
-    type->flags.is_variable = true;
+    type = initialize_type(context, buffer, NO_EXTRA_TYPEDEF_FLAGS, meta_data);
     type->value.variable.buffer = buffer;
     switch (meta_data->width)
     {
@@ -184,7 +183,7 @@ static amqp_type_t *amqp_encode_simple_variable(amqp_context_t *context, amqp_bu
     return type;
 }
 
-static amqp_type_t *encode_compound_type(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_type_flags_t type_flags, amqp_encoding_meta_data_t *meta_data)
+static amqp_type_t *encode_compound_type(amqp_context_t *context, amqp_buffer_t *buffer, amqp_typedef_flags_t extra_typedef_flags, amqp_encoding_meta_data_t *meta_data)
 {
     amqp_type_t  *type;
 
@@ -195,7 +194,7 @@ static amqp_type_t *encode_compound_type(amqp_context_t *context, amqp_buffer_t 
         return NULL;
     }
 
-    type = initialize_type(context, buffer, type_flags, meta_data);
+    type = initialize_type(context, buffer, extra_typedef_flags, meta_data);
 
     switch (meta_data->width)
     {
@@ -536,51 +535,37 @@ amqp_type_t *amqp_encode_string_utf8n(amqp_context_t *context, amqp_buffer_t *bu
 
 amqp_type_t *amqp_encode_list_8(amqp_context_t *context, amqp_buffer_t *buffer)
 {
-    amqp_type_type_flags_t type_flags = {0};
-    type_flags.is_list = true;
-    return encode_compound_type(context, buffer, type_flags, &amqp_type_meta_data_list_8);
+    return encode_compound_type(context, buffer, amqp_is_list, &amqp_type_meta_data_list_8);
 }
 
 amqp_type_t *amqp_encode_list_32(amqp_context_t *context, amqp_buffer_t *buffer)
 {
-    amqp_type_type_flags_t type_flags = {0};
-    type_flags.is_list = true;
-    return encode_compound_type(context, buffer, type_flags, &amqp_type_meta_data_list_32);
+    return encode_compound_type(context, buffer, amqp_is_list, &amqp_type_meta_data_list_32);
 }
 
 amqp_type_t *amqp_encode_array_8(amqp_context_t *context, amqp_buffer_t *buffer)
 {
-    amqp_type_type_flags_t type_flags = {0};
-    type_flags.is_array = true;
-    return encode_compound_type(context, buffer, type_flags, &amqp_type_meta_data_array_8);
+    return encode_compound_type(context, buffer, amqp_is_array, &amqp_type_meta_data_array_8);
 }
 
 amqp_type_t *amqp_encode_array_32(amqp_context_t *context, amqp_buffer_t *buffer)
 {
-    amqp_type_type_flags_t type_flags = {0};
-    type_flags.is_array = true;
-    return encode_compound_type(context, buffer, type_flags, &amqp_type_meta_data_array_32);
+    return encode_compound_type(context, buffer, amqp_is_array, &amqp_type_meta_data_array_32);
 }
 
 amqp_type_t *amqp_encode_map_8(amqp_context_t *context, amqp_buffer_t *buffer)
 {
-    amqp_type_type_flags_t type_flags = {0};
-    type_flags.is_map = true;
-    return encode_compound_type(context, buffer, type_flags, &amqp_type_meta_data_map_8);
+    return encode_compound_type(context, buffer, amqp_is_map, &amqp_type_meta_data_map_8);
 }
 
 amqp_type_t *amqp_encode_map_32(amqp_context_t *context, amqp_buffer_t *buffer)
 {
-    amqp_type_type_flags_t type_flags = {0};
-    type_flags.is_map = true;
-    return encode_compound_type(context, buffer, type_flags, &amqp_type_meta_data_map_32);
+    return encode_compound_type(context, buffer, amqp_is_map, &amqp_type_meta_data_map_32);
 }
 
 amqp_type_t *amqp_start_encode_described_type(amqp_context_t *context, amqp_buffer_t *buffer)
 {
-    amqp_type_type_flags_t type_flags = {0};
-    type_flags.is_described = true;
-    return encode_compound_type(context, buffer, type_flags, &amqp_type_meta_data_described);
+    return encode_compound_type(context, buffer, amqp_is_composite, &amqp_type_meta_data_described);
 }
 
 static

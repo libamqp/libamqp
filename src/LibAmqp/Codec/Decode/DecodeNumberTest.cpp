@@ -41,6 +41,7 @@ SUITE(NumericDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_float(type));
         CHECK_CLOSE(123.456f, type->value.b4._float, 0.00005);
     }
 
@@ -51,6 +52,7 @@ SUITE(NumericDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_double(type));
         CHECK_CLOSE(123.456, type->value.b8._double, 0.00005);
     }
 }

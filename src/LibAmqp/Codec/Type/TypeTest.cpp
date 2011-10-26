@@ -81,8 +81,7 @@ SUITE(Type)
     TEST_FIXTURE(TypeFixture, flags)
     {
         amqp_type_t type = { 0 };
-        CHECK_EQUAL(sizeof(unsigned) * 2, sizeof(type.flags));
-    
+
         CHECK(!amqp_type_is_map(&type));
         CHECK(!amqp_type_is_list(&type));
         CHECK(!amqp_type_is_array(&type));
@@ -92,8 +91,8 @@ SUITE(Type)
     TEST_FIXTURE(TypeFixture, flags_is_map)
     {
         amqp_type_t type = { 0 };
-        type.flags.container.type.is_map = true;
-    
+        type.typedef_flags = amqp_is_map;
+
         CHECK(amqp_type_is_container(&type));
         CHECK(amqp_type_is_map(&type));
         CHECK(!amqp_type_is_list(&type));
@@ -103,8 +102,8 @@ SUITE(Type)
     TEST_FIXTURE(TypeFixture, flags_is_list)
     {
         amqp_type_t type = { 0 };
-        type.flags.container.type.is_list = true;
-    
+        type.typedef_flags = amqp_is_list;
+
         CHECK(amqp_type_is_container(&type));
         CHECK(!amqp_type_is_map(&type));
         CHECK(amqp_type_is_list(&type));
@@ -114,30 +113,11 @@ SUITE(Type)
     TEST_FIXTURE(TypeFixture, flags_is_array)
     {
         amqp_type_t type = { 0 };
-        type.flags.container.type.is_array = true;
-    
+        type.typedef_flags = amqp_is_array;
+
         CHECK(amqp_type_is_container(&type));
         CHECK(!amqp_type_is_map(&type));
         CHECK(!amqp_type_is_list(&type));
         CHECK(amqp_type_is_array(&type));
-    }
-    
-    static void copy_flags(amqp_type_t *t1, amqp_type_t *t2)
-    {
-        t2->flags.container = t1->flags.container;
-    }
-    
-    TEST_FIXTURE(TypeFixture, flags_assign)
-    {
-        amqp_type_t t1 = { 0 };
-        amqp_type_t t2 = { 0 };
-    
-        t1.flags.container.type.is_list = true;
-        copy_flags(&t1, &t2);
-    
-        CHECK(amqp_type_is_container(&t2));
-        CHECK(!amqp_type_is_map(&t2));
-        CHECK(amqp_type_is_list(&t2));
-        CHECK(!amqp_type_is_array(&t2));
     }
 }

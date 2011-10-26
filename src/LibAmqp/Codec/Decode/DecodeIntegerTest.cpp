@@ -42,6 +42,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_ulong(type));
         CHECK_EQUAL(1154895135052768677ULL, type->value.b8._ulong);
     }
 
@@ -51,6 +52,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_ulong(type));
         CHECK_EQUAL(18446744073709551614ULL, type->value.b8._ulong);
     }
 
@@ -60,6 +62,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_uint(type));
         CHECK_EQUAL(4294967294U, type->value.b4._uint);
     }
 
@@ -69,6 +72,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_ulong(type));
         CHECK_EQUAL(254UL, type->value.b8._ulong);
     }
 
@@ -78,6 +82,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_uint(type));
         CHECK_EQUAL(254U, type->value.b4._uint);
     }
     
@@ -87,6 +92,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_uint(type));
         CHECK_EQUAL(0U, type->value.b4._uint);
     }
 
@@ -96,6 +102,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_ulong(type));
         CHECK_EQUAL(0UL, type->value.b8._ulong);
     }
 
@@ -105,6 +112,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_ushort(type));
         CHECK_EQUAL(65534, type->value.b2._ushort);
     }
 
@@ -114,6 +122,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_ubyte(type));
         CHECK_EQUAL(254, type->value.b1._unsigned);
     }
 
@@ -123,6 +132,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_long(type));
         CHECK_EQUAL(-2, type->value.b8._long);
     }
 
@@ -132,6 +142,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_int(type));
         CHECK_EQUAL(-2, type->value.b4._int);
     }
 
@@ -141,6 +152,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_long(type));
         CHECK_EQUAL(-4, type->value.b8._long);
     }
 
@@ -150,6 +162,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_int(type));
         CHECK_EQUAL(-3, type->value.b4._int);
     }
 
@@ -159,6 +172,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_short(type));
         CHECK_EQUAL(-2, type->value.b2._short);
     }
 
@@ -168,6 +182,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_byte(type));
         CHECK_EQUAL(-2, type->value.b1._signed);
     }
 
@@ -177,6 +192,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_timestamp(type));
         CHECK_EQUAL(1291654800000LL, type->value.b8._timestamp);
     }
 
@@ -186,6 +202,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_timestamp(type));
         CHECK_EQUAL(-1864105200000LL, type->value.b8._timestamp);
     }
 
@@ -195,6 +212,7 @@ SUITE(IntegerDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
+        CHECK(amqp_type_is_char(type));
         CHECK_EQUAL(0x000020ac, type->value.b4._wchar);
     }
 }
