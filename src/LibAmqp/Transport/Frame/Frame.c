@@ -117,12 +117,12 @@ static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amq
         return decode_symbolic_descriptor(context, buffer, frame, type);
     }
 
-    code = amqp_type_to_ulong(type);
-    if (amqp_type_is_convert_failed(type))
+    if (!amqp_type_is_ulong(type))
     {
         amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Descriptor is not a symbol or ulong.");
         return false;
     }
+    code = amqp_type_to_ulong(type);
 
     if (frame->descriptor.domain != AMQP_DESCRIPTOR_DOMAIN)
     {

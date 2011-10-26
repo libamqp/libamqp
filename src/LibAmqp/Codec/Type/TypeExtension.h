@@ -31,37 +31,17 @@ int amqp_type_is_null(amqp_type_t *type)
 }
 
 static inline
-bool amqp_type_is_convert_failed(amqp_type_t *type)
-{
-    return type->flags.convert_failed;
-}
-
-static inline
-int amqp_type_convert_check_failed(amqp_type_t *type, int convert_result)
-{
-    return !(type->flags.convert_failed = type->flags.convert_failed || !convert_result);
-}
-
-static inline
-int amqp_type_convert_set_failed(amqp_type_t *type)
-{
-    return !(type->flags.convert_failed = true);
-}
-
-static inline
 amqp_type_t *amqp_type_get_descriptor(amqp_type_t *type)
 {
-    return amqp_type_convert_check_failed(type, amqp_type_is_described(type))
-        ? type->value.described.elements[0]
-        : type;
+    assert(amqp_type_is_described(type));
+    return type->value.described.elements[0];
 }
 
 static inline
 amqp_type_t *amqp_type_get_described(amqp_type_t *type)
 {
-    return amqp_type_convert_check_failed(type, amqp_type_is_described(type))
-        ? type->value.described.elements[1]
-        : type;
+    assert(amqp_type_is_described(type));
+    return type->value.described.elements[1];
 }
 
 static inline
@@ -73,9 +53,8 @@ int amqp_type_is_ulong(amqp_type_t *type)
 static inline
 uint64_t amqp_type_to_ulong(amqp_type_t *type)
 {
-    return amqp_type_convert_check_failed(type, amqp_type_is_ulong(type))
-        ? type->value.b8._ulong
-        : 0;
+    assert(amqp_type_is_ulong(type));
+    return type->value.b8._ulong;
 }
 
 static inline
@@ -87,25 +66,22 @@ int amqp_type_is_short(amqp_type_t *type)
 static inline
 int16_t amqp_type_to_short(amqp_type_t *type)
 {
-    return amqp_type_convert_check_failed(type, amqp_type_is_short(type))
-        ? type->value.b2._short
-        : 0;
+    assert(amqp_type_is_short(type));
+    return type->value.b2._short;
 }
 
 static inline
 size_t amqp_type_copy_to(amqp_type_t *type, uint8_t *buffer, size_t amount)
 {
-    if (amqp_type_convert_check_failed(type, amqp_type_is_variable(type)))
+    assert(amqp_type_is_variable(type));
+    
+    // TODO - push into buffer and do block copy of fragments
+    size_t i, j;
+    for (i = 0, j = type->position.index; i < type->position.size && i < amount; i++, j++)
     {
-        // TODO - push into buffer and do block copy of fragments
-        size_t i, j;
-        for (i = 0, j = type->position.index; i < type->position.size && i < amount; i++, j++)
-        {
-            buffer[i] = amqp_unchecked_getc_at(type->value.variable.buffer, j);
-        }
-        return i;
+        buffer[i] = amqp_unchecked_getc_at(type->value.variable.buffer, j);
     }
-    return 0;
+    return i;
 }
 
 static inline
@@ -124,9 +100,8 @@ int amqp_type_is_ubyte(amqp_type_t *type)
 static inline
 uint8_t amqp_type_to_ubyte(amqp_type_t *type)
 {
-    return amqp_type_convert_check_failed(type, amqp_type_is_ubyte(type))
-        ? type->value.b1._unsigned
-        : 0;
+    assert(amqp_type_is_ubyte(type));
+    return type->value.b1._unsigned;
 }
 
 static inline
@@ -138,9 +113,8 @@ int amqp_type_is_ushort(amqp_type_t *type)
 static inline
 uint8_t amqp_type_to_ushort(amqp_type_t *type)
 {
-    return amqp_type_convert_check_failed(type, amqp_type_is_ushort(type))
-        ? type->value.b2._ushort
-        : 0;
+    assert(amqp_type_is_ushort(type));
+    return type->value.b2._ushort;
 }
 
 static inline
@@ -152,9 +126,8 @@ int amqp_type_is_uint(amqp_type_t *type)
 static inline
 uint8_t amqp_type_to_uint(amqp_type_t *type)
 {
-    return amqp_type_convert_check_failed(type, amqp_type_is_uint(type))
-        ? type->value.b4._uint
-        : 0;
+    assert(amqp_type_is_uint(type));
+    return type->value.b4._uint;
 }
 
 static inline
@@ -168,6 +141,13 @@ uint8_t amqp_type_to_boolean(amqp_type_t *type)
 {
     assert(amqp_type_is_boolean(type));
     not_implemented(todo);
+}
+
+static inline
+amqp_type_t *amqp_type_array_type(amqp_type_t *type)
+{
+    // TODO - deal with zero length arrays
+    return type->value.array.elements[0];
 }
 
 #ifdef __cplusplus

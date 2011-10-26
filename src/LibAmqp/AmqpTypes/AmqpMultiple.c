@@ -52,16 +52,14 @@ int initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multip
     {
         multiple->size = 0;
         multiple->symbols = 0;
-        return true;
     }
     else if (amqp_type_is_symbol(type))
     {
         multiple->size = 1;
         multiple->symbols = AMQP_MALLOC_ARRAY(context, amqp_symbol_t, 1);
         amqp_symbol_initialize_from_type(context, &multiple->symbols[0], type);
-        return true;
     }
-    else if (amqp_type_is_array(type))
+    else if (amqp_type_is_array(type) && amqp_type_is_symbol(amqp_type_array_type(type)))
     {
         int i;
 
@@ -74,19 +72,15 @@ int initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multip
             for (i = 0; i < multiple->size; i++)
             {
                 amqp_type_t *element = type->value.array.elements[i];
-                if (!amqp_type_is_symbol(element))
-                {
-                    // TODO - if the first element is a symbol they all should be
-                    return false;
-                }
                 amqp_symbol_initialize_from_type(context, &multiple->symbols[i], element);
             }
-            return true;
         }
     }
-
-    amqp_type_convert_set_failed(type);
-    return false;
+    else
+    {
+        return false;
+    }
+    return true;
 }
 
 int amqp_multiple_symbol_initialize(amqp_context_t *context, amqp_multiple_symbol_t *multiple, amqp_type_t *type)
