@@ -32,6 +32,9 @@ SUITE(AmqpTypes)
 
     TEST_FIXTURE(AmqpTypesFixture, type_sizes)
     {
+        CHECK_EQUAL(80U, sizeof(amqp_type_t));
+        CHECK_EQUAL(8U, sizeof(amqp_type_flags_t));
+
         CHECK_EQUAL(32U, sizeof(amqp_array_t));
         CHECK_EQUAL(56U, sizeof(amqp_binary_t));
         CHECK_EQUAL(56U, sizeof(amqp_entry_t));
@@ -40,7 +43,6 @@ SUITE(AmqpTypes)
         CHECK_EQUAL(32U, sizeof(amqp_multiple_symbol_t));
         CHECK_EQUAL(56U, sizeof(amqp_string_t));
         CHECK_EQUAL(56U, sizeof(amqp_symbol_t));
-        CHECK_EQUAL(72U, sizeof(amqp_type_t));
         CHECK_EQUAL(64U, sizeof(amqp_amqp_type_t));
         CHECK_EQUAL(24U, sizeof(amqp_memory_t));
     }

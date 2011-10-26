@@ -28,6 +28,8 @@ const char *amqp_category_names[] = {
     "array"
 };
 
+
+
 amqp_encoding_meta_data_t amqp_type_meta_data_described = {
     0x00,
     0,
@@ -35,7 +37,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_described = {
     &amqp_methods_described,
     "described",
     "",
-    AMQP_TYPE_CATEGORY_COMPOUND,
+    amqp_is_composite, AMQP_TYPE_CATEGORY_COMPOUND,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_null = {
     0x40,
@@ -44,7 +46,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_null = {
     &amqp_methods_null,
     "null",
     "",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_null, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_boolean_true = {
     0x41,
@@ -53,7 +55,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_boolean_true = {
     &amqp_methods_boolean_true,
     "boolean",
     "true",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_boolean, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_boolean_false = {
     0x42,
@@ -62,7 +64,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_boolean_false = {
     &amqp_methods_boolean_false,
     "boolean",
     "false",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_boolean, AMQP_TYPE_CATEGORY_FIXED,
 };
 // <encoding name="uint0" code="0x43" category="fixed" width="0"/>
 amqp_encoding_meta_data_t amqp_type_meta_data_uint_uint0 = {
@@ -72,7 +74,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_uint_uint0 = {
     &amqp_methods_uint,
     "uint",
     "uint0",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_int | amqp_is_unsigned, AMQP_TYPE_CATEGORY_FIXED,
 };
 // <encoding name="ulong0" code="0x44" category="fixed" width="0"/>
 amqp_encoding_meta_data_t amqp_type_meta_data_ulong_ulong0 = {
@@ -82,7 +84,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_ulong_ulong0 = {
     &amqp_methods_ulong,
     "ulong",
     "ulong0",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_long | amqp_is_unsigned, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_list_0 = {
     0x45,
@@ -91,7 +93,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_list_0 = {
     &amqp_methods_list_0,
     "list",
     "list0",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_list, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_0 = {
     0x4F,
@@ -100,7 +102,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_0 = {
     &amqp_methods_extension_type,
     "extension",
     "fixed-0",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_ubyte = {
     0x50,
@@ -109,7 +111,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_ubyte = {
     &amqp_methods_ubyte,
     "ubyte",
     "",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_byte | amqp_is_unsigned, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_byte = {
     0x51,
@@ -118,7 +120,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_byte = {
     &amqp_methods_byte,
     "byte",
     "",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_byte, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_uint_small_uint = {
     0x52,
@@ -127,7 +129,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_uint_small_uint = {
     &amqp_methods_uint,
     "uint",
     "smalluint",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_int | amqp_is_unsigned, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_ulong_small_ulong = {
     0x53,
@@ -136,7 +138,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_ulong_small_ulong = {
     &amqp_methods_ulong,
     "ulong",
     "smallulong",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_long | amqp_is_unsigned, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_int_small_int = {
     0x54,
@@ -145,7 +147,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_int_small_int = {
     &amqp_methods_int,
     "int",
     "smallint",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_int, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_long_small_long = {
     0x55,
@@ -154,7 +156,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_long_small_long = {
     &amqp_methods_long,
     "long",
     "smalllong",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_long, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_boolean = {
     0x56,
@@ -163,7 +165,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_boolean = {
     &amqp_methods_boolean,
     "boolean",
     "",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_boolean, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_1 = {
     0x5F,
@@ -172,7 +174,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_1 = {
     &amqp_methods_extension_type,
     "extension",
     "fixed-1",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_ushort = {
     0x60,
@@ -181,7 +183,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_ushort = {
     &amqp_methods_ushort,
     "ushort",
     "",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_short | amqp_is_unsigned, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_short = {
     0x61,
@@ -190,7 +192,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_short = {
     &amqp_methods_short,
     "short",
     "",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_short, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_2 = {
     0x6F,
@@ -199,7 +201,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_2 = {
     &amqp_methods_extension_type,
     "extension",
     "fixed-2",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_uint = {
     0x70,
@@ -208,7 +210,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_uint = {
     &amqp_methods_uint,
     "uint",
     "",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_int | amqp_is_unsigned, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_int = {
     0x71,
@@ -217,7 +219,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_int = {
     &amqp_methods_int,
     "int",
     "",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_int, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_float_ieee_754 = {
     0x72,
@@ -226,7 +228,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_float_ieee_754 = {
     &amqp_methods_float,
     "float",
     "ieee-754",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_float, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_char_utf32 = {
     0x73,
@@ -235,7 +237,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_char_utf32 = {
     &amqp_methods_char,
     "char",
     "utf32",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_char, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_decimal32_ieee_754 = {
     0x74,
@@ -244,7 +246,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_decimal32_ieee_754 = {
     &amqp_methods_decimal32,
     "decimal32",
     "ieee-754",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_decimal32, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_4 = {
     0x7F,
@@ -253,7 +255,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_4 = {
     &amqp_methods_extension_type,
     "extension",
     "fixed-4",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_ulong = {
     0x80,
@@ -262,7 +264,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_ulong = {
     &amqp_methods_ulong,
     "ulong",
     "",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_long | amqp_is_unsigned, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_long = {
     0x81,
@@ -271,7 +273,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_long = {
     &amqp_methods_long,
     "long",
     "",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_long, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_double_ieee_754 = {
     0x82,
@@ -280,7 +282,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_double_ieee_754 = {
     &amqp_methods_double,
     "double",
     "ieee-754",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_double, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_timestamp_ms64 = {
     0x83,
@@ -289,7 +291,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_timestamp_ms64 = {
     &amqp_methods_timestamp,
     "timestamp",
     "ms64",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_timestamp, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_decimal64_ieee_754 = {
     0x84,
@@ -298,7 +300,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_decimal64_ieee_754 = {
     &amqp_methods_decimal64,
     "decimal64",
     "ieee-754",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_decimal64, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_8 = {
     0x8F,
@@ -307,7 +309,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_8 = {
     &amqp_methods_extension_type,
     "extension",
     "fixed-8",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_decimal128_ieee_754 = {
     0x94,
@@ -316,7 +318,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_decimal128_ieee_754 = {
     &amqp_methods_decimal128,
     "decimal128",
     "ieee-754",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_decimal128, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_uuid = {
     0x98,
@@ -325,7 +327,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_uuid = {
     &amqp_methods_uuid,
     "uuid",
     "",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_uuid, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_16 = {
     0x9F,
@@ -334,7 +336,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_fixed_16 = {
     &amqp_methods_extension_type,
     "extension",
     "fixed-16",
-    AMQP_TYPE_CATEGORY_FIXED,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_FIXED,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_binary_vbin8 = {
     0xA0,
@@ -343,7 +345,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_binary_vbin8 = {
     &amqp_methods_binary_vbin8,
     "binary",
     "vbin8",
-    AMQP_TYPE_CATEGORY_VARIABLE,
+    amqp_is_binary, AMQP_TYPE_CATEGORY_VARIABLE,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_string_str8_utf8 = {
     0xA1,
@@ -352,7 +354,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_string_str8_utf8 = {
     &amqp_methods_string_str8_utf8,
     "string",
     "str8-utf8",
-    AMQP_TYPE_CATEGORY_VARIABLE,
+    amqp_is_string, AMQP_TYPE_CATEGORY_VARIABLE,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_symbol_sym8 = {
     0xA3,
@@ -361,7 +363,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_symbol_sym8 = {
     &amqp_methods_symbol_sym8,
     "symbol",
     "sym8",
-    AMQP_TYPE_CATEGORY_VARIABLE,
+    amqp_is_symbol, AMQP_TYPE_CATEGORY_VARIABLE,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_variable_1 = {
     0xAF,
@@ -370,7 +372,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_variable_1 = {
     &amqp_methods_extension_type,
     "extension",
     "variable-1",
-    AMQP_TYPE_CATEGORY_VARIABLE,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_VARIABLE,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_binary_vbin32 = {
     0xB0,
@@ -379,7 +381,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_binary_vbin32 = {
     &amqp_methods_binary_vbin32,
     "binary",
     "vbin32",
-    AMQP_TYPE_CATEGORY_VARIABLE,
+    amqp_is_binary, AMQP_TYPE_CATEGORY_VARIABLE,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_string_str32_utf8 = {
     0xB1,
@@ -388,7 +390,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_string_str32_utf8 = {
     &amqp_methods_string_str32_utf8,
     "string",
     "str32-utf8",
-    AMQP_TYPE_CATEGORY_VARIABLE,
+    amqp_is_string, AMQP_TYPE_CATEGORY_VARIABLE,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_symbol_sym32 = {
     0xB3,
@@ -397,7 +399,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_symbol_sym32 = {
     &amqp_methods_symbol_sym32,
     "symbol",
     "sym32",
-    AMQP_TYPE_CATEGORY_VARIABLE,
+    amqp_is_symbol, AMQP_TYPE_CATEGORY_VARIABLE,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_variable_4 = {
     0xBF,
@@ -406,7 +408,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_variable_4 = {
     &amqp_methods_extension_type,
     "extension",
     "variable-4",
-    AMQP_TYPE_CATEGORY_VARIABLE,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_VARIABLE,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_list_8 = {
     0xC0,
@@ -415,7 +417,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_list_8 = {
     &amqp_methods_list_8,
     "list",
     "list8",
-    AMQP_TYPE_CATEGORY_COMPOUND,
+    amqp_is_list, AMQP_TYPE_CATEGORY_COMPOUND,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_map_8 = {
     0xC1,
@@ -424,7 +426,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_map_8 = {
     &amqp_methods_map_8,
     "map",
     "map8",
-    AMQP_TYPE_CATEGORY_COMPOUND,
+    amqp_is_map, AMQP_TYPE_CATEGORY_COMPOUND,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_compound_1 = {
     0xCF,
@@ -433,7 +435,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_compound_1 = {
     &amqp_methods_extension_type,
     "extension",
     "compound-1",
-    AMQP_TYPE_CATEGORY_COMPOUND,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_COMPOUND,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_list_32 = {
     0xD0,
@@ -442,7 +444,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_list_32 = {
     &amqp_methods_list_32,
     "list",
     "list32",
-    AMQP_TYPE_CATEGORY_COMPOUND,
+    amqp_is_list, AMQP_TYPE_CATEGORY_COMPOUND,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_map_32 = {
     0xD1,
@@ -451,7 +453,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_map_32 = {
     &amqp_methods_map_32,
     "map",
     "map32",
-    AMQP_TYPE_CATEGORY_COMPOUND,
+    amqp_is_map, AMQP_TYPE_CATEGORY_COMPOUND,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_compound_4 = {
     0xDF,
@@ -460,7 +462,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_compound_4 = {
     &amqp_methods_extension_type,
     "extension",
     "compound-4",
-    AMQP_TYPE_CATEGORY_COMPOUND,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_COMPOUND,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_array_8 = {
     0xE0,
@@ -469,7 +471,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_array_8 = {
     &amqp_methods_array_8,
     "array",
     "array8",
-    AMQP_TYPE_CATEGORY_ARRAY,
+    amqp_is_array, AMQP_TYPE_CATEGORY_ARRAY,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_array_1 = {
     0xEF,
@@ -478,7 +480,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_array_1 = {
     &amqp_methods_extension_type,
     "extension",
     "array-1",
-    AMQP_TYPE_CATEGORY_ARRAY,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_ARRAY,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_array_32 = {
     0xF0,
@@ -487,7 +489,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_array_32 = {
     &amqp_methods_array_32,
     "array",
     "array32",
-    AMQP_TYPE_CATEGORY_ARRAY,
+    amqp_is_array, AMQP_TYPE_CATEGORY_ARRAY,
 };
 amqp_encoding_meta_data_t amqp_type_meta_data_extension_array_4 = {
     0xFF,
@@ -496,7 +498,7 @@ amqp_encoding_meta_data_t amqp_type_meta_data_extension_array_4 = {
     &amqp_methods_extension_type,
     "extension",
     "array-4",
-    AMQP_TYPE_CATEGORY_ARRAY,
+    amqp_is_extension, AMQP_TYPE_CATEGORY_ARRAY,
 };
 
 amqp_encoding_meta_data_t *amqp__type_lookup_table[] = {

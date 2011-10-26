@@ -44,10 +44,50 @@ typedef int amqp_decoder_t(amqp_context_t *context, amqp_buffer_t *buffer, amqp_
 typedef struct amqp_type_methods_t amqp_type_methods_t;
 typedef void amqp_type_print_method_t(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer);
 // TODO -  remove unnecessary indirection. There is only the print method.
+
 struct amqp_type_methods_t
 {
     amqp_type_print_method_t *print;
 };
+
+typedef enum {
+    amqp_is_invalid = 0x00000000,
+    amqp_is_null = 0x00000001,
+    amqp_is_boolean = 0x00000002,
+    amqp_is_unsigned = 0x00000004,
+    amqp_is_byte = 0x00000008,
+    amqp_is_short = 0x00000010,
+    amqp_is_int = 0x00000020,
+    amqp_is_long = 0x00000040,
+    amqp_is_float = 0x00000080,
+    amqp_is_double = 0x00000100,
+    amqp_is_timestamp = 0x00000200,
+    amqp_is_uuid = 0x00000400,
+    amqp_is_decimal32 = 0x00000800,
+    amqp_is_decimal64 = 0x00001000,
+    amqp_is_decimal128 = 0x00002000,
+    amqp_is_char = 0x00004000,
+
+    amqp_is_fixed_mask = 0x00007fff,
+
+    amqp_is_binary = 0x00008000,
+    amqp_is_string = 0x00010000,
+    amqp_is_symbol = 0x00020000,
+    amqp_is_variable_mask = 0x00038000,
+
+    amqp_is_list = 0x00040000,
+    amqp_is_map = 0x00080000,
+    amqp_is_array = 0x00100000,
+    amqp_is_compound_mask = 0x001c0000,
+
+    amqp_is_composite = 0x00200000,
+    amqp_is_descriptor = 0x00400000,
+    amqp_is_described = 0x00800000,
+    amqp_is_extension = 0x01000000,
+
+    amqp_is_encoded = 0x02000000,
+    amqp_is_incomplete = 0x04000000,
+} amqp_typedef_flags_t;
 
 struct amqp_encoding_meta_data_t
 {
@@ -57,6 +97,7 @@ struct amqp_encoding_meta_data_t
     amqp_type_methods_t *methods;
     const char *name;
     const char *encoding_name;
+    amqp_typedef_flags_t flags;
     int category_name_index;
 };
 

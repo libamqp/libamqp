@@ -79,6 +79,9 @@ struct amqp_type_t
     amqp_encoding_meta_data_t *meta_data;
 
     amqp_buffer_position_t position;
+
+    amqp_typedef_flags_t new_flags;
+    
     amqp_type_flags_t flags;
 
     union {

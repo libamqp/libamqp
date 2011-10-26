@@ -66,6 +66,18 @@ SUITE(Type)
         amqp_deallocate_amqp_type_t_array(context, type_pool(), array_2, 0);
     }
     
+    TEST_FIXTURE(TypeFixture, typedef_flags)
+    {
+        CHECK_EQUAL(amqp_is_fixed_mask,
+                amqp_is_null | amqp_is_boolean | amqp_is_unsigned |
+                amqp_is_byte | amqp_is_short | amqp_is_int | amqp_is_long |
+                amqp_is_float | amqp_is_double | amqp_is_timestamp | amqp_is_uuid |
+                amqp_is_decimal32 | amqp_is_decimal64 | amqp_is_decimal128 | amqp_is_char
+            );
+        CHECK_EQUAL(amqp_is_variable_mask, amqp_is_binary | amqp_is_string | amqp_is_symbol);
+        CHECK_EQUAL(amqp_is_compound_mask, amqp_is_list | amqp_is_map | amqp_is_array);
+    }
+
     TEST_FIXTURE(TypeFixture, flags)
     {
         amqp_type_t type = { 0 };
