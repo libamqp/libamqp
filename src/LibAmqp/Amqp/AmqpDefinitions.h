@@ -18,6 +18,9 @@
 #define LIBAMQP_AMQP_DEFINITIONS_H
 
 #include <stdint.h>
+#include <AmqpTypes/AmqpSymbol.h>
+#include <AmqpTypes/AmqpString.h>
+#include <AmqpTypes/AmqpMap.h>
 
 enum {
     amqp_sasl_code_ok,

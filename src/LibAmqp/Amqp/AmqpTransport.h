@@ -107,7 +107,7 @@ struct amqp_transport_transfer_t {
     uint32_t handle; /* mandatory; */
     amqp_delivery_number_t delivery_id; 
     amqp_delivery_tag_t delivery_tag; 
-// TODO - define message_format
+    amqp_message_format_t message_format; 
     int settled; 
     int more; /* default="false"; */
     amqp_receiver_settle_mode_t rcv_settle_mode; 

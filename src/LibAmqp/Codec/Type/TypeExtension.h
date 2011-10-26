@@ -18,6 +18,7 @@
 #define LIBAMQP_CODEC_TYPE_TYPE_EXTENSION_H
 
 #include "Codec/Type/Type.h"
+#include "Amqp/AmqpDefinitions.h"
 
 #ifdef __cplusplus
 extern "C" {

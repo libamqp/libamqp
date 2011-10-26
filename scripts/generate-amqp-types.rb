@@ -103,6 +103,7 @@ $mappings['timestamp'] = TypedefedMapper.new('timestamp')
 $mappings['terminus_durability'] = TypedefedMapper.new('terminus_durability')
 $mappings['terminus_expiry_policy'] = TypedefedMapper.new('terminus_expiry_policy')
 $mappings['filter_set'] = TypedefedMapper.new('filter_set')
+$mappings['message_format'] = TypedefedMapper.new('message_format')
 
 $xpaths = {}
 $xpaths['transport'] = '//section[@name=\'performatives\']/type[descriptor]'

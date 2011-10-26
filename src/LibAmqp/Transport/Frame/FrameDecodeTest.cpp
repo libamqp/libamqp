@@ -24,6 +24,7 @@
 #include "Codec/Type/TypePrint.h"
 #include "TestData/TestFrames.h"
 #include "Codec/Type/TypeExtension.h"
+#include "Codec/Type/FieldTests.h"
 
 #include "debug_helper.h"
 
@@ -257,11 +258,31 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(0x12U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(14U, described->value.list.count);
 
-//        amqp_type_print(context,  described, decode_buffer);
-        CHECK(0);
 
         int field = 0;
         CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_role(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_field_is_sender_settle_mode(described->value.list.elements[field])); field++;
+
+        amqp_field_is_receiver_settle_mode(described->value.list.elements[field]); field++;
+
+        CHECK(amqp_field_is_wildcard(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_wildcard(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_boolean(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_sequence_no(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_type_is_null(described->value.list.elements[field]) || amqp_type_is_ulong(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_field_is_multiple_symbol(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_multiple_symbol(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+
+        CHECK_EQUAL(14, field);
     }
 
     TEST_FIXTURE(DecodeFixture, broker_attach_frame)
@@ -271,11 +292,29 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(0x12U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(14U, described->value.list.count);
 
-//        amqp_type_print(context,  described, decode_buffer);
-        CHECK(0);
-
         int field = 0;
         CHECK(amqp_type_is_string(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_role(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_field_is_sender_settle_mode(described->value.list.elements[field])); field++;
+
+        amqp_field_is_receiver_settle_mode(described->value.list.elements[field]); field++;
+
+        CHECK(amqp_field_is_wildcard(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_wildcard(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_boolean(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_sequence_no(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_type_is_null(described->value.list.elements[field]) || amqp_type_is_ulong(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_field_is_multiple_symbol(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_multiple_symbol(described->value.list.elements[field])); field++;
+
+        CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+        CHECK_EQUAL(14, field);
     }
 
     TEST_FIXTURE(DecodeFixture, flow_frame)
@@ -284,7 +323,6 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(0x13U, amqp_type_to_ulong(descriptor));
         CHECK_EQUAL(11U, described->value.list.count);
 
-//        amqp_type_print(context,  described, decode_buffer);
 
         int field = 0;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
@@ -298,6 +336,8 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+
+        CHECK_EQUAL(11, field);
     }
 
     TEST_FIXTURE(DecodeFixture, broker_flow_frame)
@@ -319,6 +359,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+        CHECK_EQUAL(11, field);
     }
 
     TEST_FIXTURE(DecodeFixture, ya_flow_frame)
@@ -340,6 +381,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
+        CHECK_EQUAL(11, field);
     }
 
     TEST_FIXTURE(DecodeFixture, transfer_frame_id_0)
@@ -350,10 +392,21 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(6U, described->value.list.count);
 
 //        amqp_type_print(context,  described, decode_buffer);
-        CHECK(0);
 
         int field = 0;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_delivery_number(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_delivery_tag(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_message_format(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_boolean(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_boolean(described->value.list.elements[field])); field++;
+
+        CHECK_EQUAL(6, field);
+
+        amqp_deallocate_type(context, type);
+        type = amqp_decode(context, decode_buffer);
+        ASSERT(type);
+//        amqp_type_print(context,  described, decode_buffer);
     }
 
     TEST_FIXTURE(DecodeFixture, transfer_frame_id_256)
@@ -364,10 +417,21 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(6U, described->value.list.count);
 
 //        amqp_type_print(context,  described, decode_buffer);
-        CHECK(0);
 
         int field = 0;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_delivery_number(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_delivery_tag(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_message_format(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_boolean(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_boolean(described->value.list.elements[field])); field++;
+
+        CHECK_EQUAL(6, field);
+
+        amqp_deallocate_type(context, type);
+        type = amqp_decode(context, decode_buffer);
+        ASSERT(type);
+//        amqp_type_print(context,  described, decode_buffer);
     }
 
     TEST_FIXTURE(DecodeFixture, transfer_frame_id_677)
@@ -378,10 +442,22 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(6U, described->value.list.count);
 
 //        amqp_type_print(context,  described, decode_buffer);
-        CHECK(0);
 
         int field = 0;
         CHECK(amqp_type_is_uint(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_delivery_number(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_delivery_tag(described->value.list.elements[field])); field++;
+        CHECK(amqp_field_is_message_format(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_boolean(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_boolean(described->value.list.elements[field])); field++;
+
+        CHECK_EQUAL(6, field);
+
+        amqp_deallocate_type(context, type);
+        type = amqp_decode(context, decode_buffer);
+        ASSERT(type);
+//        amqp_type_print(context,  described, decode_buffer);
+
     }
 
 }

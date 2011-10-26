@@ -18,9 +18,10 @@
 #include <string.h>
 
 #include "AmqpTypes/AmqpTypesInternal.h"
-#include "AmqpTypes/AmqpString.h"
 #include "Codec/Type/TypeExtension.h"
 #include "AmqpTypes/AmqpVariableInternal.h"
+
+#include "AmqpTypes/AmqpString.h"
 
 #include "debug_helper.h"
 
