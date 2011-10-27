@@ -23,7 +23,6 @@
 #include "Amqp/AmqpMessaging.h"
 #include "Amqp/AmqpTransactions.h"
 
-
 SUITE(AmqpTypes)
 {
     // If a field is added to a generated type one of these will fail.
@@ -32,7 +31,7 @@ SUITE(AmqpTypes)
 
     TEST_FIXTURE(AmqpTypesFixture, type_sizes)
     {
-        CHECK_EQUAL(80U, sizeof(amqp_type_t));
+        CHECK_EQUAL(72U, sizeof(amqp_type_t));
 
         CHECK_EQUAL(32U, sizeof(amqp_array_t));
         CHECK_EQUAL(56U, sizeof(amqp_binary_t));
