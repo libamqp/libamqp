@@ -224,7 +224,7 @@ SUITE(TypePrint)
         ASSERT_VALID(type);
         ASSERT_VALID(type->value.array.elements[0]);
 
-        CHECK_EQUAL(0x61, type->value.array.elements[0]->format_code);
+        CHECK_EQUAL(0x61, type->value.array.elements[0]->constructor.format_code);
         print_type();
         check_output("[(short) 10, 11, 11, 13, 14]");
     }

@@ -30,7 +30,7 @@ SUITE(CodecEncode)
         CHECK_NOT_NULL(type);
         CHECK_BUFFERS_MATCH(buffer, test_data::true_0);
 
-        CHECK_EQUAL(0x41, type->format_code);
+        CHECK_EQUAL(0x41, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x00, type->position.size);
         CHECK(amqp_type_is_not_null(type));
@@ -45,7 +45,7 @@ SUITE(CodecEncode)
         CHECK_NOT_NULL(type);
         CHECK_BUFFERS_MATCH(buffer, test_data::false_0);
 
-        CHECK_EQUAL(0x42, type->format_code);
+        CHECK_EQUAL(0x42, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x00, type->position.size);
         CHECK(amqp_type_is_not_null(type));
@@ -69,7 +69,7 @@ SUITE(CodecEncode)
 
         CHECK(amqp_type_is_valid(type));
         CHECK(amqp_type_is_array(type));
-        CHECK_EQUAL(0x56, type->value.array.elements[0]->format_code);
+        CHECK_EQUAL(0x56, type->value.array.elements[0]->constructor.format_code);
     }
 
     TEST_FIXTURE(EncodeFixture, EncodeAndDecodeArrayOfBoolean)
@@ -93,8 +93,8 @@ SUITE(CodecEncode)
         type = amqp_decode(context, buffer);
         CHECK(check_valid_array());
 
-        CHECK_EQUAL(0xe0, type->format_code);
-        CHECK_EQUAL(0x56, type->value.array.elements[0]->format_code);
+        CHECK_EQUAL(0xe0, type->constructor.format_code);
+        CHECK_EQUAL(0x56, type->value.array.elements[0]->constructor.format_code);
 
         CHECK(amqp_type_to_boolean(type->value.array.elements[0]));
         CHECK(!amqp_type_to_boolean(type->value.array.elements[1]));

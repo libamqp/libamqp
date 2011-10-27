@@ -93,14 +93,14 @@ namespace t
     {
         int old_indent;
 
-        amqp_context_printf(context, "format code: 0x%02x\n", type->format_code);
+        amqp_context_printf(context, "format code: 0x%02x\n", type->constructor.format_code);
         old_indent = amqp_context_increase_print_indent(context, 4);
-        if (type->meta_data != 0)
+        if (type->constructor.meta_data != 0)
         {
-            amqp_context_printf(context, "width: %d, name: %s", type->meta_data->width, type->meta_data->name);
-            if (*type->meta_data->encoding_name)
+            amqp_context_printf(context, "width: %d, name: %s", type->constructor.meta_data->width, type->constructor.meta_data->name);
+            if (*type->constructor.meta_data->encoding_name)
             {
-                amqp_context_printf(context, "-%s", type->meta_data->encoding_name);
+                amqp_context_printf(context, "-%s", type->constructor.meta_data->encoding_name);
             }
             amqp_context_putc(context, '\n');
         }

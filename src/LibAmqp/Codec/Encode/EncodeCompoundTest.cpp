@@ -61,7 +61,7 @@ SUITE(CompoundEncoding)
         CHECK_EQUAL((size_t) 2, type->position.index);
         CHECK_EQUAL((size_t) 4, type->position.size);
 
-        CHECK_EQUAL(0x61, type->value.array.elements[0]->format_code);
+        CHECK_EQUAL(0x61, type->value.array.elements[0]->constructor.format_code);
 
         CHECK(amqp_type_is_encoded(type));
         CHECK(amqp_type_is_encoded(type->value.array.elements[0]));
@@ -92,7 +92,7 @@ SUITE(CompoundEncoding)
         CHECK_EQUAL((size_t) 2, type->position.index);
         CHECK_EQUAL((size_t) 12, type->position.size);
 
-        CHECK_EQUAL(0x61, type->value.array.elements[0]->format_code);
+        CHECK_EQUAL(0x61, type->value.array.elements[0]->constructor.format_code);
 
         CHECK_BUFFERS_MATCH(buffer, test_data::array_shorts);
     }
@@ -114,8 +114,8 @@ SUITE(CompoundEncoding)
 
         CHECK_EQUAL((size_t) 2, (size_t) type->value.array.count);
 
-        CHECK_EQUAL(0x61, type->value.array.elements[0]->format_code);
-        CHECK_EQUAL(0xa1, type->value.array.elements[1]->format_code);
+        CHECK_EQUAL(0x61, type->value.array.elements[0]->constructor.format_code);
+        CHECK_EQUAL(0xa1, type->value.array.elements[1]->constructor.format_code);
     }
 
     // mixing elements will mark the type as invalid and will leave the buffer in an undefined state.
@@ -138,10 +138,10 @@ SUITE(CompoundEncoding)
         CHECK_NOT_NULL(type->value.array.elements);
         CHECK_EQUAL((size_t) 4, (size_t) type->value.array.count);
 
-        CHECK_EQUAL(0xa1, type->value.array.elements[0]->format_code);
-        CHECK_EQUAL(0xa1, type->value.array.elements[1]->format_code);
-        CHECK_EQUAL(0xa1, type->value.array.elements[2]->format_code);
-        CHECK_EQUAL(0xa1, type->value.array.elements[3]->format_code);
+        CHECK_EQUAL(0xa1, type->value.array.elements[0]->constructor.format_code);
+        CHECK_EQUAL(0xa1, type->value.array.elements[1]->constructor.format_code);
+        CHECK_EQUAL(0xa1, type->value.array.elements[2]->constructor.format_code);
+        CHECK_EQUAL(0xa1, type->value.array.elements[3]->constructor.format_code);
 
         CHECK_BUFFERS_MATCH(buffer, test_data::string_array);
     }

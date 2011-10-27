@@ -106,9 +106,9 @@ static amqp_type_t *initialize_type(amqp_context_t *context, amqp_buffer_t *buff
 {
     amqp_type_t *type = (amqp_type_t *) amqp_allocate(context, &context->memory.amqp_type_t_pool);
 
-    type->format_code = meta_data->format_code;
-    type->meta_data = meta_data;
-    type->typedef_flags = meta_data->typedef_flags | amqp_is_encoded | extra_typedef_flags;
+    type->constructor.format_code = meta_data->format_code;
+    type->constructor.meta_data = meta_data;
+    type->constructor.typedef_flags = meta_data->typedef_flags | amqp_is_encoded | extra_typedef_flags;
 
     if (emit_constructor(context, buffer))
     {
@@ -565,7 +565,7 @@ amqp_type_t *complete_container_type(amqp_context_t *context, amqp_buffer_t *buf
     size_t saved_buffer_write_position = amqp_buffer_size(buffer);
 
     type->position.size = saved_buffer_write_position - type->position.index;
-    switch (type->meta_data->width)
+    switch (type->constructor.meta_data->width)
     {
     case 0:
         if (type->value.described.count > 2)
@@ -600,11 +600,11 @@ amqp_type_t *complete_container_type(amqp_context_t *context, amqp_buffer_t *buf
 static
 amqp_type_t *complete_empty_list(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type)
 {
-    amqp_encoding_meta_data_t *old_meta_data = type->meta_data;
+    amqp_encoding_meta_data_t *old_meta_data = type->constructor.meta_data;
     amqp_encoding_meta_data_t *meta_data = &amqp_type_meta_data_list_0;
 
-    type->meta_data = &amqp_type_meta_data_list_0;
-    type->format_code = type->meta_data->format_code;
+    type->constructor.meta_data = &amqp_type_meta_data_list_0;
+    type->constructor.format_code = type->constructor.meta_data->format_code;
 
     // backup over the old list type format code and size field
     amqp_buffer_backup(buffer, old_meta_data->width * 2 + 1);

@@ -37,7 +37,7 @@ void amqp_initialize_amqp_type_t(amqp_context_t *c, amqp_memory_pool_t *pool, am
     assert(pool != 0);
     assert(type != 0);
 
-    type->extension_type_code = -1;
+    type->constructor.extension_type_code = -1;
 }
 
 static
@@ -92,7 +92,7 @@ void amqp_deallocate_amqp_type_t_array(amqp_context_t *context, amqp_memory_pool
 
 int amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs)
 {
-    if (lhs->format_code != rhs->format_code)
+    if (lhs->constructor.format_code != rhs->constructor.format_code)
     {
         return false;
     }
@@ -101,7 +101,7 @@ int amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs)
 
 void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type)
 {
-    amqp_encoding_meta_data_t *meta_data = type->meta_data;
+    amqp_encoding_meta_data_t *meta_data = type->constructor.meta_data;
     if (meta_data)
     {
         snprintf(buffer, size, "name=\"%s\", encoding=\"%s\", category=\"%s\"", meta_data->name, meta_data->encoding_name, amqp_category_names[meta_data->category_name_index]);

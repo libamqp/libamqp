@@ -623,16 +623,16 @@ decode_type_constructor_into_result(amqp_context_t *context, amqp_buffer_t *buff
 {
     amqp_encoding_meta_data_t *meta_data;
 
-    type->format_code = amqp_buffer_getc(buffer);
+    type->constructor.format_code = amqp_buffer_getc(buffer);
 
-    if ((meta_data = amqp_type_meta_data_lookup(context, type->format_code)) == NULL)
+    if ((meta_data = amqp_type_meta_data_lookup(context, type->constructor.format_code)) == NULL)
     {
-        decode_error(context, type, AMQP_ERROR_UNKNOWN_FORMAT_CODE, "unknown format code = 0x%02x", type->format_code);
+        decode_error(context, type, AMQP_ERROR_UNKNOWN_FORMAT_CODE, "unknown format code = 0x%02x", type->constructor.format_code);
         return 0;
     }
 
-    type->meta_data = meta_data;
-    type->typedef_flags = meta_data->typedef_flags;
+    type->constructor.meta_data = meta_data;
+    type->constructor.typedef_flags = meta_data->typedef_flags;
 
     return 1;
 }
@@ -642,7 +642,7 @@ decode_type_into_result(amqp_context_t *context, amqp_buffer_t *buffer, amqp_typ
 {
     int rc;
 
-    if (!(rc = (*type->meta_data->type_decoder)(context, buffer, type->meta_data, type)))
+    if (!(rc = (*type->constructor.meta_data->type_decoder)(context, buffer, type->constructor.meta_data, type)))
     {
         assert(type->invalid_cause != 0);
         assert(amqp_type_is_invalid(type));
@@ -658,10 +658,10 @@ amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *b
 
     type = amqp_allocate_type(context);
     
-    type->format_code = array_element_type->format_code;
-    type->extension_type_code = array_element_type->extension_type_code;
-    type->meta_data = array_element_type->meta_data;
-    type->typedef_flags = array_element_type->typedef_flags;
+    type->constructor.format_code = array_element_type->constructor.format_code;
+    type->constructor.extension_type_code = array_element_type->constructor.extension_type_code;
+    type->constructor.meta_data = array_element_type->constructor.meta_data;
+    type->constructor.typedef_flags = array_element_type->constructor.typedef_flags;
 
     decode_type_into_result(context, buffer, type);
 

@@ -28,7 +28,7 @@ SUITE(CodecEncode)
         CHECK_NOT_NULL(type);
         CHECK_BUFFERS_MATCH(buffer, test_data::null_0);
 
-        CHECK_EQUAL(0x40, type->format_code);
+        CHECK_EQUAL(0x40, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x00, type->position.size);
         CHECK(amqp_type_is_null(type));
