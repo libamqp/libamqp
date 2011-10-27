@@ -30,9 +30,9 @@ INCLUDES :=
 TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
-# TEST_RUNNER_ARGS := --exclude SlowRunning
+TEST_RUNNER_ARGS := --exclude SlowRunning
 #TEST_RUNNER_ARGS := CompoundTypeDecode
-TEST_RUNNER_ARGS := BasicDecode BooleanDecode IntegerDecode NumericDecode VariableTypeDecoder CompoundTypeDecode BadDataDecoder
+#TEST_RUNNER_ARGS := BasicDecode BooleanDecode IntegerDecode NumericDecode VariableTypeDecoder CompoundTypeDecode BadDataDecoder
 JENKINS_BUILD_OPTIONS :=
 
 SAMPLE_SRC :=

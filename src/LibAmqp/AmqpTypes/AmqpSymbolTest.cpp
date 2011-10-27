@@ -121,15 +121,13 @@ SUITE(AmqpTypesSymbol)
         type = load();
         CHECK(amqp_type_is_array(type));
         amqp_array_initialize_from_type(context, &array, type);
-CHECK(0);
-return;
-//        CHECK_EQUAL(5U, amqp_array_count(&array));
-//        for (int i  = 0; i < 5; i++)
-//        {
-//            CHECK(amqp_type_is_symbol(amqp_array_get_type(&array, i)));
-//        }
+        CHECK_EQUAL(5U, amqp_array_count(&array));
+        for (int i  = 0; i < 5; i++)
+        {
+            CHECK(amqp_type_is_symbol(amqp_array_get_type(&array, i)));
+        }
     }
-/*
+
     TEST_FIXTURE(AmqpSymbolFixture, symbol_equality_type)
     {
         load_array();
@@ -228,11 +226,10 @@ return;
         CHECK_EQUAL(amqp_symbol_hash(&ref), amqp_symbol_hash(symbol_b));
     }
 
-
     TEST_FIXTURE(AmqpSymbolFixture, symbol_equality_with_cstr)
     {
         symbol_b = amqp_symbol_create(context, b, strlen(b));
         CHECK(amqp_symbol_compare_with_cstr(symbol_b, "ABC") == 0);
     }
-*/
+
 }

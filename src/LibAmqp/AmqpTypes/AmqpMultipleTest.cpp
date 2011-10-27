@@ -69,15 +69,12 @@ SUITE(AmqpTypes)
     {
         test_data::multiple_symbol_many_values.transfer_to(buffer);
         type = amqp_decode(context, buffer);
-        CHECK(0);
-        return;
 
-//        CHECK(amqp_type_is_array(type));
-//        multiple = amqp_multiple_symbol_create(context, type);
-//        CHECK_EQUAL(3, multiple->size);
-//        CHECK_EQUAL(11, amqp_multiple_symbol_total_length(multiple));
+        CHECK(amqp_type_is_array(type));
+        multiple = amqp_multiple_symbol_create(context, type);
+        CHECK_EQUAL(3, multiple->size);
+        CHECK_EQUAL(11, amqp_multiple_symbol_total_length(multiple));
     }
-    /*
 
     TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_to_string)
     {
@@ -140,5 +137,4 @@ SUITE(AmqpTypes)
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(&multiple_ref, 1), "Foo") == 0);
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(&multiple_ref, 2), "Fum") == 0);
     }
-    */
 }

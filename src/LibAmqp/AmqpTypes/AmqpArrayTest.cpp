@@ -77,20 +77,18 @@ SUITE(AmqpTypes)
 
     TEST_FIXTURE(AmqpArrayFixture, array_type_access)
     {
-//        static const short data[] = { 10, 11, 11, 13, 14 };
+        static const short data[] = { 10, 11, 11, 13, 14 };
 
         test_data::array_shorts.transfer_to(buffer);
         type = amqp_decode(context, buffer);
-    CHECK(0);
-    return;
-//        CHECK(amqp_type_is_array(type));
-//        array = amqp_array_create_from_type(context, type);
-//
-//        for (int i = 0; i < 5; i++)
-//        {
-//            amqp_type_t *t = amqp_array_get_type(array, i);
-//            amqp_type_is_short(t);
-//            CHECK_EQUAL(data[i], amqp_type_to_short(t));
-//        }
+        CHECK(amqp_type_is_array(type));
+        array = amqp_array_create_from_type(context, type);
+
+        for (int i = 0; i < 5; i++)
+        {
+            amqp_type_t *t = amqp_array_get_type(array, i);
+            amqp_type_is_short(t);
+            CHECK_EQUAL(data[i], amqp_type_to_short(t));
+        }
     }
 }
