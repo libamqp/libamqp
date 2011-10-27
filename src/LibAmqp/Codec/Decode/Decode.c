@@ -22,8 +22,8 @@
 #include "Context/Context.h"
 #include "Codec/Type/TypeValidate.h"
 
-static amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *array_element_type);
-
+static int decode_type_constructor(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_constructor_t *constructor);
+static int decode_type_into_result(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type);
 
 int amqp_decode_null(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
@@ -566,30 +566,49 @@ int amqp_decode_map_32(amqp_context_t *context, amqp_buffer_t *buffer, amqp_enco
     return amqp_decode_map_map(context, buffer, meta_data, type);
 }
 
+static
+amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_constructor_t *constructor)
+{
+    amqp_type_t *type = amqp_allocate_type(context);
+
+    type->constructor.format_code = constructor->format_code;
+    type->constructor.extension_type_code = constructor->extension_type_code;
+    type->constructor.meta_data = constructor->meta_data;
+    type->constructor.typedef_flags = constructor->typedef_flags;
+
+    decode_type_into_result(context, buffer, type);
+
+    return type;
+}
 static int amqp_decode_array(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
+    amqp_type_constructor_t constructor;
     unsigned int i;
     int rc = amqp_construct_container_type(context, buffer, meta_data, type);
+
     if (rc)
     {
-        amqp_type_t *element_type;
         uint32_t count = get_variable_type_count(context, buffer, meta_data, type);
         if (count == -1)
         {
             return 0;
         }
 
-        type->value.array.count = count;
-        type->value.array.elements = amqp_allocate_amqp_type_t_array(context, count);
-
-        element_type = amqp_decode(context, buffer);
-        amqp_typedef_flags_set(element_type, amqp_is_contained);
-
-        type->value.array.elements[0] = element_type;
-
-        for (i = 1; i < count; i++)
+        rc = decode_type_constructor(context, buffer, &constructor);
+        if (rc == 0)
         {
-            amqp_type_t *element = amqp_decode_array_element(context, buffer, element_type);
+            decode_error(context, type, AMQP_ERROR_UNKNOWN_ARRAY_ELEMENT_FORMAT_CODE, "unknown format code = 0x%02x", constructor.format_code);
+            return 0;
+        }
+
+        if ((type->value.array.count = count) > 0)
+        {
+            type->value.array.elements = amqp_allocate_amqp_type_t_array(context, count);
+        }
+
+        for (i = 0; i < count; i++)
+        {
+            amqp_type_t *element = amqp_decode_array_element(context, buffer, &constructor);
             if (element)
             {
                 type->value.array.elements[i] = element;
@@ -632,7 +651,7 @@ decode_type_constructor(amqp_context_t *context, amqp_buffer_t *buffer, amqp_typ
 
     constructor->meta_data = meta_data;
     constructor->typedef_flags = meta_data->typedef_flags;
-
+    constructor->extension_type_code = 0;
     return 1;
 }
 static int
@@ -658,23 +677,6 @@ decode_type_into_result(amqp_context_t *context, amqp_buffer_t *buffer, amqp_typ
     }
 
     return rc;
-}
-
-static
-amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *array_element_type)
-{
-    amqp_type_t *type;
-
-    type = amqp_allocate_type(context);
-    
-    type->constructor.format_code = array_element_type->constructor.format_code;
-    type->constructor.extension_type_code = array_element_type->constructor.extension_type_code;
-    type->constructor.meta_data = array_element_type->constructor.meta_data;
-    type->constructor.typedef_flags = array_element_type->constructor.typedef_flags;
-
-    decode_type_into_result(context, buffer, type);
-
-    return type;
 }
 
 amqp_type_t *amqp_decode(amqp_context_t *context, amqp_buffer_t *buffer)
