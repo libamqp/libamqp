@@ -36,8 +36,6 @@ SUITE(CodecEncode)
         CHECK(amqp_type_is_not_null(type));
         CHECK(amqp_type_is_boolean(type));
         CHECK(amqp_type_to_boolean(type));
-
-        CHECK_EQUAL(1U, type->value.b1._unsigned);
     }
 
     TEST_FIXTURE(EncodeFixture, EncodeFalse)
@@ -53,8 +51,6 @@ SUITE(CodecEncode)
         CHECK(amqp_type_is_not_null(type));
         CHECK(amqp_type_is_boolean(type));
         CHECK(!amqp_type_to_boolean(type));
-
-        CHECK_EQUAL(0U, type->value.b1._unsigned);
     }
 
     TEST_FIXTURE(EncodeFixture, EncodeArrayOfBoolean)

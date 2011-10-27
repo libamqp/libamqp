@@ -94,7 +94,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(0x82, e->format_code);
         CHECK(amqp_type_is_double(e));
         CHECK(amqp_type_is_contained(e));
-        CHECK_CLOSE(123.456, e->value.b8._double, 0.0001);
+        CHECK_CLOSE(123.456, amqp_type_to_double(e), 0.0001);
 
         e  = amqp_type_list_element(type, 2);
         CHECK_EQUAL(0xa1, e->format_code);
@@ -108,7 +108,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(0x61, e->format_code);
         CHECK(amqp_type_is_short(e));
         CHECK(amqp_type_is_contained(e));
-        CHECK_EQUAL(10, e->value.b2._short);
+        CHECK_EQUAL(10, amqp_type_to_short(e));
 
         e  = amqp_type_list_element(type, 4);
         CHECK_EQUAL(0xe0, e->format_code);

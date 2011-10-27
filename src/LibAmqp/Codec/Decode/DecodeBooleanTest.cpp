@@ -78,7 +78,6 @@ SUITE(CodecDecode)
         CHECK_EQUAL((size_t) 0x01, type->position.size);
         CHECK(amqp_type_is_not_null(type));
         CHECK(amqp_type_is_boolean(type));
-
         CHECK(!amqp_type_to_boolean(type));
     }
 
@@ -93,11 +92,9 @@ SUITE(CodecDecode)
         CHECK_EQUAL(2U, type->value.array.count);
         CHECK_EQUAL(2U, type->value.array.count);
 
-        CHECK_EQUAL(0x01, type->value.array.elements[0]->value.b1._unsigned);
         CHECK(amqp_type_is_boolean(type->value.array.elements[0]));
         CHECK(amqp_type_to_boolean(type->value.array.elements[0]));
 
-        CHECK_EQUAL(0x00, type->value.array.elements[1]->value.b1._unsigned);
         CHECK(amqp_type_is_boolean(type->value.array.elements[0]));
         CHECK(!amqp_type_to_boolean(type->value.array.elements[1]));
     }

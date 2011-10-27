@@ -43,7 +43,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_ulong(type));
-        CHECK_EQUAL(1154895135052768677ULL, type->value.b8._ulong);
+        CHECK_EQUAL(1154895135052768677ULL, amqp_type_to_ulong(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeULong)
@@ -53,7 +53,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_ulong(type));
-        CHECK_EQUAL(18446744073709551614ULL, type->value.b8._ulong);
+        CHECK_EQUAL(18446744073709551614ULL, amqp_type_to_ulong(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeUInt)
@@ -63,7 +63,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_uint(type));
-        CHECK_EQUAL(4294967294U, type->value.b4._uint);
+        CHECK_EQUAL(4294967294U, amqp_type_to_uint(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeSmallULong)
@@ -73,7 +73,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_ulong(type));
-        CHECK_EQUAL(254UL, type->value.b8._ulong);
+        CHECK_EQUAL(254UL, amqp_type_to_ulong(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeSmallUInt)
@@ -83,7 +83,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_uint(type));
-        CHECK_EQUAL(254U, type->value.b4._uint);
+        CHECK_EQUAL(254U, amqp_type_to_uint(type));
     }
     
     TEST_FIXTURE(DecodeFixture, DecodeUintZero)
@@ -93,7 +93,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_uint(type));
-        CHECK_EQUAL(0U, type->value.b4._uint);
+        CHECK_EQUAL(0U, amqp_type_to_uint(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeULongZero)
@@ -103,7 +103,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_ulong(type));
-        CHECK_EQUAL(0UL, type->value.b8._ulong);
+        CHECK_EQUAL(0UL, amqp_type_to_ulong(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeUShort)
@@ -113,7 +113,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_ushort(type));
-        CHECK_EQUAL(65534, type->value.b2._ushort);
+        CHECK_EQUAL(65534, amqp_type_to_ushort(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeUByte)
@@ -123,7 +123,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_ubyte(type));
-        CHECK_EQUAL(254, type->value.b1._unsigned);
+        CHECK_EQUAL(254, amqp_type_to_ubyte(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeLong)
@@ -133,7 +133,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_long(type));
-        CHECK_EQUAL(-2, type->value.b8._long);
+        CHECK_EQUAL(-2, amqp_type_to_long(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeInt)
@@ -143,7 +143,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_int(type));
-        CHECK_EQUAL(-2, type->value.b4._int);
+        CHECK_EQUAL(-2, amqp_type_to_int(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeSmallLong)
@@ -153,7 +153,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_long(type));
-        CHECK_EQUAL(-4, type->value.b8._long);
+        CHECK_EQUAL(-4, amqp_type_to_long(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeSmallInt)
@@ -163,7 +163,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_int(type));
-        CHECK_EQUAL(-3, type->value.b4._int);
+        CHECK_EQUAL(-3, amqp_type_to_int(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeShort)
@@ -173,7 +173,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_short(type));
-        CHECK_EQUAL(-2, type->value.b2._short);
+        CHECK_EQUAL(-2, amqp_type_to_short(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeByte)
@@ -183,7 +183,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_byte(type));
-        CHECK_EQUAL(-2, type->value.b1._signed);
+        CHECK_EQUAL(-2, amqp_type_to_byte(type));
     }
 
     TEST_FIXTURE(DecodeFixture, TimeStamp)
@@ -193,7 +193,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_timestamp(type));
-        CHECK_EQUAL(1291654800000LL, type->value.b8._timestamp);
+        CHECK_EQUAL(1291654800000LL, amqp_type_to_timestamp(type));
     }
 
     TEST_FIXTURE(DecodeFixture, TimeStamp2)
@@ -203,7 +203,7 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_timestamp(type));
-        CHECK_EQUAL(-1864105200000LL, type->value.b8._timestamp);
+        CHECK_EQUAL(-1864105200000LL, amqp_type_to_timestamp(type));
     }
 
     TEST_FIXTURE(DecodeFixture, wchar)
@@ -213,6 +213,6 @@ SUITE(IntegerDecode)
 
         ASSERT_VALID(type);
         CHECK(amqp_type_is_char(type));
-        CHECK_EQUAL(0x000020ac, type->value.b4._wchar);
+        CHECK_EQUAL(0x000020ac, amqp_type_to_char(type));
     }
 }

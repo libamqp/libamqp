@@ -90,7 +90,7 @@ void amqp_deallocate_amqp_type_t_array(amqp_context_t *context, amqp_memory_pool
     }
 }
 
-bool amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs)
+int amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs)
 {
     if (lhs->format_code != rhs->format_code)
     {

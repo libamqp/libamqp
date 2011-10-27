@@ -41,7 +41,9 @@ static int amqp_decode_fixed_zero_width(amqp_context_t *context, amqp_buffer_t *
 
 int amqp_decode_boolean_true(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-    return amqp_decode_fixed_zero_width(context, buffer, meta_data, type);
+    amqp_decode_fixed_zero_width(context, buffer, meta_data, type);
+    type->value.b1._signed = 1;
+    return true;
 }
 
 int amqp_decode_boolean_false(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
