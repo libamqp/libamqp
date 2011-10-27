@@ -334,12 +334,7 @@ int amqp_construct_variable_type(amqp_context_t *context, amqp_buffer_t *buffer,
 static
 int amqp_construct_binary_variable_type(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-    if (amqp_construct_variable_type(context, buffer, meta_data, type))
-    {
-        type->flags.is_binary = true;
-        return true;
-    }
-    return false;
+    return amqp_construct_variable_type(context, buffer, meta_data, type);
 }
 
 int amqp_decode_binary_vbin8(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
@@ -368,7 +363,6 @@ int amqp_decode_symbol(amqp_context_t *context, amqp_buffer_t *buffer, amqp_enco
                 return 0;
             }
         }
-        type->flags.is_symbol = true;
     }
     return rc;
 }
@@ -401,7 +395,6 @@ int amqp_decode_string_utf8(amqp_context_t *context, amqp_buffer_t *buffer, amqp
                 return 0;
             }
         }
-        type->flags.is_string = true;
     }
     return rc;
 }

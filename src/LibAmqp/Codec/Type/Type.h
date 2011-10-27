@@ -43,24 +43,6 @@ typedef struct amqp_buffer_position_t
     size_t size;
 } amqp_buffer_position_t;
 
-typedef struct {
-//    unsigned int is_null:1;
-//    unsigned int is_invalid:1;
-//    unsigned int is_encoded:1;
-//    unsigned int is_incomplete:1;
-//    unsigned int is_contained:1;
-//    unsigned int is_variable:1;
-    unsigned int is_binary:1;
-    unsigned int is_symbol:1;
-    unsigned int is_string:1;
-//    unsigned int is_descriptor:1;
-//    unsigned int has_descriptor:1;
-//    union {
-//        unsigned int is_compound;
-//        amqp_type_type_flags_t type;
-//    } container;
-} amqp_type_flags_t;
-
 struct amqp_type_t
 {
     int format_code;
@@ -69,10 +51,7 @@ struct amqp_type_t
 
     amqp_buffer_position_t position;
 
-//    amqp_typedef_flags_t typedef_flags;
     uint32_t typedef_flags;
-
-    amqp_type_flags_t flags;
 
     union {
         amqp_eight_byte_t b8;

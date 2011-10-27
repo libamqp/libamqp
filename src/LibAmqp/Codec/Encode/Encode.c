@@ -465,28 +465,24 @@ amqp_type_t *amqp_encode_binary(amqp_context_t *context, amqp_buffer_t *buffer, 
 amqp_type_t *amqp_encode_binary_vbin8(amqp_context_t *context, amqp_buffer_t *buffer, const unsigned char *value, size_t size)
 {
     amqp_type_t *result = amqp_encode_simple_variable(context, buffer, &amqp_type_meta_data_binary_vbin8, value, size);
-    result->flags.is_binary = true;
     return result;
 }
 
 amqp_type_t *amqp_encode_binary_vbin32(amqp_context_t *context, amqp_buffer_t *buffer, const unsigned char *value, size_t size)
 {
     amqp_type_t *result = amqp_encode_simple_variable(context, buffer, &amqp_type_meta_data_binary_vbin32, value, size);
-    result->flags.is_binary = true;
     return result;
 }
 
 amqp_type_t *amqp_encode_symbol_sym8n(amqp_context_t *context, amqp_buffer_t *buffer, const char *value, size_t size)
 {
     amqp_type_t *result = amqp_encode_simple_variable(context, buffer, &amqp_type_meta_data_symbol_sym8, (const unsigned char *) value, size);
-    result->flags.is_symbol = true;
     return result;
 }
 
 amqp_type_t *amqp_encode_symbol_sym32n(amqp_context_t *context, amqp_buffer_t *buffer, const char *value, size_t size)
 {
     amqp_type_t *result = amqp_encode_simple_variable(context, buffer, &amqp_type_meta_data_symbol_sym32, (const unsigned char *) value, size);
-    result->flags.is_symbol = true;
     return result;
 }
 
@@ -515,7 +511,6 @@ amqp_type_t *encode_string_utf8(amqp_context_t *context, amqp_buffer_t *buffer, 
 {
     // TODO - validate
     amqp_type_t *result = amqp_encode_simple_variable(context, buffer, size < 256 ? &amqp_type_meta_data_string_str8_utf8 : &amqp_type_meta_data_string_str32_utf8, (const unsigned char *) value, size);
-    result->flags.is_string = true;
     return result;
 }
 
