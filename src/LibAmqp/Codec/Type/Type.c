@@ -22,10 +22,12 @@
 #include "Context/Context.h"
 #include "Memory/Pool.h"
 
+#include "debug_helper.h"
+
 void amqp_mark_type_invalid(amqp_type_t *type, int cause)
 {
     assert(type != 0);
-    type->flags.is_invalid = 1;
+    amqp_typedef_flags_set(type, amqp_is_invalid);
     type->invalid_cause = cause;
 }
 
@@ -44,7 +46,7 @@ void amqp_cleanup_amqp_type_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_
     assert(pool != 0);
     assert(type != 0);
 
-    if (type->flags.container.is_compound)
+    if (amqp_type_is_container(type))
     {
         amqp_deallocate_amqp_type_t_array(c, pool, type->value.compound.elements, type->value.compound.count);
     }

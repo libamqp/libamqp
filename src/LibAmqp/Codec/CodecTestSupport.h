@@ -65,7 +65,7 @@ namespace t
 
 #define ASSERT_INVALID(type)  \
     CHECK_NOT_NULL(type); \
-    CHECK(!amqp_type_is_valid(type))
+    CHECK(amqp_type_is_invalid(type))
 
 #define CHECK_BUFFERS_MATCH(buffer, byte_array) \
      CHECK(t::compare_buffers(byte_array.bytes(), byte_array.size(), buffer))

@@ -142,7 +142,6 @@ SUITE(Connection)
         CHECK_EQUAL("Stopped", connection->state.connection.name);
     }
 
-
 //    TEST_FIXTURE(ConnectionFixture, connection_should_establish_amqp_tunnel)
 //    {
 //        connection->protocols = AMQP_PROTOCOL_AMQP;
@@ -165,6 +164,4 @@ SUITE(Connection)
 //        amqp_connection_shutdown(context, connection);
 //        loop_while_running();
 //    }
-
-
 }

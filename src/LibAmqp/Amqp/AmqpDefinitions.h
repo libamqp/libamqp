@@ -18,6 +18,9 @@
 #define LIBAMQP_AMQP_DEFINITIONS_H
 
 #include <stdint.h>
+#include <AmqpTypes/AmqpSymbol.h>
+#include <AmqpTypes/AmqpString.h>
+#include <AmqpTypes/AmqpMap.h>
 
 enum {
     amqp_sasl_code_ok,
@@ -49,6 +52,7 @@ typedef enum amqp_receiver_settle_mode_t
 } amqp_receiver_settle_mode_t;
 
 typedef uint32_t amqp_milliseconds_t;
+typedef uint32_t amqp_seconds_t;
 typedef amqp_binary_t amqp_delivery_tag_t;
 typedef uint32_t amqp_sequence_no_t;    // RFC-1982 sequence number
 typedef amqp_sequence_no_t amqp_delivery_number_t;
@@ -66,9 +70,12 @@ typedef struct amqp_error_t         // descriptor 0000:001d
     amqp_fields_t info;
 } amqp_error_t;
 
-// TODO - deal with messages.xml types
-typedef int amqp_state_t;
-typedef int amqp_source_t;
-typedef int amqp_target_t;
+typedef struct amqp_wildcard_t
+{
+    int filler;
+} amqp_wildcard_t;
 
+typedef int  amqp_terminus_durability_t;
+typedef int  amqp_terminus_expiry_policy_t;
+typedef int  amqp_filter_set_t;
 #endif

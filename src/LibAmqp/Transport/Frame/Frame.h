@@ -27,6 +27,9 @@ extern "C" {
 
 #include "Amqp/AmqpSecurity.h"
 #include "Amqp/AmqpTransport.h"
+#include "Amqp/AmqpMessaging.h"
+#include "Amqp/AmqpTransactions.h"
+
 #include "AmqpTypes/AmqpDescriptor.h"
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
@@ -64,22 +67,22 @@ struct amqp_frame_t
 
     union {
         union {
-            amqp_frame_sasl_mechanisms_t mechanisms;
-            amqp_frame_sasl_init_t init;
-            amqp_frame_sasl_challenge_t challenge;
-            amqp_frame_sasl_response_t response;
-            amqp_frame_sasl_outcome_t outcome;
+            amqp_security_sasl_mechanisms_t mechanisms;
+            amqp_security_sasl_init_t init;
+            amqp_security_sasl_challenge_t challenge;
+            amqp_security_sasl_response_t response;
+            amqp_security_sasl_outcome_t outcome;
         } sasl;
         union {
-            amqp_frame_open_t open;
-            amqp_frame_begin_t begin;
-            amqp_frame_attach_t attach;
-            amqp_frame_flow_t flow;
-            amqp_frame_transfer_t transfer;
-            amqp_frame_disposition_t disposition;
-            amqp_frame_detach_t detach;
-            amqp_frame_end_t end;
-            amqp_frame_close_t close;
+            amqp_transport_open_t open;
+            amqp_transport_begin_t begin;
+            amqp_transport_attach_t attach;
+            amqp_transport_flow_t flow;
+            amqp_transport_transfer_t transfer;
+            amqp_transport_disposition_t disposition;
+            amqp_transport_detach_t detach;
+            amqp_transport_end_t end;
+            amqp_transport_close_t close;
         } amqp;
     } frames;
 

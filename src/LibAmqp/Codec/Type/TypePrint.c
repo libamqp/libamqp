@@ -181,7 +181,7 @@ static int amqp_nested_type_print(amqp_context_t *context, amqp_type_t *type, am
     amqp_type_print_method_t *method = type->meta_data->methods->print;
     assert(method != NULL);
 
-    if (type->flags.is_invalid)
+    if (amqp_type_is_invalid(type))
     {
         print_invalid_type(context, type, buffer);
     }

@@ -69,6 +69,7 @@ SUITE(AmqpTypes)
     {
         test_data::multiple_symbol_many_values.transfer_to(buffer);
         type = amqp_decode(context, buffer);
+
         CHECK(amqp_type_is_array(type));
         multiple = amqp_multiple_symbol_create(context, type);
         CHECK_EQUAL(3, multiple->size);

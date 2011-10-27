@@ -74,7 +74,7 @@ static void amqp_sasl_mechanisms_feld_encoder(amqp_context_t *context, amqp_buff
 
 void amqp_encode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer)
 {
-    amqp_encode_frame(context, buffer, AMQP_FRAME_ID_SASL_MECHANISMS_LIST, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_mechanisms_feld_encoder, DEFAULT_FIELDS_ENCODER_ARG);
+    amqp_encode_frame(context, buffer, amqp_sasl_mechanisms_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_mechanisms_feld_encoder, DEFAULT_FIELDS_ENCODER_ARG);
 }
 
 static void amqp_sasl_init_feld_encoder(amqp_context_t *context, amqp_buffer_t *buffer, void *arg)
@@ -95,5 +95,5 @@ static void amqp_sasl_init_feld_encoder(amqp_context_t *context, amqp_buffer_t *
 
 void amqp_encode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin)
 {
-    amqp_encode_frame(context, buffer, AMQP_FRAME_ID_SASL_INIT_LIST, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_init_feld_encoder, sasl_plugin);
+    amqp_encode_frame(context, buffer, amqp_sasl_init_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_init_feld_encoder, sasl_plugin);
 }

@@ -75,16 +75,17 @@ namespace t
     {
         int not_first = false;
         amqp_context_printf(context, "flags");
-        not_first = dump_flag(context, type->flags.is_null, "is_null", not_first);
-        not_first = dump_flag(context, type->flags.is_invalid, "is_invalid", not_first);
-        not_first = dump_flag(context, type->flags.is_encoded, "is_encoded", not_first);
-        not_first = dump_flag(context, type->flags.is_incomplete, "is_incomplete", not_first);
-        not_first = dump_flag(context, type->flags.is_contained, "is_contained", not_first);
-        not_first = dump_flag(context, type->flags.is_descriptor, "is_descriptor", not_first);
-        not_first = dump_flag(context, type->flags.has_descriptor, "has_descriptor", not_first);
-        not_first = dump_flag(context, type->flags.container.type.is_array, "is_array", not_first);
-        not_first = dump_flag(context, type->flags.container.type.is_list, "is_list", not_first);
-        dump_flag(context, type->flags.container.type.is_map, "is_map", not_first);
+        not_first = dump_flag(context, amqp_type_is_null(type), "is_null", not_first);
+        not_first = dump_flag(context, amqp_type_is_invalid(type), "is_invalid", not_first);
+        not_first = dump_flag(context, amqp_type_is_encoded(type), "is_encoded", not_first);
+        not_first = dump_flag(context, amqp_type_is_incomplete(type), "is_incomplete", not_first);
+        not_first = dump_flag(context, amqp_type_is_contained(type), "is_contained", not_first);
+        not_first = dump_flag(context, amqp_type_is_descriptor(type), "is_descriptor", not_first);
+        not_first = dump_flag(context, amqp_type_is_described(type), "is_described", not_first);
+        not_first = dump_flag(context, amqp_type_is_composite(type), "is_composite", not_first);
+        not_first = dump_flag(context, amqp_type_is_array(type), "is_array", not_first);
+        not_first = dump_flag(context, amqp_type_is_list(type), "is_list", not_first);
+        dump_flag(context, amqp_type_is_map(type), "is_map", not_first);
         amqp_context_putc(context, '\n');
     }
 

@@ -81,7 +81,6 @@ SUITE(AmqpTypes)
 
         test_data::array_shorts.transfer_to(buffer);
         type = amqp_decode(context, buffer);
-
         CHECK(amqp_type_is_array(type));
         array = amqp_array_create_from_type(context, type);
 

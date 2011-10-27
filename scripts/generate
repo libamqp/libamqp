@@ -27,4 +27,6 @@ function generate_file
 }
 
 generate_file transport.bare.xml AmqpTransport.h
+generate_file messaging.bare.xml AmqpMessaging.h
 generate_file security.bare.xml AmqpSecurity.h
+generate_file transactions.bare.xml AmqpTransactions.h

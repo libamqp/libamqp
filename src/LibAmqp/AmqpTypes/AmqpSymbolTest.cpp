@@ -121,7 +121,6 @@ SUITE(AmqpTypesSymbol)
         type = load();
         CHECK(amqp_type_is_array(type));
         amqp_array_initialize_from_type(context, &array, type);
-
         CHECK_EQUAL(5U, amqp_array_count(&array));
         for (int i  = 0; i < 5; i++)
         {
@@ -226,7 +225,6 @@ SUITE(AmqpTypesSymbol)
         symbol_b = amqp_symbol_create(context, b, strlen(b));
         CHECK_EQUAL(amqp_symbol_hash(&ref), amqp_symbol_hash(symbol_b));
     }
-
 
     TEST_FIXTURE(AmqpSymbolFixture, symbol_equality_with_cstr)
     {
