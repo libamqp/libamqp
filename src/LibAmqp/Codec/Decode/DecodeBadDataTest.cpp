@@ -225,7 +225,7 @@ SUITE(BadDataDecoder)
         type = amqp_decode_supress_messages(context, decode_buffer);
 
         ASSERT_INVALID(type);
-        CHECK_EQUAL(1U, type->flags.is_invalid);
+        CHECK(amqp_type_is_invalid(type));
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 }

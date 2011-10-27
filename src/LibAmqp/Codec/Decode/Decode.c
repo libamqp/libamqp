@@ -29,7 +29,6 @@ int amqp_decode_null(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encodi
 {
     type->position.index = amqp_buffer_index(buffer);
     type->position.size = 0;
-    type->flags.is_null = 1;
     return true;
 }
 
@@ -59,7 +58,6 @@ static void _decode_error(amqp_context_t *context, amqp_type_t *type, int level,
 
     amqp_mark_type_invalid(type, error_code);
 
-    assert(!amqp_type_is_valid(type));
     assert(amqp_type_is_invalid(type));
 
     if (level < context->debug.level)
@@ -73,9 +71,6 @@ static void _decode_error(amqp_context_t *context, amqp_type_t *type, int level,
         // TODO - pass source
         _amqp_error(context, level, filename, line_number, 0, error_mnemonic, error_code, "Decode failure; %s; while decoding %s", message, description);
     }
-
-//    if (context->debug.level) abort();
-
 }
 
 static inline
@@ -505,8 +500,7 @@ int amqp_decode_list_list(amqp_context_t *context, amqp_buffer_t *buffer, amqp_e
             if (element)
             {
                 type->value.list.elements[i] = element;
-                element->flags.is_contained = true;
-                element->typedef_flags |= amqp_is_contained;
+                amqp_typedef_flags_set(element, amqp_is_contained);
             }
         }
     }
@@ -557,9 +551,11 @@ static int amqp_decode_map_map(amqp_context_t *context, amqp_buffer_t *buffer, a
         for (i = 0; i < type->value.map.count; i++)
         {
             amqp_type_t *entry = amqp_decode(context, buffer);
-            entry->typedef_flags |= amqp_is_contained;
-
-            type->value.map.entries[i] = entry;
+            if (entry)
+            {
+                type->value.map.entries[i] = entry;
+                amqp_typedef_flags_set(entry, amqp_is_contained);
+            }
         }
     }
     return rc;
@@ -592,16 +588,18 @@ static int amqp_decode_array(amqp_context_t *context, amqp_buffer_t *buffer, amq
         type->value.array.elements = amqp_allocate_amqp_type_t_array(context, count);
 
         element_type = amqp_decode(context, buffer);
-        element_type->typedef_flags |= amqp_is_contained;
+        amqp_typedef_flags_set(element_type, amqp_is_contained);
 
         type->value.array.elements[0] = element_type;
 
         for (i = 1; i < count; i++)
         {
             amqp_type_t *element = amqp_decode_array_element(context, buffer, element_type);
-            element_type->typedef_flags |= amqp_is_contained;
-
-            type->value.array.elements[i] = element;
+            if (element)
+            {
+                type->value.array.elements[i] = element;
+                amqp_typedef_flags_set(element, amqp_is_contained);
+            }
         }
 
         // TODO - check that the elements do not go past the array boundry
@@ -651,7 +649,6 @@ decode_type_into_result(amqp_context_t *context, amqp_buffer_t *buffer, amqp_typ
 
     if (!(rc = (*type->meta_data->type_decoder)(context, buffer, type->meta_data, type)))
     {
-        assert(type->flags.is_invalid);
         assert(type->invalid_cause != 0);
         assert(amqp_type_is_invalid(type));
     }

@@ -44,28 +44,17 @@ typedef struct amqp_buffer_position_t
 } amqp_buffer_position_t;
 
 typedef struct {
-//    unsigned int is_array:1;
-//    unsigned int is_list:1;
-//    unsigned int is_map:1;
-    /**
-        A compound type with two elements; one defining the type's descriptor
-        and the second defining the type's structure.
-     */
-    unsigned int is_described:1;
-} amqp_type_type_flags_t;
-
-typedef struct {
-    unsigned int is_null:1;
-    unsigned int is_invalid:1;
-    unsigned int is_encoded:1;
+//    unsigned int is_null:1;
+//    unsigned int is_invalid:1;
+//    unsigned int is_encoded:1;
 //    unsigned int is_incomplete:1;
-    unsigned int is_contained:1;
+//    unsigned int is_contained:1;
 //    unsigned int is_variable:1;
     unsigned int is_binary:1;
     unsigned int is_symbol:1;
     unsigned int is_string:1;
-    unsigned int is_descriptor:1;
-    unsigned int has_descriptor:1;
+//    unsigned int is_descriptor:1;
+//    unsigned int has_descriptor:1;
 //    union {
 //        unsigned int is_compound;
 //        amqp_type_type_flags_t type;
@@ -345,71 +334,29 @@ int amqp_type_is_incomplete(amqp_type_t *type)
     return type->typedef_flags & amqp_is_incomplete;
 }
 
-//static inline
-//bool amqp_type_is_container(amqp_type_t *type)
-//{
-//    return type->flags.container.is_compound != 0;
-//}
-
-//static inline
-//bool amqp_type_is_array(amqp_type_t *type)
-//{
-//    return type->flags.container.type.is_array != 0;
-//}
-//
-//static inline
-//bool amqp_type_is_list(amqp_type_t *type)
-//{
-//    return type->flags.container.type.is_list != 0;
-//}
-
 static inline
-bool amqp_type_is_empty_list(amqp_type_t *type)
+int amqp_type_is_empty_list(amqp_type_t *type)
 {
     return amqp_type_is_list(type) != 0 && type->value.list.count == 0;
 }
 
 static inline
-bool amqp_type_is_valid(amqp_type_t *type)
+int amqp_type_is_valid(amqp_type_t *type)
 {
-    return (type->typedef_flags & amqp_is_invalid) == 0;
+    return (type->typedef_flags & (amqp_is_invalid | amqp_is_incomplete)) == 0;
 }
 
 static inline
-bool amqp_type_is_invalid(amqp_type_t *type)
+int amqp_type_is_invalid(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_invalid;
+    return type->typedef_flags & (amqp_is_invalid | amqp_is_incomplete);
 }
 
 static inline
-bool amqp_type_is_contained(amqp_type_t *type)
+int amqp_type_is_contained(amqp_type_t *type)
 {
     return type->typedef_flags & amqp_is_contained;
 }
-
-//static inline
-//bool amqp_type_is_variable(amqp_type_t *type)
-//{
-//    return type->flags.is_variable != 0;
-//}
-//
-//static inline
-//bool amqp_type_is_composite(amqp_type_t *type)
-//{
-//    return type->flags.container.type.is_described != 0;
-//}
-//
-//static inline
-//bool amqp_type_is_described(amqp_type_t *type)
-//{
-//    return type->flags.has_descriptor != 0;
-//}
-//
-//static inline
-//bool amqp_type_is_descriptor(amqp_type_t *type)
-//{
-//    return type->flags.is_descriptor != 0;
-//}
 
 static inline
 amqp_type_t *amqp_type_list_element(amqp_type_t *type, size_t index)
@@ -424,7 +371,6 @@ amqp_type_t *amqp_type_map_element(amqp_type_t *type, size_t index)
     assert(amqp_type_is_map(type) && type->value.map.count > index);
     return type->value.map.entries[index];
 }
-
 
 /////
 // CONVERSION FUNCTION
@@ -511,7 +457,6 @@ amqp_type_t *amqp_type_array_type(amqp_type_t *type)
     // TODO - deal with zero length arrays
     return type->value.array.elements[0];
 }
-
 
 #ifdef __cplusplus
 }

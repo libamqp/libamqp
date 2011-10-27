@@ -47,7 +47,7 @@ static inline void amqp_add_element_to_container(amqp_context_t *context, amqp_b
         size_t count = context->encode.container->value.compound.count++;
 
         // container is now responsible for deallocating this type
-        type->flags.is_contained = true;
+        amqp_typedef_flags_set(type, amqp_is_contained);
 
         if (amqp_type_is_array(context->encode.container) && count > 0)
         {
@@ -66,13 +66,11 @@ static inline void amqp_add_element_to_container(amqp_context_t *context, amqp_b
             switch (count)
             {
             case 0:
-                type->typedef_flags |= amqp_is_descriptor;
-                type->flags.is_descriptor = true;
+                amqp_typedef_flags_set(type, amqp_is_descriptor);
                 break;
 
             case 1:
-                type->typedef_flags |= amqp_is_described;
-                type->flags.has_descriptor = true;
+                amqp_typedef_flags_set(type, amqp_is_described);
                 break;
             }
         }
@@ -89,7 +87,7 @@ static inline bool is_i_contained_within_array(amqp_context_t *context)
 
 static void push_container(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type)
 {
-    type->typedef_flags |= amqp_is_incomplete;
+    amqp_typedef_flags_set(type, amqp_is_incomplete);
     type->value.compound.saved_container = context->encode.container;
     context->encode.container = type;
 }
@@ -98,7 +96,7 @@ static amqp_type_t *pop_container(amqp_context_t *context)
 {
     amqp_type_t *result = context->encode.container;
 
-    result->typedef_flags &= ~amqp_is_incomplete;
+    amqp_typedef_flags_clear(result, amqp_is_incomplete);
     context->encode.container = result->value.compound.saved_container;
     result->value.compound.saved_container = 0;
     return result;
@@ -224,11 +222,6 @@ static amqp_type_t *encode_compound_type(amqp_context_t *context, amqp_buffer_t 
 amqp_type_t *amqp_encode_null(amqp_context_t *context, amqp_buffer_t *buffer)
 {
     amqp_type_t *type = amqp_encode_fixed(context, buffer, &amqp_type_meta_data_null);
-
-    if (type)
-    {
-        type->flags.is_null = 1;
-    }
 
     return type;
 }

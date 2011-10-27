@@ -63,8 +63,8 @@ SUITE(CompoundEncoding)
 
         CHECK_EQUAL(0x61, type->value.array.elements[0]->format_code);
 
-        CHECK_EQUAL(1U, type->flags.is_encoded);
-        CHECK_EQUAL(1U, type->value.array.elements[0]->flags.is_encoded);
+        CHECK(amqp_type_is_encoded(type));
+        CHECK(amqp_type_is_encoded(type->value.array.elements[0]));
 
         CHECK_BUFFERS_MATCH(buffer, test_data::single_element_array);
     }

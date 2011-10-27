@@ -31,7 +31,8 @@ TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
 #TEST_RUNNER_ARGS := --exclude SlowRunning
-TEST_RUNNER_ARGS := BasicDecode BooleanDecode IntegerDecode NumericDecode VariableTypeDecoder CompoundTypeDecode BadDataDecoder CodecEncode
+TEST_RUNNER_ARGS := BasicDecode BooleanDecode IntegerDecode NumericDecode VariableTypeDecoder CompoundTypeDecode BadDataDecoder \
+        CodecEncode CompoundEncoding VariableTypesEncoding
 JENKINS_BUILD_OPTIONS :=
 
 SAMPLE_SRC :=
