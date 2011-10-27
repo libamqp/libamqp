@@ -59,6 +59,9 @@ static void _decode_error(amqp_context_t *context, amqp_type_t *type, int level,
 
     amqp_mark_type_invalid(type, error_code);
 
+    assert(!amqp_type_is_valid(type));
+    assert(amqp_type_is_invalid(type));
+
     if (level < context->debug.level)
     {
         amqp_describe_type(description, sizeof(description), type);
@@ -449,7 +452,7 @@ int amqp_decode_described_type(amqp_context_t *context, amqp_buffer_t *buffer, a
     if (descriptor)
     {
         type->value.described.elements[0] = descriptor;
-        type->typedef_flags |= (amqp_is_contained | amqp_is_descriptor);
+        descriptor->typedef_flags |= (amqp_is_contained | amqp_is_descriptor);
 
         descriptor->flags.is_contained = true;
         descriptor->flags.is_descriptor = true;
@@ -464,7 +467,7 @@ int amqp_decode_described_type(amqp_context_t *context, amqp_buffer_t *buffer, a
     if (described)
     {
         type->value.described.elements[1] = described;
-        type->typedef_flags |= (amqp_is_contained | amqp_is_described);
+        described->typedef_flags |= (amqp_is_contained | amqp_is_described);
 
         described->flags.is_contained = true;
         described->flags.has_descriptor = true;
@@ -513,6 +516,7 @@ int amqp_decode_list_list(amqp_context_t *context, amqp_buffer_t *buffer, amqp_e
             {
                 type->value.list.elements[i] = element;
                 element->flags.is_contained = true;
+                element->typedef_flags |= amqp_is_contained;
             }
         }
     }
@@ -566,6 +570,8 @@ static int amqp_decode_map_map(amqp_context_t *context, amqp_buffer_t *buffer, a
         {
             amqp_type_t *entry = amqp_decode(context, buffer);
             entry->flags.is_contained = true;
+            entry->typedef_flags |= amqp_is_contained;
+
             type->value.map.entries[i] = entry;
         }
     }
@@ -663,6 +669,7 @@ decode_type_into_result(amqp_context_t *context, amqp_buffer_t *buffer, amqp_typ
     {
         assert(type->flags.is_invalid);
         assert(type->invalid_cause != 0);
+        assert(amqp_type_is_invalid(type));
     }
 
     return rc;

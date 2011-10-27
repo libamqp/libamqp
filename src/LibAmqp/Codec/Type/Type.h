@@ -128,14 +128,6 @@ extern int amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs);
 extern void amqp_mark_type_invalid(amqp_type_t *type, int cause);
 extern void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type);
 
-
-
-static inline
-int amqp_type_is_invalid(amqp_type_t *type)
-{
-    return type->typedef_flags == 0;
-}
-
 static inline
 int amqp_type_is_null(amqp_type_t *type)
 {
@@ -367,7 +359,13 @@ bool amqp_type_is_empty_list(amqp_type_t *type)
 static inline
 bool amqp_type_is_valid(amqp_type_t *type)
 {
-    return type->typedef_flags && !amqp_type_is_incomplete(type);
+    return (type->typedef_flags & amqp_is_invalid) == 0;
+}
+
+static inline
+bool amqp_type_is_invalid(amqp_type_t *type)
+{
+    return type->typedef_flags & amqp_is_invalid;
 }
 
 static inline

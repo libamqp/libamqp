@@ -51,7 +51,6 @@ struct amqp_type_methods_t
 };
 
 typedef enum {
-    amqp_is_invalid = 0x00000000,
     amqp_is_null = 0x00000001,
     amqp_is_boolean = 0x00000002,
     amqp_is_unsigned = 0x00000004,
@@ -84,10 +83,11 @@ typedef enum {
     amqp_is_descriptor = 0x00400000,
     amqp_is_described = 0x00800000,
     amqp_is_extension = 0x01000000,
+    amqp_is_invalid = 0x02000000,
 
-    amqp_is_encoded = 0x02000000,
-    amqp_is_incomplete = 0x04000000,
-    amqp_is_contained = 0x08000000,
+    amqp_is_encoded = 0x10000000,
+    amqp_is_incomplete = 0x20000000,
+    amqp_is_contained = 0x40000000,
 } amqp_typedef_flags_t;
 
 struct amqp_encoding_meta_data_t

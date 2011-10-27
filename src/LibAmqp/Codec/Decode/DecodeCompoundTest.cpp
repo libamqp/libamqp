@@ -21,6 +21,8 @@
 #include "Codec/Decode/Decode.h"
 #include "Codec/Type/Type.h"
 
+#include "debug_helper.h"
+
 SUITE(CompoundTypeDecode)
 {
     class DecodeFixture : public SuiteCodec::CodecFixture
@@ -55,11 +57,13 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(0x61, type->value.array.elements[0]->format_code);
 
         CHECK_EQUAL((size_t) 5, type->value.array.count);
-        ASSERT_VALID(type->value.array.elements[0]);
-        ASSERT_VALID(type->value.array.elements[1]);
-        ASSERT_VALID(type->value.array.elements[2]);
-        ASSERT_VALID(type->value.array.elements[3]);
-        ASSERT_VALID(type->value.array.elements[4]);
+        for (int i = 0; i < 5; i++)
+        {
+            amqp_type_t *e = type->value.array.elements[i];
+            ASSERT_VALID(e);
+            CHECK(amqp_type_is_short(e));
+            CHECK(amqp_type_is_contained(e));
+        }
 
         CHECK_EQUAL((size_t) 0x04, type->value.array.elements[0]->position.index);
         CHECK_EQUAL((size_t) 0x02, type->value.array.elements[0]->position.size);
@@ -80,32 +84,42 @@ SUITE(CompoundTypeDecode)
 
         e  = amqp_type_list_element(type, 0);
         CHECK_EQUAL(0xa3, e->format_code);
+        CHECK(amqp_type_is_symbol(e));
+        CHECK(amqp_type_is_contained(e));
         result = amqp_convert_bytes_to_cstr(context, e);
         CHECK_EQUAL("Foo", result);
         AMQP_FREE(context, result);
 
         e  = amqp_type_list_element(type, 1);
         CHECK_EQUAL(0x82, e->format_code);
+        CHECK(amqp_type_is_double(e));
+        CHECK(amqp_type_is_contained(e));
         CHECK_CLOSE(123.456, e->value.b8._double, 0.0001);
 
         e  = amqp_type_list_element(type, 2);
         CHECK_EQUAL(0xa1, e->format_code);
+        CHECK(amqp_type_is_string(e));
+        CHECK(amqp_type_is_contained(e));
         result = amqp_convert_bytes_to_cstr(context, e);
         CHECK_EQUAL("Hello", result);
         AMQP_FREE(context, result);
 
         e  = amqp_type_list_element(type, 3);
         CHECK_EQUAL(0x61, e->format_code);
+        CHECK(amqp_type_is_short(e));
+        CHECK(amqp_type_is_contained(e));
         CHECK_EQUAL(10, e->value.b2._short);
 
         e  = amqp_type_list_element(type, 4);
         CHECK_EQUAL(0xe0, e->format_code);
         CHECK_ARRAY(e);
+        CHECK(amqp_type_is_contained(e));
         CHECK_EQUAL((size_t) 2, e->value.compound.count);
 
         e  = amqp_type_list_element(type, 5);
         CHECK_EQUAL(0xe0, e->format_code);
         CHECK_ARRAY(e);
+        CHECK(amqp_type_is_contained(e));
         CHECK_EQUAL((size_t) 1, e->value.compound.count);
     }
 
@@ -194,22 +208,22 @@ SUITE(CompoundTypeDecode)
         amqp_type_t *descriptor = type->value.described.elements[0];
         amqp_type_t *list = type->value.described.elements[1];
 
-        CHECK(!amqp_type_is_composite(type));
-        CHECK(amqp_type_is_descriptor(type));
-        CHECK(!amqp_type_is_described(type));
+        CHECK(!amqp_type_is_composite(descriptor));
+        CHECK(amqp_type_is_descriptor(descriptor));
+        CHECK(!amqp_type_is_described(descriptor));
 
-        CHECK(!amqp_type_is_composite(type));
-        CHECK(!amqp_type_is_descriptor(type));
-        CHECK(amqp_type_is_described(type));
+        CHECK(!amqp_type_is_composite(list));
+        CHECK(!amqp_type_is_descriptor(list));
+        CHECK(amqp_type_is_described(list));
 
         CHECK_LIST(list);
 
         CHECK(amqp_type_is_composite(list->value.list.elements[1]));
         CHECK(!amqp_type_is_descriptor(list->value.list.elements[1]));
-        CHECK(!amqp_type_is_composite(list->value.list.elements[1]));
+        CHECK(!amqp_type_is_described(list->value.list.elements[1]));
 
         CHECK(amqp_type_is_descriptor(list->value.list.elements[1]->value.described.elements[0]));
-        CHECK(amqp_type_is_composite(list->value.list.elements[1]->value.described.elements[1]));
+        CHECK(amqp_type_is_described(list->value.list.elements[1]->value.described.elements[1]));
 
         CHECK(amqp_type_is_contained(list->value.list.elements[1]->value.described.elements[0]));
         CHECK(amqp_type_is_contained(list->value.list.elements[1]->value.described.elements[1]));
@@ -238,7 +252,9 @@ SUITE(CompoundTypeDecode)
     {
         context->debug.level = 0;
         load_decode_buffer(test_data::invalid_descriptor);
+        break_one();
         type = amqp_decode(context, decode_buffer);
+        break_one();
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_DESCRIPTOR_INVALID, type->invalid_cause);
     }

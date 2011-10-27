@@ -22,10 +22,14 @@
 #include "Context/Context.h"
 #include "Memory/Pool.h"
 
+#include "debug_helper.h"
+
 void amqp_mark_type_invalid(amqp_type_t *type, int cause)
 {
     assert(type != 0);
+    break_two();
     type->flags.is_invalid = 1;
+    type->typedef_flags |= amqp_is_invalid;
     type->invalid_cause = cause;
 }
 
