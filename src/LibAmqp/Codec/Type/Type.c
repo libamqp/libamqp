@@ -48,7 +48,7 @@ void amqp_cleanup_amqp_type_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_
     assert(pool != 0);
     assert(type != 0);
 
-    if (type->flags.container.is_compound)
+    if (amqp_type_is_container(type))
     {
         amqp_deallocate_amqp_type_t_array(c, pool, type->value.compound.elements, type->value.compound.count);
     }

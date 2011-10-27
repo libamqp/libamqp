@@ -252,9 +252,7 @@ SUITE(CompoundTypeDecode)
     {
         context->debug.level = 0;
         load_decode_buffer(test_data::invalid_descriptor);
-        break_one();
         type = amqp_decode(context, decode_buffer);
-        break_one();
         ASSERT_INVALID(type);
         CHECK_EQUAL(AMQP_ERROR_DESCRIPTOR_INVALID, type->invalid_cause);
     }

@@ -247,16 +247,19 @@ static amqp_type_t *amqp_encode_fixed_one_byte(amqp_context_t *context, amqp_buf
 
 amqp_type_t *amqp_encode_boolean(amqp_context_t *context, amqp_buffer_t *buffer, int value)
 {
+    amqp_type_t *result;
     if (is_i_contained_within_array(context))
     {
         unsigned char boolean_value = value != 0 ? 1 : 0;     // True == 1, false == 0
-        return amqp_encode_fixed_one_byte(context, buffer, &amqp_type_meta_data_boolean, boolean_value);
+        result = amqp_encode_fixed_one_byte(context, buffer, &amqp_type_meta_data_boolean, boolean_value);
     }
     else
     {
         amqp_encoding_meta_data_t *meta_data = value ? &amqp_type_meta_data_boolean_true : &amqp_type_meta_data_boolean_false;
-        return amqp_encode_fixed(context, buffer, meta_data);
+        result = amqp_encode_fixed(context, buffer, meta_data);
     }
+    result->value.b1._unsigned = value;
+    return result;
 }
 
 amqp_type_t *amqp_encode_ubyte(amqp_context_t *context, amqp_buffer_t *buffer, uint8_t value)
