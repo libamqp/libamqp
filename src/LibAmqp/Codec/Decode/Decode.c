@@ -619,22 +619,31 @@ int amqp_decode_extension_type(amqp_context_t *context, amqp_buffer_t *buffer, a
 }
 
 static int
-decode_type_constructor_into_result(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type)
+decode_type_constructor(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_constructor_t *constructor)
 {
     amqp_encoding_meta_data_t *meta_data;
 
-    type->constructor.format_code = amqp_buffer_getc(buffer);
+    constructor->format_code = amqp_buffer_getc(buffer);
 
-    if ((meta_data = amqp_type_meta_data_lookup(context, type->constructor.format_code)) == NULL)
+    if ((meta_data = amqp_type_meta_data_lookup(context, constructor->format_code)) == NULL)
     {
-        decode_error(context, type, AMQP_ERROR_UNKNOWN_FORMAT_CODE, "unknown format code = 0x%02x", type->constructor.format_code);
         return 0;
     }
 
-    type->constructor.meta_data = meta_data;
-    type->constructor.typedef_flags = meta_data->typedef_flags;
+    constructor->meta_data = meta_data;
+    constructor->typedef_flags = meta_data->typedef_flags;
 
     return 1;
+}
+static int
+decode_type_constructor_into_result(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type)
+{
+    int rc = decode_type_constructor(context, buffer, &type->constructor);
+    if (rc == 0)
+    {
+        decode_error(context, type, AMQP_ERROR_UNKNOWN_FORMAT_CODE, "unknown format code = 0x%02x", type->constructor.format_code);
+    }
+    return rc;
 }
 
 static int
