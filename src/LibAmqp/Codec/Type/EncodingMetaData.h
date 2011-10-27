@@ -76,15 +76,18 @@ typedef enum {
 
     amqp_is_list = 0x00040000,
     amqp_is_map = 0x00080000,
+    amqp_is_compound_mask = 0x000c0000,
+
     amqp_is_array = 0x00100000,
-    amqp_is_compound_mask = 0x001c0000,
 
     amqp_is_composite = 0x00200000,
+    amqp_is_container_mask = 0x003c0000,
+
     amqp_is_descriptor = 0x00400000,
     amqp_is_described = 0x00800000,
+
     amqp_is_extension = 0x01000000,
     amqp_is_invalid = 0x02000000,
-
     amqp_is_encoded = 0x10000000,
     amqp_is_incomplete = 0x20000000,
     amqp_is_contained = 0x40000000,

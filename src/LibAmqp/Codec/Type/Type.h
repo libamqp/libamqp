@@ -44,9 +44,9 @@ typedef struct amqp_buffer_position_t
 } amqp_buffer_position_t;
 
 typedef struct {
-    unsigned int is_array:1;
-    unsigned int is_list:1;
-    unsigned int is_map:1;
+//    unsigned int is_array:1;
+//    unsigned int is_list:1;
+//    unsigned int is_map:1;
     /**
         A compound type with two elements; one defining the type's descriptor
         and the second defining the type's structure.
@@ -58,18 +58,18 @@ typedef struct {
     unsigned int is_null:1;
     unsigned int is_invalid:1;
     unsigned int is_encoded:1;
-    unsigned int is_incomplete:1;
+//    unsigned int is_incomplete:1;
     unsigned int is_contained:1;
-    unsigned int is_variable:1;
+//    unsigned int is_variable:1;
     unsigned int is_binary:1;
     unsigned int is_symbol:1;
     unsigned int is_string:1;
     unsigned int is_descriptor:1;
     unsigned int has_descriptor:1;
-    union {
-        unsigned int is_compound;
-        amqp_type_type_flags_t type;
-    } container;
+//    union {
+//        unsigned int is_compound;
+//        amqp_type_type_flags_t type;
+//    } container;
 } amqp_type_flags_t;
 
 struct amqp_type_t
@@ -80,8 +80,9 @@ struct amqp_type_t
 
     amqp_buffer_position_t position;
 
-    amqp_typedef_flags_t typedef_flags;
-    
+//    amqp_typedef_flags_t typedef_flags;
+    uint32_t typedef_flags;
+
     amqp_type_flags_t flags;
 
     union {
@@ -127,6 +128,18 @@ extern amqp_type_t **amqp_realloc_amqp_type_t_array(amqp_context_t *c, amqp_type
 extern int amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs);
 extern void amqp_mark_type_invalid(amqp_type_t *type, int cause);
 extern void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type);
+
+static inline
+void amqp_typedef_flags_set(amqp_type_t *type, uint32_t flags)
+{
+    type->typedef_flags |= flags;
+}
+
+static inline
+void amqp_typedef_flags_clear(amqp_type_t *type, uint32_t bits)
+{
+    type->typedef_flags &= ~bits;
+}
 
 static inline
 int amqp_type_is_null(amqp_type_t *type)
@@ -299,7 +312,7 @@ int amqp_type_is_array(amqp_type_t *type)
 static inline
 int amqp_type_is_container(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_compound_mask;
+    return type->typedef_flags & amqp_is_container_mask;
 }
 
 static inline
@@ -353,7 +366,7 @@ int amqp_type_is_incomplete(amqp_type_t *type)
 static inline
 bool amqp_type_is_empty_list(amqp_type_t *type)
 {
-    return type->flags.container.type.is_list != 0 && type->value.list.count == 0;
+    return amqp_type_is_list(type) != 0 && type->value.list.count == 0;
 }
 
 static inline

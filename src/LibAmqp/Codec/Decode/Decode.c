@@ -332,8 +332,7 @@ int amqp_construct_variable_type(amqp_context_t *context, amqp_buffer_t *buffer,
 
     // advance the read index past the variable types data.
     amqp_buffer_advance_read_index(buffer, size);
-    type->flags.is_variable = true;
-    type->value.variable.buffer = buffer;
+    type->value.variable.buffer = buffer; // TODO - consider doing tis for all types
     return true;
 }
 
@@ -442,8 +441,6 @@ int amqp_decode_described_type(amqp_context_t *context, amqp_buffer_t *buffer, a
 
     type->position.index = amqp_buffer_index(buffer);
     type->position.size = 0;
-    type->flags.container.type.is_described = true;
-    type->typedef_flags |= amqp_is_composite;
 
     type->value.described.count = 2;
     type->value.described.elements = amqp_allocate_amqp_type_t_array(context, 2);
@@ -452,10 +449,7 @@ int amqp_decode_described_type(amqp_context_t *context, amqp_buffer_t *buffer, a
     if (descriptor)
     {
         type->value.described.elements[0] = descriptor;
-        descriptor->typedef_flags |= (amqp_is_contained | amqp_is_descriptor);
-
-        descriptor->flags.is_contained = true;
-        descriptor->flags.is_descriptor = true;
+        amqp_typedef_flags_set(descriptor, amqp_is_contained | amqp_is_descriptor);
     }
     else
     {
@@ -467,10 +461,7 @@ int amqp_decode_described_type(amqp_context_t *context, amqp_buffer_t *buffer, a
     if (described)
     {
         type->value.described.elements[1] = described;
-        described->typedef_flags |= (amqp_is_contained | amqp_is_described);
-
-        described->flags.is_contained = true;
-        described->flags.has_descriptor = true;
+        amqp_typedef_flags_set(described, amqp_is_contained | amqp_is_described);
     }
     else
     {
@@ -486,7 +477,7 @@ int amqp_decode_described_type(amqp_context_t *context, amqp_buffer_t *buffer, a
 
     if (!amqp_type_is_valid(described))
     {
-        decode_error(context, type, AMQP_ERROR_DESCRIBED_INVALID, "type for a described type is invalid");
+        decode_error(context, type, AMQP_ERROR_DESCRIBED_INVALID, "described type is invalid");
         return false;
     }
 
@@ -505,7 +496,6 @@ int amqp_decode_list_list(amqp_context_t *context, amqp_buffer_t *buffer, amqp_e
             return 0;
         }
 
-        type->flags.container.type.is_list = true;
         type->value.list.count = count;
 // TODO - don't allocate array if count is zero
         type->value.list.elements = amqp_allocate_amqp_type_t_array(context, count);
@@ -528,7 +518,6 @@ int amqp_decode_list_0(amqp_context_t *context, amqp_buffer_t *buffer, amqp_enco
     int rc =  amqp_decode_fixed_zero_width(context, buffer, meta_data, type);
     if (rc)
     {
-        type->flags.container.type.is_list = true;
         type->value.list.count = 0;
     }
     return rc;
@@ -562,14 +551,12 @@ static int amqp_decode_map_map(amqp_context_t *context, amqp_buffer_t *buffer, a
             return 0;
         }
 
-        type->flags.container.type.is_map = true;
         type->value.map.count = count;
 
         type->value.map.entries = amqp_allocate_amqp_type_t_array(context, count);
         for (i = 0; i < type->value.map.count; i++)
         {
             amqp_type_t *entry = amqp_decode(context, buffer);
-            entry->flags.is_contained = true;
             entry->typedef_flags |= amqp_is_contained;
 
             type->value.map.entries[i] = entry;
@@ -601,12 +588,10 @@ static int amqp_decode_array(amqp_context_t *context, amqp_buffer_t *buffer, amq
             return 0;
         }
 
-        type->flags.container.type.is_array = true;
         type->value.array.count = count;
         type->value.array.elements = amqp_allocate_amqp_type_t_array(context, count);
 
         element_type = amqp_decode(context, buffer);
-        element_type->flags.is_contained = true;
         element_type->typedef_flags |= amqp_is_contained;
 
         type->value.array.elements[0] = element_type;
@@ -614,7 +599,6 @@ static int amqp_decode_array(amqp_context_t *context, amqp_buffer_t *buffer, amq
         for (i = 1; i < count; i++)
         {
             amqp_type_t *element = amqp_decode_array_element(context, buffer, element_type);
-            element->flags.is_contained = true;
             element_type->typedef_flags |= amqp_is_contained;
 
             type->value.array.elements[i] = element;

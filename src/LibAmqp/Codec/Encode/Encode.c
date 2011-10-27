@@ -89,7 +89,7 @@ static inline bool is_i_contained_within_array(amqp_context_t *context)
 
 static void push_container(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type)
 {
-    type->flags.is_incomplete = true;
+    type->typedef_flags |= amqp_is_incomplete;
     type->value.compound.saved_container = context->encode.container;
     context->encode.container = type;
 }
@@ -98,7 +98,7 @@ static amqp_type_t *pop_container(amqp_context_t *context)
 {
     amqp_type_t *result = context->encode.container;
 
-    result->flags.is_incomplete = false;
+    result->typedef_flags &= ~amqp_is_incomplete;
     context->encode.container = result->value.compound.saved_container;
     result->value.compound.saved_container = 0;
     return result;
