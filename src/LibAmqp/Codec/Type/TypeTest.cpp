@@ -81,11 +81,6 @@ SUITE(Type)
         CHECK_EQUAL(amqp_is_variable_mask, amqp_is_binary | amqp_is_string | amqp_is_symbol);
     }
 
-    TEST_FIXTURE(TypeFixture, typedef_flags_compound)
-    {
-        CHECK_EQUAL(amqp_is_compound_mask, amqp_is_list | amqp_is_map);
-    }
-
     TEST_FIXTURE(TypeFixture, typedef_flags_container)
     {
         CHECK_EQUAL(amqp_is_container_mask, amqp_is_list | amqp_is_map | amqp_is_array | amqp_is_composite);

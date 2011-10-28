@@ -21,6 +21,7 @@ extern "C" {
 #endif
 
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
@@ -76,12 +77,9 @@ typedef enum {
 
     amqp_is_list = 0x00040000,
     amqp_is_map = 0x00080000,
-    amqp_is_compound_mask = 0x000c0000,
-
     amqp_is_array = 0x00100000,
-
     amqp_is_composite = 0x00200000,
-    amqp_is_container_mask = 0x003c0000,
+    amqp_is_container_mask = 0x003c0000, // Map, List, Array or Composite
 
     amqp_is_descriptor = 0x00400000,
     amqp_is_described = 0x00800000,
@@ -95,7 +93,7 @@ typedef enum {
 
 struct amqp_encoding_meta_data_t
 {
-    unsigned char format_code;
+    uint8_t format_code;
     int width;
     amqp_decoder_t *type_decoder;
     amqp_type_methods_t *methods;

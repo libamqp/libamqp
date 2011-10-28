@@ -567,7 +567,7 @@ int amqp_decode_map_32(amqp_context_t *context, amqp_buffer_t *buffer, amqp_enco
 }
 
 static
-amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_constructor_t *constructor)
+amqp_type_t *create_array_element(amqp_context_t *context, amqp_type_constructor_t *constructor)
 {
     amqp_type_t *type = amqp_allocate_type(context);
 
@@ -576,14 +576,20 @@ amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *b
     type->constructor.meta_data = constructor->meta_data;
     type->constructor.typedef_flags = constructor->typedef_flags;
 
-    decode_type_into_result(context, buffer, type);
+    return type;
+}
+static
+amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_constructor_t *constructor)
+{
+    amqp_type_t *type = create_array_element(context, constructor);
 
+    decode_type_into_result(context, buffer, type);
     return type;
 }
 static int amqp_decode_array(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-    amqp_type_constructor_t constructor;
     unsigned int i;
+    amqp_type_constructor_t *c;
     int rc = amqp_construct_container_type(context, buffer, meta_data, type);
 
     if (rc)
@@ -594,28 +600,31 @@ static int amqp_decode_array(amqp_context_t *context, amqp_buffer_t *buffer, amq
             return 0;
         }
 
-        rc = decode_type_constructor(context, buffer, &constructor);
+        type->value.array.count = count;
+        type->value.array.constructor = amqp_allocate_type(context);
+
+        c = &type->value.array.constructor->constructor;
+        rc = decode_type_constructor(context, buffer, c);
         if (rc == 0)
         {
-            decode_error(context, type, AMQP_ERROR_UNKNOWN_ARRAY_ELEMENT_FORMAT_CODE, "unknown format code = 0x%02x", constructor.format_code);
+            decode_error(context, type, AMQP_ERROR_UNKNOWN_ARRAY_ELEMENT_FORMAT_CODE, "unknown format code = 0x%02x", c->format_code);
             return 0;
         }
 
-        if ((type->value.array.count = count) > 0)
+        if (count > 0)
         {
             type->value.array.elements = amqp_allocate_amqp_type_t_array(context, count);
-        }
 
-        for (i = 0; i < count; i++)
-        {
-            amqp_type_t *element = amqp_decode_array_element(context, buffer, &constructor);
-            if (element)
+            for (i = 0; i < count; i++)
             {
-                type->value.array.elements[i] = element;
-                amqp_typedef_flags_set(element, amqp_is_contained);
+                amqp_type_t *element = amqp_decode_array_element(context, buffer, c);
+                if (element)
+                {
+                    type->value.array.elements[i] = element;
+                    amqp_typedef_flags_set(element, amqp_is_contained);
+                }
             }
         }
-
         // TODO - check that the elements do not go past the array boundry
     }
     return rc;

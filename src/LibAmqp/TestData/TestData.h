@@ -129,7 +129,7 @@ namespace test_data
     extern TestData multiple_symbol_null;
     extern TestData multiple_symbol_one_value;
     extern TestData multiple_symbol_many_values;
-    extern TestData multiple_symbol_empty_array;
+    extern TestData empty_array_of_symbols;
 
     extern TestData array_of_symbols;
 

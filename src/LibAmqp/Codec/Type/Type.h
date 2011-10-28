@@ -45,10 +45,10 @@ typedef struct amqp_buffer_position_t
 
 typedef struct amqp_type_constructor_t
 {
-    int format_code;
-    int extension_type_code;
     amqp_encoding_meta_data_t *meta_data;
     uint32_t typedef_flags;
+    uint8_t format_code;
+    uint8_t extension_type_code;
 } amqp_type_constructor_t;
 
 struct amqp_type_t
@@ -65,11 +65,11 @@ struct amqp_type_t
         struct {
             size_t count;
             amqp_type_t **elements;
-            amqp_type_t *saved_container;
         } compound;
         struct {
             size_t count;
             amqp_type_t **elements;
+            amqp_type_t *constructor;
         } array;
         struct {
             size_t count;
@@ -87,6 +87,7 @@ struct amqp_type_t
             amqp_buffer_t *buffer;
         } variable;
     } value;
+    amqp_type_t *saved_container;
 };
 
 extern void amqp_type_initialize_pool(amqp_memory_pool_t *pool);
@@ -111,6 +112,13 @@ void amqp_typedef_flags_clear(amqp_type_t *type, uint32_t bits)
 {
     assert(type);
     type->constructor.typedef_flags &= ~bits;
+}
+
+static inline
+int amqp_typedef_flags_test(amqp_type_t *type, uint32_t bits)
+{
+    assert(type);
+    return type->constructor.typedef_flags & bits;
 }
 
 static inline
@@ -523,9 +531,8 @@ double amqp_type_to_double(amqp_type_t *type)
 static inline
 amqp_type_t *amqp_type_array_type(amqp_type_t *type)
 {
-    assert(type);
-    // TODO - deal with zero length arrays
-    return type->value.array.elements[0];
+    assert(amqp_type_is_array(type));
+    return type->value.array.constructor;
 }
 
 #ifdef __cplusplus

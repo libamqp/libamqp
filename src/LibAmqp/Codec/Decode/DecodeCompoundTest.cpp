@@ -151,7 +151,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(0x81, amqp_type_map_element(type, 9)->constructor.format_code);
     }
 
-    TEST_FIXTURE(DecodeFixture, arrray_elements_are_cocntained)
+    TEST_FIXTURE(DecodeFixture, arrray_elements_are_contained)
     {
         load_decode_buffer(test_data::array_shorts);
         type = amqp_decode(context, decode_buffer);
@@ -161,6 +161,17 @@ SUITE(CompoundTypeDecode)
         CHECK(amqp_type_is_contained(type->value.array.elements[2]));
         CHECK(amqp_type_is_contained(type->value.array.elements[3]));
         CHECK(amqp_type_is_contained(type->value.array.elements[4]));
+    }
+
+    TEST_FIXTURE(DecodeFixture, empty_array_of_symbols)
+    {
+        test_data::empty_array_of_symbols.transfer_to(decode_buffer);
+        type = amqp_decode(context, decode_buffer);
+
+        CHECK(amqp_type_is_array(type));
+        CHECK_EQUAL(0U, type->value.array.count);
+
+        // TODO - check element type even
     }
 
     TEST_FIXTURE(DecodeFixture, list_elements_are_contained)

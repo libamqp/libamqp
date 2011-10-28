@@ -75,18 +75,6 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_symbol(type->value.array.elements[0]));
     }
 
-    TEST_FIXTURE(DecodeFixture, multiple_symbol_empty_array)
-    {
-        test_data::multiple_symbol_empty_array.transfer_to(decode_buffer);
-// TODO - fix bug in decoding empty array
-        RETURN_UNLESS_JENKINS();
-//        type = amqp_decode(context, decode_buffer);
-//        amqp_type_print(context, type, decode_buffer);
-//        CHECK(amqp_type_is_array(type));
-//        CHECK_EQUAL(0U, type->value.array.count);
-//        CHECK(0);
-    }
-
     void DecodeFixture::load(test_data::TestData &data)
     {
         load_decode_buffer(data);

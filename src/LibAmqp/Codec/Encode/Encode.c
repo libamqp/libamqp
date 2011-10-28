@@ -26,58 +26,38 @@
 
 #define NO_EXTRA_TYPEDEF_FLAGS  0
 
-/*
-    constructor is not emitted for array elements after the first
- */
-static inline int emit_constructor(amqp_context_t *context, amqp_buffer_t *buffer)
-{
-    amqp_type_t *type = context->encode.container;
-    return type == 0 || (amqp_type_is_container(type) && !amqp_type_is_array(type)) || (amqp_type_is_array(type)  && type->value.array.count == 0);
-}
-
 static inline amqp_type_t **allocate_elements(amqp_context_t *c, amqp_type_t **elements, size_t count)
 {
     return elements == 0 ? amqp_allocate_amqp_type_t_array(c, 1) : amqp_realloc_amqp_type_t_array(c, elements, count);
 }
 
-static inline void amqp_add_element_to_container(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type)
+static inline void amqp_add_element_to_container(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *container, amqp_type_t *type)
 {
-    if (context->encode.container)
+    assert(container);
+    size_t count = container->value.compound.count++;
+
+    amqp_typedef_flags_set(type, amqp_is_contained);
+
+    if (amqp_type_is_composite(container))
     {
-        size_t count = context->encode.container->value.compound.count++;
-
-        // container is now responsible for deallocating this type
-        amqp_typedef_flags_set(type, amqp_is_contained);
-
-        if (amqp_type_is_array(context->encode.container) && count > 0)
+        switch (count)
         {
-            // this is not the first element being added to an array. We must ensure that the type of this element
-            // matches the type of the first element in the array
-            if (!amqp_type_match(context->encode.container->value.compound.elements[0], type))
-            {
-                // mark both the element and container as invalid
-                amqp_mark_type_invalid(type, AMQP_ERROR_ARRAY_ELEMENT_TYPE_INCORRECT);
-                amqp_mark_type_invalid(context->encode.container, AMQP_ERROR_ARRAY_ELEMENT_TYPE_INCORRECT);
-            }
-        }
+        case 0:
+            amqp_typedef_flags_set(type, amqp_is_descriptor);
+            break;
 
-        if (amqp_type_is_composite(context->encode.container))
-        {
-            switch (count)
-            {
-            case 0:
-                amqp_typedef_flags_set(type, amqp_is_descriptor);
-                break;
+        case 1:
+            amqp_typedef_flags_set(type, amqp_is_described);
+            break;
 
-            case 1:
-                amqp_typedef_flags_set(type, amqp_is_described);
-                break;
-            }
+        default:
+            // TODO - handle
+            abort();
         }
-        
-        context->encode.container->value.compound.elements = allocate_elements(context, context->encode.container->value.compound.elements, count + 1);
-        context->encode.container->value.compound.elements[count] = type;
     }
+
+    container->value.compound.elements = allocate_elements(context, container->value.compound.elements, count + 1);
+    container->value.compound.elements[count] = type;
 }
 
 static inline bool is_i_contained_within_array(amqp_context_t *context)
@@ -88,7 +68,7 @@ static inline bool is_i_contained_within_array(amqp_context_t *context)
 static void push_container(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type)
 {
     amqp_typedef_flags_set(type, amqp_is_incomplete);
-    type->value.compound.saved_container = context->encode.container;
+    type->saved_container = context->encode.container;
     context->encode.container = type;
 }
 
@@ -97,25 +77,58 @@ static amqp_type_t *pop_container(amqp_context_t *context)
     amqp_type_t *result = context->encode.container;
 
     amqp_typedef_flags_clear(result, amqp_is_incomplete);
-    context->encode.container = result->value.compound.saved_container;
-    result->value.compound.saved_container = 0;
+    context->encode.container = result->saved_container;
+    result->saved_container = 0;
     return result;
+}
+
+static void initialize_constructor(amqp_type_constructor_t *constructor, amqp_context_t *context, amqp_buffer_t *buffer, const amqp_typedef_flags_t extra_typedef_flags, amqp_encoding_meta_data_t *meta_data)
+{
+    constructor->format_code = meta_data->format_code;
+    constructor->meta_data = meta_data;
+    constructor->typedef_flags = meta_data->typedef_flags | amqp_is_encoded | extra_typedef_flags;
+}
+
+static void emit_constructor(amqp_buffer_t *buffer, amqp_type_constructor_t *constructor)
+{
+    amqp_buffer_putc(buffer, constructor->format_code);
+    // TODO - consider extension code?
 }
 
 static amqp_type_t *initialize_type(amqp_context_t *context, amqp_buffer_t *buffer, const amqp_typedef_flags_t extra_typedef_flags, amqp_encoding_meta_data_t *meta_data)
 {
+    amqp_type_t *enclosing_container = context->encode.container;
     amqp_type_t *type = (amqp_type_t *) amqp_allocate(context, &context->memory.amqp_type_t_pool);
 
-    type->constructor.format_code = meta_data->format_code;
-    type->constructor.meta_data = meta_data;
-    type->constructor.typedef_flags = meta_data->typedef_flags | amqp_is_encoded | extra_typedef_flags;
+    initialize_constructor(&type->constructor, context, buffer, extra_typedef_flags, meta_data);
 
-    if (emit_constructor(context, buffer))
+    if (enclosing_container)
     {
-        amqp_buffer_putc(buffer, meta_data->format_code);
-    }
+        int within_array = amqp_type_is_array(enclosing_container);
 
-    amqp_add_element_to_container(context, buffer, type);
+        if (!within_array)
+        {
+            emit_constructor(buffer, &type->constructor);
+        }
+        else if (enclosing_container->value.array.count == 0)
+        {
+            emit_constructor(buffer, &type->constructor);
+            enclosing_container->value.array.constructor = type;       // Save link to array constructor
+        }
+        else if (!amqp_type_match(enclosing_container->value.array.constructor, type))
+        {
+            // mark both the element and container as invalid
+            amqp_mark_type_invalid(type, AMQP_ERROR_ARRAY_ELEMENT_TYPE_INCORRECT);
+            amqp_mark_type_invalid(enclosing_container, AMQP_ERROR_ARRAY_ELEMENT_TYPE_INCORRECT);
+            // TODO - log message
+        }
+
+        amqp_add_element_to_container(context, buffer, enclosing_container, type);
+    }
+    else
+    {
+        emit_constructor(buffer, &type->constructor);
+    }
 
     if (amqp_type_is_container(type))
     {

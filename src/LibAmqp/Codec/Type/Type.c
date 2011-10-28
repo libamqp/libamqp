@@ -50,6 +50,10 @@ void amqp_cleanup_amqp_type_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_
     {
         amqp_deallocate_amqp_type_t_array(c, pool, type->value.compound.elements, type->value.compound.count);
     }
+    if (amqp_type_is_array(type) && (!amqp_type_is_encoded(type) || (amqp_type_is_encoded(type) && type->value.array.count == 0)))
+    {
+        amqp_deallocate_type(c, type->value.array.constructor);
+    }
 }
 
 void amqp_type_initialize_pool(amqp_memory_pool_t *pool)
