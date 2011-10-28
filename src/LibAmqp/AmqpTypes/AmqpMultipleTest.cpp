@@ -109,7 +109,8 @@ SUITE(AmqpTypes)
         ASSERT(type);
         CHECK(amqp_type_is_array(type));
         CHECK_EQUAL(0U, type->value.array.count);
-        
+        CHECK(amqp_type_is_symbol(amqp_type_array_type(type)));
+
         multiple = amqp_multiple_symbol_create(context, type);
         CHECK_EQUAL(0, multiple->size);
 
