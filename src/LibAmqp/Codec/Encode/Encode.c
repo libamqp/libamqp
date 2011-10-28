@@ -547,6 +547,7 @@ amqp_type_t *amqp_encode_list_32(amqp_context_t *context, amqp_buffer_t *buffer)
     return encode_compound_type(context, buffer, amqp_is_list, &amqp_type_meta_data_list_32);
 }
 
+// TODO - encode encode length array
 amqp_type_t *amqp_encode_array_8(amqp_context_t *context, amqp_buffer_t *buffer)
 {
     return encode_compound_type(context, buffer, amqp_is_array, &amqp_type_meta_data_array_8);
