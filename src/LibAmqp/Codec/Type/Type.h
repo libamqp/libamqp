@@ -43,16 +43,19 @@ typedef struct amqp_buffer_position_t
     size_t size;
 } amqp_buffer_position_t;
 
+typedef struct amqp_type_constructor_t
+{
+    amqp_encoding_meta_data_t *meta_data;
+    uint32_t typedef_flags;
+    uint8_t format_code;
+    uint8_t extension_type_code;
+} amqp_type_constructor_t;
+
 struct amqp_type_t
 {
-    int format_code;
-    int extension_type_code;
-    amqp_encoding_meta_data_t *meta_data;
-
+    int invalid_cause ;
+    amqp_type_constructor_t constructor;
     amqp_buffer_position_t position;
-
-    uint32_t typedef_flags;
-
     union {
         amqp_eight_byte_t b8;
         amqp_four_byte_t b4;
@@ -62,11 +65,11 @@ struct amqp_type_t
         struct {
             size_t count;
             amqp_type_t **elements;
-            amqp_type_t *saved_container;
         } compound;
         struct {
             size_t count;
             amqp_type_t **elements;
+            amqp_type_t *constructor;
         } array;
         struct {
             size_t count;
@@ -84,7 +87,7 @@ struct amqp_type_t
             amqp_buffer_t *buffer;
         } variable;
     } value;
-    int invalid_cause ;
+    amqp_type_t *saved_container;
 };
 
 extern void amqp_type_initialize_pool(amqp_memory_pool_t *pool);
@@ -100,241 +103,288 @@ extern void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type);
 static inline
 void amqp_typedef_flags_set(amqp_type_t *type, uint32_t flags)
 {
-    type->typedef_flags |= flags;
+    assert(type);
+    type->constructor.typedef_flags |= flags;
 }
 
 static inline
 void amqp_typedef_flags_clear(amqp_type_t *type, uint32_t bits)
 {
-    type->typedef_flags &= ~bits;
+    assert(type);
+    type->constructor.typedef_flags &= ~bits;
+}
+
+static inline
+int amqp_typedef_flags_test(amqp_type_t *type, uint32_t bits)
+{
+    assert(type);
+    return type->constructor.typedef_flags & bits;
 }
 
 static inline
 int amqp_type_is_null(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_null;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_null;
 }
 
 static inline
 int amqp_type_is_not_null(amqp_type_t *type)
 {
-    return (type->typedef_flags & amqp_is_null) == 0;
+    assert(type);
+    return (type->constructor.typedef_flags & amqp_is_null) == 0;
 }
 
 static inline
 int amqp_type_is_boolean(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_boolean;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_boolean;
 }
 
 static inline
 int amqp_type_is_unsigned(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_unsigned;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_unsigned;
 }
 
 static inline
 int amqp_type_is_ubyte(amqp_type_t *type)
 {
-    return type->typedef_flags & (amqp_is_byte | amqp_is_unsigned);
+    assert(type);
+    return (type->constructor.typedef_flags & (amqp_is_byte | amqp_is_unsigned)) == (amqp_is_byte | amqp_is_unsigned);
 }
 
 static inline
 int amqp_type_is_ushort(amqp_type_t *type)
 {
-    return type->typedef_flags & (amqp_is_short | amqp_is_unsigned);
+    assert(type);
+    return (type->constructor.typedef_flags & (amqp_is_short | amqp_is_unsigned)) == (amqp_is_short | amqp_is_unsigned);
 }
 
 static inline
 int amqp_type_is_uint(amqp_type_t *type)
 {
-    return type->typedef_flags & (amqp_is_int | amqp_is_unsigned);
+    assert(type);
+    return (type->constructor.typedef_flags & (amqp_is_int | amqp_is_unsigned)) == (amqp_is_int | amqp_is_unsigned);
 }
 
 static inline
 int amqp_type_is_ulong(amqp_type_t *type)
 {
-    return type->typedef_flags & (amqp_is_long | amqp_is_unsigned);
+    assert(type);
+    return (type->constructor.typedef_flags & (amqp_is_long | amqp_is_unsigned)) == (amqp_is_long | amqp_is_unsigned);
 }
 
 static inline
 int amqp_type_is_signed(amqp_type_t *type)
 {
-    return (type->typedef_flags & amqp_is_unsigned) == 0;
+    assert(type);
+    return (type->constructor.typedef_flags & amqp_is_unsigned) == 0;
 }
 
 static inline
 int amqp_type_is_byte(amqp_type_t *type)
 {
-    return (type->typedef_flags & amqp_is_byte) && amqp_type_is_signed(type);
+    assert(type);
+    return ((type->constructor.typedef_flags & amqp_is_byte) != 0 ) && amqp_type_is_signed(type);
 }
 
 static inline
 int amqp_type_is_short(amqp_type_t *type)
 {
-    return (type->typedef_flags & amqp_is_short) && amqp_type_is_signed(type);
+    assert(type);
+    return (type->constructor.typedef_flags & amqp_is_short) && amqp_type_is_signed(type);
 }
 
 static inline
 int amqp_type_is_int(amqp_type_t *type)
 {
-    return (type->typedef_flags & amqp_is_int) && amqp_type_is_signed(type);
+    assert(type);
+    return (type->constructor.typedef_flags & amqp_is_int) && amqp_type_is_signed(type);
 }
 
 static inline
 int amqp_type_is_long(amqp_type_t *type)
 {
-    return (type->typedef_flags & amqp_is_long) && amqp_type_is_signed(type);
+    assert(type);
+    return (type->constructor.typedef_flags & amqp_is_long) && amqp_type_is_signed(type);
 }
 
 static inline
 int amqp_type_is_float(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_float;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_float;
 }
 
 static inline
 int amqp_type_is_double(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_double;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_double;
 }
 
 static inline
 int amqp_type_is_timestamp(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_timestamp;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_timestamp;
 }
 
 static inline
 int amqp_type_is_uuid(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_uuid;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_uuid;
 }
 
 static inline
 int amqp_type_is_decimal32(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_decimal32;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_decimal32;
 }
 
 static inline
 int amqp_type_is_decimal64(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_decimal64;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_decimal64;
 }
 
 static inline
 int amqp_type_is_decimal128(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_decimal128;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_decimal128;
 }
 
 static inline
 int amqp_type_is_char(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_char;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_char;
 }
 
 static inline
 int amqp_type_is_binary(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_binary;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_binary;
 }
 
 static inline
 int amqp_type_is_string(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_string;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_string;
 }
 
 static inline
 int amqp_type_is_symbol(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_symbol;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_symbol;
 }
 
 static inline
 int amqp_type_is_variable(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_variable_mask;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_variable_mask;
 }
 
 static inline
 int amqp_type_is_list(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_list;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_list;
 }
 
 static inline
 int amqp_type_is_map(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_map;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_map;
 }
 
 static inline
 int amqp_type_is_array(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_array;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_array;
 }
 
 static inline
 int amqp_type_is_container(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_container_mask;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_container_mask;
 }
 
 static inline
 int amqp_type_is_composite(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_composite;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_composite;
 }
 
 static inline
 int amqp_type_is_descriptor(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_descriptor;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_descriptor;
 }
 
 static inline
 int amqp_type_is_described(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_described;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_described;
 }
 
 static inline
 int amqp_type_is_encoded(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_encoded;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_encoded;
 }
 
 static inline
 int amqp_type_is_incomplete(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_incomplete;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_incomplete;
 }
 
 static inline
 int amqp_type_is_empty_list(amqp_type_t *type)
 {
+    assert(type);
     return amqp_type_is_list(type) != 0 && type->value.list.count == 0;
 }
 
 static inline
 int amqp_type_is_valid(amqp_type_t *type)
 {
-    return (type->typedef_flags & (amqp_is_invalid | amqp_is_incomplete)) == 0;
+    assert(type);
+    return (type->constructor.typedef_flags & (amqp_is_invalid | amqp_is_incomplete)) == 0;
 }
 
 static inline
 int amqp_type_is_invalid(amqp_type_t *type)
 {
-    return type->typedef_flags & (amqp_is_invalid | amqp_is_incomplete);
+    assert(type);
+    return type->constructor.typedef_flags & (amqp_is_invalid | amqp_is_incomplete);
 }
 
 static inline
 int amqp_type_is_contained(amqp_type_t *type)
 {
-    return type->typedef_flags & amqp_is_contained;
+    assert(type);
+    return type->constructor.typedef_flags & amqp_is_contained;
 }
 
 static inline
@@ -351,8 +401,7 @@ amqp_type_t *amqp_type_map_element(amqp_type_t *type, size_t index)
     return type->value.map.entries[index];
 }
 
-/////
-// CONVERSION FUNCTION
+// ACCESS FUNCTIONS
 static inline
 amqp_type_t *amqp_type_get_descriptor(amqp_type_t *type)
 {
@@ -365,20 +414,6 @@ amqp_type_t *amqp_type_get_described(amqp_type_t *type)
 {
     assert(amqp_type_is_composite(type));
     return type->value.described.elements[1];
-}
-
-static inline
-uint64_t amqp_type_to_ulong(amqp_type_t *type)
-{
-    assert(amqp_type_is_ulong(type));
-    return type->value.b8._ulong;
-}
-
-static inline
-int16_t amqp_type_to_short(amqp_type_t *type)
-{
-    assert(amqp_type_is_short(type));
-    return type->value.b2._short;
 }
 
 static inline
@@ -402,6 +437,13 @@ uint8_t amqp_type_get_byte_at(amqp_type_t *type, size_t index)
     return amqp_unchecked_getc_at(type->value.variable.buffer, type->position.index + index);
 }
 
+// CONVERSION FUNCTIONS
+static inline
+int amqp_type_to_boolean(amqp_type_t *type)
+{
+    return type->value.b1._signed;
+}
+
 static inline
 uint8_t amqp_type_to_ubyte(amqp_type_t *type)
 {
@@ -410,31 +452,87 @@ uint8_t amqp_type_to_ubyte(amqp_type_t *type)
 }
 
 static inline
-uint8_t amqp_type_to_ushort(amqp_type_t *type)
+int8_t amqp_type_to_byte(amqp_type_t *type)
+{
+    assert(amqp_type_is_byte(type));
+    return type->value.b1._signed;
+}
+
+static inline
+uint16_t amqp_type_to_ushort(amqp_type_t *type)
 {
     assert(amqp_type_is_ushort(type));
     return type->value.b2._ushort;
 }
 
 static inline
-uint8_t amqp_type_to_uint(amqp_type_t *type)
+int16_t amqp_type_to_short(amqp_type_t *type)
+{
+    assert(amqp_type_is_short(type));
+    return type->value.b2._short;
+}
+
+static inline
+uint32_t amqp_type_to_uint(amqp_type_t *type)
 {
     assert(amqp_type_is_uint(type));
     return type->value.b4._uint;
 }
 
 static inline
-uint8_t amqp_type_to_boolean(amqp_type_t *type)
+int32_t amqp_type_to_int(amqp_type_t *type)
 {
-    assert(amqp_type_is_boolean(type));
-    return type->format_code == 0x41 || (type->format_code == 0x56 && type->value.b1._unsigned == 1);
+    assert(amqp_type_is_int(type));
+    return type->value.b4._int;
+}
+
+static inline
+wchar_t amqp_type_to_char(amqp_type_t *type)
+{
+    assert(amqp_type_is_char(type));
+    return type->value.b4._wchar;
+}
+
+static inline
+uint64_t amqp_type_to_ulong(amqp_type_t *type)
+{
+    assert(amqp_type_is_ulong(type));
+    return type->value.b8._ulong;
+}
+
+static inline
+int64_t amqp_type_to_long(amqp_type_t *type)
+{
+    assert(amqp_type_is_long(type));
+    return type->value.b8._long;
+}
+
+static inline
+amqp_timestamp_t amqp_type_to_timestamp(amqp_type_t *type)
+{
+    assert(amqp_type_is_timestamp(type));
+    return type->value.b8._timestamp;
+}
+
+static inline
+float amqp_type_to_float(amqp_type_t *type)
+{
+    assert(amqp_type_is_float(type));
+    return type->value.b4._float;
+}
+
+static inline
+double amqp_type_to_double(amqp_type_t *type)
+{
+    assert(amqp_type_is_double(type));
+    return type->value.b8._double;
 }
 
 static inline
 amqp_type_t *amqp_type_array_type(amqp_type_t *type)
 {
-    // TODO - deal with zero length arrays
-    return type->value.array.elements[0];
+    assert(amqp_type_is_array(type));
+    return type->value.array.constructor;
 }
 
 #ifdef __cplusplus

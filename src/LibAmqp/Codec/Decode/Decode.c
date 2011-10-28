@@ -22,8 +22,8 @@
 #include "Context/Context.h"
 #include "Codec/Type/TypeValidate.h"
 
-static amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *array_element_type);
-
+static int decode_type_constructor(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_constructor_t *constructor);
+static int decode_type_into_result(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type);
 
 int amqp_decode_null(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
@@ -41,7 +41,9 @@ static int amqp_decode_fixed_zero_width(amqp_context_t *context, amqp_buffer_t *
 
 int amqp_decode_boolean_true(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
-    return amqp_decode_fixed_zero_width(context, buffer, meta_data, type);
+    amqp_decode_fixed_zero_width(context, buffer, meta_data, type);
+    type->value.b1._signed = 1;
+    return true;
 }
 
 int amqp_decode_boolean_false(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
@@ -564,13 +566,34 @@ int amqp_decode_map_32(amqp_context_t *context, amqp_buffer_t *buffer, amqp_enco
     return amqp_decode_map_map(context, buffer, meta_data, type);
 }
 
+static
+amqp_type_t *create_array_element(amqp_context_t *context, amqp_type_constructor_t *constructor)
+{
+    amqp_type_t *type = amqp_allocate_type(context);
+
+    type->constructor.format_code = constructor->format_code;
+    type->constructor.extension_type_code = constructor->extension_type_code;
+    type->constructor.meta_data = constructor->meta_data;
+    type->constructor.typedef_flags = constructor->typedef_flags;
+
+    return type;
+}
+static
+amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_constructor_t *constructor)
+{
+    amqp_type_t *type = create_array_element(context, constructor);
+
+    decode_type_into_result(context, buffer, type);
+    return type;
+}
 static int amqp_decode_array(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *meta_data, amqp_type_t *type)
 {
     unsigned int i;
+    amqp_type_constructor_t *c;
     int rc = amqp_construct_container_type(context, buffer, meta_data, type);
+
     if (rc)
     {
-        amqp_type_t *element_type;
         uint32_t count = get_variable_type_count(context, buffer, meta_data, type);
         if (count == -1)
         {
@@ -578,23 +601,30 @@ static int amqp_decode_array(amqp_context_t *context, amqp_buffer_t *buffer, amq
         }
 
         type->value.array.count = count;
-        type->value.array.elements = amqp_allocate_amqp_type_t_array(context, count);
+        type->value.array.constructor = amqp_allocate_type(context);
 
-        element_type = amqp_decode(context, buffer);
-        amqp_typedef_flags_set(element_type, amqp_is_contained);
-
-        type->value.array.elements[0] = element_type;
-
-        for (i = 1; i < count; i++)
+        c = &type->value.array.constructor->constructor;
+        rc = decode_type_constructor(context, buffer, c);
+        if (rc == 0)
         {
-            amqp_type_t *element = amqp_decode_array_element(context, buffer, element_type);
-            if (element)
-            {
-                type->value.array.elements[i] = element;
-                amqp_typedef_flags_set(element, amqp_is_contained);
-            }
+            decode_error(context, type, AMQP_ERROR_UNKNOWN_ARRAY_ELEMENT_FORMAT_CODE, "unknown format code = 0x%02x", c->format_code);
+            return 0;
         }
 
+        if (count > 0)
+        {
+            type->value.array.elements = amqp_allocate_amqp_type_t_array(context, count);
+
+            for (i = 0; i < count; i++)
+            {
+                amqp_type_t *element = amqp_decode_array_element(context, buffer, c);
+                if (element)
+                {
+                    type->value.array.elements[i] = element;
+                    amqp_typedef_flags_set(element, amqp_is_contained);
+                }
+            }
+        }
         // TODO - check that the elements do not go past the array boundry
     }
     return rc;
@@ -617,22 +647,31 @@ int amqp_decode_extension_type(amqp_context_t *context, amqp_buffer_t *buffer, a
 }
 
 static int
-decode_type_constructor_into_result(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type)
+decode_type_constructor(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_constructor_t *constructor)
 {
     amqp_encoding_meta_data_t *meta_data;
 
-    type->format_code = amqp_buffer_getc(buffer);
+    constructor->format_code = amqp_buffer_getc(buffer);
 
-    if ((meta_data = amqp_type_meta_data_lookup(context, type->format_code)) == NULL)
+    if ((meta_data = amqp_type_meta_data_lookup(context, constructor->format_code)) == NULL)
     {
-        decode_error(context, type, AMQP_ERROR_UNKNOWN_FORMAT_CODE, "unknown format code = 0x%02x", type->format_code);
         return 0;
     }
 
-    type->meta_data = meta_data;
-    type->typedef_flags = meta_data->typedef_flags;
-
+    constructor->meta_data = meta_data;
+    constructor->typedef_flags = meta_data->typedef_flags;
+    constructor->extension_type_code = 0;
     return 1;
+}
+static int
+decode_type_constructor_into_result(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *type)
+{
+    int rc = decode_type_constructor(context, buffer, &type->constructor);
+    if (rc == 0)
+    {
+        decode_error(context, type, AMQP_ERROR_UNKNOWN_FORMAT_CODE, "unknown format code = 0x%02x", type->constructor.format_code);
+    }
+    return rc;
 }
 
 static int
@@ -640,30 +679,13 @@ decode_type_into_result(amqp_context_t *context, amqp_buffer_t *buffer, amqp_typ
 {
     int rc;
 
-    if (!(rc = (*type->meta_data->type_decoder)(context, buffer, type->meta_data, type)))
+    if (!(rc = (*type->constructor.meta_data->type_decoder)(context, buffer, type->constructor.meta_data, type)))
     {
         assert(type->invalid_cause != 0);
         assert(amqp_type_is_invalid(type));
     }
 
     return rc;
-}
-
-static
-amqp_type_t *amqp_decode_array_element(amqp_context_t *context, amqp_buffer_t *buffer, amqp_type_t *array_element_type)
-{
-    amqp_type_t *type;
-
-    type = amqp_allocate_type(context);
-    
-    type->format_code = array_element_type->format_code;
-    type->extension_type_code = array_element_type->extension_type_code;
-    type->meta_data = array_element_type->meta_data;
-    type->typedef_flags = array_element_type->typedef_flags;
-
-    decode_type_into_result(context, buffer, type);
-
-    return type;
 }
 
 amqp_type_t *amqp_decode(amqp_context_t *context, amqp_buffer_t *buffer)

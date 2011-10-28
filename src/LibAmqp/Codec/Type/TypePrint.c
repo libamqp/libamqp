@@ -178,7 +178,7 @@ static inline void print_invalid_type(amqp_context_t *context, amqp_type_t *type
 // TODO - change return type
 static int amqp_nested_type_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    amqp_type_print_method_t *method = type->meta_data->methods->print;
+    amqp_type_print_method_t *method = type->constructor.meta_data->methods->print;
     assert(method != NULL);
 
     if (amqp_type_is_invalid(type))
@@ -197,11 +197,11 @@ static void amqp_type_print_formatted_leader(amqp_context_t *context, amqp_type_
 {
     if (type && context->config.formatted_print)
     {
-        str_print(context, type->meta_data->name);
-        if (type->meta_data->encoding_name[0])
+        str_print(context, type->constructor.meta_data->name);
+        if (type->constructor.meta_data->encoding_name[0])
         {
             amqp_context_putc(context, '-');
-            str_print(context, type->meta_data->encoding_name);
+            str_print(context, type->constructor.meta_data->encoding_name);
         }
         amqp_context_putc(context, ':');
         amqp_context_putc(context, ' ');
@@ -268,79 +268,79 @@ void amqp_type_method_boolean_false_print(amqp_context_t *context, amqp_type_t *
 
 void amqp_type_method_boolean_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    type->value.b1._unsigned == 0x00 ?
+    amqp_type_to_boolean(type) ?
             amqp_type_method_boolean_true_print(context, type, buffer) :
             amqp_type_method_boolean_false_print(context, type, buffer);
 }
 
 void amqp_type_method_ubyte_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%u", type->value.b1._unsigned);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%u", amqp_type_to_ubyte(type));
 }
 
 void amqp_type_method_byte_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%d", type->value.b1._signed);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%d", amqp_type_to_byte(type));
 }
 
 void amqp_type_method_ushort_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%u", type->value.b2._ushort);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%u", amqp_type_to_ushort(type));
 }
 
 void amqp_type_method_short_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%d", type->value.b2._short);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%d", amqp_type_to_short(type));
 }
 
 void amqp_type_method_uint_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%u", type->value.b4._uint);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%u", amqp_type_to_uint(type));
 }
 
 void amqp_type_method_int_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%d", type->value.b4._int);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%d", amqp_type_to_int(type));
 }
 
 void amqp_type_method_ulong_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%lu", type->value.b8._ulong);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%lu", amqp_type_to_ulong(type));
 }
 
 void amqp_type_method_long_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%ld", type->value.b8._long);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%ld", amqp_type_to_long(type));
 }
 
 void amqp_type_method_small_int_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%d", type->value.b4._int);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%d", amqp_type_to_int(type));
 }
 
 void amqp_type_method_small_ulong_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%lu", type->value.b8._ulong);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%lu", amqp_type_to_ulong(type));
 }
 
 void amqp_type_method_small_long_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%ld", type->value.b8._ulong);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%ld", amqp_type_to_long(type));
 }
 
 void amqp_type_method_float_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%f", type->value.b4._float);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%f", amqp_type_to_float(type));
 }
 
 void amqp_type_method_double_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "%f", type->value.b8._double);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "%f", amqp_type_to_double(type));
 }
 
 void amqp_type_method_char_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    printf_numeric_type_value(context, type->meta_data->name, "U%60x", type->value.b4._wchar);
+    printf_numeric_type_value(context, type->constructor.meta_data->name, "U%60x", amqp_type_to_char(type));
 }
 
 void amqp_type_method_decimal32_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
@@ -350,7 +350,7 @@ void amqp_type_method_decimal32_print(amqp_context_t *context, amqp_type_t *type
 
 void amqp_type_method_timestamp_print(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
 {
-    int64_t milliseconds_since_epoc = type->value.b8._timestamp;
+    int64_t milliseconds_since_epoc = amqp_type_to_timestamp(type);
     time_t seconds_since_epoc = milliseconds_since_epoc / 1000;
     int milliseconds = milliseconds_since_epoc % 1000;
     struct tm *utc_time = gmtime(&seconds_since_epoc);

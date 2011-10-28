@@ -93,14 +93,14 @@ namespace t
     {
         int old_indent;
 
-        amqp_context_printf(context, "format code: 0x%02x\n", type->format_code);
+        amqp_context_printf(context, "format code: 0x%02x\n", type->constructor.format_code);
         old_indent = amqp_context_increase_print_indent(context, 4);
-        if (type->meta_data != 0)
+        if (type->constructor.meta_data != 0)
         {
-            amqp_context_printf(context, "width: %d, name: %s", type->meta_data->width, type->meta_data->name);
-            if (*type->meta_data->encoding_name)
+            amqp_context_printf(context, "width: %d, name: %s", type->constructor.meta_data->width, type->constructor.meta_data->name);
+            if (*type->constructor.meta_data->encoding_name)
             {
-                amqp_context_printf(context, "-%s", type->meta_data->encoding_name);
+                amqp_context_printf(context, "-%s", type->constructor.meta_data->encoding_name);
             }
             amqp_context_putc(context, '\n');
         }
@@ -111,12 +111,6 @@ namespace t
         amqp_context_putc(context, '\n');
         amqp_type_print_formatted(context, type, buffer);
         amqp_context_set_print_indent(context, old_indent);
-    }
-
-    void dump_type_buffer(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
-    {
-        amqp_buffer_dump(context, buffer);
-        amqp_context_putc(context, '\n');
     }
 
     // lhs is left hand param passed to macro
@@ -140,8 +134,14 @@ namespace t
         return 1;
     }
 
-    int compare_buffers(const unsigned char *expect, size_t expect_size, amqp_buffer_t *buffer)
+    int compare_buffers(amqp_context_t *context, const unsigned char *expect, size_t expect_size, amqp_buffer_t *buffer)
     {
-        return compare_buffers(expect, expect_size, amqp_buffer_pointer(buffer, 0), amqp_buffer_size(buffer));
+        int rc = compare_buffers(expect, expect_size, amqp_buffer_pointer(buffer, 0), amqp_buffer_size(buffer));
+        if (!rc)
+        {
+            amqp_buffer_dump(context, buffer);
+            amqp_context_putc(context, '\n');
+        }
+        return rc;
     }
 }

@@ -63,10 +63,9 @@ int initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multip
     {
         int i;
 
-        // TODO -  deal with an empty array
+        multiple->size = type->value.array.count;
         if (type->value.array.count > 0)
         {
-            multiple->size = type->value.array.count;
             multiple->symbols = AMQP_MALLOC_ARRAY(context, amqp_symbol_t, multiple->size);
 
             for (i = 0; i < multiple->size; i++)
@@ -74,6 +73,10 @@ int initialize_from_type(amqp_context_t *context, amqp_multiple_symbol_t *multip
                 amqp_type_t *element = type->value.array.elements[i];
                 amqp_symbol_initialize_from_type(context, &multiple->symbols[i], element);
             }
+        }
+        else
+        {
+            multiple->symbols = 0;
         }
     }
     else

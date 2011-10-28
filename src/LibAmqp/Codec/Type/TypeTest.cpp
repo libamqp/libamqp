@@ -81,11 +81,6 @@ SUITE(Type)
         CHECK_EQUAL(amqp_is_variable_mask, amqp_is_binary | amqp_is_string | amqp_is_symbol);
     }
 
-    TEST_FIXTURE(TypeFixture, typedef_flags_compound)
-    {
-        CHECK_EQUAL(amqp_is_compound_mask, amqp_is_list | amqp_is_map);
-    }
-
     TEST_FIXTURE(TypeFixture, typedef_flags_container)
     {
         CHECK_EQUAL(amqp_is_container_mask, amqp_is_list | amqp_is_map | amqp_is_array | amqp_is_composite);
@@ -104,7 +99,7 @@ SUITE(Type)
     TEST_FIXTURE(TypeFixture, flags_is_map)
     {
         amqp_type_t type = { 0 };
-        type.typedef_flags = amqp_is_map;
+        type.constructor.typedef_flags = amqp_is_map;
 
         CHECK(amqp_type_is_container(&type));
         CHECK(amqp_type_is_map(&type));
@@ -115,7 +110,7 @@ SUITE(Type)
     TEST_FIXTURE(TypeFixture, flags_is_list)
     {
         amqp_type_t type = { 0 };
-        type.typedef_flags = amqp_is_list;
+        type.constructor.typedef_flags = amqp_is_list;
 
         CHECK(amqp_type_is_container(&type));
         CHECK(!amqp_type_is_map(&type));
@@ -126,7 +121,7 @@ SUITE(Type)
     TEST_FIXTURE(TypeFixture, flags_is_array)
     {
         amqp_type_t type = { 0 };
-        type.typedef_flags = amqp_is_array;
+        type.constructor.typedef_flags = amqp_is_array;
 
         CHECK(amqp_type_is_container(&type));
         CHECK(!amqp_type_is_map(&type));

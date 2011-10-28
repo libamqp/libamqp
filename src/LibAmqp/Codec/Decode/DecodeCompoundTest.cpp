@@ -45,7 +45,7 @@ SUITE(CompoundTypeDecode)
 
         ASSERT_VALID(type);
 
-        CHECK_EQUAL(0xe0, type->format_code);
+        CHECK_EQUAL(0xe0, type->constructor.format_code);
 
         CHECK_ARRAY(type);
 
@@ -54,7 +54,7 @@ SUITE(CompoundTypeDecode)
 
         CHECK_NOT_NULL(type->value.array.elements);
         CHECK_NOT_NULL(type->value.array.elements[0]);
-        CHECK_EQUAL(0x61, type->value.array.elements[0]->format_code);
+        CHECK_EQUAL(0x61, type->value.array.elements[0]->constructor.format_code);
 
         CHECK_EQUAL((size_t) 5, type->value.array.count);
         for (int i = 0; i < 5; i++)
@@ -76,14 +76,14 @@ SUITE(CompoundTypeDecode)
 
         ASSERT_VALID(type);
 
-        CHECK_EQUAL(0xd0, type->format_code);
+        CHECK_EQUAL(0xd0, type->constructor.format_code);
         CHECK_LIST(type);
         CHECK_EQUAL((size_t) 6, type->value.list.count);
 
         amqp_type_t *e;
 
         e  = amqp_type_list_element(type, 0);
-        CHECK_EQUAL(0xa3, e->format_code);
+        CHECK_EQUAL(0xa3, e->constructor.format_code);
         CHECK(amqp_type_is_symbol(e));
         CHECK(amqp_type_is_contained(e));
         result = amqp_convert_bytes_to_cstr(context, e);
@@ -91,13 +91,13 @@ SUITE(CompoundTypeDecode)
         AMQP_FREE(context, result);
 
         e  = amqp_type_list_element(type, 1);
-        CHECK_EQUAL(0x82, e->format_code);
+        CHECK_EQUAL(0x82, e->constructor.format_code);
         CHECK(amqp_type_is_double(e));
         CHECK(amqp_type_is_contained(e));
-        CHECK_CLOSE(123.456, e->value.b8._double, 0.0001);
+        CHECK_CLOSE(123.456, amqp_type_to_double(e), 0.0001);
 
         e  = amqp_type_list_element(type, 2);
-        CHECK_EQUAL(0xa1, e->format_code);
+        CHECK_EQUAL(0xa1, e->constructor.format_code);
         CHECK(amqp_type_is_string(e));
         CHECK(amqp_type_is_contained(e));
         result = amqp_convert_bytes_to_cstr(context, e);
@@ -105,19 +105,19 @@ SUITE(CompoundTypeDecode)
         AMQP_FREE(context, result);
 
         e  = amqp_type_list_element(type, 3);
-        CHECK_EQUAL(0x61, e->format_code);
+        CHECK_EQUAL(0x61, e->constructor.format_code);
         CHECK(amqp_type_is_short(e));
         CHECK(amqp_type_is_contained(e));
-        CHECK_EQUAL(10, e->value.b2._short);
+        CHECK_EQUAL(10, amqp_type_to_short(e));
 
         e  = amqp_type_list_element(type, 4);
-        CHECK_EQUAL(0xe0, e->format_code);
+        CHECK_EQUAL(0xe0, e->constructor.format_code);
         CHECK_ARRAY(e);
         CHECK(amqp_type_is_contained(e));
         CHECK_EQUAL((size_t) 2, e->value.compound.count);
 
         e  = amqp_type_list_element(type, 5);
-        CHECK_EQUAL(0xe0, e->format_code);
+        CHECK_EQUAL(0xe0, e->constructor.format_code);
         CHECK_ARRAY(e);
         CHECK(amqp_type_is_contained(e));
         CHECK_EQUAL((size_t) 1, e->value.compound.count);
@@ -135,23 +135,23 @@ SUITE(CompoundTypeDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(0xc1, type->format_code);
+        CHECK_EQUAL(0xc1, type->constructor.format_code);
         CHECK_MAP(type);
         CHECK_EQUAL((size_t) 10, type->value.map.count); // number of entries not elements
 
-        CHECK_EQUAL(0xa1, amqp_type_map_element(type, 0)->format_code);
-        CHECK_EQUAL(0xc0, amqp_type_map_element(type, 1)->format_code);
-        CHECK_EQUAL(0x40, amqp_type_map_element(type, 2)->format_code);
-        CHECK_EQUAL(0x41, amqp_type_map_element(type, 3)->format_code);
-        CHECK_EQUAL(0xa1, amqp_type_map_element(type, 4)->format_code);
-        CHECK_EQUAL(0x82, amqp_type_map_element(type, 5)->format_code);
-        CHECK_EQUAL(0xa1, amqp_type_map_element(type, 6)->format_code);
-        CHECK_EQUAL(0x55, amqp_type_map_element(type, 7)->format_code);
-        CHECK_EQUAL(0xa1, amqp_type_map_element(type, 8)->format_code);
-        CHECK_EQUAL(0x81, amqp_type_map_element(type, 9)->format_code);
+        CHECK_EQUAL(0xa1, amqp_type_map_element(type, 0)->constructor.format_code);
+        CHECK_EQUAL(0xc0, amqp_type_map_element(type, 1)->constructor.format_code);
+        CHECK_EQUAL(0x40, amqp_type_map_element(type, 2)->constructor.format_code);
+        CHECK_EQUAL(0x41, amqp_type_map_element(type, 3)->constructor.format_code);
+        CHECK_EQUAL(0xa1, amqp_type_map_element(type, 4)->constructor.format_code);
+        CHECK_EQUAL(0x82, amqp_type_map_element(type, 5)->constructor.format_code);
+        CHECK_EQUAL(0xa1, amqp_type_map_element(type, 6)->constructor.format_code);
+        CHECK_EQUAL(0x55, amqp_type_map_element(type, 7)->constructor.format_code);
+        CHECK_EQUAL(0xa1, amqp_type_map_element(type, 8)->constructor.format_code);
+        CHECK_EQUAL(0x81, amqp_type_map_element(type, 9)->constructor.format_code);
     }
 
-    TEST_FIXTURE(DecodeFixture, arrray_elements_are_cocntained)
+    TEST_FIXTURE(DecodeFixture, arrray_elements_are_contained)
     {
         load_decode_buffer(test_data::array_shorts);
         type = amqp_decode(context, decode_buffer);
@@ -161,6 +161,17 @@ SUITE(CompoundTypeDecode)
         CHECK(amqp_type_is_contained(type->value.array.elements[2]));
         CHECK(amqp_type_is_contained(type->value.array.elements[3]));
         CHECK(amqp_type_is_contained(type->value.array.elements[4]));
+    }
+
+    TEST_FIXTURE(DecodeFixture, empty_array_of_symbols)
+    {
+        test_data::empty_array_of_symbols.transfer_to(decode_buffer);
+        type = amqp_decode(context, decode_buffer);
+
+        CHECK(amqp_type_is_array(type));
+        CHECK_EQUAL(0U, type->value.array.count);
+
+        // TODO - check element type even
     }
 
     TEST_FIXTURE(DecodeFixture, list_elements_are_contained)
@@ -272,7 +283,7 @@ SUITE(CompoundTypeDecode)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(0xc1, type->format_code);
+        CHECK_EQUAL(0xc1, type->constructor.format_code);
         CHECK_MAP(type);
         CHECK_EQUAL((size_t) 0, type->value.map.count); // number of entries not elements
     }
@@ -283,7 +294,7 @@ SUITE(CompoundTypeDecode)
         type = amqp_decode(context, decode_buffer);
         ASSERT_VALID(type);
 
-        CHECK_EQUAL(0xc0, type->format_code);
+        CHECK_EQUAL(0xc0, type->constructor.format_code);
         CHECK_LIST(type);
         CHECK_EQUAL((size_t) 0, type->value.list.count);
     }
@@ -294,7 +305,7 @@ SUITE(CompoundTypeDecode)
         type = amqp_decode(context, decode_buffer);
         ASSERT_VALID(type);
 
-        CHECK_EQUAL(0x45, type->format_code);
+        CHECK_EQUAL(0x45, type->constructor.format_code);
         CHECK_LIST(type);
         CHECK_EQUAL((size_t) 0, type->value.list.count);
     }

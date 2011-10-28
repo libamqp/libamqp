@@ -40,7 +40,7 @@ SUITE(CodecEncode)
         CHECK_NOT_NULL(type);
         CHECK_BUFFERS_MATCH(buffer, test_data::ulong_zero);
 
-        CHECK_EQUAL(0x44, type->format_code);
+        CHECK_EQUAL(0x44, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x00, type->position.size);
     }
@@ -62,7 +62,7 @@ SUITE(CodecEncode)
         CHECK_NOT_NULL(type);
         CHECK_BUFFERS_MATCH(buffer, test_data::ulong_zero);
 
-        CHECK_EQUAL(0x44, type->format_code);
+        CHECK_EQUAL(0x44, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x00, type->position.size);
     }
