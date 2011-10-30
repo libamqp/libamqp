@@ -146,7 +146,7 @@ $mappings['fields'] = TypedefedMapper.new('fields', 'map')
 $mappings['node-properties'] = TypedefedMapper.new('fields', 'map')
 $mappings['delivery-tag'] = TypedefedMapper.new('delivery_tag', 'binary')
 
-$mappings['error'] = TypedefedMapper.new('error')
+$mappings['error'] = TypedefedMapper.new('error', 'amqp_error')
 $mappings['timestamp'] = TypedefedMapper.new('timestamp')
 
 $mappings['terminus-durability'] = TypedefedMapper.new('terminus_durability')

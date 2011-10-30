@@ -23,40 +23,11 @@
 
 #include "debug_helper.h"
 
-enum {
-    optional = false,
-    mandatory = true
-};
+#include "AmqpTypes/Decode/AmqpTypesDecode.h"
+#include "AmqpTypes/Decode/AmqpDefinitionsDecode.h"
 
-#define amqp_field_error(context, code, field, total, ...) _amqp_decode_field_error(context, __FILE__, __LINE__, #code, code, field, total, "" __VA_ARGS__)
-#define amqp_decode_field_error(context, field, total, ...) amqp_field_error(context, AMQP_ERROR_FRAME_FIELD_DECODE_FAILED, field, total, "" __VA_ARGS__)
-#define amqp_mandatory_field_missing_error(context, field, total, s) amqp_field_error(context, AMQP_ERROR_MULTIPLE_DECODE_FAILED, field, total, "Mandatory \"%s\" is null or missing", s)
-#define amqp_field_range_error(context, field, total, ...) amqp_field_error(context, AMQP_ERROR_FRAME_FIELD_RANGE_ERROR, field, total, "" __VA_ARGS__)
-
-void _amqp_decode_field_error(amqp_context_t *context, const char *filename, int line_number, const char *error_mnemonic, int error_code, int field, int total, const char *format, ...)
-{
-    char message[256];
-    va_list args;
-
-    va_start(args, format);
-    vsnprintf(message, sizeof(message), format, args);
-    va_end(args);
-
-    _amqp_error(context, 1, filename, line_number, 0, error_mnemonic, error_code, "Failed to decode field at position %d (%d of %d). %s", field, field + 1, total, message);
-}
-
-#define amqp_decode_frame_error(context, frame_type) amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode a %s frame.", frame_type);
-
-static inline
-amqp_type_t *field(amqp_type_t *list, int field_number)
-{
-    return list && (field_number < list->value.list.count) ? list->value.list.elements[field_number] : 0;
-}
-
-#include "frame_decode_field.h"
-#include "Transport/Decode/decode_sasl_frame.h"
-#include "Transport/Decode/decode_transport_frame.h"
-//#include "frame_decode_frame.h"
+#include "Transport/Decode/DecodeSaslFrame.h"
+#include "Transport/Decode/DecodeTransportFrame.h"
 
 static int decode_header(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame)
 {
@@ -149,46 +120,46 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
     switch (frame->descriptor.id)
     {
         case amqp_sasl_mechanisms_list_descriptor:
-            return decode_sasl_mechanisms_frame(context, buffer, frame, type);
+            return amqp_decode_sasl_mechanisms_frame(context, buffer, frame, type);
 
         case amqp_sasl_init_list_descriptor:
-            return decode_sasl_init_frame(context, buffer, frame, type);
+            return amqp_decode_sasl_init_frame(context, buffer, frame, type);
 
         case amqp_sasl_challenge_list_descriptor:
-            return decode_sasl_challenge_frame(context, buffer, frame, type);
+            return amqp_decode_sasl_challenge_frame(context, buffer, frame, type);
 
         case amqp_sasl_response_list_descriptor:
-            return decode_sasl_response_frame(context, buffer, frame, type);
+            return amqp_decode_sasl_response_frame(context, buffer, frame, type);
 
         case amqp_sasl_outcome_list_descriptor:
-            return decode_sasl_outcome_frame(context, buffer, frame, type);
+            return amqp_decode_sasl_outcome_frame(context, buffer, frame, type);
 
         case amqp_open_list_descriptor:
-            return decode_amqp_open_frame(context, buffer, frame, type);
+            return amqp_decode_amqp_open_frame(context, buffer, frame, type);
 
         case amqp_begin_list_descriptor:
-            return decode_amqp_begin_frame(context, buffer, frame, type);
+            return amqp_decode_amqp_begin_frame(context, buffer, frame, type);
 
         case amqp_attach_list_descriptor:
-            return decode_amqp_attach_frame(context, buffer, frame, type);
+            return amqp_decode_amqp_attach_frame(context, buffer, frame, type);
 
         case amqp_flow_list_descriptor:
-            return decode_amqp_flow_frame(context, buffer, frame, type);
+            return amqp_decode_amqp_flow_frame(context, buffer, frame, type);
 
         case amqp_transfer_list_descriptor:
-            return decode_amqp_transfer_frame(context, buffer, frame, type);
+            return amqp_decode_amqp_transfer_frame(context, buffer, frame, type);
 
         case amqp_disposition_list_descriptor:
-            return decode_amqp_disposition_frame(context, buffer, frame, type);
+            return amqp_decode_amqp_disposition_frame(context, buffer, frame, type);
 
         case amqp_detach_list_descriptor:
-            return decode_amqp_detach_frame(context, buffer, frame, type);
+            return amqp_decode_amqp_detach_frame(context, buffer, frame, type);
 
         case amqp_end_list_descriptor:
-            return decode_amqp_end_frame(context, buffer, frame, type);
+            return amqp_decode_amqp_end_frame(context, buffer, frame, type);
 
         case amqp_close_list_descriptor:
-            return decode_amqp_close_frame(context, buffer, frame, type);
+            return amqp_decode_amqp_close_frame(context, buffer, frame, type);
 
         default:
             amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Unsupported descriptor id. Id = %08x", frame->descriptor.id);

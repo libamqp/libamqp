@@ -29,6 +29,7 @@
 #include "AmqpTypes/AmqpMultiple.h"
 #include "AmqpTypes/AmqpString.h"
 #include "AmqpTypes/AmqpSymbol.h"
+#include "AmqpTypes/AmqpWildcard.h"
 
 #include "Amqp/AmqpDefinitions.h"
 
@@ -43,6 +44,7 @@ union amqp_amqp_type_t
     amqp_multiple_symbol_t multiple_symbol;
     amqp_string_t string;
     amqp_symbol_t symbol;
+    amqp_wildcard_t wildcard;
 };
 
 #endif

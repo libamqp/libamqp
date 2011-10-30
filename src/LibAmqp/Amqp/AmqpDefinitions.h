@@ -73,11 +73,6 @@ typedef struct amqp_error_t         // descriptor 0000:001d
     amqp_fields_t info;
 } amqp_error_t;
 
-typedef struct amqp_wildcard_t
-{
-    int filler;
-} amqp_wildcard_t;
-
 typedef int  amqp_terminus_durability_t;
 typedef int  amqp_terminus_expiry_policy_t;
 typedef int  amqp_filter_set_t;

@@ -20,23 +20,21 @@
   	scripts/generate-amqp-types.rb to generate AMQP typedefs
   	scripts/generate-decode-methods.rb to generate composite type decode methods
  */
-#ifndef LIBAMQP_TRANSPORT_DECODE_SECURITY_H
-#define LIBAMQP_TRANSPORT_DECODE_SECURITY_H
-#ifdef __cplusplus
-extern "C" {
-#endif
-    
 /*
     <type name='sasl-mechanisms' provides='sasl-frame' class='composite' source='list'>
       <descriptor name='amqp:sasl-mechanisms:list' code='0x00000000:0x00000040'/>
       <field name='sasl-server-mechanisms' mandatory='true' type='symbol' multiple='true'/>
     </type>
 */ 
+#ifdef AMQP_DECODE_GENERATED_HEADER
+extern int amqp_decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list);
+#endif
+#ifdef AMQP_DECODE_GENERATED_BODY
 static void cleanup_sasl_mechanisms_frame(amqp_context_t *context, amqp_frame_t *frame)
 {
     amqp_multiple_symbol_cleanup(context, &frame->frames.sasl.mechanisms.sasl_server_mechanisms);
 }
-static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
+int amqp_decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
 {
     const int total_fields = 1;
     int field_number = 0;
@@ -45,7 +43,7 @@ static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *
     frame->dispatch = amqp_dispatch_sasl_mechanisms;
     frame->cleanup = cleanup_sasl_mechanisms_frame;
 
-    rc = decode_mandatory_multiple_symbol(context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.mechanisms.sasl_server_mechanisms); field_number++;
+    rc = amqp_decode_mandatory_multiple_type_symbol(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.sasl.mechanisms.sasl_server_mechanisms); field_number++;
 
     assert(field_number = total_fields);
     if (rc == 0)
@@ -55,7 +53,7 @@ static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *
 
     return rc;  
 }   
-
+#endif
 /*
     <type name='sasl-init' provides='sasl-frame' class='composite' source='list'>
       <descriptor name='amqp:sasl-init:list' code='0x00000000:0x00000041'/>
@@ -64,13 +62,17 @@ static int decode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *
       <field name='hostname' type='string'/>
     </type>
 */ 
+#ifdef AMQP_DECODE_GENERATED_HEADER
+extern int amqp_decode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list);
+#endif
+#ifdef AMQP_DECODE_GENERATED_BODY
 static void cleanup_sasl_init_frame(amqp_context_t *context, amqp_frame_t *frame)
 {
     amqp_symbol_cleanup(context, &frame->frames.sasl.init.mechanism);
     amqp_binary_cleanup(context, &frame->frames.sasl.init.initial_response);
     amqp_string_cleanup(context, &frame->frames.sasl.init.hostname);
 }
-static int decode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
+int amqp_decode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
 {
     const int total_fields = 3;
     int field_number = 0;
@@ -79,9 +81,9 @@ static int decode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer
     frame->dispatch = amqp_dispatch_sasl_init;
     frame->cleanup = cleanup_sasl_init_frame;
 
-    rc = decode_mandatory_symbol(context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.init.mechanism); field_number++;
-    rc = rc && decode_binary(context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.init.initial_response); field_number++;
-    rc = rc && decode_string(context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.init.hostname); field_number++;
+    rc = amqp_decode_mandatory_type_symbol(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.sasl.init.mechanism); field_number++;
+    rc = rc && amqp_decode_type_binary(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.sasl.init.initial_response); field_number++;
+    rc = rc && amqp_decode_type_string(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.sasl.init.hostname); field_number++;
 
     assert(field_number = total_fields);
     if (rc == 0)
@@ -91,18 +93,22 @@ static int decode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer
 
     return rc;  
 }   
-
+#endif
 /*
     <type name='sasl-challenge' provides='sasl-frame' class='composite' source='list'>
       <descriptor name='amqp:sasl-challenge:list' code='0x00000000:0x00000042'/>
       <field name='challenge' mandatory='true' type='binary'/>
     </type>
 */ 
+#ifdef AMQP_DECODE_GENERATED_HEADER
+extern int amqp_decode_sasl_challenge_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list);
+#endif
+#ifdef AMQP_DECODE_GENERATED_BODY
 static void cleanup_sasl_challenge_frame(amqp_context_t *context, amqp_frame_t *frame)
 {
     amqp_binary_cleanup(context, &frame->frames.sasl.challenge.challenge);
 }
-static int decode_sasl_challenge_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
+int amqp_decode_sasl_challenge_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
 {
     const int total_fields = 1;
     int field_number = 0;
@@ -111,7 +117,7 @@ static int decode_sasl_challenge_frame(amqp_context_t *context, amqp_buffer_t *b
     frame->dispatch = amqp_dispatch_sasl_challenge;
     frame->cleanup = cleanup_sasl_challenge_frame;
 
-    rc = decode_mandatory_binary(context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.challenge.challenge); field_number++;
+    rc = amqp_decode_mandatory_type_binary(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.sasl.challenge.challenge); field_number++;
 
     assert(field_number = total_fields);
     if (rc == 0)
@@ -121,18 +127,22 @@ static int decode_sasl_challenge_frame(amqp_context_t *context, amqp_buffer_t *b
 
     return rc;  
 }   
-
+#endif
 /*
     <type name='sasl-response' provides='sasl-frame' class='composite' source='list'>
       <descriptor name='amqp:sasl-response:list' code='0x00000000:0x00000043'/>
       <field name='response' mandatory='true' type='binary'/>
     </type>
 */ 
+#ifdef AMQP_DECODE_GENERATED_HEADER
+extern int amqp_decode_sasl_response_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list);
+#endif
+#ifdef AMQP_DECODE_GENERATED_BODY
 static void cleanup_sasl_response_frame(amqp_context_t *context, amqp_frame_t *frame)
 {
     amqp_binary_cleanup(context, &frame->frames.sasl.response.response);
 }
-static int decode_sasl_response_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
+int amqp_decode_sasl_response_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
 {
     const int total_fields = 1;
     int field_number = 0;
@@ -141,7 +151,7 @@ static int decode_sasl_response_frame(amqp_context_t *context, amqp_buffer_t *bu
     frame->dispatch = amqp_dispatch_sasl_response;
     frame->cleanup = cleanup_sasl_response_frame;
 
-    rc = decode_mandatory_binary(context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.response.response); field_number++;
+    rc = amqp_decode_mandatory_type_binary(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.sasl.response.response); field_number++;
 
     assert(field_number = total_fields);
     if (rc == 0)
@@ -151,7 +161,7 @@ static int decode_sasl_response_frame(amqp_context_t *context, amqp_buffer_t *bu
 
     return rc;  
 }   
-
+#endif
 /*
     <type name='sasl-outcome' provides='sasl-frame' class='composite' source='list'>
       <descriptor name='amqp:sasl-outcome:list' code='0x00000000:0x00000044'/>
@@ -159,12 +169,16 @@ static int decode_sasl_response_frame(amqp_context_t *context, amqp_buffer_t *bu
       <field name='additional-data' type='binary'/>
     </type>
 */ 
+#ifdef AMQP_DECODE_GENERATED_HEADER
+extern int amqp_decode_sasl_outcome_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list);
+#endif
+#ifdef AMQP_DECODE_GENERATED_BODY
 static void cleanup_sasl_outcome_frame(amqp_context_t *context, amqp_frame_t *frame)
 {
     // code
     amqp_binary_cleanup(context, &frame->frames.sasl.outcome.additional_data);
 }
-static int decode_sasl_outcome_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
+int amqp_decode_sasl_outcome_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
 {
     const int total_fields = 2;
     int field_number = 0;
@@ -173,8 +187,8 @@ static int decode_sasl_outcome_frame(amqp_context_t *context, amqp_buffer_t *buf
     frame->dispatch = amqp_dispatch_sasl_outcome;
     frame->cleanup = cleanup_sasl_outcome_frame;
 
-    rc = decode_mandatory_sasl_code(context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.outcome.code); field_number++;
-    rc = rc && decode_binary(context, field(field_list, field_number), field_number, total_fields, &frame->frames.sasl.outcome.additional_data); field_number++;
+    rc = amqp_decode_mandatory_primitive_sasl_code(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.sasl.outcome.code); field_number++;
+    rc = rc && amqp_decode_type_binary(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.sasl.outcome.additional_data); field_number++;
 
     assert(field_number = total_fields);
     if (rc == 0)
@@ -184,8 +198,4 @@ static int decode_sasl_outcome_frame(amqp_context_t *context, amqp_buffer_t *buf
 
     return rc;  
 }   
-
-#ifdef __cplusplus
-}
-#endif
 #endif

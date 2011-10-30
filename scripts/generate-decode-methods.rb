@@ -41,9 +41,13 @@ class Parser
     ""
   end
   
+  def type_or_primitive(f)
+    primitive?(f) ? "primitive_" : "type_"
+  end
+  
   def default_arg_value(f)
     v=f.attributes['default']
-    $enum_value_mapping[v] || v || "0"
+    $enum_value_mapping[v] || v || "AMQP_NO_DEFAULT_VALUE"
   end
   
   def default_arg(f)
@@ -82,8 +86,8 @@ class Parser
   
   def decode_field_call(element, field, tunnel, padding)
     return todo(field) if !has_mapping?(field)    
-    "#{padding}decode_#{mandatory_prefix field}#{multiple_prefix field}#{base_xml_name field}(#{mandatory_arg field}" +
-            "context, field(field_list, field_number), field_number, total_fields, " +
+    "#{padding}amqp_decode_#{mandatory_prefix field}#{multiple_prefix field}#{type_or_primitive field}#{base_xml_name field}(#{mandatory_arg field}" +
+            "context, amqp_field_from_list(field_list, field_number), field_number, total_fields, " +
             "&frame->frames.#{frame_field_name element, field, tunnel}" +
             "#{default_arg field}); field_number++;"         
   end
@@ -120,10 +124,14 @@ class Parser
 /*
     #{e}
 */ 
+\#ifdef AMQP_DECODE_GENERATED_HEADER
+extern int amqp_decode_#{qname}_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list);
+\#endif
+\#ifdef AMQP_DECODE_GENERATED_BODY
 static void cleanup_#{qname}_frame(amqp_context_t *context, amqp_frame_t *frame)
 {
 #{cleanup_calls(e, tunnel)}}
-static int decode_#{qname}_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
+int amqp_decode_#{qname}_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
 {
     const int total_fields = #{total_fields};
     int field_number = 0;
@@ -141,32 +149,18 @@ static int decode_#{qname}_frame(amqp_context_t *context, amqp_buffer_t *buffer,
 
     return rc;  
 }   
-
+\#endif
 eos
   end
 
   def parse
     guard = File.basename(@xml_file, ".bare.xml").downcase
     puts($header)
-    puts(<<-eos)
-\#ifndef LIBAMQP_TRANSPORT_DECODE_#{guard.upcase}_H
-\#define LIBAMQP_TRANSPORT_DECODE_#{guard.upcase}_H
-\#ifdef __cplusplus
-extern "C" {
-\#endif
-    
-eos
     xml_file = File.new(@xml_file)
     document = REXML::Document.new(xml_file)
     $xpaths.each do |key, value| 
       document.root.each_element(value) { |e| method e }
     end
-    puts(<<-eos)
-\#ifdef __cplusplus
-}
-\#endif
-\#endif
-eos
   end
 end
 

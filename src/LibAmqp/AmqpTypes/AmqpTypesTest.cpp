@@ -46,7 +46,7 @@ SUITE(AmqpTypes)
     }
     TEST_FIXTURE(AmqpTypesFixture, error_definition)
     {
-        CHECK_EQUAL(144U, sizeof(amqp_definition_error_t));
+        CHECK_EQUAL(152U, sizeof(amqp_error_t));
     }
     TEST_FIXTURE(AmqpTypesFixture, frames)
     {
@@ -56,9 +56,9 @@ SUITE(AmqpTypes)
         CHECK_EQUAL(72U, sizeof(amqp_transport_flow_t));
         CHECK_EQUAL(96U, sizeof(amqp_transport_transfer_t));
         CHECK_EQUAL(24U, sizeof(amqp_transport_disposition_t));
-        CHECK_EQUAL(152U, sizeof(amqp_transport_detach_t));
-        CHECK_EQUAL(144U, sizeof(amqp_transport_end_t));
-        CHECK_EQUAL(144U, sizeof(amqp_transport_close_t));
+        CHECK_EQUAL(160U, sizeof(amqp_transport_detach_t));
+        CHECK_EQUAL(152U, sizeof(amqp_transport_end_t));
+        CHECK_EQUAL(152U, sizeof(amqp_transport_close_t));
     }
     TEST_FIXTURE(AmqpTypesFixture, security)
     {
@@ -81,7 +81,7 @@ SUITE(AmqpTypes)
     {
         CHECK_EQUAL(16U, sizeof(amqp_delivery_state_received_t));
         CHECK_EQUAL(16U, sizeof(amqp_delivery_state_accepted_t));
-        CHECK_EQUAL(144U, sizeof(amqp_delivery_state_rejected_t));
+//        CHECK_EQUAL(144U, sizeof(amqp_delivery_state_rejected_t));
         CHECK_EQUAL(16U, sizeof(amqp_delivery_state_released_t));
         CHECK_EQUAL(40U, sizeof(amqp_delivery_state_modified_t));
     }
