@@ -81,7 +81,7 @@ SUITE(AmqpTypes)
     {
         CHECK_EQUAL(16U, sizeof(amqp_delivery_state_received_t));
         CHECK_EQUAL(16U, sizeof(amqp_delivery_state_accepted_t));
-//        CHECK_EQUAL(144U, sizeof(amqp_delivery_state_rejected_t));
+        CHECK_EQUAL(152U, sizeof(amqp_delivery_state_rejected_t));
         CHECK_EQUAL(16U, sizeof(amqp_delivery_state_released_t));
         CHECK_EQUAL(40U, sizeof(amqp_delivery_state_modified_t));
     }
