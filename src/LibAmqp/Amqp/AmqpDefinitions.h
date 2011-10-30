@@ -67,6 +67,7 @@ typedef amqp_map_t amqp_fields_t;
 
 typedef struct amqp_error_t         // descriptor 0000:001d
 {
+    int is_null;
     amqp_symbol_t condition;
     amqp_string_t description;
     amqp_fields_t info;

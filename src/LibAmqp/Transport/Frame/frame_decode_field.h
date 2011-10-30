@@ -148,3 +148,52 @@ decode_receiver_settle_mode(amqp_context_t *context, amqp_type_t *field, int fie
     }
     return rc;
 }
+
+static void
+amqp_error_cleanup(amqp_context_t *context, amqp_error_t *error)
+{
+    amqp_symbol_cleanup(context, &error->condition);
+    amqp_string_cleanup(context, &error->description);
+    amqp_map_cleanup(context, &error->info);
+}
+
+static int
+decode_error(amqp_context_t *context, amqp_type_t *field_type, int field_number, int total_fields, amqp_error_t *result)
+{
+    amqp_type_t *error_field_list;
+    int rc;
+
+    if (amqp_type_is_null(field_type))
+    {
+        result->is_null = true;
+        amqp_symbol_initialize_as_null(context, &result->condition);
+        amqp_string_initialize_as_null(context, &result->description);
+        amqp_map_initialize_as_null(context, &result->info);
+        return true;
+    }
+    if (!amqp_type_is_composite(field_type))
+    {
+        amqp_decode_field_error(context, field_number, total_fields, "Expected a composite type describing an AMQP Error condition.");
+        return false;
+    }
+
+    // TODO - check class code is 0x1d. If not, lookup error handling plugin manager
+
+    error_field_list = amqp_type_get_described(field_type);
+    if (!amqp_type_is_list(error_field_list))
+    {
+        amqp_decode_field_error(context, field_number, total_fields, "Expected a described list containing error fields.");
+        return false;
+    }
+
+    rc = decode_mandatory_symbol(context, field(error_field_list, 0), 0, 3, &result->condition) &&
+            decode_string(context, field(error_field_list, 1), 1, 3, &result->description) &&
+            decode_map(context, field(error_field_list, 2), 2, 3, &result->info);
+
+    if (rc == 0)
+    {
+        amqp_decode_frame_error(context, "AMQP Error");
+    }
+
+    return rc;
+}

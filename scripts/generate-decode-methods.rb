@@ -1,0 +1,177 @@
+#!/usr/bin/ruby
+#
+require 'rexml/document'
+require 'generate-common'
+
+$enum_value_mapping = {}
+$enum_value_mapping['mixed'] = 'amqp_sender_settle_mode_mixed'
+$enum_value_mapping['first'] = 'amqp_receiver_settle_mode_first'
+
+class Parser
+  include Common
+  
+  def initialize(xml_file)
+    @xml_file = xml_file
+  end      
+
+  def xml_name(f)
+    m = field_mapping f
+    m.xml_name 
+  end
+
+  def base_xml_name(f)
+    m = field_mapping f
+    m.base_xml_name 
+  end
+
+  def c_name(f)
+    m = field_mapping f
+    m.xml_name(f) 
+  end
+
+  def multiple_prefix(f)
+    multiple?(f) ? "multiple_" : ""
+  end
+  def mandatory_prefix(f)
+    mandatory?(f) ? "mandatory_" : ""
+  end
+
+  def mandatory_arg(f)
+    # mandatory?(f) ? "mandatory" : "optional"
+    ""
+  end
+  
+  def default_arg_value(f)
+    v=f.attributes['default']
+    $enum_value_mapping[v] || v || "0"
+  end
+  
+  def default_arg(f)
+    return "" if mandatory?(f)
+    return "" unless primitive?(f)
+    ", #{default_arg_value(f)}"
+  end
+  
+  def group(e)
+    e.attributes['name'].split('-').last
+  end
+  def field_name(f)
+    f.attributes['name'].gsub(/-/,'_')
+  end
+  def frame_field_name(e, f, t)
+    "#{t}.#{group e}.#{field_name f}"
+  end
+  
+  def todo(f)
+    "// TODO - Missing or confusing mapping for #{f}\nabort();"
+  end  
+  
+  def cleanup_call(e, f, t)
+    return "// #{field_name(f)}" if primitive?(f)
+    "amqp_#{multiple_prefix f}#{base_xml_name f}_cleanup(context, &frame->frames.#{frame_field_name e, f, t});" 
+  end
+  
+  def cleanup_calls(e, t)
+    result = ""
+    e.elements.each('field') do |f| 
+      result += "    " + cleanup_call(e, f, t)
+      result += "\n"
+    end
+    result
+  end
+  
+  def decode_field_call(element, field, tunnel, padding)
+    return todo(field) if !has_mapping?(field)    
+    "#{padding}decode_#{mandatory_prefix field}#{multiple_prefix field}#{base_xml_name field}(#{mandatory_arg field}" +
+            "context, field(field_list, field_number), field_number, total_fields, " +
+            "&frame->frames.#{frame_field_name element, field, tunnel}" +
+            "#{default_arg field}); field_number++;"         
+  end
+  
+  def decode_calls(e, t)
+    result = ""
+    assign = "rc = "
+    e.elements.each('field') do |f| 
+      # result += "    // #{f}\n"
+      result += "    " + decode_field_call(e, f, t, assign)
+      result += "\n"
+      assign = "rc = rc && "
+    end
+    result
+  end    
+  
+  def method(e)
+    raw_name = e.attributes['name']
+    lname = raw_name.split('-').last
+    name = raw_name.gsub(/-/,'_')
+    title = raw_name.split('-').collect{|x| x.capitalize}
+    if (title[0] == 'Sasl')
+      title[0].upcase!
+      title = title.join(' ')
+      tunnel = 'sasl'
+    else
+      title = "AMQP " + title.join(' ')
+      tunnel = 'amqp'
+    end
+    qname = "#{tunnel}_#{lname}"
+    total_fields = e.elements.count - 1
+
+    puts(<<-eos)
+/*
+    #{e}
+*/ 
+static void cleanup_#{qname}_frame(amqp_context_t *context, amqp_frame_t *frame)
+{
+#{cleanup_calls(e, tunnel)}}
+static int decode_#{qname}_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_t *frame, amqp_type_t *field_list)
+{
+    const int total_fields = #{total_fields};
+    int field_number = 0;
+    int rc;
+    
+    frame->dispatch = amqp_dispatch_#{qname};
+    frame->cleanup = cleanup_#{qname}_frame;
+
+#{decode_calls(e, tunnel)}
+    assert(field_number = total_fields);
+    if (rc == 0)
+    {
+        amqp_decode_frame_error(context, "#{title}");
+    }
+
+    return rc;  
+}   
+
+eos
+  end
+
+  def parse
+    guard = File.basename(@xml_file, ".bare.xml").downcase
+    puts($header)
+    puts(<<-eos)
+\#ifndef LIBAMQP_TRANSPORT_DECODE_#{guard.upcase}_H
+\#define LIBAMQP_TRANSPORT_DECODE_#{guard.upcase}_H
+\#ifdef __cplusplus
+extern "C" {
+\#endif
+    
+eos
+    xml_file = File.new(@xml_file)
+    document = REXML::Document.new(xml_file)
+    $xpaths.each do |key, value| 
+      document.root.each_element(value) { |e| method e }
+    end
+    puts(<<-eos)
+\#ifdef __cplusplus
+}
+\#endif
+\#endif
+eos
+  end
+end
+
+if ARGV[0] 
+  Parser.new(ARGV[0]).parse
+else
+  puts('No XML file provided')
+end
