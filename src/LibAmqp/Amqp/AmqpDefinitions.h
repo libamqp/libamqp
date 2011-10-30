@@ -29,27 +29,29 @@ enum {
     amqp_sasl_code_perm_system_error,
     amqp_sasl_code_temp_system_error
 };
-
 typedef uint8_t amqp_sasl_code_t;
 
-typedef enum amqp_role_t
+enum
 {
     amqp_sender_role = false,
     amqp_receiver_role = true
-} amqp_role_t;
+};
+typedef int amqp_role_t;
 
-typedef enum amqp_sender_settle_mode_t
+enum
 {
     amqp_sender_settle_mode_unsettled = 0,
     amqp_sender_settle_mode_settled = 1,
     amqp_sender_settle_mode_mixed = 2
-} amqp_sender_settle_mode_t;
+};
+typedef uint8_t amqp_sender_settle_mode_t;
 
-typedef enum amqp_receiver_settle_mode_t
+enum
 {
     amqp_receiver_settle_mode_first = 0,
     amqp_receiver_settle_mode_second = 1
-} amqp_receiver_settle_mode_t;
+};
+typedef uint8_t amqp_receiver_settle_mode_t;
 
 typedef uint32_t amqp_milliseconds_t;
 typedef uint32_t amqp_seconds_t;

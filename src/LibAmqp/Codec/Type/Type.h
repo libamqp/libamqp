@@ -124,15 +124,13 @@ int amqp_typedef_flags_test(amqp_type_t *type, uint32_t bits)
 static inline
 int amqp_type_is_null(amqp_type_t *type)
 {
-    assert(type);
-    return type->constructor.typedef_flags & amqp_is_null;
+    return type == 0 || type->constructor.typedef_flags & amqp_is_null;
 }
 
 static inline
 int amqp_type_is_not_null(amqp_type_t *type)
 {
-    assert(type);
-    return (type->constructor.typedef_flags & amqp_is_null) == 0;
+    return type && (type->constructor.typedef_flags & amqp_is_null) == 0;
 }
 
 static inline

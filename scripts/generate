@@ -1,32 +1,45 @@
 #!/bin/bash
 
 readonly base=$(dirname "$0")
-readonly cmd="${base}/generate-amqp-types.rb"
-
-if [ ! -f "$cmd" -o ! -x "$cmd" ]
-then
-    echo "Cannot locate or execure $cmd"
-    exit 1
-fi
 
 readonly source_dir="${base}/../Documentation/amqp-xml"
-readonly dest_dir="${base}/../src/LibAmqp/Amqp"
 
-function generate_file
+function generate_files
 {
-	local xml_file="$1"
-	local c_file="$2"
-	local source="${source_dir}/${xml_file}"
-	if [ ! -r "${source}" ]
-	then
-		echo "Cannot access XML file: ${source}"
-		exit 1
-	fi
-	echo "${xml_file}"
-	"$cmd" "${source}" > "${dest_dir}/${c_file}"
+    local cmd="${base}/$1.rb"
+    if [ ! -f "$cmd" -o ! -x "$cmd" ]
+    then
+	echo "Cannot locate or execure $cmd"
+	exit 1
+    fi
+
+    local xml_file="$2"
+    local dest_dir="${base}/../src/LibAmqp/$3"
+    local c_file="$4"
+    local source="${source_dir}/${xml_file}"
+    if [ ! -r "${source}" ]
+    then
+	echo "Cannot access XML file: ${source}"
+	exit 1
+    fi
+    echo "${cmd} ${xml_file}"
+    "$cmd" ${mode} "${source}" > "${dest_dir}/${c_file}"
 }
 
-generate_file transport.bare.xml AmqpTransport.h
-generate_file messaging.bare.xml AmqpMessaging.h
-generate_file security.bare.xml AmqpSecurity.h
-generate_file transactions.bare.xml AmqpTransactions.h
+function generate_types
+{
+    generate_files generate-amqp-types "$1" Amqp "$2"
+}
+
+function generate_decode
+{
+    generate_files generate-decode-methods "$1" Transport/Decode "$2"
+}
+
+generate_types transport.bare.xml AmqpTransport.h
+generate_types messaging.bare.xml AmqpMessaging.h
+generate_types security.bare.xml AmqpSecurity.h
+generate_types transactions.bare.xml AmqpTransactions.h
+
+generate_decode security.bare.xml decode_sasl_frame.h
+generate_decode transport.bare.xml decode_transport_frame.h
