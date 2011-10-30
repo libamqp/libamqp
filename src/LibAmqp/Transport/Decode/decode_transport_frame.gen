@@ -190,8 +190,8 @@ int amqp_decode_amqp_attach_frame(amqp_context_t *context, amqp_buffer_t *buffer
     rc = rc && amqp_decode_mandatory_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.role); field_number++;
     rc = rc && amqp_decode_primitive_sender_settle_mode(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.snd_settle_mode, amqp_sender_settle_mode_mixed); field_number++;
     rc = rc && amqp_decode_primitive_receiver_settle_mode(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.rcv_settle_mode, amqp_receiver_settle_mode_first); field_number++;
-    rc = rc && amqp_decode_type_wildcard(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.source); field_number++;
-    rc = rc && amqp_decode_type_wildcard(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.target); field_number++;
+    rc = rc && amqp_decode_type_wildcard_expecting_source(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.source); field_number++;
+    rc = rc && amqp_decode_type_wildcard_expecting_target(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.target); field_number++;
     rc = rc && amqp_decode_type_map(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.unsettled); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.incomplete_unsettled, false); field_number++;
     rc = rc && amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.initial_delivery_count, AMQP_NO_DEFAULT_VALUE); field_number++;
@@ -323,7 +323,7 @@ int amqp_decode_amqp_transfer_frame(amqp_context_t *context, amqp_buffer_t *buff
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.settled, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.more, false); field_number++;
     rc = rc && amqp_decode_primitive_receiver_settle_mode(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.rcv_settle_mode, AMQP_NO_DEFAULT_VALUE); field_number++;
-    rc = rc && amqp_decode_type_wildcard(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.state); field_number++;
+    rc = rc && amqp_decode_type_wildcard_expecting_delivery_state(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.state); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.resume, false); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.aborted, false); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.batchable, false); field_number++;
@@ -374,7 +374,7 @@ int amqp_decode_amqp_disposition_frame(amqp_context_t *context, amqp_buffer_t *b
     rc = rc && amqp_decode_mandatory_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.first); field_number++;
     rc = rc && amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.last, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.settled, false); field_number++;
-    rc = rc && amqp_decode_type_wildcard(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.state); field_number++;
+    rc = rc && amqp_decode_type_wildcard_expecting_delivery_state(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.state); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.batchable, false); field_number++;
 
     assert(field_number = total_fields);

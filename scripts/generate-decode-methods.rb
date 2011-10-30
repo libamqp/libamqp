@@ -45,6 +45,10 @@ class Parser
     primitive?(f) ? "primitive_" : "type_"
   end
   
+  def requires_suffix(f)
+    "_expecting_#{f.attributes['requires'].gsub(/-/,'_')}" if f.attributes['requires']
+  end
+  
   def default_arg_value(f)
     v=f.attributes['default']
     $enum_value_mapping[v] || v || "AMQP_NO_DEFAULT_VALUE"
@@ -86,7 +90,7 @@ class Parser
   
   def decode_field_call(element, field, tunnel, padding)
     return todo(field) if !has_mapping?(field)    
-    "#{padding}amqp_decode_#{mandatory_prefix field}#{multiple_prefix field}#{type_or_primitive field}#{base_xml_name field}(#{mandatory_arg field}" +
+    "#{padding}amqp_decode_#{mandatory_prefix field}#{multiple_prefix field}#{type_or_primitive field}#{base_xml_name field}#{requires_suffix field}(#{mandatory_arg field}" +
             "context, amqp_field_from_list(field_list, field_number), field_number, total_fields, " +
             "&frame->frames.#{frame_field_name element, field, tunnel}" +
             "#{default_arg field}); field_number++;"         

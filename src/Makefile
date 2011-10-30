@@ -14,6 +14,7 @@ MODULES := \
 	LibAmqp/Codec \
 	LibAmqp/Thread \
 	LibAmqp/Transport \
+	LibAmqp/Messaging \
 	LibAmqp/Plugin \
 	LibAmqp/Plugin/SaslAnonymous \
 	LibAmqp/Plugin/SaslPlain \

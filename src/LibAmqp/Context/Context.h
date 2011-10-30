@@ -25,6 +25,7 @@
 #include "Buffer/Buffer.h"
 #include "Codec/Type/Type.h"
 #include "Context/ErrorHandling.h"
+#include "Messaging/MessagingPlugin.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -152,11 +153,12 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
         struct
         {
             int cloned;
+            amqp_hash_table_t *amqp_descriptors;
             struct
             {
                 amqp_sasl_plugin_node_t *sasl_plugin_list;
+                amqp_messaging_methods_t messaging;
             } plugins;
-            amqp_hash_table_t *amqp_descriptors;
         } reference;
 
         amqp_event_loop_t *thread_event_loop;

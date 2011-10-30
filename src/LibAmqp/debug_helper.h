@@ -21,6 +21,7 @@
 extern "C" {
 #endif
 
+#include <stdlib.h>
 #include <stdio.h>
 #include "todo.h"
 

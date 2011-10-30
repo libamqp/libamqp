@@ -57,6 +57,9 @@ extern void amqp_amqp_error_cleanup(amqp_context_t *context, amqp_error_t *error
 extern int amqp_decode_type_amqp_error(amqp_context_t *context, amqp_type_t *field_type, int field_number, int total_fields, amqp_error_t *result);
 
 extern void amqp_wildcard_cleanup(amqp_context_t *context, amqp_wildcard_t *wildcard);
-extern int amqp_decode_type_wildcard(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
+
+extern int amqp_decode_type_wildcard_expecting_source(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
+extern int amqp_decode_type_wildcard_expecting_target(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
+extern int amqp_decode_type_wildcard_expecting_delivery_state(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
 
 #endif
