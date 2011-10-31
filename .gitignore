@@ -2,10 +2,12 @@
 .hg
 .hgtags
 .hgignore
+
 .idea
 .project
 .cproject
 .settings
+*.tmproj
 
 *.o
 *.a
