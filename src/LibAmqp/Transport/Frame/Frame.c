@@ -215,8 +215,9 @@ static int decode_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fra
         return true;
     }
 
+    frame->type = type;
     rc = decode_performative(context, buffer, frame, type);
-    amqp_deallocate_type(context, type);
+//    amqp_deallocate_type(context, type);
     return rc;
 }
 
@@ -273,6 +274,11 @@ void amqp_frame_cleanup(amqp_context_t *context, amqp_frame_t *frame)
     if (frame == 0)
     {
         return;
+    }
+
+    if (frame->type)
+    {
+        amqp_deallocate_type(context, frame->type);
     }
 
     if (frame->descriptor.id != 0)

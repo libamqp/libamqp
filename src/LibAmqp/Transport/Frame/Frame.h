@@ -63,6 +63,8 @@ struct amqp_frame_t
         uint16_t channel;
     } type_specific;
 
+    amqp_type_t *type;      // Useful for debugging but it uses extra memory.
+
     amqp_descriptor_t descriptor;
 
     union {

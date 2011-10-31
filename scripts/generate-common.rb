@@ -159,11 +159,3 @@ $mappings['sasl-code'] = EnumMapper.new('sasl_code')
 $mappings['sender-settle-mode'] = EnumMapper.new('sender_settle_mode')
 $mappings['receiver-settle-mode'] = EnumMapper.new('receiver_settle_mode')
 
-$xpaths = {}
-$xpaths['transport'] = '//section[@name=\'performatives\']/type[descriptor]'
-$xpaths['security'] = '//section[@name=\'sasl\']/type[descriptor]'
-# $xpaths['definition'] = '//section[@name=\'definitions\']/type[descriptor]'
-$xpaths['messaging'] = '//section[@name=\'message-format\']/type[descriptor]'
-$xpaths['delivery-state'] = '//section[@name=\'delivery-state\']/type'
-$xpaths['addressing'] = '//section[@name=\'addressing\']/type[descriptor]'
-$xpaths['txn'] = '//section[@name=\'coordination\']/type[descriptor]'

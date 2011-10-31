@@ -51,5 +51,9 @@ namespace SuiteFrame
     {
         return check_header(AMQP_SASL_FRAME_TYPE, 0U);
     }
+    int FrameFixture::check_amqp_header()
+    {
+        return check_header(AMQP_FRAME_TYPE, 0U);
+    }
 
 }
