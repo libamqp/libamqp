@@ -119,10 +119,10 @@ int amqp_decode_amqp_begin_frame(amqp_context_t *context, amqp_buffer_t *buffer,
     frame->cleanup = cleanup_amqp_begin_frame;
 
     rc = amqp_decode_primitive_ushort(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.begin.remote_channel, AMQP_NO_DEFAULT_VALUE); field_number++;
-    rc = rc && amqp_decode_mandatory_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.begin.next_outgoing_id); field_number++;
+    rc = rc && amqp_decode_mandatory_primitive_sequence_no(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.begin.next_outgoing_id); field_number++;
     rc = rc && amqp_decode_mandatory_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.begin.incoming_window); field_number++;
     rc = rc && amqp_decode_mandatory_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.begin.outgoing_window); field_number++;
-    rc = rc && amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.begin.handle_max, 4294967295); field_number++;
+    rc = rc && amqp_decode_primitive_handle(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.begin.handle_max, 4294967295); field_number++;
     rc = rc && amqp_decode_multiple_type_symbol(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.begin.offered_capabilities); field_number++;
     rc = rc && amqp_decode_multiple_type_symbol(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.begin.desired_capabilities); field_number++;
     rc = rc && amqp_decode_type_map(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.begin.properties); field_number++;
@@ -186,7 +186,7 @@ int amqp_decode_amqp_attach_frame(amqp_context_t *context, amqp_buffer_t *buffer
     frame->cleanup = cleanup_amqp_attach_frame;
 
     rc = amqp_decode_mandatory_type_string(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.name); field_number++;
-    rc = rc && amqp_decode_mandatory_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.handle); field_number++;
+    rc = rc && amqp_decode_mandatory_primitive_handle(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.handle); field_number++;
     rc = rc && amqp_decode_mandatory_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.role); field_number++;
     rc = rc && amqp_decode_primitive_sender_settle_mode(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.snd_settle_mode, amqp_sender_settle_mode_mixed); field_number++;
     rc = rc && amqp_decode_primitive_receiver_settle_mode(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.rcv_settle_mode, amqp_receiver_settle_mode_first); field_number++;
@@ -194,7 +194,7 @@ int amqp_decode_amqp_attach_frame(amqp_context_t *context, amqp_buffer_t *buffer
     rc = rc && amqp_decode_type_wildcard_expecting_target(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.target); field_number++;
     rc = rc && amqp_decode_type_map(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.unsettled); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.incomplete_unsettled, false); field_number++;
-    rc = rc && amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.initial_delivery_count, AMQP_NO_DEFAULT_VALUE); field_number++;
+    rc = rc && amqp_decode_primitive_sequence_no(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.initial_delivery_count, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_primitive_ulong(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.max_message_size, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_multiple_type_symbol(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.offered_capabilities); field_number++;
     rc = rc && amqp_decode_multiple_type_symbol(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.attach.desired_capabilities); field_number++;
@@ -252,12 +252,12 @@ int amqp_decode_amqp_flow_frame(amqp_context_t *context, amqp_buffer_t *buffer, 
     frame->dispatch = amqp_dispatch_amqp_flow;
     frame->cleanup = cleanup_amqp_flow_frame;
 
-    rc = amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.next_incoming_id, AMQP_NO_DEFAULT_VALUE); field_number++;
+    rc = amqp_decode_primitive_sequence_no(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.next_incoming_id, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_mandatory_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.incoming_window); field_number++;
-    rc = rc && amqp_decode_mandatory_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.next_outgoing_id); field_number++;
+    rc = rc && amqp_decode_mandatory_primitive_sequence_no(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.next_outgoing_id); field_number++;
     rc = rc && amqp_decode_mandatory_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.outgoing_window); field_number++;
-    rc = rc && amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.handle, AMQP_NO_DEFAULT_VALUE); field_number++;
-    rc = rc && amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.delivery_count, AMQP_NO_DEFAULT_VALUE); field_number++;
+    rc = rc && amqp_decode_primitive_handle(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.handle, AMQP_NO_DEFAULT_VALUE); field_number++;
+    rc = rc && amqp_decode_primitive_sequence_no(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.delivery_count, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.link_credit, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.available, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.flow.drain, false); field_number++;
@@ -316,10 +316,10 @@ int amqp_decode_amqp_transfer_frame(amqp_context_t *context, amqp_buffer_t *buff
     frame->dispatch = amqp_dispatch_amqp_transfer;
     frame->cleanup = cleanup_amqp_transfer_frame;
 
-    rc = amqp_decode_mandatory_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.handle); field_number++;
-    rc = rc && amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.delivery_id, AMQP_NO_DEFAULT_VALUE); field_number++;
+    rc = amqp_decode_mandatory_primitive_handle(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.handle); field_number++;
+    rc = rc && amqp_decode_primitive_sequence_no(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.delivery_id, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_type_binary(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.delivery_tag); field_number++;
-    rc = rc && amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.message_format, AMQP_NO_DEFAULT_VALUE); field_number++;
+    rc = rc && amqp_decode_primitive_message_format(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.message_format, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.settled, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.more, false); field_number++;
     rc = rc && amqp_decode_primitive_receiver_settle_mode(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.transfer.rcv_settle_mode, AMQP_NO_DEFAULT_VALUE); field_number++;
@@ -371,8 +371,8 @@ int amqp_decode_amqp_disposition_frame(amqp_context_t *context, amqp_buffer_t *b
     frame->cleanup = cleanup_amqp_disposition_frame;
 
     rc = amqp_decode_mandatory_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.role); field_number++;
-    rc = rc && amqp_decode_mandatory_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.first); field_number++;
-    rc = rc && amqp_decode_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.last, AMQP_NO_DEFAULT_VALUE); field_number++;
+    rc = rc && amqp_decode_mandatory_primitive_sequence_no(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.first); field_number++;
+    rc = rc && amqp_decode_primitive_sequence_no(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.last, AMQP_NO_DEFAULT_VALUE); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.settled, false); field_number++;
     rc = rc && amqp_decode_type_wildcard_expecting_delivery_state(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.state); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.disposition.batchable, false); field_number++;
@@ -413,7 +413,7 @@ int amqp_decode_amqp_detach_frame(amqp_context_t *context, amqp_buffer_t *buffer
     frame->dispatch = amqp_dispatch_amqp_detach;
     frame->cleanup = cleanup_amqp_detach_frame;
 
-    rc = amqp_decode_mandatory_primitive_uint(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.detach.handle); field_number++;
+    rc = amqp_decode_mandatory_primitive_handle(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.detach.handle); field_number++;
     rc = rc && amqp_decode_primitive_boolean(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.detach.closed, false); field_number++;
     rc = rc && amqp_decode_type_amqp_error(context, amqp_field_from_list(field_list, field_number), field_number, total_fields, &frame->frames.amqp.detach.error); field_number++;
 

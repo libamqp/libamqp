@@ -83,10 +83,10 @@ struct amqp_transport_open_t {
 struct amqp_transport_begin_t {
     // 8 fields
     uint16_t remote_channel; 
-    amqp_transfer_number_t next_outgoing_id; /* mandatory; */
+    amqp_sequence_no_t next_outgoing_id; /* mandatory; */
     uint32_t incoming_window; /* mandatory; */
     uint32_t outgoing_window; /* mandatory; */
-    uint32_t handle_max; /* default="4294967295"; */
+    amqp_handle_t handle_max; /* default="4294967295"; */
     amqp_multiple_symbol_t offered_capabilities; 
     amqp_multiple_symbol_t desired_capabilities; 
     amqp_fields_t properties; 
@@ -114,7 +114,7 @@ struct amqp_transport_begin_t {
 struct amqp_transport_attach_t {
     // 14 fields
     amqp_string_t name; /* mandatory; */
-    uint32_t handle; /* mandatory; */
+    amqp_handle_t handle; /* mandatory; */
     amqp_role_t role; /* mandatory; */
     amqp_sender_settle_mode_t snd_settle_mode; /* default="mixed"; */
     amqp_receiver_settle_mode_t rcv_settle_mode; /* default="first"; */
@@ -147,11 +147,11 @@ struct amqp_transport_attach_t {
 */
 struct amqp_transport_flow_t {
     // 11 fields
-    amqp_transfer_number_t next_incoming_id; 
+    amqp_sequence_no_t next_incoming_id; 
     uint32_t incoming_window; /* mandatory; */
-    amqp_transfer_number_t next_outgoing_id; /* mandatory; */
+    amqp_sequence_no_t next_outgoing_id; /* mandatory; */
     uint32_t outgoing_window; /* mandatory; */
-    uint32_t handle; 
+    amqp_handle_t handle; 
     amqp_sequence_no_t delivery_count; 
     uint32_t link_credit; 
     uint32_t available; 
@@ -178,8 +178,8 @@ struct amqp_transport_flow_t {
 */
 struct amqp_transport_transfer_t {
     // 11 fields
-    uint32_t handle; /* mandatory; */
-    amqp_delivery_number_t delivery_id; 
+    amqp_handle_t handle; /* mandatory; */
+    amqp_sequence_no_t delivery_id; 
     amqp_delivery_tag_t delivery_tag; 
     amqp_message_format_t message_format; 
     int settled; 
@@ -205,8 +205,8 @@ struct amqp_transport_transfer_t {
 struct amqp_transport_disposition_t {
     // 6 fields
     amqp_role_t role; /* mandatory; */
-    amqp_delivery_number_t first; /* mandatory; */
-    amqp_delivery_number_t last; 
+    amqp_sequence_no_t first; /* mandatory; */
+    amqp_sequence_no_t last; 
     int settled; /* default="false"; */
     amqp_wildcard_t state; 
     int batchable; /* default="false"; */
@@ -222,7 +222,7 @@ struct amqp_transport_disposition_t {
 */
 struct amqp_transport_detach_t {
     // 3 fields
-    uint32_t handle; /* mandatory; */
+    amqp_handle_t handle; /* mandatory; */
     int closed; /* default="false"; */
     amqp_error_t error; 
 };
