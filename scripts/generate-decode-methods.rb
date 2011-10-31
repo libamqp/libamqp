@@ -3,6 +3,10 @@
 require 'rexml/document'
 require 'generate-common'
 
+$xpaths = {}
+$xpaths['transport'] = '//section[@name=\'performatives\']/type[descriptor]'
+$xpaths['security'] = '//section[@name=\'sasl\']/type[descriptor]'
+
 $enum_value_mapping = {}
 $enum_value_mapping['mixed'] = 'amqp_sender_settle_mode_mixed'
 $enum_value_mapping['first'] = 'amqp_receiver_settle_mode_first'

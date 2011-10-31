@@ -16,6 +16,9 @@
 
 #ifndef LIBAMQP_AMQP_DEFINITIONS_H
 #define LIBAMQP_AMQP_DEFINITIONS_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 #include <AmqpTypes/AmqpSymbol.h>
@@ -76,4 +79,8 @@ typedef struct amqp_error_t         // descriptor 0000:001d
 typedef int  amqp_terminus_durability_t;
 typedef int  amqp_terminus_expiry_policy_t;
 typedef int  amqp_filter_set_t;
+
+#ifdef __cplusplus
+}
+#endif
 #endif

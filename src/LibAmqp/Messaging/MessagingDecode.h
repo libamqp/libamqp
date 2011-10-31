@@ -36,9 +36,9 @@ typedef struct amqp_context_t amqp_context_t;
     typedef struct amqp_wildcard_t amqp_wildcard_t;
 #endif
 
-extern int amqp_decode_source(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
-extern int amqp_decode_target(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
-extern int amqp_decode_delivery_state(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
+extern int amqp_decode_source(amqp_context_t *context, amqp_wildcard_t *wildcard);
+extern int amqp_decode_target(amqp_context_t *context, amqp_wildcard_t *wildcard);
+extern int amqp_decode_delivery_state(amqp_context_t *context, amqp_wildcard_t *wildcard);
 
 #ifdef __cplusplus
 }

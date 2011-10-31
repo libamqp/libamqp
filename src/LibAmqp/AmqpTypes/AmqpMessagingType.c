@@ -17,14 +17,13 @@
 #include <assert.h>
 #include <string.h>
 
-#include "AmqpTypes/AmqpTypes.h"
+#include "AmqpTypes/AmqpMessagingType.h"
 #include "AmqpTypes/AmqpTypesInternal.h"
 
-void amqp_type_cleanup(amqp_context_t *context, amqp_amqp_type_t *amqp_type)
+void amqp_messaging_type_cleanup(amqp_context_t *context, amqp_messaging_type_t *messaging_type)
 {
-    if (amqp_type && amqp_type->leader.fn_table && amqp_type->leader.fn_table->dtor)
+    if (messaging_type && messaging_type->leader.fn_table && messaging_type->leader.fn_table->dtor)
     {
-        amqp_type->leader.fn_table->dtor(context, amqp_type);
+        messaging_type->leader.fn_table->dtor(context, (amqp_amqp_type_t *) messaging_type);
     }
 }
-

@@ -41,12 +41,14 @@ typedef struct amqp_context_t amqp_context_t;
     typedef struct amqp_wildcard_t amqp_wildcard_t;
 #endif
 
+#include "AmqpTypes/AmqpMessagingType.h"
+
 typedef struct amqp_messaging_methods_t
 {
     struct {
-        int (*source)(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
-        int (*target)(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
-        int (*delivery_state)(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
+        amqp_messaging_type_decoder_t source;
+        amqp_messaging_type_decoder_t target;
+        amqp_messaging_type_decoder_t delivery_state;
     } decode;
 } amqp_messaging_methods_t;
 

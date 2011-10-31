@@ -31,10 +31,16 @@ function generate_types
     generate_files generate-amqp-types "$1" "${base_dir}/Amqp" "$2"
 }
 
-function generate_decode
+function generate_frame_decode
 {
     local dest_dir="${base_dir}/Transport/Decode"
     generate_files generate-decode-methods "$1" "${dest_dir}" "$2.gen"
+}
+
+function generate_type_decode
+{
+    local dest_dir="${base_dir}/Messaging"
+    generate_files generate-type-decode-methods "$1" "${dest_dir}" "$2.gen"
 }
 
 generate_types transport.bare.xml AmqpTransport.h
@@ -42,5 +48,7 @@ generate_types messaging.bare.xml AmqpMessaging.h
 generate_types security.bare.xml AmqpSecurity.h
 generate_types transactions.bare.xml AmqpTransactions.h
 
-generate_decode security.bare.xml decode_sasl_frame
-generate_decode transport.bare.xml decode_transport_frame
+generate_frame_decode security.bare.xml decode_sasl_frame
+generate_frame_decode transport.bare.xml decode_transport_frame
+
+generate_type_decode messaging.bare.xml decode_messaging_types

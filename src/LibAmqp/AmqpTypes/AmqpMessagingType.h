@@ -13,18 +13,27 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
+#ifndef LIBAMQP_AMQP_TYPES_AMQP_MESSAGING_TYPE_H
+#define LIBAMQP_AMQP_TYPES_AMQP_MESSAGING_TYPE_H
 
-#include <assert.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <string.h>
 
-#include "AmqpTypes/AmqpTypes.h"
-#include "AmqpTypes/AmqpTypesInternal.h"
+#include "AmqpTypes/AmqpLeader.h"
 
-void amqp_type_cleanup(amqp_context_t *context, amqp_amqp_type_t *amqp_type)
+typedef int (*amqp_messaging_type_decoder_t)(amqp_context_t *context, amqp_wildcard_t *wildcard);
+
+struct amqp_messaging_type_t
 {
-    if (amqp_type && amqp_type->leader.fn_table && amqp_type->leader.fn_table->dtor)
-    {
-        amqp_type->leader.fn_table->dtor(context, amqp_type);
-    }
-}
+    amqp_leader_t leader;
+};
 
+extern void amqp_messaging_type_cleanup(amqp_context_t *context, amqp_messaging_type_t *messaging_type);
+
+#ifdef __cplusplus
+}
+#endif
+#endif

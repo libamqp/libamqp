@@ -23,19 +23,40 @@ extern "C" {
 #include <string.h>
 
 #include "AmqpTypes/AmqpLeader.h"
-#include "AmqpTypes/AmqpHashTable.h"
-#include "AmqpTypes/AmqpVariable.h"
+#include "AmqpTypes/AmqpMessagingType.h"
 
 #ifndef LIBAMQP_AMQP_WILDCARD_T
 #define LIBAMQP_AMQP_WILDCARD_T
     typedef struct amqp_wildcard_t amqp_wildcard_t;
 #endif
 
+
 struct amqp_wildcard_t
 {
-    int ph;
+    amqp_leader_t leader;
+    amqp_type_t *type;
+    amqp_messaging_type_decoder_t message_type_decoder;
+
+    // following members to be initialised by decode function
+    amqp_messaging_type_t *messaging_type;
+    void (*cleanup_messaging_type)(amqp_context_t *context, amqp_messaging_type_t *messaging_type);
 };
 
+extern void amqp_wildcard_initialize_as_null(amqp_context_t *context, amqp_wildcard_t *wildcard);
+
+static inline
+int amqp_wildcard_is_null(amqp_wildcard_t *wildcard)
+{
+    return wildcard->type == 0;
+}
+
+extern void amqp_wildcard_initialize(amqp_context_t *context, amqp_wildcard_t *wildcard, amqp_type_t *type, amqp_messaging_type_decoder_t message_type_decoder);
+
+static inline
+void amqp_wildcard_cleanup(amqp_context_t *context, amqp_wildcard_t *wildcard)
+{
+    amqp_type_cleanup(context, (amqp_amqp_type_t *) wildcard);
+}
 
 #ifdef __cplusplus
 }
