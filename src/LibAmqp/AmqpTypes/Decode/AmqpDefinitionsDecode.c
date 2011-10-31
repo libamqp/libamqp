@@ -39,7 +39,7 @@ int amqp_decode_mandatory_multiple_type_symbol(amqp_context_t *context, amqp_typ
     int rc = amqp_decode_multiple_type_symbol(context, field, field_number, total_fields, multiple);
     if (rc)
     {
-        if (multiple->size == 0)
+        if (amqp_multiple_symbol_is_null(multiple))
         {
             amqp_mandatory_field_missing_error(context, field_number, total_fields, "multiple symbol");
             return false;
