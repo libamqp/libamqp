@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     }
 
     type = amqp_decode(context, buffer);
-    amqp_type_print_formatted(context, type, buffer);
+    amqp_type_print_formatted(context, type);
 
     amqp_deallocate_type(context, type);
     amqp_deallocate_buffer(context, buffer);

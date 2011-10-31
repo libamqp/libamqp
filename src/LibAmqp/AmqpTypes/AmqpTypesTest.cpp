@@ -23,7 +23,6 @@
 #include "Amqp/AmqpMessaging.h"
 #include "Amqp/AmqpTransactions.h"
 
-
 SUITE(AmqpTypes)
 {
     // If a field is added to a generated type one of these will fail.
@@ -32,8 +31,7 @@ SUITE(AmqpTypes)
 
     TEST_FIXTURE(AmqpTypesFixture, type_sizes)
     {
-        CHECK_EQUAL(80U, sizeof(amqp_type_t));
-        CHECK_EQUAL(8U, sizeof(amqp_type_flags_t));
+        CHECK_EQUAL(72U, sizeof(amqp_type_t));
 
         CHECK_EQUAL(32U, sizeof(amqp_array_t));
         CHECK_EQUAL(56U, sizeof(amqp_binary_t));
@@ -48,19 +46,19 @@ SUITE(AmqpTypes)
     }
     TEST_FIXTURE(AmqpTypesFixture, error_definition)
     {
-        CHECK_EQUAL(144U, sizeof(amqp_definition_error_t));
+        CHECK_EQUAL(152U, sizeof(amqp_error_t));
     }
     TEST_FIXTURE(AmqpTypesFixture, frames)
     {
         CHECK_EQUAL(288U, sizeof(amqp_transport_open_t));
         CHECK_EQUAL(120U, sizeof(amqp_transport_begin_t));
-        CHECK_EQUAL(224U, sizeof(amqp_transport_attach_t));
+        CHECK_EQUAL(296U, sizeof(amqp_transport_attach_t));
         CHECK_EQUAL(72U, sizeof(amqp_transport_flow_t));
-        CHECK_EQUAL(96U, sizeof(amqp_transport_transfer_t));
-        CHECK_EQUAL(24U, sizeof(amqp_transport_disposition_t));
-        CHECK_EQUAL(152U, sizeof(amqp_transport_detach_t));
-        CHECK_EQUAL(144U, sizeof(amqp_transport_end_t));
-        CHECK_EQUAL(144U, sizeof(amqp_transport_close_t));
+        CHECK_EQUAL(136U, sizeof(amqp_transport_transfer_t));
+        CHECK_EQUAL(64U, sizeof(amqp_transport_disposition_t));
+        CHECK_EQUAL(160U, sizeof(amqp_transport_detach_t));
+        CHECK_EQUAL(152U, sizeof(amqp_transport_end_t));
+        CHECK_EQUAL(152U, sizeof(amqp_transport_close_t));
     }
     TEST_FIXTURE(AmqpTypesFixture, security)
     {
@@ -72,8 +70,8 @@ SUITE(AmqpTypes)
     }
     TEST_FIXTURE(AmqpTypesFixture, messaging_addressing)
     {
-        CHECK_EQUAL(184U, sizeof(amqp_addressing_source_t));
-        CHECK_EQUAL(88U, sizeof(amqp_addressing_target_t));
+        CHECK_EQUAL(256U, sizeof(amqp_addressing_source_t));
+        CHECK_EQUAL(120U, sizeof(amqp_addressing_target_t));
         CHECK_EQUAL(16U, sizeof(amqp_addressing_delete_on_close_t));
         CHECK_EQUAL(16U, sizeof(amqp_addressing_delete_on_no_links_t));
         CHECK_EQUAL(16U, sizeof(amqp_addressing_delete_on_no_messages_t));
@@ -83,7 +81,7 @@ SUITE(AmqpTypes)
     {
         CHECK_EQUAL(16U, sizeof(amqp_delivery_state_received_t));
         CHECK_EQUAL(16U, sizeof(amqp_delivery_state_accepted_t));
-        CHECK_EQUAL(144U, sizeof(amqp_delivery_state_rejected_t));
+        CHECK_EQUAL(152U, sizeof(amqp_delivery_state_rejected_t));
         CHECK_EQUAL(16U, sizeof(amqp_delivery_state_released_t));
         CHECK_EQUAL(40U, sizeof(amqp_delivery_state_modified_t));
     }
@@ -92,11 +90,11 @@ SUITE(AmqpTypes)
         CHECK_EQUAL(20U, sizeof(amqp_messaging_header_t));
         CHECK_EQUAL(32U, sizeof(amqp_messaging_delivery_annotations_t));
         CHECK_EQUAL(32U, sizeof(amqp_messaging_message_annotations_t));
-        CHECK_EQUAL(384U, sizeof(amqp_messaging_properties_t));
+        CHECK_EQUAL(520U, sizeof(amqp_messaging_properties_t));
         CHECK_EQUAL(32U, sizeof(amqp_messaging_application_properties_t));
         CHECK_EQUAL(56U, sizeof(amqp_messaging_data_t));
         CHECK_EQUAL(16U, sizeof(amqp_messaging_amqp_sequence_t));
-        CHECK_EQUAL(4U, sizeof(amqp_messaging_amqp_value_t));
+        CHECK_EQUAL(40U, sizeof(amqp_messaging_amqp_value_t));
         CHECK_EQUAL(32U, sizeof(amqp_messaging_footer_t));
     }
 }

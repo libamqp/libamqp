@@ -33,10 +33,17 @@ struct amqp_map_t
 };
 
 extern void amqp_map_initialize_as_null(amqp_context_t *context, amqp_map_t *map);
+
 static inline
 int amqp_map_is_null(amqp_map_t *map)
 {
     return map->type == 0 && map->entries == 0;
+}
+
+static inline
+int amqp_map_is_null_or_empty(amqp_map_t *map)
+{
+    return map->size == 0 || amqp_map_is_null(map);
 }
 
 extern void amqp_map_initialize(amqp_context_t *context, amqp_map_t *map, size_t size);

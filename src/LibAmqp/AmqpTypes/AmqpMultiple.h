@@ -34,6 +34,12 @@ struct amqp_multiple_symbol_t
 };
 
 static inline
+int amqp_multiple_symbol_is_null(amqp_multiple_symbol_t *multiple)
+{
+    return multiple->size == 0;
+}
+
+static inline
 void amqp_multiple_symbol_cleanup(amqp_context_t *context, amqp_multiple_symbol_t *multiple)
 {
     amqp_type_cleanup(context, (amqp_amqp_type_t *) multiple);

@@ -11,6 +11,7 @@ MODULE = LibAmqp/Transport
 SRC += $(wildcard $(MODULE)/*.c) \
     $(wildcard $(MODULE)/LowLevel/*.c) \
     $(wildcard $(MODULE)/Connection/*.c) \
+    $(wildcard $(MODULE)/Decode/*.c) \
     $(wildcard $(MODULE)/Sasl/*.c) \
     $(wildcard $(MODULE)/Frame/*.c)
 

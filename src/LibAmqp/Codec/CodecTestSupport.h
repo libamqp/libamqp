@@ -53,10 +53,9 @@ namespace SuiteCodec
 namespace t
 {
     void dump_type(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer);
-    void dump_type_buffer(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer);
 
     int compare_buffers(const unsigned char *lhs, size_t lhs_size, const unsigned char *rhs, size_t rhs_size);
-    int compare_buffers(const unsigned char *expect, size_t expect_size, amqp_buffer_t *buffer);
+    int compare_buffers(amqp_context_t *context, const unsigned char *expect, size_t expect_size, amqp_buffer_t *buffer);
 }
 
 #define ASSERT_VALID(type)  \
@@ -65,10 +64,10 @@ namespace t
 
 #define ASSERT_INVALID(type)  \
     CHECK_NOT_NULL(type); \
-    CHECK(!amqp_type_is_valid(type))
+    CHECK(amqp_type_is_invalid(type))
 
 #define CHECK_BUFFERS_MATCH(buffer, byte_array) \
-     CHECK(t::compare_buffers(byte_array.bytes(), byte_array.size(), buffer))
+     CHECK(t::compare_buffers(context, byte_array.bytes(), byte_array.size(), buffer))
 
 #define CHECK_ARRAY(type) \
     CHECK(amqp_type_is_container(type)); \

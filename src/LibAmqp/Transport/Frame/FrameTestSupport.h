@@ -32,6 +32,7 @@ namespace SuiteFrame
 
     int check_header(uint8_t frame_type, uint16_t frame_specific);
     int check_sasl_header();
+    int check_amqp_header();
 
     public:
         amqp_frame_t *frame;

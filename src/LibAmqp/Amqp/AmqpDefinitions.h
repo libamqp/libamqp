@@ -16,6 +16,9 @@
 
 #ifndef LIBAMQP_AMQP_DEFINITIONS_H
 #define LIBAMQP_AMQP_DEFINITIONS_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdint.h>
 #include <AmqpTypes/AmqpSymbol.h>
@@ -29,27 +32,29 @@ enum {
     amqp_sasl_code_perm_system_error,
     amqp_sasl_code_temp_system_error
 };
-
 typedef uint8_t amqp_sasl_code_t;
 
-typedef enum amqp_role_t
+enum
 {
     amqp_sender_role = false,
     amqp_receiver_role = true
-} amqp_role_t;
+};
+typedef int amqp_role_t;
 
-typedef enum amqp_sender_settle_mode_t
+enum
 {
     amqp_sender_settle_mode_unsettled = 0,
     amqp_sender_settle_mode_settled = 1,
     amqp_sender_settle_mode_mixed = 2
-} amqp_sender_settle_mode_t;
+};
+typedef uint8_t amqp_sender_settle_mode_t;
 
-typedef enum amqp_receiver_settle_mode_t
+enum
 {
     amqp_receiver_settle_mode_first = 0,
     amqp_receiver_settle_mode_second = 1
-} amqp_receiver_settle_mode_t;
+};
+typedef uint8_t amqp_receiver_settle_mode_t;
 
 typedef uint32_t amqp_milliseconds_t;
 typedef uint32_t amqp_seconds_t;
@@ -65,17 +70,17 @@ typedef amqp_map_t amqp_fields_t;
 
 typedef struct amqp_error_t         // descriptor 0000:001d
 {
+    int is_null;
     amqp_symbol_t condition;
     amqp_string_t description;
     amqp_fields_t info;
 } amqp_error_t;
 
-typedef struct amqp_wildcard_t
-{
-    int filler;
-} amqp_wildcard_t;
-
 typedef int  amqp_terminus_durability_t;
 typedef int  amqp_terminus_expiry_policy_t;
 typedef int  amqp_filter_set_t;
+
+#ifdef __cplusplus
+}
+#endif
 #endif

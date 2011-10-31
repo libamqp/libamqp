@@ -75,6 +75,7 @@ SUITE(Sasl)
 
         type = amqp_sasl_mechanisms_encode(context, buffer);
         ASSERT(type);
+
         CHECK(amqp_type_is_array(type));
 
         multiple = amqp_multiple_symbol_create_from_type(context, type);

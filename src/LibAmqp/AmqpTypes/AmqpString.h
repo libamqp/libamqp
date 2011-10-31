@@ -60,6 +60,8 @@ extern int amqp_string_compare_with_cstr(amqp_string_t *lhs, const char *rhs);
 extern int amqp_string_compare_with_bytes(amqp_string_t *lhs, const uint8_t *rhs, size_t size);
 extern uint32_t amqp_string_hash(amqp_string_t *string);
 
+extern int amqp_string_print(amqp_context_t *context, amqp_string_t *string);
+
 #ifdef __cplusplus
 }
 #endif

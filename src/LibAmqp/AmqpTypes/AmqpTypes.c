@@ -19,7 +19,6 @@
 
 #include "AmqpTypes/AmqpTypes.h"
 #include "AmqpTypes/AmqpTypesInternal.h"
-#include "debug_helper.h"
 
 void amqp_type_cleanup(amqp_context_t *context, amqp_amqp_type_t *amqp_type)
 {

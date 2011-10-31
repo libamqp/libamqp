@@ -70,6 +70,7 @@ amqp_create_context()
     result->context.reference.plugins.sasl_plugin_list = 0;
     // Danger Will Robinson - using context while initialzing it so do last.
     result->context.reference.amqp_descriptors = amqp_load_descriptors(&result->context);
+    amqp_initialize_default_messaging_methods(&result->context.reference.plugins.messaging);
 
     return (amqp_context_t *) result;
 }

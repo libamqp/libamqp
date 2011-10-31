@@ -69,6 +69,7 @@ SUITE(AmqpTypes)
     {
         test_data::multiple_symbol_many_values.transfer_to(buffer);
         type = amqp_decode(context, buffer);
+
         CHECK(amqp_type_is_array(type));
         multiple = amqp_multiple_symbol_create(context, type);
         CHECK_EQUAL(3, multiple->size);
@@ -99,6 +100,23 @@ SUITE(AmqpTypes)
         uint8_t buffer[5];
         amqp_multiple_symbol_to_char_bytes(multiple, ", ", buffer, sizeof(buffer));
         CHECK_EQUAL("PLAI", (char *) buffer);
+    }
+
+    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_empty_array)
+    {
+        test_data::empty_array_of_symbols.transfer_to(buffer);
+        type = amqp_decode(context, buffer);
+        ASSERT(type);
+        CHECK(amqp_type_is_array(type));
+        CHECK_EQUAL(0U, type->value.array.count);
+        CHECK(amqp_type_is_symbol(amqp_type_array_type(type)));
+
+        multiple = amqp_multiple_symbol_create(context, type);
+        CHECK_EQUAL(0, multiple->size);
+
+        int rc = amqp_multiple_symbol_initialize(context, &multiple_ref, type);
+        ASSERT(rc);
+        CHECK_EQUAL(0, multiple_ref.size);
     }
 
     TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_null)

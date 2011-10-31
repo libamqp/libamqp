@@ -21,6 +21,7 @@ extern "C" {
 #endif
 
 #include <stdarg.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
@@ -42,7 +43,7 @@ typedef struct amqp_encoding_meta_data_t amqp_encoding_meta_data_t;
 typedef int amqp_decoder_t(amqp_context_t *context, amqp_buffer_t *buffer, amqp_encoding_meta_data_t *, amqp_type_t *);
 
 typedef struct amqp_type_methods_t amqp_type_methods_t;
-typedef void amqp_type_print_method_t(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer);
+typedef void amqp_type_print_method_t(amqp_context_t *context, amqp_type_t *type);
 // TODO -  remove unnecessary indirection. There is only the print method.
 
 struct amqp_type_methods_t
@@ -51,7 +52,6 @@ struct amqp_type_methods_t
 };
 
 typedef enum {
-    amqp_is_invalid = 0x00000000,
     amqp_is_null = 0x00000001,
     amqp_is_boolean = 0x00000002,
     amqp_is_unsigned = 0x00000004,
@@ -78,26 +78,28 @@ typedef enum {
     amqp_is_list = 0x00040000,
     amqp_is_map = 0x00080000,
     amqp_is_array = 0x00100000,
-    amqp_is_compound_mask = 0x001c0000,
-
     amqp_is_composite = 0x00200000,
+    amqp_is_container_mask = 0x003c0000, // Map, List, Array or Composite
+
     amqp_is_descriptor = 0x00400000,
     amqp_is_described = 0x00800000,
-    amqp_is_extension = 0x01000000,
 
-    amqp_is_encoded = 0x02000000,
-    amqp_is_incomplete = 0x04000000,
+    amqp_is_extension = 0x01000000,
+    amqp_is_invalid = 0x02000000,
+    amqp_is_encoded = 0x10000000,
+    amqp_is_incomplete = 0x20000000,
+    amqp_is_contained = 0x40000000,
 } amqp_typedef_flags_t;
 
 struct amqp_encoding_meta_data_t
 {
-    unsigned char format_code;
+    uint8_t format_code;
     int width;
     amqp_decoder_t *type_decoder;
     amqp_type_methods_t *methods;
     const char *name;
     const char *encoding_name;
-    amqp_typedef_flags_t flags;
+    amqp_typedef_flags_t typedef_flags;
     int category_name_index;
 };
 

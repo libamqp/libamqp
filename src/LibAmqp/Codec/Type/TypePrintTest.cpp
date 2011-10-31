@@ -60,23 +60,23 @@ SUITE(TypePrint)
         }
         void print_type()
         {
-            amqp_type_print(context, type, decode_buffer);
+            amqp_type_print(context, type);
         }
     
         void print_type_formatted()
         {
-            amqp_type_print_formatted(context, type, decode_buffer);
+            amqp_type_print_formatted(context, type);
         }
 
-        void check_output(const char *expected)
-        {
-            CHECK_EQUAL(expected, (const char *) output);
-        }
+#define check_output(e) CHECK_EQUAL((e), (const char *) output);
+//        void check_output(const char *expected)
+//        {
+//            CHECK_EQUAL(expected, (const char *) output);
+//        }
 
     public:
         amqp_type_t *type;
 
-    private:
         char output[1024];
         size_t count;
     };
@@ -224,7 +224,7 @@ SUITE(TypePrint)
         ASSERT_VALID(type);
         ASSERT_VALID(type->value.array.elements[0]);
 
-        CHECK_EQUAL(0x61, type->value.array.elements[0]->format_code);
+        CHECK_EQUAL(0x61, type->value.array.elements[0]->constructor.format_code);
         print_type();
         check_output("[(short) 10, 11, 11, 13, 14]");
     }
@@ -329,7 +329,7 @@ SUITE(TypePrint)
         ASSERT_VALID(type);
 
         print_type();
-        check_output("false");
+        check_output("true");
     }
 
     TEST_FIXTURE(TypePrintFixture, BooleanOneByteEncodingFalseValue)
@@ -340,6 +340,6 @@ SUITE(TypePrint)
         ASSERT_VALID(type);
 
         print_type();
-        check_output("true");
+        check_output("false");
     }
 }

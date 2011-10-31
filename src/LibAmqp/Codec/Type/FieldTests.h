@@ -34,14 +34,14 @@ static inline
 int amqp_field_is_sender_settle_mode(amqp_type_t *type)
 {
     return amqp_type_is_null(type) ||
-        (amqp_type_is_ubyte(type) && type->value.b1._unsigned <= amqp_sender_settle_mode_mixed);
+        (amqp_type_is_ubyte(type) && amqp_type_to_ubyte(type) <= amqp_sender_settle_mode_mixed);
 }
 
 static inline
 int amqp_field_is_receiver_settle_mode(amqp_type_t *type)
 {
     return amqp_type_is_null(type) ||
-        (amqp_type_is_ubyte(type) && type->value.b1._unsigned <= amqp_receiver_settle_mode_second);
+        (amqp_type_is_ubyte(type) && amqp_type_to_ubyte(type) <= amqp_receiver_settle_mode_second);
 }
 
 static inline

@@ -25,7 +25,7 @@
 #include "Codec/Type/Type.h"
 
 
-SUITE(StringDecoder)
+SUITE(VariableTypeDecoder)
 {
     class DecodeFixture : public SuiteCodec::CodecFixture
     {
@@ -46,7 +46,7 @@ SUITE(StringDecoder)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(0xa0, type->format_code);
+        CHECK_EQUAL(0xa0, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 12, type->position.size);
         CHECK(amqp_type_is_variable(type));
@@ -60,7 +60,7 @@ SUITE(StringDecoder)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(0xb0, type->format_code);
+        CHECK_EQUAL(0xb0, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x05, type->position.index);
         CHECK_EQUAL((size_t) 16, type->position.size);
         CHECK(amqp_type_is_variable(type));
@@ -74,7 +74,7 @@ SUITE(StringDecoder)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(0xa1, type->format_code);
+        CHECK_EQUAL(0xa1, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 0x0b, type->position.size);
         CHECK(amqp_type_is_variable(type));
@@ -88,7 +88,7 @@ SUITE(StringDecoder)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(0xb1, type->format_code);
+        CHECK_EQUAL(0xb1, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x05, type->position.index);
         CHECK_EQUAL((size_t) 0x0f, type->position.size);
         CHECK(amqp_type_is_variable(type));
@@ -102,7 +102,7 @@ SUITE(StringDecoder)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(0xb3, type->format_code);
+        CHECK_EQUAL(0xb3, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x05, type->position.index);
         CHECK_EQUAL((size_t) 0x06, type->position.size);
         CHECK(amqp_type_is_variable(type));
@@ -116,7 +116,7 @@ SUITE(StringDecoder)
         type = amqp_decode(context, decode_buffer);
 
         ASSERT_VALID(type);
-        CHECK_EQUAL(0xa3, type->format_code);
+        CHECK_EQUAL(0xa3, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x02, type->position.index);
         CHECK_EQUAL((size_t) 0x03, type->position.size);
         CHECK(amqp_type_is_variable(type));

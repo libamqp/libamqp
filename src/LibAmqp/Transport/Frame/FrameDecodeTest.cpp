@@ -75,25 +75,13 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_symbol(type->value.array.elements[0]));
     }
 
-    TEST_FIXTURE(DecodeFixture, multiple_symbol_empty_array)
-    {
-        test_data::multiple_symbol_empty_array.transfer_to(decode_buffer);
-// TODO - fix bug in decoding empty array
-        RETURN_UNLESS_JENKINS();
-//        type = amqp_decode(context, decode_buffer);
-//        amqp_type_print(context, type, decode_buffer);
-//        CHECK(amqp_type_is_array(type));
-//        CHECK_EQUAL(0U, type->value.array.count);
-//        CHECK(0);
-    }
-
     void DecodeFixture::load(test_data::TestData &data)
     {
         load_decode_buffer(data);
         amqp_buffer_advance_read_index(decode_buffer, 8);
         type = amqp_decode(context, decode_buffer);
         CHECK(amqp_type_is_valid(type));
-        CHECK(amqp_type_is_described(type));
+        CHECK(amqp_type_is_composite(type));
         descriptor = amqp_type_get_descriptor(type);
         CHECK(amqp_type_is_ulong(descriptor) || amqp_type_is_symbol(descriptor));
 
@@ -239,7 +227,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(1U, described->value.list.count);
 
         int field = 0;
-        CHECK(amqp_type_is_described(described->value.list.elements[field])); field++;
+        CHECK(amqp_type_is_composite(described->value.list.elements[field])); field++;
     }
 
     TEST_FIXTURE(DecodeFixture, close_confirm_frame)
@@ -403,7 +391,7 @@ SUITE(FrameTypeDecode)
         amqp_deallocate_type(context, type);
         type = amqp_decode(context, decode_buffer);
         ASSERT(type);
-//        amqp_type_print(context,  described, decode_buffer);
+//        amqp_type_print(context,  described);
     }
 
     TEST_FIXTURE(DecodeFixture, transfer_frame_id_256)
@@ -426,7 +414,7 @@ SUITE(FrameTypeDecode)
         amqp_deallocate_type(context, type);
         type = amqp_decode(context, decode_buffer);
         ASSERT(type);
-//        amqp_type_print(context,  described, decode_buffer);
+//        amqp_type_print(context,  described);
     }
 
     TEST_FIXTURE(DecodeFixture, transfer_frame_id_677)
@@ -449,6 +437,6 @@ SUITE(FrameTypeDecode)
         amqp_deallocate_type(context, type);
         type = amqp_decode(context, decode_buffer);
         ASSERT(type);
-//        amqp_type_print(context,  described, decode_buffer);
+//        amqp_type_print(context,  described);
     }
 }

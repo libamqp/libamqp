@@ -73,6 +73,11 @@ typedef struct amqp_map_t amqp_map_t;
     typedef struct amqp_multiple_symbol_t amqp_multiple_symbol_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_MESSAGING_TYPE_T
+#define LIBAMQP_AMQP_MESSAGING_TYPE_T
+    typedef struct amqp_messaging_type_t amqp_messaging_type_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_STRING_TYPE_T
 #define LIBAMQP_AMQP_STRING_TYPE_T
 typedef struct amqp_string_t amqp_string_t;
@@ -83,10 +88,20 @@ typedef struct amqp_string_t amqp_string_t;
     typedef struct amqp_symbol_t amqp_symbol_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_TYPE_T
+#define LIBAMQP_AMQP_TYPE_T
+    typedef struct amqp_type_t amqp_type_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_TYPES_T
 #define LIBAMQP_AMQP_TYPES_T
     typedef union amqp_amqp_type_t amqp_amqp_type_t;
     typedef struct amqp_fn_table_t amqp_fn_table_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_WILDCARD_T
+#define LIBAMQP_AMQP_WILDCARD_T
+    typedef struct amqp_wildcard_t amqp_wildcard_t;
 #endif
 
 typedef struct amqp_leader_t

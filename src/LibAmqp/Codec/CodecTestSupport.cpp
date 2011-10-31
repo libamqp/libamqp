@@ -75,16 +75,17 @@ namespace t
     {
         int not_first = false;
         amqp_context_printf(context, "flags");
-        not_first = dump_flag(context, type->flags.is_null, "is_null", not_first);
-        not_first = dump_flag(context, type->flags.is_invalid, "is_invalid", not_first);
-        not_first = dump_flag(context, type->flags.is_encoded, "is_encoded", not_first);
-        not_first = dump_flag(context, type->flags.is_incomplete, "is_incomplete", not_first);
-        not_first = dump_flag(context, type->flags.is_contained, "is_contained", not_first);
-        not_first = dump_flag(context, type->flags.is_descriptor, "is_descriptor", not_first);
-        not_first = dump_flag(context, type->flags.has_descriptor, "has_descriptor", not_first);
-        not_first = dump_flag(context, type->flags.container.type.is_array, "is_array", not_first);
-        not_first = dump_flag(context, type->flags.container.type.is_list, "is_list", not_first);
-        dump_flag(context, type->flags.container.type.is_map, "is_map", not_first);
+        not_first = dump_flag(context, amqp_type_is_null(type), "is_null", not_first);
+        not_first = dump_flag(context, amqp_type_is_invalid(type), "is_invalid", not_first);
+        not_first = dump_flag(context, amqp_type_is_encoded(type), "is_encoded", not_first);
+        not_first = dump_flag(context, amqp_type_is_incomplete(type), "is_incomplete", not_first);
+        not_first = dump_flag(context, amqp_type_is_contained(type), "is_contained", not_first);
+        not_first = dump_flag(context, amqp_type_is_descriptor(type), "is_descriptor", not_first);
+        not_first = dump_flag(context, amqp_type_is_described(type), "is_described", not_first);
+        not_first = dump_flag(context, amqp_type_is_composite(type), "is_composite", not_first);
+        not_first = dump_flag(context, amqp_type_is_array(type), "is_array", not_first);
+        not_first = dump_flag(context, amqp_type_is_list(type), "is_list", not_first);
+        dump_flag(context, amqp_type_is_map(type), "is_map", not_first);
         amqp_context_putc(context, '\n');
     }
 
@@ -92,14 +93,14 @@ namespace t
     {
         int old_indent;
 
-        amqp_context_printf(context, "format code: 0x%02x\n", type->format_code);
+        amqp_context_printf(context, "format code: 0x%02x\n", type->constructor.format_code);
         old_indent = amqp_context_increase_print_indent(context, 4);
-        if (type->meta_data != 0)
+        if (type->constructor.meta_data != 0)
         {
-            amqp_context_printf(context, "width: %d, name: %s", type->meta_data->width, type->meta_data->name);
-            if (*type->meta_data->encoding_name)
+            amqp_context_printf(context, "width: %d, name: %s", type->constructor.meta_data->width, type->constructor.meta_data->name);
+            if (*type->constructor.meta_data->encoding_name)
             {
-                amqp_context_printf(context, "-%s", type->meta_data->encoding_name);
+                amqp_context_printf(context, "-%s", type->constructor.meta_data->encoding_name);
             }
             amqp_context_putc(context, '\n');
         }
@@ -108,14 +109,8 @@ namespace t
 
         amqp_buffer_dump_fragment(context, buffer, type->position.index, type->position.index + type->position.size);
         amqp_context_putc(context, '\n');
-        amqp_type_print_formatted(context, type, buffer);
+        amqp_type_print_formatted(context, type);
         amqp_context_set_print_indent(context, old_indent);
-    }
-
-    void dump_type_buffer(amqp_context_t *context, amqp_type_t *type, amqp_buffer_t *buffer)
-    {
-        amqp_buffer_dump(context, buffer);
-        amqp_context_putc(context, '\n');
     }
 
     // lhs is left hand param passed to macro
@@ -139,8 +134,14 @@ namespace t
         return 1;
     }
 
-    int compare_buffers(const unsigned char *expect, size_t expect_size, amqp_buffer_t *buffer)
+    int compare_buffers(amqp_context_t *context, const unsigned char *expect, size_t expect_size, amqp_buffer_t *buffer)
     {
-        return compare_buffers(expect, expect_size, amqp_buffer_pointer(buffer, 0), amqp_buffer_size(buffer));
+        int rc = compare_buffers(expect, expect_size, amqp_buffer_pointer(buffer, 0), amqp_buffer_size(buffer));
+        if (!rc)
+        {
+            amqp_buffer_dump(context, buffer);
+            amqp_context_putc(context, '\n');
+        }
+        return rc;
     }
 }

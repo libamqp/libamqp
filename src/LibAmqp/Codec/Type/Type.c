@@ -22,10 +22,12 @@
 #include "Context/Context.h"
 #include "Memory/Pool.h"
 
+#include "debug_helper.h"
+
 void amqp_mark_type_invalid(amqp_type_t *type, int cause)
 {
     assert(type != 0);
-    type->flags.is_invalid = 1;
+    amqp_typedef_flags_set(type, amqp_is_invalid);
     type->invalid_cause = cause;
 }
 
@@ -35,7 +37,7 @@ void amqp_initialize_amqp_type_t(amqp_context_t *c, amqp_memory_pool_t *pool, am
     assert(pool != 0);
     assert(type != 0);
 
-    type->extension_type_code = -1;
+    type->constructor.extension_type_code = -1;
 }
 
 static
@@ -44,9 +46,13 @@ void amqp_cleanup_amqp_type_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_
     assert(pool != 0);
     assert(type != 0);
 
-    if (type->flags.container.is_compound)
+    if (amqp_type_is_container(type))
     {
         amqp_deallocate_amqp_type_t_array(c, pool, type->value.compound.elements, type->value.compound.count);
+    }
+    if (amqp_type_is_array(type) && (!amqp_type_is_encoded(type) || (amqp_type_is_encoded(type) && type->value.array.count == 0)))
+    {
+        amqp_deallocate_type(c, type->value.array.constructor);
     }
 }
 
@@ -88,9 +94,9 @@ void amqp_deallocate_amqp_type_t_array(amqp_context_t *context, amqp_memory_pool
     }
 }
 
-bool amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs)
+int amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs)
 {
-    if (lhs->format_code != rhs->format_code)
+    if (lhs->constructor.format_code != rhs->constructor.format_code)
     {
         return false;
     }
@@ -99,7 +105,7 @@ bool amqp_type_match(amqp_type_t *lhs, amqp_type_t *rhs)
 
 void amqp_describe_type(char *buffer, size_t size, amqp_type_t *type)
 {
-    amqp_encoding_meta_data_t *meta_data = type->meta_data;
+    amqp_encoding_meta_data_t *meta_data = type->constructor.meta_data;
     if (meta_data)
     {
         snprintf(buffer, size, "name=\"%s\", encoding=\"%s\", category=\"%s\"", meta_data->name, meta_data->encoding_name, amqp_category_names[meta_data->category_name_index]);

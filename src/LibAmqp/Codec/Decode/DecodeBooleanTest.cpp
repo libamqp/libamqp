@@ -28,12 +28,13 @@ SUITE(CodecDecode)
         type = amqp_decode(context, decode_buffer);
 
         CHECK_NOT_NULL(type);
-        CHECK_EQUAL(0x41, type->format_code);
+        CHECK_EQUAL(0x41, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x00, type->position.size);
-        CHECK_EQUAL(0U, type->flags.is_null);
+        CHECK(amqp_type_is_not_null(type));
+        CHECK(amqp_type_is_boolean(type));
 
-        CHECK(amqp_convert_to_boolean(type));
+        CHECK(amqp_type_to_boolean(type));
     }
 
     TEST_FIXTURE(DecodeFixture, ZeroByteFalse)
@@ -42,12 +43,13 @@ SUITE(CodecDecode)
         type = amqp_decode(context, decode_buffer);
 
         CHECK_NOT_NULL(type);
-        CHECK_EQUAL(0x42, type->format_code);
+        CHECK_EQUAL(0x42, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x00, type->position.size);
-        CHECK_EQUAL(0U, type->flags.is_null);
+        CHECK(amqp_type_is_not_null(type));
+        CHECK(amqp_type_is_boolean(type));
 
-        CHECK(!amqp_convert_to_boolean(type));
+        CHECK(!amqp_type_to_boolean(type));
     }
 
     TEST_FIXTURE(DecodeFixture, SingleByteTrue)
@@ -56,12 +58,13 @@ SUITE(CodecDecode)
         type = amqp_decode(context, decode_buffer);
 
         CHECK_NOT_NULL(type);
-        CHECK_EQUAL(0x56, type->format_code);
+        CHECK_EQUAL(0x56, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
-        CHECK_EQUAL(0U, type->flags.is_null);
+        CHECK(amqp_type_is_not_null(type));
+        CHECK(amqp_type_is_boolean(type));
 
-        CHECK(amqp_convert_to_boolean(type));
+        CHECK(amqp_type_to_boolean(type));
     }
 
     TEST_FIXTURE(DecodeFixture, SingleByteFalse)
@@ -70,12 +73,12 @@ SUITE(CodecDecode)
         type = amqp_decode(context, decode_buffer);
 
         CHECK_NOT_NULL(type);
-        CHECK_EQUAL(0x56, type->format_code);
+        CHECK_EQUAL(0x56, type->constructor.format_code);
         CHECK_EQUAL((size_t) 0x01, type->position.index);
         CHECK_EQUAL((size_t) 0x01, type->position.size);
-        CHECK_EQUAL(0U, type->flags.is_null);
-
-        CHECK(!amqp_convert_to_boolean(type));
+        CHECK(amqp_type_is_not_null(type));
+        CHECK(amqp_type_is_boolean(type));
+        CHECK(!amqp_type_to_boolean(type));
     }
 
     TEST_FIXTURE(DecodeFixture, DecodeSimpleBooleanArray)
@@ -85,12 +88,14 @@ SUITE(CodecDecode)
 
         CHECK(check_valid_array());
 
-        CHECK_EQUAL(0x56, type->value.array.elements[0]->format_code);
+        CHECK_EQUAL(0x56, type->value.array.elements[0]->constructor.format_code);
         CHECK_EQUAL(2U, type->value.array.count);
         CHECK_EQUAL(2U, type->value.array.count);
-        CHECK_EQUAL(0x01, type->value.array.elements[0]->value.b1._unsigned);
-        CHECK(amqp_convert_to_boolean(type->value.array.elements[0]));
-        CHECK_EQUAL(0x00, type->value.array.elements[1]->value.b1._unsigned);
-        CHECK(!amqp_convert_to_boolean(type->value.array.elements[1]));
+
+        CHECK(amqp_type_is_boolean(type->value.array.elements[0]));
+        CHECK(amqp_type_to_boolean(type->value.array.elements[0]));
+
+        CHECK(amqp_type_is_boolean(type->value.array.elements[0]));
+        CHECK(!amqp_type_to_boolean(type->value.array.elements[1]));
     }
 }
