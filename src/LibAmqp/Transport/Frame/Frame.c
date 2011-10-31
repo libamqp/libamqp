@@ -112,7 +112,7 @@ static int decode_remainder(amqp_context_t *context, amqp_buffer_t *buffer, amqp
     if (!amqp_type_is_list(type))
     {
         amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Expected an AMQP list type.");
-        amqp_type_print(context, type, buffer);
+        amqp_type_print(context, type);
         return false;
     }
 
@@ -193,7 +193,7 @@ static int decode_performative(amqp_context_t *context, amqp_buffer_t *buffer, a
     if (rc == 0)
     {
         amqp_error(context, AMQP_ERROR_FRAME_DECODE_FAILED, "Failed to decode frame. Dumping type...");
-        amqp_type_dump(context, 2, type, buffer);
+        amqp_type_dump(context, 2, type);
     }
 
     return rc;

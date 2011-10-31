@@ -391,7 +391,7 @@ SUITE(FrameTypeDecode)
         amqp_deallocate_type(context, type);
         type = amqp_decode(context, decode_buffer);
         ASSERT(type);
-//        amqp_type_print(context,  described, decode_buffer);
+//        amqp_type_print(context,  described);
     }
 
     TEST_FIXTURE(DecodeFixture, transfer_frame_id_256)
@@ -414,7 +414,7 @@ SUITE(FrameTypeDecode)
         amqp_deallocate_type(context, type);
         type = amqp_decode(context, decode_buffer);
         ASSERT(type);
-//        amqp_type_print(context,  described, decode_buffer);
+//        amqp_type_print(context,  described);
     }
 
     TEST_FIXTURE(DecodeFixture, transfer_frame_id_677)
@@ -437,6 +437,6 @@ SUITE(FrameTypeDecode)
         amqp_deallocate_type(context, type);
         type = amqp_decode(context, decode_buffer);
         ASSERT(type);
-//        amqp_type_print(context,  described, decode_buffer);
+//        amqp_type_print(context,  described);
     }
 }

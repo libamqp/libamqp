@@ -60,12 +60,12 @@ SUITE(TypePrint)
         }
         void print_type()
         {
-            amqp_type_print(context, type, decode_buffer);
+            amqp_type_print(context, type);
         }
     
         void print_type_formatted()
         {
-            amqp_type_print_formatted(context, type, decode_buffer);
+            amqp_type_print_formatted(context, type);
         }
 
 #define check_output(e) CHECK_EQUAL((e), (const char *) output);
