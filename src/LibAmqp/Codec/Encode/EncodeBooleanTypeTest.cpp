@@ -65,7 +65,6 @@ SUITE(CodecEncode)
             amqp_encode_boolean(context, buffer, false);
         CHECK_NOT_NULL(type);
         amqp_complete_type(context, buffer, type);
-        break_one();
 
         CHECK(amqp_type_is_valid(type));
         CHECK(amqp_type_is_array(type));

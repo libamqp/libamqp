@@ -25,7 +25,6 @@ extern "C" {
 
 #include "AmqpTypes/AmqpVariable.h"
 
-
 struct amqp_binary_t
 {
     amqp_leader_t leader;
