@@ -24,6 +24,7 @@ extern "C" {
 #include "libamqp_common.h"
 #include "Transport/LowLevel/Connect.h"
 #include "Transport/LowLevel/Timer.h"
+#include "Context/SaslIdentity.h"
 #include "Transport/Connection/ConnectionTrace.h"
 #include "Transport/Connection/ConnectionRead.h"
 #include "Transport/Connection/ConnectionSocket.h"
@@ -322,7 +323,7 @@ struct amqp_connection_t
     } limits;
     amqp_accept_handler_arguments_t *accept_handler_arguments;
     amqp_timer_t *timer;
-    amqp_sasl_identity_t *identity_hooks;
+    amqp_sasl_identity_t identity_hooks;
 };
 
 extern void amqp_connection_state_initialize(amqp_connection_t *connection);

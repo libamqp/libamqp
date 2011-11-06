@@ -64,6 +64,10 @@ namespace SuiteConnection
         static void do_nothing_action(amqp_connection_t *connection);
         static void not_implemented_action(amqp_connection_t *connection);
 
+        static const char *provide_login(amqp_context_t *context);
+        static const char *provide_password(amqp_context_t *context);
+        static const char *provide_email(amqp_context_t *context);
+
     public:
         amqp_event_loop_t *loop;
         amqp_connection_t *connection;

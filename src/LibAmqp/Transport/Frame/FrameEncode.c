@@ -84,7 +84,7 @@ static void amqp_sasl_init_feld_encoder(amqp_connection_t *connection, amqp_buff
     assert(sasl_plugin && sasl_plugin->mechanism_name);
 
     amqp_encode_symbol(connection->context, buffer, sasl_plugin->mechanism_name);
-    amqp_sasl_plugin_initial_response(connection->context, sasl_plugin, buffer, connection->identity_hooks);
+    amqp_sasl_plugin_initial_response(connection->context, sasl_plugin, buffer, &connection->identity_hooks);
     amqp_encode_string(connection->context, buffer, connection->socket.hostname);
 }
 

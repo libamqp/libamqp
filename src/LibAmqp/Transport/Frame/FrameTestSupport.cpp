@@ -25,6 +25,7 @@ namespace SuiteFrame
     {
         amqp_context_register_sasl_plugin(context, amqp_plugin_sasl_plain_create(context));
         connection = amqp_connection_create(context);
+        connection->socket.hostname = "unknown";
     }
 
     FrameFixture::~FrameFixture()
@@ -51,9 +52,9 @@ namespace SuiteFrame
     {
         return check_header(AMQP_SASL_FRAME_TYPE, 0U);
     }
+
     int FrameFixture::check_amqp_header()
     {
         return check_header(AMQP_FRAME_TYPE, 0U);
     }
-
 }

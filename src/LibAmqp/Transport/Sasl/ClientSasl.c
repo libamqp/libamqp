@@ -25,15 +25,18 @@
 #include "Transport/Frame/FrameEncode.h"
 #include "Codec/Encode/Encode.h"
 #include "Plugin/Sasl.h"
+
+#include "Transport/Sasl/ClientSasl.h"
+
 #include "debug_helper.h"
 
-void amqp_encode_sasl_init_response(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
+static void amqp_encode_sasl_init_response(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
 {
     amqp_buffer_reset(connection->buffer.write);
     amqp_encode_sasl_init_frame(connection, connection->buffer.write, plugin);
 }
 
-void no_supported_mechanism_error(amqp_connection_t *connection, amqp_multiple_symbol_t *multiple)
+static void no_supported_mechanism_error(amqp_connection_t *connection, amqp_multiple_symbol_t *multiple)
 {
     // TODO - add details of available SASL plugins.
     int space = amqp_multiple_symbol_total_length(multiple) + (amqp_multiple_symbol_size(multiple) - 1) * 2 + 1;

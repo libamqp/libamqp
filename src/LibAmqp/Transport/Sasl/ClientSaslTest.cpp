@@ -22,42 +22,48 @@
 #include "AmqpTypes/AmqpMultiple.h"
 #include "Plugin/SaslPlain/SaslPlain.h"
 #include "Plugin/SaslAnonymous/SaslAnonymous.h"
+#include "TestData/TestFrames.h"
+#include "Transport/Frame/Frame.h"
+
+#include "Transport/Sasl/ClientSasl.h"
 
 #include "debug_helper.h"
 
-#include "Transport/Connection/ConnectionTestSupport.h"
+#include "Transport/Frame/FrameTestSupport.h"
 
 SUITE(Sasl)
 {
-    class ClientSaslFixture : public SuiteConnection::BaseConnectionFixture
+    class ClientSaslFixture : public SuiteFrame::FrameFixture
     {
     public:
         ClientSaslFixture();
         ~ClientSaslFixture();
 
     public:
-        amqp_type_t *type;
         amqp_symbol_t *symbol;
         amqp_multiple_symbol_t *multiple;
-        amqp_connection_t *connection;
     };
 
-    ClientSaslFixture::ClientSaslFixture() : type(0), symbol(0), multiple(0)
+    ClientSaslFixture::ClientSaslFixture() : symbol(0), multiple(0)
     {
-        connection = amqp_connection_create(context);
     }
 
     ClientSaslFixture::~ClientSaslFixture()
     {
         amqp_symbol_cleanup(context, symbol);
         amqp_multiple_symbol_cleanup(context, multiple);
-        amqp_connection_destroy(context, connection);
-        amqp_deallocate_type(context, type);
     }
 
-    TEST_FIXTURE(ClientSaslFixture, encode_sasl_init_frame)
+    TEST_FIXTURE(ClientSaslFixture, encode_sasl_init)
     {
+        test_data::sasl_mechanisms_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_sasl_frame(context, decode_buffer);
+        ASSERT(frame != 0);
 
+        break_one();
+
+        amqp_sasl_process_mechanisms_frame(connection, frame);
+    
         CHECK(0);
     }
 }

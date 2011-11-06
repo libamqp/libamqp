@@ -31,6 +31,7 @@ static amqp_connection_t *create_connection(amqp_context_t *context)
 
     result->limits.max_frame_size = context->limits.max_frame_size;
 
+    result->identity_hooks = context->sasl.identity_hooks;
     return result;
 }
 

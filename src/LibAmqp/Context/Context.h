@@ -25,6 +25,7 @@
 #include "Buffer/Buffer.h"
 #include "Codec/Type/Type.h"
 #include "Context/ErrorHandling.h"
+#include "Context/SaslIdentity.h"
 #include "Messaging/MessagingPlugin.h"
 
 #ifdef __cplusplus
@@ -87,13 +88,6 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     typedef struct amqp_symbol_t amqp_symbol_t;
 #endif
 
-    struct amqp_sasl_identity_t
-    {
-        const char *(*login)(amqp_context_t *context);
-        const char *(*password)(amqp_context_t *context);
-        const char *(*email)(amqp_context_t *context);
-    };
-
     typedef int amqp_debug_print_c_t(int c);
 
     typedef union amqp_outputter_arg_t
@@ -144,11 +138,6 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
             amqp_memory_pool_t amqp_frame_t_pool;
         } memory;
 
-//        struct
-//        {
-//            amqp_buffer_t *buffer;
-//        } decode;
-//
         struct
         {
             amqp_buffer_t *buffer;
@@ -169,9 +158,13 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
             {
                 amqp_sasl_plugin_node_t *sasl_plugin_list;
                 amqp_messaging_methods_t messaging;
-                amqp_sasl_identity_t *identity_hooks;
             } plugins;
         } reference;
+
+        struct
+        {
+            amqp_sasl_identity_t identity_hooks;
+        } sasl;
 
         amqp_event_loop_t *thread_event_loop;
     };
@@ -209,6 +202,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     extern amqp_sasl_plugin_t *amqp_context_first_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_node_t **sasl_plugin_node);
     extern amqp_sasl_plugin_t *amqp_context_next_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_node_t **sasl_plugin_node);
     extern int amqp_context_sasl_plugin_count(amqp_context_t *context);
+    extern void amqp_context_register_identity_hooks(amqp_context_t *context, amqp_identity_hook_method_t provide_login, amqp_identity_hook_method_t provide_password, amqp_identity_hook_method_t provide_email);
 
     extern uint8_t *amqp_allocate_print_buffer(amqp_context_t *context, size_t n);
     extern void amqp_deallocate_print_buffer(amqp_context_t *context, uint8_t *buffer);
