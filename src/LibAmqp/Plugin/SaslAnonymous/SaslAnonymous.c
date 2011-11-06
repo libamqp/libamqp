@@ -15,6 +15,8 @@
  */
 
 #include "Context/Context.h"
+#include "Codec/Encode/Encode.h"
+
 #include "Plugin/SaslAnonymous/SaslAnonymous.h"
 #include "debug_helper.h"
 
@@ -24,9 +26,15 @@ static void cleanup_instance_handler(amqp_context_t *context, amqp_sasl_plugin_t
     AMQP_FREE(context, sasl_plugin);
 }
 
-static int initial_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer)
+static amqp_type_t *initial_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks)
 {
-    not_implemented(todo);
+    const char *email;
+
+    assert(identity_hooks->email);
+
+    email = identity_hooks->email(context);
+
+    return amqp_encode_binary(context, buffer, (unsigned char *) email, strlen(email));
 }
 
 static amqp_sasl_plugin_t *instance_create_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)

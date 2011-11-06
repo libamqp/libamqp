@@ -44,16 +44,16 @@ amqp_sasl_plugin_t *amqp_sasl_plugin_instance_create(amqp_context_t *context, am
     return sasl_plugin->essence.plugin.instance_create_handler(context, sasl_plugin);
 }
 
-int amqp_sasl_plugin_initial_response(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer)
+amqp_type_t *amqp_sasl_plugin_initial_response(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks)
 {
     assert(sasl_plugin && sasl_plugin->essence.instance.initial_response_handler);
-    return sasl_plugin->essence.instance.initial_response_handler(context, sasl_plugin, buffer);
+    return sasl_plugin->essence.instance.initial_response_handler(context, sasl_plugin, buffer, identity_hooks);
 }
 
-int amqp_sasl_plugin_challenge_response(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_binary_t *challenge, amqp_buffer_t *buffer)
+amqp_type_t *amqp_sasl_plugin_challenge_response(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_binary_t *challenge, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks)
 {
     assert(sasl_plugin && sasl_plugin->essence.instance.challenge_response_handler);
-    return sasl_plugin->essence.instance.challenge_response_handler(context, sasl_plugin, challenge, buffer);
+    return sasl_plugin->essence.instance.challenge_response_handler(context, sasl_plugin, challenge, buffer, identity_hooks);
 }
 
 //
@@ -64,12 +64,12 @@ static void base_instance_cleanup_handler(amqp_context_t *context, amqp_sasl_plu
     AMQP_FREE(context, sasl_plugin);
 }
 
-static int initial_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer)
+static amqp_type_t *initial_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks)
 {
     not_implemented(todo);
 }
 
-static int challenge_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_binary_t *challenge, amqp_buffer_t *buffer)
+static amqp_type_t *challenge_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_binary_t *challenge, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks)
 {
     not_implemented(todo);
 }

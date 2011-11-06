@@ -52,6 +52,7 @@ SUITE(Sasl)
 //        amqp_connection_destroy(context, connection);
     }
 
+//amqp_plugin_sasl_plain_create(context)
     TEST_FIXTURE(ClientSaslFixture, encode_sasl_init_frame)
     {
         CHECK(0);

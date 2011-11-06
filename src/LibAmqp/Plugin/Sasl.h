@@ -34,6 +34,11 @@ typedef struct amqp_buffer_t amqp_buffer_t;
     typedef struct amqp_context_t amqp_context_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_TYPE_T
+#define LIBAMQP_AMQP_TYPE_T
+    typedef struct amqp_type_t amqp_type_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_SASL_PLUGIN_TYPE_T
 #define LIBAMQP_AMQP_SASL_PLUGIN_TYPE_T
 typedef struct amqp_sasl_plugin_t amqp_sasl_plugin_t;
@@ -48,8 +53,8 @@ typedef void (*amqp_sasl_plugin_cleanup_handler)(amqp_context_t *context, amqp_s
 typedef amqp_sasl_plugin_t *(*amqp_sasl_plugin_instance_create_handler)(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin);
 
 typedef void (*amqp_sasl_plugin_instance_cleanup_handler)(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin);
-typedef int (*amqp_sasl_plugin_initial_response_handler)(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer);
-typedef int (*amqp_sasl_plugin_challenge_response_handler)(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_binary_t *challenge, amqp_buffer_t *buffer);
+typedef amqp_type_t *(*amqp_sasl_plugin_initial_response_handler)(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks);
+typedef amqp_type_t *(*amqp_sasl_plugin_challenge_response_handler)(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_binary_t *challenge, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks);
 
 struct amqp_sasl_plugin_t
 {
@@ -71,8 +76,8 @@ struct amqp_sasl_plugin_t
 
 extern amqp_sasl_plugin_t *amqp_sasl_plugin_instance_create(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin);
 
-extern int amqp_sasl_plugin_initial_response(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer);
-extern int amqp_sasl_plugin_challenge_response(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_binary_t *challenge, amqp_buffer_t *buffer);
+extern amqp_type_t *amqp_sasl_plugin_initial_response(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks);
+extern amqp_type_t *amqp_sasl_plugin_challenge_response(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_binary_t *challenge, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks);
 
 extern amqp_sasl_plugin_t *amqp_sasl_plugin_base_create(amqp_context_t *context, const char *name, amqp_sasl_plugin_instance_create_handler instance_create_handler);
 extern amqp_sasl_plugin_t *amqp_sasl_plugin_base_instance_create(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin);

@@ -82,6 +82,12 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     typedef struct amqp_symbol_t amqp_symbol_t;
 #endif
 
+    typedef struct amqp_sasl_identity_t
+    {
+        const char *(*login)(amqp_context_t *context);
+        const char *(*password)(amqp_context_t *context);
+        const char *(*email)(amqp_context_t *context);
+    } amqp_sasl_identity_t;
 
     typedef int amqp_debug_print_c_t(int c);
 
@@ -158,6 +164,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
             {
                 amqp_sasl_plugin_node_t *sasl_plugin_list;
                 amqp_messaging_methods_t messaging;
+                amqp_sasl_identity_t *identity_hooks;
             } plugins;
         } reference;
 
