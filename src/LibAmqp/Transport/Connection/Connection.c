@@ -34,7 +34,7 @@ static amqp_connection_t *create_connection(amqp_context_t *context)
     return result;
 }
 
-amqp_connection_t *amqp_connection_initialize(amqp_context_t *context)
+amqp_connection_t *amqp_connection_create(amqp_context_t *context)
 {
     amqp_connection_t *result = create_connection(context);
 

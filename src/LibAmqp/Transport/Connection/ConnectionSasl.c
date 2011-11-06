@@ -131,6 +131,8 @@ static void sasl_mechanisms_while_waiting_on_sasl_mechanisms(amqp_connection_t *
     amqp_sasl_plugin_t *plugin = amqp_sasl_select_mechanism(connection, multiple);
     if (plugin)
     {
+//        amqp_encode_and_send_sasl_init_response(connection, plugin)
+        // TODO transition state.
         not_implemented(todo);
     }
     else
@@ -141,6 +143,7 @@ static void sasl_mechanisms_while_waiting_on_sasl_mechanisms(amqp_connection_t *
         amqp_connection_failed(connection, AMQP_ERROR_NO_SASL_MECHANISM, AMQP_CONNECTION_SASL_ERROR, "No SASL plugin matches broker mechanism list. Broker supports: %s", buffer);
         amqp_deallocate_print_buffer(connection->context, buffer);
     }
+    // TODO -  deallocate frame?
 }
 static void transition_to_waiting_on_sasl_mechanisms(amqp_connection_t *connection)
 {

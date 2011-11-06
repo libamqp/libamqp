@@ -43,7 +43,7 @@ SUITE(VariableTypesEncoding)
     
     TEST_FIXTURE(EncodeFixture, amqp_encode_string_str_utf8)
     {
-        type = amqp_encode_string_utf8(context, buffer, "Hello World");
+        type = amqp_encode_string(context, buffer, "Hello World");
 
         CHECK_NOT_NULL(type);
         CHECK_BUFFERS_MATCH(buffer, test_data::hello_world);
@@ -52,9 +52,9 @@ SUITE(VariableTypesEncoding)
         CHECK_EQUAL((size_t) 0x0b, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_string_utf8)
+    TEST_FIXTURE(EncodeFixture, amqp_encode_string)
     {
-        type = amqp_encode_string_utf8(context, buffer, "Hello World");
+        type = amqp_encode_string(context, buffer, "Hello World");
 
         CHECK_NOT_NULL(type);
         CHECK_BUFFERS_MATCH(buffer, test_data::hello_world);
@@ -67,7 +67,7 @@ SUITE(VariableTypesEncoding)
     {
         CHECK_EQUAL((size_t) 257, strlen(test_data::lorem_ipsum));
 
-        type = amqp_encode_string_utf8(context, buffer, test_data::lorem_ipsum);
+        type = amqp_encode_string(context, buffer, test_data::lorem_ipsum);
 
         CHECK_NOT_NULL(type);
 

@@ -527,12 +527,12 @@ amqp_type_t *encode_string_utf8(amqp_context_t *context, amqp_buffer_t *buffer, 
     return result;
 }
 
-amqp_type_t *amqp_encode_string_utf8(amqp_context_t *context, amqp_buffer_t *buffer, const char *value)
+amqp_type_t *amqp_encode_string(amqp_context_t *context, amqp_buffer_t *buffer, const char *value)
 {
    return encode_string_utf8(context, buffer, value, strlen(value));
 }
 
-amqp_type_t *amqp_encode_string_utf8n(amqp_context_t *context, amqp_buffer_t *buffer, const char *value, size_t size)
+amqp_type_t *amqp_encode_stringn(amqp_context_t *context, amqp_buffer_t *buffer, const char *value, size_t size)
 {
    return encode_string_utf8(context, buffer, value, size);
 }

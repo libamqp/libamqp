@@ -79,18 +79,13 @@ void amqp_encode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *b
 
 static void amqp_sasl_init_feld_encoder(amqp_context_t *context, amqp_buffer_t *buffer, void *arg)
 {
-    amqp_binary_t *initial_response;
     amqp_sasl_plugin_t *sasl_plugin = (amqp_sasl_plugin_t *) arg;
+
     assert(sasl_plugin && sasl_plugin->mechanism_name);
 
-//    initial_response = sasl_plugin->initial_response_handler(context, sasl_plugin);
-
     amqp_encode_symbol(context, buffer, sasl_plugin->mechanism_name);
-//    amqp_encode_binary
-
-//not_implemented(todo);
-
-    amqp_binary_cleanup(context, initial_response);
+    amqp_sasl_plugin_initial_response(context, sasl_plugin, buffer);
+    amqp_encode_string(context, buffer, "xxx");
 }
 
 void amqp_encode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin)

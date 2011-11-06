@@ -18,22 +18,28 @@
 #include "Plugin/SaslAnonymous/SaslAnonymous.h"
 #include "debug_helper.h"
 
-static void cleanup_plugin(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)
+static void cleanup_instance_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)
 {
+    assert(sasl_plugin != 0);
     AMQP_FREE(context, sasl_plugin);
 }
 
-static amqp_binary_t *initial_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)
+static int initial_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer)
 {
     not_implemented(todo);
 }
 
-amqp_sasl_plugin_t *amqp_plugin_sasl_anonymous_create(amqp_context_t *context)
+static amqp_sasl_plugin_t *instance_create_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)
 {
-    amqp_sasl_plugin_t *result = AMQP_MALLOC(context, amqp_sasl_plugin_t);
-    result->mechanism_name = "ANONYMOUS";
-    result->plugin_cleanup_handler = cleanup_plugin;
-    result->initial_response_handler = initial_response_handler;
+    amqp_sasl_plugin_t *result = amqp_sasl_plugin_base_instance_create(context, sasl_plugin);
+
+    result->essence.instance.cleanup_instance_handler = cleanup_instance_handler;
+    result->essence.instance.initial_response_handler = initial_response_handler;
 
     return result;
+}
+
+amqp_sasl_plugin_t *amqp_plugin_sasl_anonymous_create(amqp_context_t *context)
+{
+    return amqp_sasl_plugin_base_create(context, "ANONYMOUS", instance_create_handler);
 }

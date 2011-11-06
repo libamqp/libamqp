@@ -36,12 +36,12 @@ SUITE(Connection)
 
     ConnectionFixture::ConnectionFixture()
     {
-        connection = amqp_connection_initialize(context);
+        connection = amqp_connection_create(context);
         setup_stop_hook();
     }
     ConnectionFixture::ConnectionFixture(amqp_connection_test_hook_t *test_hooks) : BrokerUsingFixture(test_hooks)
     {
-        connection = amqp_connection_initialize(context);
+        connection = amqp_connection_create(context);
         setup_stop_hook();
     }
 

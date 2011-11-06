@@ -27,6 +27,8 @@ extern "C" {
 
 extern amqp_sasl_plugin_t *amqp_plugin_sasl_plain_create(amqp_context_t *context);
 
+extern amqp_sasl_plugin_t *amqp_plugin_sasl_plain_instance_create(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin);
+
 #ifdef __cplusplus
 }
 #endif

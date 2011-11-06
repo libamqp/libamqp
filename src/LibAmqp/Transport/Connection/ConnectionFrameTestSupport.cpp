@@ -49,7 +49,7 @@ namespace SuiteConnectionFrame
         write_copy = 0;
         buffer = amqp_allocate_buffer(context);
 
-        connection = amqp_connection_initialize(context);
+        connection = amqp_connection_create(context);
         connection->state.writer.commence_write = write_intercept;
         connection->state.reader.commence_read = read_intercept;
         connection->state.connection.done = done_callback;
