@@ -44,6 +44,11 @@ typedef struct amqp_buffer_t amqp_buffer_t;
 typedef struct amqp_context_t amqp_context_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_SASL_IDENTITY_TYPE_T
+#define LIBAMQP_AMQP_SASL_IDENTITY_TYPE_T
+typedef struct amqp_sasl_identity_t amqp_sasl_identity_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_CONNECTION_TYPE_T
 #define LIBAMQP_AMQP_CONNECTION_TYPE_T
 typedef struct amqp_connection_t amqp_connection_t;
@@ -317,6 +322,7 @@ struct amqp_connection_t
     } limits;
     amqp_accept_handler_arguments_t *accept_handler_arguments;
     amqp_timer_t *timer;
+    amqp_sasl_identity_t *identity_hooks;
 };
 
 extern void amqp_connection_state_initialize(amqp_connection_t *connection);

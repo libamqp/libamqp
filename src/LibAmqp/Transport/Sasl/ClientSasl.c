@@ -22,13 +22,15 @@
 #include "Transport/Connection/Connection.h"
 #include "Transport/Frame/Frame.h"
 #include "Transport/Sasl/SaslMechanisms.h"
+#include "Transport/Frame/FrameEncode.h"
 #include "Codec/Encode/Encode.h"
 #include "Plugin/Sasl.h"
 #include "debug_helper.h"
 
-void amqp_encode_and_send_sasl_init_response(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
+void amqp_encode_sasl_init_response(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
 {
-    // TODO - Delegate initialisation of the buffer to the plugin
+    amqp_buffer_reset(connection->buffer.write);
+    amqp_encode_sasl_init_frame(connection, connection->buffer.write, plugin);
 }
 
 void no_supported_mechanism_error(amqp_connection_t *connection, amqp_multiple_symbol_t *multiple)
@@ -49,7 +51,7 @@ int amqp_sasl_process_mechanisms_frame(amqp_connection_t *connection, amqp_frame
     amqp_sasl_plugin_t *plugin = amqp_sasl_select_mechanism(connection, multiple);
     if (plugin)
     {
-        amqp_encode_and_send_sasl_init_response(connection, plugin);
+        amqp_encode_sasl_init_response(connection, plugin);
         // TODO transition state.
 
         not_implemented(todo);

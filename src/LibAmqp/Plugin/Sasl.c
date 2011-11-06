@@ -46,7 +46,7 @@ amqp_sasl_plugin_t *amqp_sasl_plugin_instance_create(amqp_context_t *context, am
 
 amqp_type_t *amqp_sasl_plugin_initial_response(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks)
 {
-    assert(sasl_plugin && sasl_plugin->essence.instance.initial_response_handler);
+    assert(sasl_plugin && sasl_plugin->essence.instance.initial_response_handler && identity_hooks);
     return sasl_plugin->essence.instance.initial_response_handler(context, sasl_plugin, buffer, identity_hooks);
 }
 

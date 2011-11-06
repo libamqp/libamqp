@@ -23,13 +23,13 @@ namespace SuiteFrame
 {
     FrameFixture::FrameFixture() : frame(0), type(0)
     {
-        buffer = amqp_allocate_buffer(context);
         amqp_context_register_sasl_plugin(context, amqp_plugin_sasl_plain_create(context));
+        connection = amqp_connection_create(context);
     }
 
     FrameFixture::~FrameFixture()
     {
-        amqp_deallocate_buffer(context, buffer);
+        amqp_connection_destroy(context, connection);
         amqp_frame_cleanup(context, frame);
         amqp_deallocate_type(context, type);
     }

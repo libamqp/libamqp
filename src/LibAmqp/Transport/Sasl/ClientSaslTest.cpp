@@ -25,36 +25,39 @@
 
 #include "debug_helper.h"
 
+#include "Transport/Connection/ConnectionTestSupport.h"
+
 SUITE(Sasl)
 {
-    class ClientSaslFixture : public SuiteSasl::BaseSaslFixture
+    class ClientSaslFixture : public SuiteConnection::BaseConnectionFixture
     {
     public:
         ClientSaslFixture();
         ~ClientSaslFixture();
 
     public:
+        amqp_type_t *type;
         amqp_symbol_t *symbol;
         amqp_multiple_symbol_t *multiple;
-//        amqp_connection_t *connection;
+        amqp_connection_t *connection;
     };
 
-    ClientSaslFixture::ClientSaslFixture() : symbol(0), multiple(0)
+    ClientSaslFixture::ClientSaslFixture() : type(0), symbol(0), multiple(0)
     {
-//        connection = amqp_connection_create(context);
-        amqp_context_register_sasl_plugin(context, amqp_plugin_sasl_plain_create(context));
+        connection = amqp_connection_create(context);
     }
 
     ClientSaslFixture::~ClientSaslFixture()
     {
         amqp_symbol_cleanup(context, symbol);
         amqp_multiple_symbol_cleanup(context, multiple);
-//        amqp_connection_destroy(context, connection);
+        amqp_connection_destroy(context, connection);
+        amqp_deallocate_type(context, type);
     }
 
-//amqp_plugin_sasl_plain_create(context)
     TEST_FIXTURE(ClientSaslFixture, encode_sasl_init_frame)
     {
+
         CHECK(0);
     }
 }

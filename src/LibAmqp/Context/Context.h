@@ -42,6 +42,11 @@ extern "C"
     typedef struct amqp_context_t amqp_context_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_SASL_IDENTITY_TYPE_T
+#define LIBAMQP_AMQP_SASL_IDENTITY_TYPE_T
+typedef struct amqp_sasl_identity_t amqp_sasl_identity_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_FRAME_TYPE_T
 #define LIBAMQP_AMQP_FRAME_TYPE_T
 typedef struct amqp_frame_t amqp_frame_t;
@@ -82,12 +87,12 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     typedef struct amqp_symbol_t amqp_symbol_t;
 #endif
 
-    typedef struct amqp_sasl_identity_t
+    struct amqp_sasl_identity_t
     {
         const char *(*login)(amqp_context_t *context);
         const char *(*password)(amqp_context_t *context);
         const char *(*email)(amqp_context_t *context);
-    } amqp_sasl_identity_t;
+    };
 
     typedef int amqp_debug_print_c_t(int c);
 
