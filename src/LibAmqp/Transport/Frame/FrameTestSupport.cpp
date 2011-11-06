@@ -30,6 +30,7 @@ namespace SuiteFrame
 
     FrameFixture::~FrameFixture()
     {
+        connection->socket.hostname = 0;
         amqp_connection_destroy(context, connection);
         amqp_frame_cleanup(context, frame);
         amqp_deallocate_type(context, type);

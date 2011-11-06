@@ -60,10 +60,17 @@ SUITE(Sasl)
         frame = amqp_decode_sasl_frame(context, decode_buffer);
         ASSERT(frame != 0);
 
-        break_one();
-
         amqp_sasl_process_mechanisms_frame(connection, frame);
-    
-        CHECK(0);
+        amqp_buffer_t *buffer = connection->buffer.write;
+        amqp_buffer_advance_read_index(buffer, 8);
+        type = amqp_decode(context, buffer);
+        ASSERT(type);
+        CHECK(amqp_type_is_valid(type));
+        CHECK(amqp_type_is_composite(type));
+        amqp_type_t *described = amqp_type_get_described(type);
+        CHECK(amqp_type_is_list(described));
+        CHECK(amqp_type_is_symbol(amqp_type_list_element(described, 0)));
+        CHECK(amqp_type_is_binary(amqp_type_list_element(described, 1)));
+        CHECK(amqp_type_is_string(amqp_type_list_element(described, 2)));
     }
 }

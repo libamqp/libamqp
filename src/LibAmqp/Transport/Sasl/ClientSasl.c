@@ -30,13 +30,14 @@
 
 #include "debug_helper.h"
 
-static void amqp_encode_sasl_init_response(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
+//static
+void amqp_encode_sasl_init_response(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
 {
     amqp_buffer_reset(connection->buffer.write);
     amqp_encode_sasl_init_frame(connection, connection->buffer.write, plugin);
 }
 
-static void no_supported_mechanism_error(amqp_connection_t *connection, amqp_multiple_symbol_t *multiple)
+static void no_supported_sasl_mechanism_error(amqp_connection_t *connection, amqp_multiple_symbol_t *multiple)
 {
     // TODO - add details of available SASL plugins.
     int space = amqp_multiple_symbol_total_length(multiple) + (amqp_multiple_symbol_size(multiple) - 1) * 2 + 1;
@@ -55,14 +56,12 @@ int amqp_sasl_process_mechanisms_frame(amqp_connection_t *connection, amqp_frame
     if (plugin)
     {
         amqp_encode_sasl_init_response(connection, plugin);
-        // TODO transition state.
-
-        not_implemented(todo);
+        amqp_sasl_plugin_instance_cleanup(connection->context, plugin);
         return true;
     }
     else
     {
-        no_supported_mechanism_error(connection, multiple);
+        no_supported_sasl_mechanism_error(connection, multiple);
         return false;
     }
 }
