@@ -183,7 +183,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     extern void amqp_deallocate_frame(amqp_context_t *context, amqp_frame_t *type);
 
     extern amqp_debug_print_c_t *amqp_context_define_putc_function(amqp_context_t *context, amqp_debug_print_c_t *putc);
-    extern int amqp_context_printf(amqp_context_t *context, const char *format, ...);
+    extern int amqp_context_printf(amqp_context_t *context, int level, const char *format, ...);
     extern int amqp_context_putc(amqp_context_t *context, int c);
     extern int amqp_context_increase_print_indent(amqp_context_t *context, int delta);
     extern int amqp_context_set_print_indent(amqp_context_t *context, int indent);

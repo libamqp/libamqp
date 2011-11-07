@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_SASL_CLIENT_SASL_H
-#define LIBAMQP_TRANSPORT_SASL_CLIENT_SASL_H
+#ifndef LIBAMQP_TRANSPORT_SASL_SERVER_SASL_H
+#define LIBAMQP_TRANSPORT_SASL_SERVER_SASL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,9 +47,7 @@ typedef struct amqp_connection_t amqp_connection_t;
 typedef struct amqp_frame_t amqp_frame_t;
 #endif
 
-extern int amqp_sasl_process_mechanisms_frame(amqp_connection_t *connection, amqp_frame_t *frame);
-extern int amqp_sasl_process_challenge_frame(amqp_connection_t *connection, amqp_frame_t *frame);
-extern int amqp_sasl_process_outcome_frame(amqp_connection_t *connection, amqp_frame_t *frame);
+extern int amqp_sasl_prepare_mechanisms_frame(amqp_connection_t *connection);
 
 #ifdef __cplusplus
 }

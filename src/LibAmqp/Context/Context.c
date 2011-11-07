@@ -296,4 +296,3 @@ void amqp_deallocate_print_buffer(amqp_context_t *context, uint8_t *buffer)
 {
     free(buffer);
 }
-

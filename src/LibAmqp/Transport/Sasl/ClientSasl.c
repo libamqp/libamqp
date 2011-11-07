@@ -30,14 +30,15 @@
 
 #include "debug_helper.h"
 
-//static
-void amqp_encode_sasl_init_response(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
+static
+int amqp_encode_sasl_init_response(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
 {
     amqp_buffer_reset(connection->buffer.write);
-    amqp_encode_sasl_init_frame(connection, connection->buffer.write, plugin);
+    return amqp_encode_sasl_init_frame(connection, connection->buffer.write, plugin);
 }
 
-static void no_supported_sasl_mechanism_error(amqp_connection_t *connection, amqp_multiple_symbol_t *multiple)
+static
+void no_supported_sasl_mechanism_error(amqp_connection_t *connection, amqp_multiple_symbol_t *multiple)
 {
     // TODO - add details of available SASL plugins.
     int space = amqp_multiple_symbol_total_length(multiple) + (amqp_multiple_symbol_size(multiple) - 1) * 2 + 1;
@@ -53,15 +54,25 @@ int amqp_sasl_process_mechanisms_frame(amqp_connection_t *connection, amqp_frame
     // Find the first supported mechanism and get it to initialise the sasl init frame
     amqp_multiple_symbol_t *multiple = &frame->frames.sasl.mechanisms.sasl_server_mechanisms;
     amqp_sasl_plugin_t *plugin = amqp_sasl_select_mechanism(connection, multiple);
+
     if (plugin)
     {
-        amqp_encode_sasl_init_response(connection, plugin);
-        amqp_sasl_plugin_instance_cleanup(connection->context, plugin);
-        return true;
+        connection->sasl.plugin = plugin;
+        return amqp_encode_sasl_init_response(connection, plugin);
     }
     else
     {
         no_supported_sasl_mechanism_error(connection, multiple);
         return false;
     }
+}
+int amqp_sasl_process_challenge_frame(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    not_implemented(todo);
+}
+int amqp_sasl_process_outcome_frame(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    assert(frame && connection->sasl.plugin);
+
+    return amqp_sasl_plugin_outcome(connection->context, connection->sasl.plugin, &frame->frames.sasl.outcome);
 }

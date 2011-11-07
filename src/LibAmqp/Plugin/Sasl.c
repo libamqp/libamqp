@@ -56,6 +56,12 @@ amqp_type_t *amqp_sasl_plugin_challenge_response(amqp_context_t *context, amqp_s
     return sasl_plugin->essence.instance.challenge_response_handler(context, sasl_plugin, challenge, buffer, identity_hooks);
 }
 
+int amqp_sasl_plugin_outcome(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_security_sasl_outcome_t *outcome)
+{
+    assert(sasl_plugin && sasl_plugin->essence.instance.outcome_handler);
+    return sasl_plugin->essence.instance.outcome_handler(context, sasl_plugin, outcome);
+}
+
 //
 static void base_instance_cleanup_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)
 {
@@ -66,12 +72,17 @@ static void base_instance_cleanup_handler(amqp_context_t *context, amqp_sasl_plu
 
 static amqp_type_t *initial_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks)
 {
-    not_implemented(todo);
+    return 0;
 }
 
 static amqp_type_t *challenge_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_binary_t *challenge, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks)
 {
-    not_implemented(todo);
+    return 0;
+}
+
+static int outcome_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_security_sasl_outcome_t *outcome)
+{
+    return outcome && amqp_binary_is_null(&outcome->additional_data) && outcome->code == amqp_sasl_code_ok;
 }
 
 amqp_sasl_plugin_t *amqp_sasl_plugin_base_instance_create(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)
@@ -81,6 +92,7 @@ amqp_sasl_plugin_t *amqp_sasl_plugin_base_instance_create(amqp_context_t *contex
     result->essence.instance.cleanup_instance_handler = base_instance_cleanup_handler;
     result->essence.instance.initial_response_handler = initial_response_handler;
     result->essence.instance.challenge_response_handler = challenge_response_handler;
+    result->essence.instance.outcome_handler = outcome_handler;
     result->essence.instance.instance_state = 0;
     return result;
 }

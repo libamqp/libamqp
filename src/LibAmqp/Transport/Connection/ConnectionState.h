@@ -65,6 +65,12 @@ typedef struct amqp_connections_t amqp_connections_t;
 typedef struct amqp_frame_t amqp_frame_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_SASL_PLUGIN_TYPE_T
+#define LIBAMQP_AMQP_SASL_PLUGIN_TYPE_T
+typedef struct amqp_sasl_plugin_t amqp_sasl_plugin_t;
+#endif
+
+
 enum amqp_connection_protocols
 {
     AMQP_PROTOCOL_AMQP = 0x01,
@@ -323,7 +329,10 @@ struct amqp_connection_t
     } limits;
     amqp_accept_handler_arguments_t *accept_handler_arguments;
     amqp_timer_t *timer;
-    amqp_sasl_identity_t identity_hooks;
+    struct {
+        amqp_sasl_identity_t identity_hooks;
+        amqp_sasl_plugin_t *plugin;
+    } sasl;
 };
 
 extern void amqp_connection_state_initialize(amqp_connection_t *connection);

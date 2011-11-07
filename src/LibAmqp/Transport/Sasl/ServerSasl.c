@@ -14,20 +14,24 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_FRAME_FRAME_ENCODE_H
-#define LIBAMQP_TRANSPORT_FRAME_FRAME_ENCODE_H
+//#include "Context/Context.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "string.h"
 
+#include "Context/Context.h"
+#include "Transport/Connection/Connection.h"
 #include "Transport/Frame/Frame.h"
+#include "Transport/Sasl/SaslMechanisms.h"
+#include "Transport/Frame/FrameEncode.h"
+#include "Codec/Encode/Encode.h"
 #include "Plugin/Sasl.h"
 
-extern int amqp_encode_sasl_mechanisms_frame(amqp_connection_t *connection, amqp_buffer_t *buffer);
-extern int amqp_encode_sasl_init_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin);
+#include "Transport/Sasl/ServerSasl.h"
 
-#ifdef __cplusplus
+#include "debug_helper.h"
+
+
+int amqp_sasl_prepare_mechanisms_frame(amqp_connection_t *connection)
+{
+    return amqp_encode_sasl_mechanisms_frame(connection, connection->buffer.write);
 }
-#endif
-#endif
