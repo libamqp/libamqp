@@ -67,7 +67,47 @@ int amqp_socket_address_port(struct sockaddr_storage *socket_address, socklen_t 
     }
 }
 
-int amqp_socket_shutdown_output(int fd)
+int amqp_socket_shutdown_output(amqp_socket_t fd)
 {
     return shutdown(fd, SHUT_WR);
+}
+
+int amqp_set_socket_to_nonblocking(amqp_socket_t fd)
+{
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1)
+    {
+        return -1;
+    }
+    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+}
+
+int amqp_set_socket_to_blocking(amqp_socket_t fd)
+{
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1)
+    {
+        return -1;
+    }
+    return fcntl(fd, F_SETFL, flags & ~O_NONBLOCK);
+}
+
+int amqp_socket_get_error(amqp_socket_t fd)
+{
+    int so_error = 0;
+    socklen_t so_error_length = sizeof(so_error);
+    int rc = getsockopt(fd, SOL_SOCKET, SO_ERROR, &so_error, &so_error_length);
+    return rc != -1 ? so_error : errno;
+}
+
+int amqp_set_socket_to_ignore_sigpipe(amqp_socket_t fd)
+{
+#ifndef AMQP_WINDOWS_PORT
+#ifdef SO_NOSIGPIPE
+    int value = 1;
+    return amqp_set_socket_option(fd, SO_NOSIGPIPE, value);
+#else
+#error "Ignore SIGPIPE"
+#endif
+#endif
 }

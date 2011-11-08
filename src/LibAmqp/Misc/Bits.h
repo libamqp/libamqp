@@ -41,7 +41,7 @@ static inline int amqp_trailing_zeros_32(uint32_t value)
     return amqp_mod_37_bit_position[value % 37];
 }
 
-#if ULONG_MAX > 4294967295ULL
+#if defined(__LP__) || defined(_WIN64) || ULONG_MAX > 4294967295ULL
 #define amqp_mask_t uint64_t
 #define amqp_trailing_zeros amqp_trailing_zeros_64
 #define amqp_next_power_two amqp_next_power_two_64

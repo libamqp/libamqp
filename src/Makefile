@@ -31,7 +31,7 @@ INCLUDES :=
 TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
-#TEST_RUNNER_ARGS := --exclude SlowRunning
+TEST_RUNNER_ARGS := --exclude SlowRunning
 #TEST_RUNNER_ARGS := BasicDecode CodecDecode IntegerDecode NumericDecode VariableTypeDecoder CompoundTypeDecode BadDataDecoder  CodecEncode CompoundEncoding VariableTypesEncoding
 #TEST_RUNNER_ARGS :=  CodecDecode
 JENKINS_BUILD_OPTIONS :=
@@ -51,7 +51,7 @@ BUILD_OPTIONS += -DLIBAMQP_TRACE_CONNECT_STATE
 
 CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES)) $(BUILD_OPTIONS) $(JENKINS_BUILD_OPTIONS)
 # CFLAGS += -g -O3 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -fasm
-CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -fasm $(COVERAGE_CFLAGS)
+CFLAGS = -g -O0 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -D_DARWIN_C_SOURCE -fasm $(COVERAGE_CFLAGS)
 CXXFLAGS = -g -Wall
 LDFLAGS = -lev -lpthread $(COVERAGE_LDFLAGS)
 
