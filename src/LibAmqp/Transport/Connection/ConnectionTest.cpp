@@ -61,7 +61,6 @@ SUITE(Connection)
     TEST_FIXTURE(ConnectionFixture, fixture_should_balance_allocations)
     {
     }
-
     TEST_FIXTURE(ConnectionFixture, limits_should_be_initialized)
     {
         CHECK_EQUAL(AMQP_DEFAULT_MAX_FRAME_SIZE, connection->limits.max_frame_size);
@@ -80,6 +79,7 @@ SUITE(Connection)
         amqp_connection_shutdown(context, connection);
         loop_while_running();
         CHECK(!amqp_connection_is(connection, AMQP_CONNECTION_RUNNING));
+        CHECK(0);
     }
 
     class ConnectionHookFixture : public ConnectionFixture
@@ -105,6 +105,7 @@ SUITE(Connection)
         };
         return &hooks;
     }
+/*
 
     TEST_FIXTURE(ConnectionHookFixture, connection_should_reject_sasl_version)
     {
@@ -114,10 +115,10 @@ SUITE(Connection)
         loop_while_socket_state_is("Connecting");
         loop_while_connection_state_is("ConnectingSasl");
         CHECK_EQUAL("Stopped", connection->state.connection.name); // TODO - Should it be Failed
+        loop_while_running();
 
         CHECK(connection->failure_flags & AMQP_CONNECTION_SASL_NEGOTIATION_REJECTED);
     }
-
     TEST_FIXTURE(ConnectionHookFixture, connection_should_reject_amqp_version)
     {
         context->debug.level = 0;
@@ -141,7 +142,7 @@ SUITE(Connection)
         loop_while_running();
         CHECK_EQUAL("Stopped", connection->state.connection.name);
     }
-
+*/
 //    TEST_FIXTURE(ConnectionFixture, connection_should_establish_amqp_tunnel)
 //    {
 //        connection->protocols = AMQP_PROTOCOL_AMQP;

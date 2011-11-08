@@ -97,7 +97,13 @@ static void transition_to_enabled(amqp_connection_t *connection)
 
 static void read_done_while_reading_frame_header(amqp_connection_t *connection, amqp_buffer_t *buffer, int amount)
 {
-// TODO - explicitly handle EOF
+    if (amount == 0)
+    {
+        amqp_connection_trace(connection, "SASL negotiation failed - peer has closed the connection");
+        connection->state.connection.shutdown(connection);
+        return;
+    }
+
     if (amount != AMQP_FRAME_HEADER_SIZE)
     {
         amqp_connection_failed(connection, AMQP_ERROR_PARTIAL_READ, AMQP_CONNECTION_READ_ERROR, "Cannot read frame header. Got %d bytes.", amount);

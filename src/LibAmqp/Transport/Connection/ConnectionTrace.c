@@ -50,7 +50,7 @@ void _vamqp_connection_error(amqp_connection_t *connection, const char *filename
 //    va_end(args);
 
     _amqp_debug(connection->context, 2, filename, line_number, source, 0,
-            "connection state - %s:socket=%s:writer=%s:reader=%s:tls=%s:sasl=%s:amqp=%s:neg=%s",
+            "connection state - %s:socket=%s:writer=%s:reader=%s:tls=%s:sasl=%s:amqp=%s:neg=%s:frame=%s",
             connection->state.connection.name,
             connection->state.socket.name,
             connection->state.writer.name,
@@ -58,7 +58,9 @@ void _vamqp_connection_error(amqp_connection_t *connection, const char *filename
             connection->state.tls.name,
             connection->state.sasl.name,
             connection->state.amqp.name,
-            connection->state.negotiator.name);
+            connection->state.negotiator.name,
+            connection->state.frame.name
+            );
 }
 
 void _amqp_connection_error(amqp_connection_t *connection, const char *filename, int line_number, const char *error_mnemonic, int error_code, const char *format, ...)

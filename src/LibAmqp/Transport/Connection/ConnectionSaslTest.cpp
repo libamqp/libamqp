@@ -41,7 +41,7 @@ SUITE(ConnectionSasl)
     {
         connection->socket.hostname = 0;
     }
-/*
+
     TEST_FIXTURE(ConnectionSaslFixture, fixture_should_balance_allocations)
     {
         CHECK(connection->state.frame.name != 0);
@@ -58,7 +58,7 @@ SUITE(ConnectionSasl)
 
         CHECK_BUFFERS_MATCH(write_copy, test_data::sasl_protocol_1_0_0);
     }
-*/
+
     TEST_FIXTURE(ConnectionSaslFixture, sasl_version_accepted)
     {
         static test_data::TestData *test_frames[] =
@@ -76,32 +76,4 @@ SUITE(ConnectionSasl)
         CHECK_EQUAL("Negotiated", connection->state.negotiator.name);
         CHECK_EQUAL("Negotiated", connection->state.sasl.name);
     }
-
-//    TEST_FIXTURE(ConnectionFrameFixture, stop_while_stopped)
-//    {
-//        connection->state.frame.enable(connection);
-//        connection->state.frame.stop(connection);
-//        CHECK_EQUAL("Stopped", connection->state.frame.name);
-//
-//        connection->state.frame.stop(connection);
-//        CHECK_EQUAL("Stopped", connection->state.frame.name);
-//    }
-//
-//    TEST_FIXTURE(ConnectionFrameFixture, read_minimal_frame)
-//    {
-//        ConnectionFrameFixture::test_data_p = &test_data::minimal_frame_header;
-//        connection->state.frame.enable(connection);
-//        connection->state.frame.read(connection, buffer, 8, done_callback);
-//        CHECK_EQUAL("Enabled", connection->state.frame.name);
-//        CHECK_EQUAL(8U, connection->io.frame.frame_size);
-//    }
-//
-//    TEST_FIXTURE(ConnectionFrameFixture, read_frame)
-//    {
-//        ConnectionFrameFixture::test_data_p = &test_data::sasl_mechanisms_frame;
-//        connection->state.frame.enable(connection);
-//        connection->state.frame.read(connection, buffer, 8, done_callback);
-//        CHECK_EQUAL("Enabled", connection->state.frame.name);
-//        CHECK_EQUAL(0x15U, connection->io.frame.frame_size);
-//    }
 }

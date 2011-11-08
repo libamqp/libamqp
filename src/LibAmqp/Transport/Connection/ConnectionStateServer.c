@@ -209,7 +209,9 @@ static void done_while_accepting_sasl(amqp_connection_t *connection)
 }
 static void fail_while_accepting_sasl(amqp_connection_t *connection)
 {
-    not_implemented(fail_while_accepting_sasl);
+    amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_SASL_NEGOTIATION_REJECTED);
+    amqp_connection_trace(connection, "SASL negotiation failed");
+    connection->state.connection.drain(connection);
 }
 static void reject_while_accepting_sasl(amqp_connection_t *connection, uint32_t version)
 {

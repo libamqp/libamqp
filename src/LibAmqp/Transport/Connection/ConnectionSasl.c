@@ -76,7 +76,7 @@ void write_complete_callback(amqp_connection_t *connection)
 }
 
 static
-void frame_available_from_server_callback(amqp_connection_t *connection, amqp_buffer_t *buffer)
+void frame_available_callback(amqp_connection_t *connection, amqp_buffer_t *buffer)
 {
     amqp_frame_t *frame = amqp_decode_sasl_frame(connection->context, buffer);
     if (frame)
@@ -111,9 +111,9 @@ static void sasl_version_accepted_callback(amqp_connection_t *connection)
 
     // TODO - no longer - connection->state.connection.done(connection);
     
-    connection->state.frame.enable(connection);             // TODO - consider this redundant?
+    connection->state.frame.enable(connection);
     amqp_buffer_reset(connection->buffer.read);
-    connection->state.frame.read(connection, connection->buffer.read, frame_available_from_server_callback);
+    connection->state.frame.read(connection, connection->buffer.read, frame_available_callback);
 }
 static void sasl_version_rejected_callback(amqp_connection_t *connection, uint32_t version)
 {
@@ -153,7 +153,6 @@ static void transition_to_initialized(amqp_connection_t *connection)
     trace_transition("Created");
 }
 
-
 static void received_sasl_mechanisms_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
     if (process_frame(connection, frame, amqp_sasl_process_mechanisms_frame))
@@ -175,7 +174,7 @@ static void wait_for_sasl_challenge_or_outcome(amqp_connection_t *connection)
     transition_to_waiting_on_sasl_challenge_or_outcome(connection);
 
     amqp_buffer_reset(connection->buffer.read);
-    connection->state.frame.read(connection, connection->buffer.read, frame_available_from_server_callback);
+    connection->state.frame.read(connection, connection->buffer.read, frame_available_callback);
 }
 
 static void done_while_writing_sasl_init_frame(amqp_connection_t *connection)
@@ -217,10 +216,10 @@ static void transition_to_waiting_on_sasl_challenge_or_outcome(amqp_connection_t
 
 static void done_while_writing_sasl_challenge_response_frame(amqp_connection_t *connection)
 {
-    transition_to_waiting_on_sasl_initial_response_frame(connection);
+    transition_to_waiting_on_sasl_challenge_or_outcome(connection);
 
     amqp_buffer_reset(connection->buffer.read);
-    connection->state.frame.read(connection, connection->buffer.read, frame_available_from_server_callback);
+    connection->state.frame.read(connection, connection->buffer.read, frame_available_callback);
 }
 static void transition_to_writing_sasl_challenge_response_frame(amqp_connection_t *connection)
 {
@@ -241,11 +240,6 @@ static void done_while_sending_header_response(amqp_connection_t *connection)
         transition_to_writing_sasl_mechanisms_frame(connection);
         connection->state.writer.commence_write(connection, connection->buffer.write, write_complete_callback);
     }
-/*
-    // server need to send sasl mechanisms frame
-    transition_to_negotiated(connection);
-    call_action(connection->state.connection.done, connection->context, connection);
-    */
 }
 static void transition_to_sending_header_response(amqp_connection_t *connection)
 {
@@ -257,7 +251,10 @@ static void transition_to_sending_header_response(amqp_connection_t *connection)
 
 static void done_while_writing_sasl_mechanisms_frame(amqp_connection_t *connection)
 {
-    wait_for_sasl_challenge_or_outcome(connection);
+    transition_to_waiting_on_sasl_initial_response_frame(connection);
+    connection->state.frame.enable(connection);
+    amqp_buffer_reset(connection->buffer.read);
+    connection->state.frame.read(connection, connection->buffer.read, frame_available_callback);
 }
 static void transition_to_writing_sasl_mechanisms_frame(amqp_connection_t *connection)
 {
@@ -269,6 +266,7 @@ static void transition_to_writing_sasl_mechanisms_frame(amqp_connection_t *conne
 
 static void received_sasl_initial_response_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
+SOUTS("received_sasl_initial_response_frame");
     not_implemented(todo);
     /*int rc = amqp_sasl_process_challenge_frame(connection, frame);
     amqp_deallocate_frame(connection->context, frame);
