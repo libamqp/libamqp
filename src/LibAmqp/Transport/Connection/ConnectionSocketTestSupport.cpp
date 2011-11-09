@@ -24,7 +24,7 @@ namespace SuiteConnectionSocket
 {
     ConnectionSocketFixture::ConnectionSocketFixture()
     {
-        connection = amqp_connection_initialize(context);
+        connection = amqp_connection_create(context);
 
         write_buffer = amqp_allocate_buffer(context);
         read_buffer = amqp_allocate_buffer(context);

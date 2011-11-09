@@ -14,8 +14,6 @@
    limitations under the License.
  */
 
-
-
 #include "Context/Context.h"
 #include "Transport/LowLevel/Listener.h"
 #include "Transport/LowLevel/Socket.h"
@@ -107,7 +105,7 @@ void accept_new_connection_handler(amqp_event_loop_t* loop, ev_io *io, const int
     }
 }
 
-static int bind_socket_to_any(amqp_context_t *context, int socket_fd, int port_number)
+static int bind_socket_to_any(amqp_context_t *context, amqp_socket_t socket_fd, int port_number)
 {
     struct sockaddr_in6 sin6;
     bzero(&sin6, sizeof(sin6));
@@ -126,11 +124,17 @@ static int bind_socket_to_any(amqp_context_t *context, int socket_fd, int port_n
     return true;
 }
 
-static int start_listening_on_socket(amqp_context_t *context, int socket_fd, int port_number)
+static int start_listening_on_socket(amqp_context_t *context, amqp_socket_t socket_fd, int port_number)
 {
     if (amqp_set_socket_to_nonblocking(socket_fd) == -1)
     {
         amqp_io_error(context, "Cannot set non-blocking flag on socket");
+        return false;
+    }
+
+    if (amqp_set_socket_to_ignore_sigpipe(socket_fd) == -1)
+    {
+        amqp_io_error(context, "Cannot set socket to ignore SIGPIPE");
         return false;
     }
 
@@ -157,7 +161,7 @@ static int start_listening_on_socket(amqp_context_t *context, int socket_fd, int
 
 amqp_io_event_watcher_t *amqp_listener_initialize(amqp_context_t *context, amqp_event_loop_t *loop, int port_number, amqp_accept_event_handle_t accept_handler,  amqp_accept_handler_arguments_t *arguments)
 {
-    int socket_fd;
+    amqp_socket_t socket_fd;
     amqp_io_event_watcher_t *result;
     assert(context != 0);
 

@@ -25,9 +25,10 @@ SUITE(Frame)
 {
     TEST_FIXTURE(FrameFixture, sasl_mechanisms_frame_encode)
     {
-        amqp_encode_sasl_mechanisms_frame(context, buffer);
+        assert(connection != 0);
+        amqp_encode_sasl_mechanisms_frame(connection, decode_buffer);
 
-        frame = amqp_decode_sasl_frame(context, buffer);
+        frame = amqp_decode_sasl_frame(context, decode_buffer);
         ASSERT(frame != 0);
 
         CHECK_EQUAL(8U, frame->data_offset);

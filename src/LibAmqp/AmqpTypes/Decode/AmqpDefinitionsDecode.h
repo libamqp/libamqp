@@ -62,4 +62,11 @@ extern int amqp_decode_type_wildcard_expecting_source(amqp_context_t *context, a
 extern int amqp_decode_type_wildcard_expecting_target(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
 extern int amqp_decode_type_wildcard_expecting_delivery_state(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_wildcard_t *wildcard);
 
+extern int amqp_decode_primitive_handle(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_handle_t *result, uint32_t default_value);
+extern int amqp_decode_mandatory_primitive_handle(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_handle_t *result);
+extern int amqp_decode_primitive_sequence_no(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_sequence_no_t *result, uint32_t default_value);
+extern int amqp_decode_mandatory_primitive_sequence_no(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_sequence_no_t *result);
+extern int amqp_decode_primitive_message_format(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_message_format_t *result, uint32_t default_value);
+
+
 #endif

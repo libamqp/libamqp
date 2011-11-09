@@ -84,6 +84,7 @@ void amqp_block_header_initialize(struct amqp_block_header *header, size_t capac
     header->n_fragments = n_fragments;
 }
 extern int amqp_block_compare(amqp_memory_t *lhs, size_t lhs_offset, amqp_memory_t *rhs, size_t rhs_offset, size_t n);
+extern void amqp_dump_buffer(amqp_context_t *context, amqp_buffer_t *buffer, int limit);
 
 #include "Buffer/BufferInlines.h"
 

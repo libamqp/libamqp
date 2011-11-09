@@ -31,52 +31,30 @@ extern "C" {
 #include <netinet/in.h>
 #include <netdb.h>
 
-#ifndef _MSC_VER
+#ifndef AMQP_WINDOWS_PORT
+typedef int amqp_socket_t;
 #include <unistd.h>
+#else
+typedef HANDLE amqp_socket_t;
 #endif
 
 extern void bzero(void *block, size_t n);
 extern void amqp_socket_address_tos(char *buffer, size_t buffer_size, struct sockaddr_storage *client_address, socklen_t address_size);
 extern int amqp_socket_address_port(struct sockaddr_storage *client_address, socklen_t address_size);
-extern int amqp_socket_shutdown_output(int fd);
+extern int amqp_socket_shutdown_output(amqp_socket_t fd);
 
 inline static
-int amqp_set_socket_option(int fd, int option, int value)
+int amqp_set_socket_option(amqp_socket_t fd, int option, int value)
 {
     socklen_t value_length   = sizeof(value);
     return setsockopt(fd, SOL_SOCKET, option, &value, value_length);
 }
 
-inline static
-int amqp_set_socket_to_nonblocking(int fd)
-{
-    int flags = fcntl(fd, F_GETFL, 0);
-    if (flags == -1)
-    {
-        return -1;
-    }
-    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-}
+extern int amqp_set_socket_to_nonblocking(amqp_socket_t fd);
+extern int amqp_set_socket_to_blocking(amqp_socket_t fd);
+extern int amqp_socket_get_error(amqp_socket_t fd);
 
-inline static
-int amqp_set_socket_to_blocking(int fd)
-{
-    int flags = fcntl(fd, F_GETFL, 0);
-    if (flags == -1)
-    {
-        return -1;
-    }
-    return fcntl(fd, F_SETFL, flags & ~O_NONBLOCK);
-}
-
-inline static
-int amqp_socket_get_error(int fd)
-{
-    int so_error = 0;
-    socklen_t so_error_length = sizeof(so_error);
-    int rc = getsockopt(fd, SOL_SOCKET, SO_ERROR, &so_error, &so_error_length);
-    return rc != -1 ? so_error : errno;
-}
+extern int amqp_set_socket_to_ignore_sigpipe(amqp_socket_t fd);
 
 #ifdef __cplusplus
 }

@@ -522,19 +522,21 @@ amqp_type_t *amqp_encode_symbol(amqp_context_t *context, amqp_buffer_t *buffer, 
 static inline
 amqp_type_t *encode_string_utf8(amqp_context_t *context, amqp_buffer_t *buffer, const char *value, size_t size)
 {
+    assert(context && buffer && value);
     // TODO - validate
     amqp_type_t *result = amqp_encode_simple_variable(context, buffer, size < 256 ? &amqp_type_meta_data_string_str8_utf8 : &amqp_type_meta_data_string_str32_utf8, (const unsigned char *) value, size);
     return result;
 }
 
-amqp_type_t *amqp_encode_string_utf8(amqp_context_t *context, amqp_buffer_t *buffer, const char *value)
+amqp_type_t *amqp_encode_string(amqp_context_t *context, amqp_buffer_t *buffer, const char *value)
 {
-   return encode_string_utf8(context, buffer, value, strlen(value));
+    assert(value);
+    return encode_string_utf8(context, buffer, value, strlen(value));
 }
 
-amqp_type_t *amqp_encode_string_utf8n(amqp_context_t *context, amqp_buffer_t *buffer, const char *value, size_t size)
+amqp_type_t *amqp_encode_stringn(amqp_context_t *context, amqp_buffer_t *buffer, const char *value, size_t size)
 {
-   return encode_string_utf8(context, buffer, value, size);
+    return encode_string_utf8(context, buffer, value, size);
 }
 
 amqp_type_t *amqp_encode_list_8(amqp_context_t *context, amqp_buffer_t *buffer)

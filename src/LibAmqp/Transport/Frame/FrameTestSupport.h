@@ -14,17 +14,18 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_TEST_SUPPORT_H
-#define LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_TEST_SUPPORT_H
+#ifndef LIBAMQP_TRANSPORT_FRAME_FRAME_TEST_SUPPORT_H
+#define LIBAMQP_TRANSPORT_FRAME_FRAME_TEST_SUPPORT_H
 
 #include "libamqp_common.h"
 #include "Context/ContextTestSupport.h"
+#include "Transport/Connection/ConnectionTestSupport.h"
 #include "Transport/Frame/Frame.h"
 #include "TestData/TestFrames.h"
 
 namespace SuiteFrame
 {
-    class FrameFixture : public SuiteContext::ContextFixture
+    class FrameFixture : public SuiteConnection::BaseConnectionFixture
     {
     public:
         FrameFixture();
@@ -37,7 +38,6 @@ namespace SuiteFrame
     public:
         amqp_frame_t *frame;
         amqp_type_t *type;
-        amqp_buffer_t *buffer;
     };
 }
 #endif

@@ -51,12 +51,12 @@ SUITE(AmqpTypes)
     TEST_FIXTURE(AmqpTypesFixture, frames)
     {
         CHECK_EQUAL(288U, sizeof(amqp_transport_open_t));
-        CHECK_EQUAL(120U, sizeof(amqp_transport_begin_t));
-        CHECK_EQUAL(296U, sizeof(amqp_transport_attach_t));
-        CHECK_EQUAL(72U, sizeof(amqp_transport_flow_t));
-        CHECK_EQUAL(136U, sizeof(amqp_transport_transfer_t));
-        CHECK_EQUAL(64U, sizeof(amqp_transport_disposition_t));
-        CHECK_EQUAL(160U, sizeof(amqp_transport_detach_t));
+        CHECK_EQUAL(128U, sizeof(amqp_transport_begin_t));
+        CHECK_EQUAL(304U, sizeof(amqp_transport_attach_t));
+        CHECK_EQUAL(88U, sizeof(amqp_transport_flow_t));
+        CHECK_EQUAL(152U, sizeof(amqp_transport_transfer_t));
+        CHECK_EQUAL(72U, sizeof(amqp_transport_disposition_t));
+        CHECK_EQUAL(168U, sizeof(amqp_transport_detach_t));
         CHECK_EQUAL(152U, sizeof(amqp_transport_end_t));
         CHECK_EQUAL(152U, sizeof(amqp_transport_close_t));
     }

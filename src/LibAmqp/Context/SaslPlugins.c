@@ -63,7 +63,7 @@ amqp_sasl_plugin_t *amqp_context_lookup_sasl_plugin(amqp_context_t *context, amq
     {
         if (amqp_symbol_compare_with_cstr(mechanism, list->plugin->mechanism_name) == 0)
         {
-            return list->plugin;
+            return amqp_sasl_plugin_instance_create(context, list->plugin);
         }
         list = list->link;
     }
@@ -72,12 +72,16 @@ amqp_sasl_plugin_t *amqp_context_lookup_sasl_plugin(amqp_context_t *context, amq
 
 void amqp_context_free_sasl_plugins(amqp_context_t *context)
 {
-    while (context->reference.plugins.sasl_plugin_list)
+    amqp_sasl_plugin_node_t *list = context->reference.plugins.sasl_plugin_list;
+
+    context->reference.plugins.sasl_plugin_list = 0;
+
+    while (list)
     {
-        amqp_sasl_plugin_node_t *node = context->reference.plugins.sasl_plugin_list;
-        context->reference.plugins.sasl_plugin_list = context->reference.plugins.sasl_plugin_list->link;
-        
-        node->plugin->plugin_cleanup_handler(context, node->plugin);
+        amqp_sasl_plugin_node_t *node = list;
+        list = list->link;
+
+        amqp_sasl_plugin_cleanup(context, node->plugin);
         AMQP_FREE(context, node);
     }
 }

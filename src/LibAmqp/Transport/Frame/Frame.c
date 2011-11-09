@@ -295,3 +295,10 @@ void amqp_frame_cleanup(amqp_context_t *context, amqp_frame_t *frame)
 
     amqp_deallocate_frame(context, frame);
 }
+
+void amqp_frame_dump(amqp_context_t *context, amqp_frame_t *frame)
+{
+    amqp_context_printf(context, 2, "Frame %08x:%08x - ", frame->descriptor.domain, frame->descriptor.id);
+    amqp_type_dump(context, 2, frame->type);
+    amqp_context_putc(context, '\n');
+}

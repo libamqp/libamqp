@@ -1,0 +1,1 @@
+* Ignore SIGPIPE if SO_NOSIGPIPE is not available.

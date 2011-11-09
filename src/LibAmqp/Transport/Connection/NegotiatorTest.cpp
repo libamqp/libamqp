@@ -45,7 +45,7 @@ SUITE(ConnectionNegotiation)
 
     NegotiationFixture::NegotiationFixture()
     {
-        connection = amqp_connection_initialize(context);
+        connection = amqp_connection_create(context);
         buffer = amqp_allocate_buffer(context);
     }
 

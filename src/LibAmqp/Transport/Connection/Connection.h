@@ -82,7 +82,7 @@ enum amqp_connection_failure_flags
     AMQP_CONNECTION_AMQP_FRAME_DECODE_ERROR = 0x1000,
 };
 
-extern amqp_connection_t *amqp_connection_initialize(amqp_context_t *context);
+extern amqp_connection_t *amqp_connection_create(amqp_context_t *context);
 extern void amqp_connection_destroy(amqp_context_t *context, amqp_connection_t *connection);
 
 extern void amqp_connection_connect(amqp_context_t *context, amqp_connection_t *connection);

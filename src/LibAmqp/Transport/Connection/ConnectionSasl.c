@@ -19,6 +19,9 @@
 #include "Transport/Connection/ConnectionTrace.h"
 #include "Transport/Frame/Frame.h"
 #include "Transport/Sasl/SaslMechanisms.h"
+#include "Transport/Sasl/ClientSasl.h"
+#include "Transport/Sasl/ServerSasl.h"
+#include "Plugin/Sasl.h"
 #include "debug_helper.h"
 
 #ifdef LIBAMQP_TRACE_CONNECT_STATE
@@ -34,6 +37,12 @@ static void transition_to_waiting_on_sasl_mechanisms(amqp_connection_t *connecti
 static void transition_to_failed(amqp_connection_t *connection);
 static void transition_to_negotiated(amqp_connection_t *connection);
 static void transition_to_sending_header_response(amqp_connection_t *connection);
+static void transition_to_writing_sasl_init_frame(amqp_connection_t *connection);
+
+static void transition_to_waiting_on_sasl_challenge_or_outcome(amqp_connection_t *connection);
+static void transition_to_writing_sasl_challenge_response_frame(amqp_connection_t *connection);
+static void transition_to_writing_sasl_mechanisms_frame(amqp_connection_t *connection);
+static void transition_to_waiting_on_sasl_initial_response_frame(amqp_connection_t *connection);
 
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name);
 
@@ -44,6 +53,11 @@ void amqp_connection_sasl_initialize(amqp_connection_t *connection)
 
 static void cleanup_resources(amqp_connection_t *connection)
 {
+    if (connection->sasl.plugin)
+    {
+        amqp_sasl_plugin_instance_cleanup(connection->context, connection->sasl.plugin);
+        connection->sasl.plugin = 0;
+    }
 }
 void amqp_connection_sasl_cleanup(amqp_connection_t *connection)
 {
@@ -56,18 +70,31 @@ int amqp_connection_sasl_is_state(const amqp_connection_t *connection, const cha
 }
 
 static
-void frame_available_from_server_callback(amqp_connection_t *connection, amqp_buffer_t *buffer)
+void write_complete_callback(amqp_connection_t *connection)
+{
+    connection->state.sasl.done(connection);
+}
+
+static
+void frame_available_callback(amqp_connection_t *connection, amqp_buffer_t *buffer)
 {
     amqp_frame_t *frame = amqp_decode_sasl_frame(connection->context, buffer);
-
     if (frame)
     {
+        amqp_trace_decoded_frame(connection, frame);
         frame->dispatch(connection, frame);
     }
     else
     {
-        amqp_connection_failed(connection, AMQP_ERROR_FRAME_DECODE_FAILED, AMQP_CONNECTION_SASL_FRAME_DECODE_ERROR, "Could not decode frame from broker");
+        amqp_connection_failed(connection, AMQP_ERROR_FRAME_DECODE_FAILED, AMQP_CONNECTION_SASL_FRAME_DECODE_ERROR, "Could not decode frame from broker during SASL handshake");
     }
+}
+typedef int amqp_process_frame_method_t(amqp_connection_t *connection, amqp_frame_t *frame);
+static int process_frame(amqp_connection_t *connection, amqp_frame_t *frame, amqp_process_frame_method_t method)
+{
+    int rc = method(connection, frame);
+    amqp_frame_cleanup(connection->context, frame);
+    return rc;
 }
 
 static void sasl_broker_version_sent_callback(amqp_connection_t *connection)
@@ -84,9 +111,9 @@ static void sasl_version_accepted_callback(amqp_connection_t *connection)
 
     // TODO - no longer - connection->state.connection.done(connection);
     
-    connection->state.frame.enable(connection);             // TODO - consider this redundant?
+    connection->state.frame.enable(connection);
     amqp_buffer_reset(connection->buffer.read);
-    connection->state.frame.read(connection, connection->buffer.read, frame_available_from_server_callback);
+    connection->state.frame.read(connection, connection->buffer.read, frame_available_callback);
 }
 static void sasl_version_rejected_callback(amqp_connection_t *connection, uint32_t version)
 {
@@ -125,43 +152,94 @@ static void transition_to_initialized(amqp_connection_t *connection)
     connection->state.sasl.tunnel.accept = tunnel_accept_while_initialized;
     trace_transition("Created");
 }
-static void sasl_mechanisms_while_waiting_on_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *frame)
+
+static void received_sasl_mechanisms_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_multiple_symbol_t *multiple = &frame->frames.sasl.mechanisms.sasl_server_mechanisms;
-    amqp_sasl_plugin_t *plugin = amqp_sasl_select_mechanism(connection, multiple);
-    if (plugin)
+    if (process_frame(connection, frame, amqp_sasl_process_mechanisms_frame))
     {
-        not_implemented(todo);
-    }
-    else
-    {
-        int space = amqp_multiple_symbol_total_length(multiple) + (amqp_multiple_symbol_size(multiple) - 1) * 2 + 1;
-        uint8_t *buffer = amqp_allocate_print_buffer(connection->context, space);
-        amqp_multiple_symbol_to_char_bytes(multiple, ", ", buffer, space);
-        amqp_connection_failed(connection, AMQP_ERROR_NO_SASL_MECHANISM, AMQP_CONNECTION_SASL_ERROR, "No SASL plugin matches broker mechanism list. Broker supports: %s", buffer);
-        amqp_deallocate_print_buffer(connection->context, buffer);
+        transition_to_writing_sasl_init_frame(connection);
+        connection->state.writer.commence_write(connection, connection->buffer.write, write_complete_callback);
     }
 }
 static void transition_to_waiting_on_sasl_mechanisms(amqp_connection_t *connection)
 {
     save_old_state();
     default_state_initialization(connection, "WaitingOnSaslMechanisms");
-    connection->state.sasl.messages.mechanisms = sasl_mechanisms_while_waiting_on_sasl_mechanisms;
+    connection->state.sasl.messages.mechanisms = received_sasl_mechanisms_frame;
     trace_transition(old_state_name);
 }
 
-static void transition_to_failed(amqp_connection_t *connection)
+static void wait_for_sasl_challenge_or_outcome(amqp_connection_t *connection)
+{
+    transition_to_waiting_on_sasl_challenge_or_outcome(connection);
+
+    amqp_buffer_reset(connection->buffer.read);
+    connection->state.frame.read(connection, connection->buffer.read, frame_available_callback);
+}
+
+static void done_while_writing_sasl_init_frame(amqp_connection_t *connection)
+{
+    wait_for_sasl_challenge_or_outcome(connection);
+}
+static void transition_to_writing_sasl_init_frame(amqp_connection_t *connection)
 {
     save_old_state();
-    default_state_initialization(connection, "Failed");
+    default_state_initialization(connection, "WritingSaslInitFrame");
+    connection->state.sasl.done = done_while_writing_sasl_init_frame;
     trace_transition(old_state_name);
 }
 
+static void received_sasl_challenge_frame(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    if (process_frame(connection, frame, amqp_sasl_process_challenge_frame))
+    {
+        transition_to_writing_sasl_challenge_response_frame(connection);
+        connection->state.writer.commence_write(connection, connection->buffer.write, write_complete_callback);
+    }
+}
+static void received_sasl_outcome_frame(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    if (process_frame(connection, frame, amqp_sasl_process_outcome_frame))
+    {
+        transition_to_negotiated(connection);
+        call_action(connection->state.connection.done, connection->context, connection);
+    }
+}
+static void transition_to_waiting_on_sasl_challenge_or_outcome(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "WaitingOnSaslChallengeOrOutcomeFrame");
+    connection->state.sasl.messages.challenge = received_sasl_challenge_frame;
+    connection->state.sasl.messages.outcome = received_sasl_outcome_frame;
+    trace_transition(old_state_name);
+}
+
+static void done_while_writing_sasl_challenge_response_frame(amqp_connection_t *connection)
+{
+    transition_to_waiting_on_sasl_challenge_or_outcome(connection);
+
+    amqp_buffer_reset(connection->buffer.read);
+    connection->state.frame.read(connection, connection->buffer.read, frame_available_callback);
+}
+static void transition_to_writing_sasl_challenge_response_frame(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "WritingSaslChallengeResponseFrame");
+    connection->state.sasl.done = done_while_writing_sasl_challenge_response_frame;
+    trace_transition(old_state_name);
+}
+
+/*************************
+ Server states
+************************/
 static void done_while_sending_header_response(amqp_connection_t *connection)
 {
-    // server need to send sasl mechanisms frame
-    transition_to_negotiated(connection);
-    call_action(connection->state.connection.done, connection->context, connection);
+    int rc = amqp_sasl_prepare_mechanisms_frame(connection);
+    if (rc)
+    {
+        transition_to_writing_sasl_mechanisms_frame(connection);
+        connection->state.writer.commence_write(connection, connection->buffer.write, write_complete_callback);
+    }
 }
 static void transition_to_sending_header_response(amqp_connection_t *connection)
 {
@@ -171,10 +249,56 @@ static void transition_to_sending_header_response(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
+static void done_while_writing_sasl_mechanisms_frame(amqp_connection_t *connection)
+{
+    transition_to_waiting_on_sasl_initial_response_frame(connection);
+    connection->state.frame.enable(connection);
+    amqp_buffer_reset(connection->buffer.read);
+    connection->state.frame.read(connection, connection->buffer.read, frame_available_callback);
+}
+static void transition_to_writing_sasl_mechanisms_frame(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "WritingSaslMechanismsFrame");
+    connection->state.sasl.done = done_while_writing_sasl_mechanisms_frame;
+    trace_transition(old_state_name);
+}
+
+static void received_sasl_initial_response_frame(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+SOUTS("received_sasl_initial_response_frame");
+    not_implemented(todo);
+    /*int rc = amqp_sasl_process_challenge_frame(connection, frame);
+    amqp_deallocate_frame(connection->context, frame);
+    if (rc)
+    {
+        transition_to_writing_sasl_challenge_response_frame(connection);
+        connection->state.writer.commence_write(connection, connection->buffer.write, write_complete_callback);
+    }*/
+}
+static void transition_to_waiting_on_sasl_initial_response_frame(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "WaitingOnSaslInitialResponseFrame");
+    connection->state.sasl.messages.init = received_sasl_initial_response_frame;
+    trace_transition(old_state_name);
+}
+
+/***********************
+ Common States
+************************/
 static void transition_to_negotiated(amqp_connection_t *connection) // wrong name
 {
     save_old_state();
     default_state_initialization(connection, "Negotiated");
+    trace_transition(old_state_name);
+}
+
+
+static void transition_to_failed(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "Failed");
     trace_transition(old_state_name);
 }
 

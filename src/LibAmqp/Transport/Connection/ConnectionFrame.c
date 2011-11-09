@@ -97,7 +97,13 @@ static void transition_to_enabled(amqp_connection_t *connection)
 
 static void read_done_while_reading_frame_header(amqp_connection_t *connection, amqp_buffer_t *buffer, int amount)
 {
-// TODO - explicitly handle EOF
+    if (amount == 0)
+    {
+        amqp_connection_trace(connection, "SASL negotiation failed - peer has closed the connection");
+        connection->state.connection.shutdown(connection);
+        return;
+    }
+
     if (amount != AMQP_FRAME_HEADER_SIZE)
     {
         amqp_connection_failed(connection, AMQP_ERROR_PARTIAL_READ, AMQP_CONNECTION_READ_ERROR, "Cannot read frame header. Got %d bytes.", amount);
@@ -107,9 +113,11 @@ static void read_done_while_reading_frame_header(amqp_connection_t *connection, 
     uint32_t frame_size = amqp_buffer_read_uint32(connection->io.frame.buffer, 0);
     connection->io.frame.frame_size = frame_size;
 
-    if ((frame_size > connection->limits.max_frame_size) || (frame_size < AMQP_FRAME_HEADER_SIZE) || (frame_size == amqp_protocol_header))
+    if ((frame_size >= connection->limits.max_frame_size) || (frame_size < AMQP_FRAME_HEADER_SIZE) || (frame_size == amqp_protocol_header))
     {
-        amqp_connection_failed(connection, AMQP_ERROR_INVALID_FRAME_SIZE, AMQP_CONNECTION_READ_ERROR, "Invalid frame size. Size: %lu, max_frame_size: %lu", (unsigned long) frame_size, (unsigned long) connection->limits.max_frame_size);
+        amqp_connection_failed(connection, AMQP_ERROR_INVALID_FRAME_SIZE, AMQP_CONNECTION_READ_ERROR,
+                "Invalid frame size. Size: %08lx, max_frame_size: %lu", (unsigned long) frame_size, (unsigned long) connection->limits.max_frame_size);
+        amqp_dump_buffer(connection->context, buffer, 512);
         return;
     }
 

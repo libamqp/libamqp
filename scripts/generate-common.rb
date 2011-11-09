@@ -106,6 +106,20 @@ class TypedefedMapper
   end
 end
 
+class WrappedMapper
+  include Outputters
+  def initialize(t)
+    @name = t
+    @tag = t
+  end
+  def output(n, t, o = {})
+    puts "    amqp_#{@tag}_t #{n}; #{comment(o)}" 
+  end
+  def primitive?
+    TRUE
+  end
+end
+
 class EnumMapper < TypedefedMapper
   def initialize(t)
     super(t, nil, TRUE)
@@ -123,8 +137,6 @@ $mappings['int'] = SimpleMapper.new('int', 'int32_t')
 $mappings['ulong'] = SimpleMapper.new('ulong', 'uint64_t')
 $mappings['long'] = SimpleMapper.new('long', 'int64_t')
 
-$mappings['handle'] = SimpleMapper.new('uint', 'uint32_t')
-
 $mappings['binary'] = TypedefedMapper.new('binary')
 $mappings['string'] = TypedefedMapper.new('string')
 $mappings['symbol'] = TypedefedMapper.new('symbol')
@@ -134,12 +146,15 @@ $mappings['map'] = TypedefedMapper.new('map')
 
 $mappings['milliseconds'] = TypedefedMapper.new('milliseconds', 'uint', TRUE)
 $mappings['seconds'] = TypedefedMapper.new('seconds', 'uint', TRUE)
-$mappings['sequence-no'] = TypedefedMapper.new('sequence_no', 'uint', TRUE)
-$mappings['transfer-number'] = TypedefedMapper.new('transfer_number', 'uint', TRUE)
-$mappings['delivery-number'] = TypedefedMapper.new('delivery_number', 'uint', TRUE)
-$mappings['message-format'] = TypedefedMapper.new('message_format', 'uint', TRUE)
 
 $mappings['role'] = TypedefedMapper.new('role', 'boolean', TRUE)
+
+$mappings['handle'] = WrappedMapper.new('handle')
+$mappings['transfer-number'] = WrappedMapper.new('sequence_no')
+$mappings['delivery-number'] =  WrappedMapper.new('sequence_no')
+$mappings['sequence-no'] = WrappedMapper.new('sequence_no')
+$mappings['message-format'] = WrappedMapper.new('message_format')
+
 
 $mappings['ietf-language-tag'] = TypedefedMapper.new('ietf_language_tag', 'symbol')
 $mappings['fields'] = TypedefedMapper.new('fields', 'map')

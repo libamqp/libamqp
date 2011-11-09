@@ -45,6 +45,7 @@ typedef enum amqp_connection_trace_flag_t
     AMQP_TRACE_CONNECTION_AMQP = 0X00000080,
     AMQP_TRACE_DISCONNECTS = 0X00000100,
     AMQP_TRACE_FRAME_READER = 0X00000200,
+    AMQP_TRACE_DECODED_FRAME = 0X00000400,
 } amqp_connection_trace_flag_t;
 
 #ifdef LIBAMQP_TRACE_CONNECT_STATE
@@ -53,10 +54,16 @@ typedef enum amqp_connection_trace_flag_t
     { \
         _amqp_connection_trace_transition(connection, __FILE__, __LINE__, flag, old_state_name, state_name); \
     }
+#define amqp_trace_decoded_frame(connection, frame) \
+    if (connection->trace_flags & AMQP_TRACE_DECODED_FRAME) \
+    { \
+        amqp_frame_dump(connection->context, frame); \
+    }
 #define amqp_connection_trace(connection, ...) _amqp_connection_trace(connection, __FILE__, __LINE__, "" __VA_ARGS__)
 #else
 #define amqp_connection_trace_transition(connection, flag, old_state_name, state_name)
 #define amqp_connection_trace(connection, ...)
+#define amqp_trace_decoded_frame(connection, frame)
 #endif
 
 extern void _amqp_connection_trace(amqp_connection_t *connection, const char * filename, int line_number, const char *format, ...);
