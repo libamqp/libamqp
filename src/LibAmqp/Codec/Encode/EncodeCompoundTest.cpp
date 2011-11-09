@@ -107,7 +107,7 @@ SUITE(CompoundEncoding)
         CHECK_NULL(type->value.array.elements);
 
         amqp_encode_short(context, buffer, 10);
-        amqp_encode_string_utf8(context, buffer, "hello");
+        amqp_encode_string(context, buffer, "hello");
 
         amqp_complete_type(context, buffer, type);
         ASSERT_INVALID(type);
@@ -127,10 +127,10 @@ SUITE(CompoundEncoding)
 
         CHECK_NULL(type->value.array.elements);
 
-        amqp_encode_string_utf8(context, buffer, "the");
-        amqp_encode_string_utf8(context, buffer, "little");
-        amqp_encode_string_utf8(context, buffer, "brown");
-        amqp_encode_string_utf8(context, buffer, "fox");
+        amqp_encode_string(context, buffer, "the");
+        amqp_encode_string(context, buffer, "little");
+        amqp_encode_string(context, buffer, "brown");
+        amqp_encode_string(context, buffer, "fox");
 
         amqp_complete_type(context, buffer, type);
         ASSERT_VALID(type);
@@ -181,7 +181,7 @@ SUITE(CompoundEncoding)
 
         amqp_encode_symbol(context, buffer, "Foo");
         amqp_encode_double(context, buffer, 123.456);
-        amqp_encode_string_utf8(context, buffer, "Hello");
+        amqp_encode_string(context, buffer, "Hello");
         amqp_encode_short(context, buffer, 10);
             l = amqp_encode_array_8(context, buffer);
                 amqp_encode_short(context, buffer, 10);
@@ -211,10 +211,10 @@ SUITE(CompoundEncoding)
         type = amqp_encode_map_8(context, buffer);
         ASSERT_INVALID(type);
 
-            amqp_encode_string_utf8(context, buffer, "list:");
+            amqp_encode_string(context, buffer, "list:");
             l = amqp_encode_list_8(context, buffer);
                 amqp_encode_long(context, buffer, 1);
-                amqp_encode_string_utf8(context, buffer, "two");
+                amqp_encode_string(context, buffer, "two");
                 amqp_encode_double(context, buffer, 3.141593);
                 amqp_encode_null(context, buffer);
                 amqp_encode_boolean(context, buffer, false);
@@ -230,13 +230,13 @@ SUITE(CompoundEncoding)
             amqp_encode_null(context, buffer);
             amqp_encode_boolean(context, buffer, true);
 
-            amqp_encode_string_utf8(context, buffer, "pi");
+            amqp_encode_string(context, buffer, "pi");
             amqp_encode_double(context, buffer, 3.141593);
 
-            amqp_encode_string_utf8(context, buffer, "two");
+            amqp_encode_string(context, buffer, "two");
             amqp_encode_long(context, buffer, 2);
 
-            amqp_encode_string_utf8(context, buffer, "129");
+            amqp_encode_string(context, buffer, "129");
             amqp_encode_long(context, buffer, 129);
 
         amqp_complete_type(context, buffer, type);
@@ -284,13 +284,13 @@ SUITE(CompoundEncoding)
     static amqp_type_t *encode_described_list(amqp_context_t *context, amqp_buffer_t *buffer)
     {
         amqp_type_t *result = amqp_start_encode_described_type(context, buffer);
-            amqp_encode_string_utf8(context, buffer, "List");
+            amqp_encode_string(context, buffer, "List");
             {
                 amqp_type_t *list = amqp_encode_list_8(context, buffer);
-                amqp_encode_string_utf8(context, buffer, "Pie");
+                amqp_encode_string(context, buffer, "Pie");
                 {
                     amqp_type_t *pi = amqp_start_encode_described_type(context, buffer);
-                    amqp_encode_string_utf8(context, buffer, "PI");
+                    amqp_encode_string(context, buffer, "PI");
                     amqp_encode_double(context, buffer, 3.141593);
                     amqp_complete_type(context, buffer, pi);
                 }

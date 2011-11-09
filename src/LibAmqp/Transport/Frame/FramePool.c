@@ -20,19 +20,17 @@
 #include "debug_helper.h"
 
 static
-void amqp_initialize_amqp_frame_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_frame_t *type)
+void amqp_initialize_amqp_frame_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_frame_t *frame)
 {
     assert(pool != 0);
-    assert(type != 0);
-
+    assert(frame != 0);
 }
 
 static
-void amqp_cleanup_amqp_frame_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_frame_t *type)
+void amqp_cleanup_amqp_frame_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_frame_t *frame)
 {
     assert(pool != 0);
-    assert(type != 0);
-
+    assert(frame != 0);
 }
 
 void amqp_frame_initialize_pool(amqp_memory_pool_t *pool)

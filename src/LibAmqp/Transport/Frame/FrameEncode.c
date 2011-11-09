@@ -26,37 +26,41 @@
 #define DEFAULT_TYPE_SPECIFIC_FIELD   0
 #define DEFAULT_FIELDS_ENCODER_ARG   0
 
-typedef void (*amqp_frame_encoder_t)(amqp_context_t *context, amqp_buffer_t *buffer, void *encoder_arg);
-
-static void amqp_sasl_mechanisms_feld_encoder(amqp_context_t *context, amqp_buffer_t *buffer, void *ignored);
+typedef int (*amqp_frame_encoder_t)(amqp_connection_t *connection, amqp_buffer_t *buffer, void *encoder_arg);
 
 static inline
-void encode_frame_list(amqp_context_t *context, amqp_buffer_t *buffer, amqp_frame_encoder_t fields_encoder, void *fields_encoder_arg)
+int encode_frame_list(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_frame_encoder_t fields_encoder, void *fields_encoder_arg)
 {
-    amqp_type_t *list = amqp_encode_list_8(context, buffer);
-    fields_encoder(context, buffer, fields_encoder_arg);
-    amqp_complete_type(context, buffer, list);
+    int rc;
+    amqp_type_t *list = amqp_encode_list_8(connection->context, buffer);
+    rc = fields_encoder(connection, buffer, fields_encoder_arg);
+    amqp_complete_type(connection->context, buffer, list);
+    return rc;
 }
 
 static inline
-void encode_performative(amqp_context_t *context, amqp_buffer_t *buffer, uint64_t id, amqp_frame_encoder_t fields_encoder, void *encoder_arg)
+int encode_performative(amqp_connection_t *connection, amqp_buffer_t *buffer, uint64_t id, amqp_frame_encoder_t fields_encoder, void *encoder_arg)
 {
+    int rc;
+    amqp_context_t *context = connection->context;
     amqp_type_t *frame = amqp_start_encode_described_type(context, buffer);
     amqp_encode_ulong(context, buffer, id);
-    encode_frame_list(context, buffer, fields_encoder, encoder_arg);
+    rc = encode_frame_list(connection, buffer, fields_encoder, encoder_arg);
     amqp_complete_type(context, buffer, frame);
     amqp_deallocate_type(context, frame);
+    return rc;
 }
 
 static
-void amqp_encode_frame(amqp_context_t *context, amqp_buffer_t *buffer, uint64_t id, uint8_t frame_type, uint16_t frame_type_specific, amqp_frame_encoder_t fields_encoder, void *encoder_arg)
+int amqp_encode_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, uint64_t id, uint8_t frame_type, uint16_t frame_type_specific, amqp_frame_encoder_t fields_encoder, void *encoder_arg)
 {
-    size_t performativce_offset, frame_size;;
+    size_t performativce_offset, frame_size;
+    int rc;
 
     amqp_buffer_advance_write_point(buffer, 8);
     performativce_offset = amqp_buffer_write_point(buffer);
 
-    encode_performative(context, buffer, id, fields_encoder, encoder_arg);
+    rc = encode_performative(connection, buffer, id, fields_encoder, encoder_arg);
 
     frame_size = amqp_buffer_size(buffer);
     amqp_buffer_set_write_index(buffer, 0);
@@ -65,35 +69,47 @@ void amqp_encode_frame(amqp_context_t *context, amqp_buffer_t *buffer, uint64_t 
     amqp_buffer_write_uint8(buffer, frame_type);
     amqp_buffer_write_uint16(buffer, frame_type_specific);
     amqp_buffer_set_write_index(buffer, frame_size);
+
+    return rc;
 }
 
-static void amqp_sasl_mechanisms_feld_encoder(amqp_context_t *context, amqp_buffer_t *buffer, void *ignored)
+static int amqp_sasl_mechanisms_field_encoder(amqp_connection_t *connection, amqp_buffer_t *buffer, void *ignored)
 {
-    amqp_sasl_mechanisms_encode(context, buffer);
+    if (amqp_context_sasl_plugin_count(connection->context) == 0)
+    {
+        amqp_connection_failed(connection, AMQP_ERROR_SASL_PLUGINS_REGISTERED, AMQP_CONNECTION_SASL_ERROR, "Cannot construct SASL Mechanisms list. No SASL plugins registered.");
+        return 0;
+    }
+    // TODO use a differet plugin list for server and client.
+    amqp_sasl_mechanisms_encode(connection->context, buffer);
+    return 1;
 }
 
-void amqp_encode_sasl_mechanisms_frame(amqp_context_t *context, amqp_buffer_t *buffer)
+int amqp_encode_sasl_mechanisms_frame(amqp_connection_t *connection, amqp_buffer_t *buffer)
 {
-    amqp_encode_frame(context, buffer, amqp_sasl_mechanisms_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_mechanisms_feld_encoder, DEFAULT_FIELDS_ENCODER_ARG);
+    assert(connection && buffer);
+    return amqp_encode_frame(connection, buffer, amqp_sasl_mechanisms_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_mechanisms_field_encoder, DEFAULT_FIELDS_ENCODER_ARG);
 }
 
-static void amqp_sasl_init_feld_encoder(amqp_context_t *context, amqp_buffer_t *buffer, void *arg)
+static int amqp_sasl_init_field_encoder(amqp_connection_t *connection, amqp_buffer_t *buffer, void *arg)
 {
-    amqp_binary_t *initial_response;
     amqp_sasl_plugin_t *sasl_plugin = (amqp_sasl_plugin_t *) arg;
+
     assert(sasl_plugin && sasl_plugin->mechanism_name);
 
-//    initial_response = sasl_plugin->initial_response_handler(context, sasl_plugin);
+    if (connection->socket.hostname == 0)
+    {
+        amqp_connection_failed(connection, AMQP_ERROR_NO_HOST_NAME, AMQP_CONNECTION_SASL_ERROR, "Cannot initialize SASL Init frame. No hostname provided.");
+        return 0;
+    }
 
-    amqp_encode_symbol(context, buffer, sasl_plugin->mechanism_name);
-//    amqp_encode_binary
-
-//not_implemented(todo);
-
-    amqp_binary_cleanup(context, initial_response);
+    amqp_encode_symbol(connection->context, buffer, sasl_plugin->mechanism_name);
+    amqp_sasl_plugin_initial_response(connection->context, sasl_plugin, buffer, &connection->sasl.identity_hooks);
+    amqp_encode_string(connection->context, buffer, connection->socket.hostname ? connection->socket.hostname : "unknown-host");
+    return 1;
 }
 
-void amqp_encode_sasl_init_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin)
+int  amqp_encode_sasl_init_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin)
 {
-    amqp_encode_frame(context, buffer, amqp_sasl_init_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_init_feld_encoder, sasl_plugin);
+    return amqp_encode_frame(connection, buffer, amqp_sasl_init_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_init_field_encoder, sasl_plugin);
 }

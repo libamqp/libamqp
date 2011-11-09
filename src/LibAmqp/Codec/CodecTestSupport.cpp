@@ -65,7 +65,7 @@ namespace t
     {
         if (value != 0)
         {
-            amqp_context_printf(context, "%c %s", not_first ? ',' : ':', text);
+            amqp_context_printf(context, 3, "%c %s", not_first ? ',' : ':', text);
             return true;
         }
         return not_first;
@@ -74,7 +74,7 @@ namespace t
     void dump_type_flags(amqp_context_t *context, amqp_type_t *type)
     {
         int not_first = false;
-        amqp_context_printf(context, "flags");
+        amqp_context_printf(context, 3, "flags");
         not_first = dump_flag(context, amqp_type_is_null(type), "is_null", not_first);
         not_first = dump_flag(context, amqp_type_is_invalid(type), "is_invalid", not_first);
         not_first = dump_flag(context, amqp_type_is_encoded(type), "is_encoded", not_first);
@@ -93,14 +93,14 @@ namespace t
     {
         int old_indent;
 
-        amqp_context_printf(context, "format code: 0x%02x\n", type->constructor.format_code);
+        amqp_context_printf(context, 3, "format code: 0x%02x\n", type->constructor.format_code);
         old_indent = amqp_context_increase_print_indent(context, 4);
         if (type->constructor.meta_data != 0)
         {
-            amqp_context_printf(context, "width: %d, name: %s", type->constructor.meta_data->width, type->constructor.meta_data->name);
+            amqp_context_printf(context, 3, "width: %d, name: %s", type->constructor.meta_data->width, type->constructor.meta_data->name);
             if (*type->constructor.meta_data->encoding_name)
             {
-                amqp_context_printf(context, "-%s", type->constructor.meta_data->encoding_name);
+                amqp_context_printf(context, 3, "-%s", type->constructor.meta_data->encoding_name);
             }
             amqp_context_putc(context, '\n');
         }

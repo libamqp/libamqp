@@ -26,8 +26,8 @@ SUITE(Frame)
 {
     TEST_FIXTURE(FrameFixture, client_open_frame)
     {
-        test_data::client_open_frame.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::client_open_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -51,8 +51,8 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, broker_open_frame)
     {
-        test_data::broker_open_frame.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::broker_open_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -76,8 +76,8 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, client_begin_frame)
     {
-        test_data::client_begin_frame.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::client_begin_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -100,8 +100,8 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, broker_begin_frame)
     {
-        test_data::broker_begin_frame.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::broker_begin_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -124,8 +124,8 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, close_frame)
     {
-        test_data::close_frame.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::close_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -142,8 +142,8 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, close_confirm_frame)
     {
-        test_data::close_confirm_frame.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::close_confirm_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -157,8 +157,8 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, client_attach_frame)
     {
-        test_data::client_attach_frame.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::client_attach_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -188,8 +188,8 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, broker_attach_frame)
     {
-        test_data::broker_attach_frame.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::broker_attach_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -220,8 +220,8 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, flow_frame)
     {
-        test_data::flow_frame.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::flow_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -255,8 +255,8 @@ SUITE(Frame)
     }
     TEST_FIXTURE(FrameFixture, broker_flow_frame)
     {
-        test_data::broker_flow_frame.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::broker_flow_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -291,8 +291,8 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, ya_flow_frame)
     {
-        test_data::ya_flow_frame.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::ya_flow_frame.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -327,8 +327,8 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, transfer_frame_id_0)
     {
-        test_data::transfer_frame_id_0.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::transfer_frame_id_0.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -352,8 +352,8 @@ SUITE(Frame)
     
     TEST_FIXTURE(FrameFixture, transfer_frame_id_256)
     {
-        test_data::transfer_frame_id_256.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::transfer_frame_id_256.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());
@@ -376,8 +376,8 @@ SUITE(Frame)
 
     TEST_FIXTURE(FrameFixture, transfer_frame_id_677)
     {
-        test_data::transfer_frame_id_677.transfer_to(buffer);
-        frame = amqp_decode_amqp_frame(context, buffer);
+        test_data::transfer_frame_id_677.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
 
         ASSERT(frame != 0);
         CHECK(check_amqp_header());

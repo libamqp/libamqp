@@ -24,6 +24,7 @@ extern "C" {
 #include "libamqp_common.h"
 #include "Transport/LowLevel/Connect.h"
 #include "Transport/LowLevel/Timer.h"
+#include "Context/SaslIdentity.h"
 #include "Transport/Connection/ConnectionTrace.h"
 #include "Transport/Connection/ConnectionRead.h"
 #include "Transport/Connection/ConnectionSocket.h"
@@ -44,6 +45,11 @@ typedef struct amqp_buffer_t amqp_buffer_t;
 typedef struct amqp_context_t amqp_context_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_SASL_IDENTITY_TYPE_T
+#define LIBAMQP_AMQP_SASL_IDENTITY_TYPE_T
+typedef struct amqp_sasl_identity_t amqp_sasl_identity_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_CONNECTION_TYPE_T
 #define LIBAMQP_AMQP_CONNECTION_TYPE_T
 typedef struct amqp_connection_t amqp_connection_t;
@@ -58,6 +64,12 @@ typedef struct amqp_connections_t amqp_connections_t;
 #define LIBAMQP_AMQP_FRAME_TYPE_T
 typedef struct amqp_frame_t amqp_frame_t;
 #endif
+
+#ifndef LIBAMQP_AMQP_SASL_PLUGIN_TYPE_T
+#define LIBAMQP_AMQP_SASL_PLUGIN_TYPE_T
+typedef struct amqp_sasl_plugin_t amqp_sasl_plugin_t;
+#endif
+
 
 enum amqp_connection_protocols
 {
@@ -317,6 +329,10 @@ struct amqp_connection_t
     } limits;
     amqp_accept_handler_arguments_t *accept_handler_arguments;
     amqp_timer_t *timer;
+    struct {
+        amqp_sasl_identity_t identity_hooks;
+        amqp_sasl_plugin_t *plugin;
+    } sasl;
 };
 
 extern void amqp_connection_state_initialize(amqp_connection_t *connection);

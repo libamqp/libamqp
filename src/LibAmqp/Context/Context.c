@@ -48,6 +48,11 @@ void amqp_restore_outputter(amqp_context_t *context)
     context->debug.outputter = amqp_stream_outputter;
 }
 
+static const char *default_identity_hook(amqp_context_t *context)
+{
+    return 0;
+}
+
 amqp_context_t *
 amqp_create_context()
 {
@@ -68,10 +73,12 @@ amqp_create_context()
     result->context.thread_event_loop = 0;
 
     result->context.reference.plugins.sasl_plugin_list = 0;
-    // Danger Will Robinson - using context while initialzing it so do last.
+
+    // Danger Will Robinson - using context while initialzing it. So, do last.
     result->context.reference.amqp_descriptors = amqp_load_descriptors(&result->context);
     amqp_initialize_default_messaging_methods(&result->context.reference.plugins.messaging);
 
+    amqp_context_register_identity_hooks(&result->context, default_identity_hook, default_identity_hook, default_identity_hook);
     return (amqp_context_t *) result;
 }
 
@@ -99,6 +106,9 @@ amqp_context_t *amqp_context_clone(amqp_context_t *context)
     result->context.reference.cloned = true;
 
     result->context.thread_event_loop = 0;   // Don't clone the event loop. Need one per thread.
+
+    // Don't clone the identity hooks.
+    amqp_context_register_identity_hooks(&result->context, default_identity_hook, default_identity_hook, default_identity_hook);
 
     return (amqp_context_t *) result;
 }

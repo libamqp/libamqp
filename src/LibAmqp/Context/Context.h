@@ -25,6 +25,7 @@
 #include "Buffer/Buffer.h"
 #include "Codec/Type/Type.h"
 #include "Context/ErrorHandling.h"
+#include "Context/SaslIdentity.h"
 #include "Messaging/MessagingPlugin.h"
 
 #ifdef __cplusplus
@@ -40,6 +41,11 @@ extern "C"
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
     typedef struct amqp_context_t amqp_context_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_SASL_IDENTITY_TYPE_T
+#define LIBAMQP_AMQP_SASL_IDENTITY_TYPE_T
+typedef struct amqp_sasl_identity_t amqp_sasl_identity_t;
 #endif
 
 #ifndef LIBAMQP_AMQP_FRAME_TYPE_T
@@ -81,7 +87,6 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
 #define LIBAMQP_AMQP_SYMBOL_T
     typedef struct amqp_symbol_t amqp_symbol_t;
 #endif
-
 
     typedef int amqp_debug_print_c_t(int c);
 
@@ -133,11 +138,6 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
             amqp_memory_pool_t amqp_frame_t_pool;
         } memory;
 
-//        struct
-//        {
-//            amqp_buffer_t *buffer;
-//        } decode;
-//
         struct
         {
             amqp_buffer_t *buffer;
@@ -161,6 +161,11 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
             } plugins;
         } reference;
 
+        struct
+        {
+            amqp_sasl_identity_t identity_hooks;
+        } sasl;
+
         amqp_event_loop_t *thread_event_loop;
     };
 
@@ -178,7 +183,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     extern void amqp_deallocate_frame(amqp_context_t *context, amqp_frame_t *type);
 
     extern amqp_debug_print_c_t *amqp_context_define_putc_function(amqp_context_t *context, amqp_debug_print_c_t *putc);
-    extern int amqp_context_printf(amqp_context_t *context, const char *format, ...);
+    extern int amqp_context_printf(amqp_context_t *context, int level, const char *format, ...);
     extern int amqp_context_putc(amqp_context_t *context, int c);
     extern int amqp_context_increase_print_indent(amqp_context_t *context, int delta);
     extern int amqp_context_set_print_indent(amqp_context_t *context, int indent);
@@ -197,6 +202,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     extern amqp_sasl_plugin_t *amqp_context_first_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_node_t **sasl_plugin_node);
     extern amqp_sasl_plugin_t *amqp_context_next_sasl_plugin(amqp_context_t *context, amqp_sasl_plugin_node_t **sasl_plugin_node);
     extern int amqp_context_sasl_plugin_count(amqp_context_t *context);
+    extern void amqp_context_register_identity_hooks(amqp_context_t *context, amqp_identity_hook_method_t provide_login, amqp_identity_hook_method_t provide_password, amqp_identity_hook_method_t provide_email);
 
     extern uint8_t *amqp_allocate_print_buffer(amqp_context_t *context, size_t n);
     extern void amqp_deallocate_print_buffer(amqp_context_t *context, uint8_t *buffer);

@@ -37,9 +37,8 @@ SUITE(Context)
 
         amqp_sasl_plugin_t *create_and_register_plugin(const char *name)
         {
-            amqp_sasl_plugin_t *p = AMQP_MALLOC(context, amqp_sasl_plugin_t);
-            p->mechanism_name = name;
-            p->plugin_cleanup_handler = plugin_cleanup;
+            amqp_sasl_plugin_t *p = amqp_sasl_plugin_base_create(context, name, amqp_sasl_plugin_base_instance_create);
+            p->essence.plugin.cleanup_plugin_handler = plugin_cleanup;
             amqp_context_register_sasl_plugin(context, p);
             return p;
         }
@@ -58,7 +57,6 @@ SUITE(Context)
         cleanup_count++;
     }
 
-
     TEST_FIXTURE(BaseSaslPluginsFixture, sasl_plugins_cleanup_called)
     {
         create_and_register_plugin("ANONYMOUS");
@@ -74,42 +72,7 @@ SUITE(Context)
         CHECK_EQUAL((void *) 0, amqp_context_first_sasl_plugin(context, &list));
     }
 
-    class SaslPluginsFixture : public BaseSaslPluginsFixture
-    {
-    public:
-        SaslPluginsFixture()
-        {
-            symbol_anonymous = amqp_symbol_create_from_cstr(context, "ANONYMOUS");
-            symbol_plain = amqp_symbol_create_from_cstr(context, "PLAIN");
-            symbol_pretty = amqp_symbol_create_from_cstr(context, "PRETTY");
-        }
-        ~SaslPluginsFixture()
-        {
-            amqp_context_free_sasl_plugins(context);
-
-            amqp_symbol_cleanup(context, symbol_anonymous);
-            amqp_symbol_cleanup(context, symbol_plain);
-            amqp_symbol_cleanup(context, symbol_pretty);
-        }
-
-    public:
-        amqp_symbol_t *symbol_anonymous;
-        amqp_symbol_t *symbol_plain;
-        amqp_symbol_t *symbol_pretty;
-    };
-
-    TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_lookup)
-    {
-        amqp_sasl_plugin_t *p1 = create_and_register_plugin("ANONYMOUS");
-        amqp_sasl_plugin_t *p2 = create_and_register_plugin("PLAIN");
-
-        CHECK_EQUAL((void *) 0, amqp_context_lookup_sasl_plugin(context, symbol_pretty));
-        CHECK_EQUAL(p2, amqp_context_lookup_sasl_plugin(context, symbol_plain));
-        CHECK_EQUAL(p1, amqp_context_lookup_sasl_plugin(context, symbol_anonymous));
-    }
-
-
-    TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_registered_plugin_count)
+    TEST_FIXTURE(BaseSaslPluginsFixture, sasl_plugins_registered_plugin_count)
     {
         CHECK_EQUAL(0, amqp_context_sasl_plugin_count(context));
         create_and_register_plugin("ANONYMOUS");
@@ -118,12 +81,73 @@ SUITE(Context)
         CHECK_EQUAL(2, amqp_context_sasl_plugin_count(context));
     }
 
+    class SaslPluginsFixture : public BaseSaslPluginsFixture
+    {
+    public:
+        SaslPluginsFixture() : plain(0), anonymous(0)
+        {
+            symbol_anonymous = amqp_symbol_create_from_cstr(context, "ANONYMOUS");
+            symbol_plain = amqp_symbol_create_from_cstr(context, "PLAIN");
+            symbol_pretty = amqp_symbol_create_from_cstr(context, "PRETTY");
+        }
+        ~SaslPluginsFixture()
+        {
+            amqp_symbol_cleanup(context, symbol_anonymous);
+            amqp_symbol_cleanup(context, symbol_plain);
+            amqp_symbol_cleanup(context, symbol_pretty);
+
+            amqp_sasl_plugin_instance_cleanup(context, plain);
+            amqp_sasl_plugin_instance_cleanup(context, anonymous);
+
+            amqp_context_free_sasl_plugins(context);
+        }
+
+    public:
+        amqp_symbol_t *symbol_anonymous;
+        amqp_symbol_t *symbol_plain;
+        amqp_symbol_t *symbol_pretty;
+        amqp_sasl_plugin_t *plain;
+        amqp_sasl_plugin_t *anonymous;
+    };
+
+    TEST_FIXTURE(SaslPluginsFixture, fixture_should_balance_allocations)
+    {
+
+    }
 
     TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_lookup_with_nothing_registered)
     {
         CHECK_EQUAL((void *) 0, amqp_context_lookup_sasl_plugin(context, symbol_pretty));
         CHECK_EQUAL((void *) 0, amqp_context_lookup_sasl_plugin(context, symbol_plain));
         CHECK_EQUAL((void *) 0, amqp_context_lookup_sasl_plugin(context, symbol_anonymous));
+    }
+
+    TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_lookup_with_plain_registered)
+    {
+        create_and_register_plugin("PLAIN");
+
+        plain = amqp_context_lookup_sasl_plugin(context, symbol_plain);
+        CHECK_EQUAL("PLAIN", plain->mechanism_name);
+    }
+
+    TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_lookup_with_anonymous_registered)
+    {
+        create_and_register_plugin("ANONYMOUS");
+
+        anonymous = amqp_context_lookup_sasl_plugin(context, symbol_anonymous);
+        CHECK_EQUAL("ANONYMOUS", anonymous->mechanism_name);
+    }
+
+    TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_lookup)
+    {
+        create_and_register_plugin("ANONYMOUS");
+        create_and_register_plugin("PLAIN");
+
+        plain = amqp_context_lookup_sasl_plugin(context, symbol_plain);
+        CHECK_EQUAL("PLAIN", plain->mechanism_name);
+
+        anonymous = amqp_context_lookup_sasl_plugin(context, symbol_anonymous);
+        CHECK_EQUAL("ANONYMOUS", anonymous->mechanism_name);
     }
 
     TEST_FIXTURE(SaslPluginsFixture, sasl_plugins_anonymous_over_plain)

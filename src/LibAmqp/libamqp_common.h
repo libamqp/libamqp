@@ -38,6 +38,7 @@ extern "C" {
 #ifdef _MSC_VER
 #include "libamqp_win32.h"
 #define not_reached()   abort(); return 0;
+#define AMQP_WINDOWS_PORT
 #else
 #include <stdint.h>
 #define not_reached()   abort();

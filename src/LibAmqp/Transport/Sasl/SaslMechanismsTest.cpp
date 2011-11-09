@@ -21,6 +21,7 @@
 #include "AmqpTypes/AmqpMultiple.h"
 #include "Plugin/SaslPlain/SaslPlain.h"
 #include "Plugin/SaslAnonymous/SaslAnonymous.h"
+#include "Codec/Type/TypePrint.h"
 
 #include "debug_helper.h"
 
@@ -52,7 +53,7 @@ SUITE(Sasl)
     {
         type = amqp_sasl_mechanisms_encode(context, buffer);
         ASSERT(type);
-        CHECK(amqp_type_is_symbol(type));
+        ASSERT(amqp_type_is_symbol(type));
 
         symbol = amqp_symbol_create_from_type(context, type);
         CHECK(amqp_symbol_compare_with_cstr(symbol, "PLAIN") == 0);

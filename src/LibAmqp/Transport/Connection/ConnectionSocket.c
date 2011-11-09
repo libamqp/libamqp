@@ -229,6 +229,7 @@ static void attempt_connection_to_next_address(amqp_connection_t *connection)
     }
 
     amqp_set_socket_to_nonblocking(connection->socket.fd);
+    amqp_set_socket_to_ignore_sigpipe(connection->socket.fd);
 
     if (connect(connection->socket.fd, iterator->ai_addr, iterator->ai_addrlen) == 0)
     {

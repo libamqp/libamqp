@@ -20,6 +20,8 @@
 #include "Transport/Connection/ConnectionTrace.h"
 #include "Transport/Connection/ConnectionTestHook.h"
 
+#include "debug_helper.h"
+
 #ifdef LIBAMQP_TRACE_CONNECT_STATE
 #define save_old_state()  const char* old_state_name = connection->state.connection.name
 #define trace_transition(old_state_name) amqp_connection_trace_transition(connection, AMQP_TRACE_CONNECTION, old_state_name, connection->state.connection.name)
@@ -209,7 +211,10 @@ static void done_while_accepting_sasl(amqp_connection_t *connection)
 }
 static void fail_while_accepting_sasl(amqp_connection_t *connection)
 {
-    not_implemented(fail_while_accepting_sasl);
+    amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_SASL_NEGOTIATION_REJECTED);
+    amqp_connection_trace(connection, "SASL negotiation failed");
+    break_two();
+    connection->state.connection.drain(connection);
 }
 static void reject_while_accepting_sasl(amqp_connection_t *connection, uint32_t version)
 {

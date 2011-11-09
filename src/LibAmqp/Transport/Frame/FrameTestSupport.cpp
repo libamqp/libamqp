@@ -23,13 +23,15 @@ namespace SuiteFrame
 {
     FrameFixture::FrameFixture() : frame(0), type(0)
     {
-        buffer = amqp_allocate_buffer(context);
         amqp_context_register_sasl_plugin(context, amqp_plugin_sasl_plain_create(context));
+        connection = amqp_connection_create(context);
+        connection->socket.hostname = "unknown";
     }
 
     FrameFixture::~FrameFixture()
     {
-        amqp_deallocate_buffer(context, buffer);
+        connection->socket.hostname = 0;
+        amqp_connection_destroy(context, connection);
         amqp_frame_cleanup(context, frame);
         amqp_deallocate_type(context, type);
     }
@@ -51,9 +53,9 @@ namespace SuiteFrame
     {
         return check_header(AMQP_SASL_FRAME_TYPE, 0U);
     }
+
     int FrameFixture::check_amqp_header()
     {
         return check_header(AMQP_FRAME_TYPE, 0U);
     }
-
 }

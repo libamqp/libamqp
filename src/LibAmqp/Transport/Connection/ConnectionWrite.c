@@ -320,6 +320,7 @@ static void default_write_next(amqp_connection_t *connection)
 
 static void default_write_stop(amqp_connection_t *connection, amqp_connection_action_f done_callback)
 {
+    done_callback(connection);
 }
 
 static void default_write_abort(amqp_connection_t *connection)

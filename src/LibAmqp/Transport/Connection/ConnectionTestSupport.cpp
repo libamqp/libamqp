@@ -29,6 +29,7 @@ namespace SuiteConnection
     {
         amqp_context_set_name(context, "client");
         amqp_register_default_plugins(context);
+        amqp_context_register_identity_hooks(context, provide_login, provide_password, provide_email);
         
         loop = ev_default_loop(0);
         context->thread_event_loop = loop;
@@ -104,6 +105,21 @@ namespace SuiteConnection
     {
         BaseConnectionFixture::running = true;
         connection->state.stopped_hook = stopped_hook;
+    }
+
+    const char *BaseConnectionFixture::provide_login(amqp_context_t *context)
+    {
+        return "joe";
+    }
+
+    const char *BaseConnectionFixture::provide_password(amqp_context_t *context)
+    {
+        return "secret";
+    }
+
+    const char *BaseConnectionFixture::provide_email(amqp_context_t *context)
+    {
+        return "joe@s.gl";
     }
 
     void BaseConnectionFixture::connect_to(const char *hostname, int port_number)
