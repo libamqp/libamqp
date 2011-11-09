@@ -15,12 +15,16 @@
  */
 
 #include <assert.h>
+#include <limits.h>
 #include <string.h>
 
 #include "Buffer/Buffer.h"
 #include "Buffer/BufferInternal.h"
 #include "Memory/Memory.h"
 #include "Misc/Bits.h"
+
+#include "Context/Context.h"
+
 #include "debug_helper.h"
 
 
@@ -250,4 +254,74 @@ int amqp_block_compare(amqp_memory_t *lhs, size_t lhs_offset, amqp_memory_t *rhs
     }
     return result;
     */
+}
+
+static
+void amqp_dump_buffer_data(amqp_context_t *context, size_t index, amqp_buffer_t *buffer, int limit)
+{
+    size_t j = 0;
+    size_t i = index;
+
+    while (i < amqp_buffer_size(buffer) && j < 32 && i < limit)
+    {
+        int c = amqp_unchecked_getc_at(buffer, i);
+        amqp_context_putc(context, to_hex(c >> 4));
+        amqp_context_putc(context, to_hex(c & 0x0f));
+        amqp_context_putc(context, ' ');
+        i++;
+        j++;
+    }
+    while (j < 32)
+    {
+        amqp_context_putc(context, ' ');
+        amqp_context_putc(context, ' ');
+        amqp_context_putc(context, ' ');
+        j++;
+    }
+    amqp_context_putc(context, ' ');
+    j = 0;
+    while (index < amqp_buffer_size(buffer) && j < 32 && i < limit)
+    {
+        int c = amqp_unchecked_getc_at(buffer, index);
+        amqp_context_putc(context, isprint(c) ? c : '.');
+        index++;
+        j++;
+    }
+}
+
+void amqp_dump_buffer(amqp_context_t *context, amqp_buffer_t *buffer, int limit)
+{
+    size_t i = 0;
+    size_t width = (33 - context->debug.indent.auto_indent) & ~1;
+
+    if (amqp_buffer_size(buffer) == 0)
+    {
+        return;
+    }
+
+    if (width < 8)
+    {
+        width = 8;
+    }
+
+    if (limit == 0)
+    {
+//        limit = MAX_INT;  // Why is this not defined???
+        limit = 1 << 12;
+    }
+
+    amqp_context_printf(context, 2, "buffer, size = %lu {\n", amqp_buffer_size(buffer));
+
+    amqp_dump_buffer_data(context, i, buffer, limit);
+    i += 32;
+
+    while (i < amqp_buffer_size(buffer) && i < limit)
+    {
+        amqp_context_putc(context, '\n');
+        amqp_dump_buffer_data(context, i, buffer, limit);
+        i += 32;
+    }
+    amqp_context_putc(context, '\n');
+    amqp_context_putc(context, '}');
+    amqp_context_putc(context, '\n');
 }
