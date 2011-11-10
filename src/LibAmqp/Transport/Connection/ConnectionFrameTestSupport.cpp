@@ -73,7 +73,7 @@ namespace SuiteConnectionFrame
         if (connection->trace_flags & AMQP_TRACE_CONNECTION_WRITER)
         {
             amqp_context_printf(connection->context, 1, "written: ");
-            t::amqp_buffer_dump(connection->context, buffer);
+            amqp_dump_buffer(connection->context, buffer, 0);
         }
         write_callback(connection);
     }
@@ -103,7 +103,7 @@ namespace SuiteConnectionFrame
             if (connection->trace_flags & AMQP_TRACE_CONNECTION_READER)
             {
                 amqp_context_printf(connection->context, 1, "read: ");
-                t::amqp_buffer_dump(connection->context, buffer);
+                amqp_dump_buffer(connection->context, buffer, 0);
             }
 
             read_callback(connection, buffer, required);

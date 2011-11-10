@@ -31,40 +31,48 @@ void amqp_socket_address_tos(char *buffer, size_t buffer_size, struct sockaddr_s
     const char *address = 0;
     int length;
 
-    switch (socket_address->ss_family) {
-    case AF_INET:
-        if (address_size >= sizeof(struct sockaddr_in))
-        {
-            address = inet_ntop(AF_INET, &((struct sockaddr_in *) socket_address)->sin_addr, address_buffer, sizeof(address_buffer));
-        }
-        break;
+    if (socket_address)
+    {
+        switch (socket_address->ss_family) {
+        case AF_INET:
+            if (address_size >= sizeof(struct sockaddr_in))
+            {
+                address = inet_ntop(AF_INET, &((struct sockaddr_in *) socket_address)->sin_addr, address_buffer, sizeof(address_buffer));
+            }
+            break;
 
-    case AF_INET6:
-        if (address_size >= sizeof(struct sockaddr_in6))
-        {
-            address = inet_ntop(AF_INET, &((struct sockaddr_in6 *) socket_address)->sin6_addr, address_buffer, sizeof(address_buffer));
+        case AF_INET6:
+            if (address_size >= sizeof(struct sockaddr_in6))
+            {
+                address = inet_ntop(AF_INET, &((struct sockaddr_in6 *) socket_address)->sin6_addr, address_buffer, sizeof(address_buffer));
+            }
+            break;
         }
-        break;
     }
 
     if (address == 0) address = "<unknown>";
     length = strlen(address);
     if (length > buffer_size) length = buffer_size - 1;
     strncpy(buffer, address, length);
+    buffer[length] = '\0';
 }
 
 int amqp_socket_address_port(struct sockaddr_storage *socket_address, socklen_t address_size)
 {
-    switch (socket_address->ss_family) {
-    case AF_INET:
-        return ntohs(((struct sockaddr_in *) socket_address)->sin_port);
+    if (socket_address)
+    {
+        switch (socket_address->ss_family) {
+        case AF_INET:
+            return ntohs(((struct sockaddr_in *) socket_address)->sin_port);
 
-    case AF_INET6:
-        return ntohs(((struct sockaddr_in6 *) socket_address)->sin6_port);
+        case AF_INET6:
+            return ntohs(((struct sockaddr_in6 *) socket_address)->sin6_port);
 
-    default:
-        return -1;
+        default:
+            break;
+        }
     }
+    return -1;
 }
 
 int amqp_socket_shutdown_output(amqp_socket_t fd)
