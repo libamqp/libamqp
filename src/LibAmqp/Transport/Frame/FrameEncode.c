@@ -57,6 +57,7 @@ int amqp_encode_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, uint
     size_t performativce_offset, frame_size;
     int rc;
 
+    amqp_buffer_reset(buffer);
     amqp_buffer_advance_write_point(buffer, 8);
     performativce_offset = amqp_buffer_write_point(buffer);
 
