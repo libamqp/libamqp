@@ -90,6 +90,7 @@ SUITE(Frame)
     {
         test_data::sasl_init_frame.transfer_to(decode_buffer);
         frame = amqp_decode_sasl_frame(context, decode_buffer);
+
         ASSERT(frame != 0);
 
         CHECK(check_sasl_header());
@@ -99,7 +100,7 @@ SUITE(Frame)
         CHECK_EQUAL(0, amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 0));
         CHECK_EQUAL('a', amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 1));
         CHECK_EQUAL(0, amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 8));
-        CHECK_EQUAL('p', amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 9));
+        CHECK_EQUAL('s', amqp_binary_byte_get_at(&frame->frames.sasl.init.initial_response, 9));
 
         CHECK(amqp_string_compare_with_cstr(&frame->frames.sasl.init.hostname, "localhost.localdomain") == 0);
     }

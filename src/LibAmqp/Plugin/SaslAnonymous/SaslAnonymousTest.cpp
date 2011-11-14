@@ -59,7 +59,7 @@ SUITE(PluginSaslAnonymous)
 
     TEST_FIXTURE(PluginSaslAnonymousFixture, encode_initial_response)
     {
-        type = amqp_sasl_plugin_initial_response(context, instance, decode_buffer, &identity_hooks);
+        type = amqp_sasl_plugin_initial_response_encode(context, instance, &identity_hooks, decode_buffer);
         CHECK(amqp_type_is_binary(type));
         size_t expected_size = strlen(provide_email(context));
 

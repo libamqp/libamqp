@@ -57,6 +57,7 @@ extern int amqp_binary_to_bytes(amqp_binary_t *binary, uint8_t *buffer, size_t b
 extern int amqp_binary_compare(amqp_binary_t *lhs, amqp_binary_t *rhs);
 extern int amqp_binary_compare_with_bytes(amqp_binary_t *lhs, const uint8_t *rhs, size_t size);
 extern uint32_t amqp_binary_hash(amqp_binary_t *binary);
+extern int amqp_binary_index_of(amqp_binary_t *binary, int c, int starting_position);
 
 static inline
 int amqp_binary_byte_get_at(amqp_binary_t *binary, size_t index)

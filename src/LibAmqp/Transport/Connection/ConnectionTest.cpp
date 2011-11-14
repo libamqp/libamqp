@@ -130,17 +130,14 @@ SUITE(Connection)
 
     TEST_FIXTURE(ConnectionFixture, connection_should_establish_sasl_tunnel)
     {
-    SOUTS("SSSSSSSSSSSS");
         connection->protocols = AMQP_PROTOCOL_SASL | AMQP_PROTOCOL_AMQP;
         connection->state.connection.mode.client.connect(connection, "localhost", 54321);
         loop_while_socket_state_is("Connecting");
         loop_while_connection_state_is("ConnectingSasl");
-        CHECK_EQUAL("ConnectingSasl", connection->state.connection.name);
+        CHECK_EQUAL("ConnectingAmqp", connection->state.connection.name);
         amqp_connection_shutdown(context, connection);
         loop_while_running();
         CHECK_EQUAL("Stopped", connection->state.connection.name);
-        CHECK(0);
-    SOUTS("EEEEEEEEEEEE");
     }
 
 //    TEST_FIXTURE(ConnectionFixture, connection_should_establish_amqp_tunnel)

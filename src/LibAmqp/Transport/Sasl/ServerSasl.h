@@ -47,7 +47,11 @@ typedef struct amqp_connection_t amqp_connection_t;
 typedef struct amqp_frame_t amqp_frame_t;
 #endif
 
+
 extern int amqp_sasl_prepare_mechanisms_frame(amqp_connection_t *connection);
+
+extern int amqp_sasl_process_init_frame(amqp_connection_t *connection, amqp_frame_t *frame);
+extern int amqp_sasl_process_challenge_response_frame(amqp_connection_t *connection, amqp_frame_t *frame);
 
 #ifdef __cplusplus
 }
