@@ -75,6 +75,18 @@ int amqp_connection_sasl_is_state(const amqp_connection_t *connection, const cha
     return connection->state.sasl.name != 0 ? (strcmp(connection->state.sasl.name, state_name) == 0) : false;
 }
 
+static void received_out_of_sequence_sasl_frame(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    amqp_connection_error(connection, AMQP_ERROR_OUT_OF_SEQUENCE_SASL_FRAME,
+                "Received an out of sequence SASL frame. Frame id: %llu while state is\"%s\" and connection is \"%s\". Aborting connection.",
+                (unsigned long long) amqp_frame_descriptor_full_id(frame), connection->state.sasl.name, connection->state.connection.name);
+
+    amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_SASL_ERROR | AMQP_CONNECTION_FRAME_SEQUENCE_ERROR);
+
+    // TODO - consider if fail is the right action
+    connection->state.connection.fail(connection);
+}
+
 static
 void write_complete_callback(amqp_connection_t *connection)
 {
@@ -174,7 +186,7 @@ static void transition_to_waiting_on_sasl_mechanisms(amqp_connection_t *connecti
 {
     save_old_state();
     default_state_initialization(connection, "WaitingOnSaslMechanisms");
-    connection->state.sasl.messages.mechanisms = received_sasl_mechanisms_frame;
+    connection->state.sasl.frame.mechanisms = received_sasl_mechanisms_frame;
     trace_transition(old_state_name);
 }
 
@@ -221,8 +233,8 @@ static void transition_to_waiting_on_sasl_challenge_or_outcome(amqp_connection_t
 {
     save_old_state();
     default_state_initialization(connection, "WaitingOnSaslChallengeOrOutcomeFrame");
-    connection->state.sasl.messages.challenge = received_sasl_challenge_frame;
-    connection->state.sasl.messages.outcome = received_sasl_outcome_frame;
+    connection->state.sasl.frame.challenge = received_sasl_challenge_frame;
+    connection->state.sasl.frame.outcome = received_sasl_outcome_frame;
     trace_transition(old_state_name);
 }
 
@@ -307,7 +319,7 @@ static void transition_to_waiting_on_sasl_initial_response_frame(amqp_connection
 {
     save_old_state();
     default_state_initialization(connection, "WaitingOnSaslInitialResponseFrame");
-    connection->state.sasl.messages.init = received_sasl_initial_response_frame;
+    connection->state.sasl.frame.init = received_sasl_initial_response_frame;
     trace_transition(old_state_name);
 }
 
@@ -334,7 +346,7 @@ static void transition_to_waiting_on_sasl_challenge_response_frame(amqp_connecti
 {
     save_old_state();
     default_state_initialization(connection, "WaitingOnSaslInitialResponseFrame");
-    connection->state.sasl.messages.init = received_sasl_challenge_response_frame;
+    connection->state.sasl.frame.init = received_sasl_challenge_response_frame;
     trace_transition(old_state_name);
 }
 
@@ -393,40 +405,15 @@ static void default_tunnel_establish(amqp_connection_t *connection, uint32_t ver
     illegal_state(connection, "TunnelEstablish");
 }
 
-static void default_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *frame)
-{
-    illegal_state(connection, "SaslMechanisms");
-}
-
-static void default_sasl_init(amqp_connection_t *connection, amqp_frame_t *frame)
-{
-    illegal_state(connection, "SaslInit");
-}
-
-static void default_sasl_challenge(amqp_connection_t *connection, amqp_frame_t *frame)
-{
-    illegal_state(connection, "SaslChallenge");
-}
-
-static void default_sasl_challenge_response(amqp_connection_t *connection, amqp_frame_t *frame)
-{
-    illegal_state(connection, "SaslChallengeResponse");
-}
-
-static void default_sasl_outcome(amqp_connection_t *connection, amqp_frame_t *frame)
-{
-    illegal_state(connection, "SaslOutcome");
-}
-
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
 {
     connection->state.sasl.connect = default_connect;
     connection->state.sasl.done = default_done;
     connection->state.sasl.tunnel.accept = default_tunnel_establish;
-    connection->state.sasl.messages.mechanisms = default_sasl_mechanisms;
-    connection->state.sasl.messages.init = default_sasl_init;
-    connection->state.sasl.messages.challenge = default_sasl_challenge;
-    connection->state.sasl.messages.response = default_sasl_challenge_response;
-    connection->state.sasl.messages.outcome = default_sasl_outcome;
+    connection->state.sasl.frame.mechanisms = received_out_of_sequence_sasl_frame;
+    connection->state.sasl.frame.init = received_out_of_sequence_sasl_frame;
+    connection->state.sasl.frame.challenge = received_out_of_sequence_sasl_frame;
+    connection->state.sasl.frame.response = received_out_of_sequence_sasl_frame;
+    connection->state.sasl.frame.outcome = received_out_of_sequence_sasl_frame;
     connection->state.sasl.name = new_state_name;
 }

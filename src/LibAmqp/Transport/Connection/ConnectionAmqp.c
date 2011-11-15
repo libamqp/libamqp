@@ -17,6 +17,7 @@
 #include "Context/Context.h"
 #include "Transport/Connection/Connection.h"
 #include "Transport/Connection/ConnectionTrace.h"
+#include "Transport/Frame/Frame.h"
 
 #ifdef LIBAMQP_TRACE_CONNECT_STATE
 #define save_old_state()  const char* old_state_name = connection->state.amqp.name
@@ -47,29 +48,39 @@ int amqp_connection_amqp_is_state(const amqp_connection_t *connection, const cha
     return connection->state.amqp.name != 0 ? (strcmp(connection->state.amqp.name, state_name) == 0) : false;
 }
 
+void amqp_received_out_of_sequence_frame(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    amqp_connection_error(connection, AMQP_ERROR_OUT_OF_SEQUENCE_AMQP_FRAME,
+                "Received an out of sequence AMQP frame. Frame id: %llu while state is\"%s\" and connection is \"%s\". Aborting connection.",
+                (unsigned long long) amqp_frame_descriptor_full_id(frame), connection->state.sasl.name, connection->state.connection.name);
+
+    amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_AMQP_ERROR | AMQP_CONNECTION_FRAME_SEQUENCE_ERROR);
+
+    // TODO - consider if fail is the right action
+    connection->state.connection.fail(connection);
+}
+
 //static
 void amqp_done_callback(amqp_connection_t *connection)
 {
     connection->state.amqp.done(connection);
 }
 
-static void start_while_initialized(amqp_connection_t *connection)
+static void send_open_while_initialized(amqp_connection_t *connection)
 {
     not_implemented(todo);
 }
-static void wait_while_initialized(amqp_connection_t *connection)
+static void wait_on_open_while_initialized(amqp_connection_t *connection)
 {
     not_implemented(todo);
 }
 static void transition_to_initialized(amqp_connection_t *connection)
 {
     default_state_initialization(connection, "Initialized");
-    connection->state.amqp.start = start_while_initialized;
-    connection->state.amqp.wait = wait_while_initialized;
+    connection->state.amqp.send_open = send_open_while_initialized;
+    connection->state.amqp.wait_on_open = wait_on_open_while_initialized;
     trace_transition("Initialized");
 }
-
-
 
 /**********************************************
  Default states
@@ -82,14 +93,14 @@ static void illegal_state(amqp_connection_t *connection, const char *event)
     amqp_fatal_program_error("Connection amqp state error");
 }
 
-static void default_start(amqp_connection_t *connection)
+static void default_send_open(amqp_connection_t *connection)
 {
-    illegal_state(connection, "Start");
+    illegal_state(connection, "SendOpen");
 }
 
-static void default_wait(amqp_connection_t *connection)
+static void default_wait_on_open(amqp_connection_t *connection)
 {
-    illegal_state(connection, "Wait");
+    illegal_state(connection, "WaitOnOpen");
 }
 
 static void default_done(amqp_connection_t *connection)
@@ -99,9 +110,20 @@ static void default_done(amqp_connection_t *connection)
 
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
 {
-    connection->state.amqp.start = default_start;
-    connection->state.amqp.wait = default_wait;
+    connection->state.amqp.send_open = default_send_open;
+    connection->state.amqp.wait_on_open = default_wait_on_open;
     connection->state.amqp.done = default_done;
+
+    connection->state.amqp.frame.open = amqp_received_out_of_sequence_frame;
+    connection->state.amqp.frame.begin = amqp_received_out_of_sequence_frame;
+    connection->state.amqp.frame.attach = amqp_received_out_of_sequence_frame;
+    connection->state.amqp.frame.flow = amqp_received_out_of_sequence_frame;
+    connection->state.amqp.frame.transfer = amqp_received_out_of_sequence_frame;
+    connection->state.amqp.frame.disposition = amqp_received_out_of_sequence_frame;
+    connection->state.amqp.frame.detach = amqp_received_out_of_sequence_frame;
+    connection->state.amqp.frame.end = amqp_received_out_of_sequence_frame;
+    connection->state.amqp.frame.close = amqp_received_out_of_sequence_frame;
+    connection->state.amqp.frame.empty = amqp_received_out_of_sequence_frame;
 
     connection->state.amqp.name = new_state_name;
 }

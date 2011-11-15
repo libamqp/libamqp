@@ -176,7 +176,7 @@ typedef struct amqp_connection_sasl_state_t
         amqp_message_dispatch_t challenge;
         amqp_message_dispatch_t response;
         amqp_message_dispatch_t outcome;
-    } messages;
+    } frame;
 } amqp_connection_sasl_state_t;
 
 typedef struct amqp_connection_amqp_tunnel_state_t
@@ -190,9 +190,9 @@ typedef struct amqp_connection_amqp_tunnel_state_t
 typedef struct amqp_connection_amqp_state_t
 {
     const char *name;
-    amqp_connection_action_f start;
-    amqp_connection_action_f wait;
     amqp_connection_action_f done;
+    amqp_connection_action_f send_open;
+    amqp_connection_action_f wait_on_open;
     struct {
         amqp_message_dispatch_t open;
         amqp_message_dispatch_t begin;
@@ -203,7 +203,9 @@ typedef struct amqp_connection_amqp_state_t
         amqp_message_dispatch_t detach;
         amqp_message_dispatch_t end;
         amqp_message_dispatch_t close;
-    } messages;
+        
+        amqp_message_dispatch_t empty;
+    } frame;
 } amqp_connection_amqp_state_t;
 
 typedef struct amqp_connection_frame_reader_state_t
@@ -230,8 +232,6 @@ typedef struct amqp_connection_state_t
             amqp_connection_negotiate_callback_f reject;
         } server;
     } mode;
-//    amqp_connection_write_f write;
-//    amqp_connection_read_f read;
     amqp_connection_read_callback_f read_done;
     amqp_connection_action_f done;
     amqp_connection_action_f fail;

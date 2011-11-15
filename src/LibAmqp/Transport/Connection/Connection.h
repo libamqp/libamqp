@@ -80,6 +80,8 @@ enum amqp_connection_failure_flags
     AMQP_CONNECTION_AMQP_ERROR = 0x0400,
     AMQP_CONNECTION_SASL_FRAME_DECODE_ERROR = 0x0800,
     AMQP_CONNECTION_AMQP_FRAME_DECODE_ERROR = 0x1000,
+    AMQP_CONNECTION_FRAME_SEQUENCE_ERROR = 0x2000,
+
 };
 
 extern amqp_connection_t *amqp_connection_create(amqp_context_t *context);
