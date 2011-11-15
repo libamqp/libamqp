@@ -36,7 +36,7 @@ static void transition_to_waiting_on_tls_tunnelled_request(amqp_connection_t *co
 static void transition_to_accepting_sasl(amqp_connection_t *connection);
 static void transition_to_waiting_on_amqp_negotiation_request(amqp_connection_t *connection);
 static void transition_to_accepting_amqp(amqp_connection_t *connection);
-static void transition_to_accepted(amqp_connection_t *connection);
+static void transition_to_tunnel_accepted(amqp_connection_t *connection);
 static void transition_to_sending_error_message(amqp_connection_t *connection);
 
 static void client_request_callback(amqp_connection_t *connection, uint32_t requested_protocol_version)
@@ -124,7 +124,7 @@ static void establish_tunnel_after_client_request(amqp_connection_t *connection,
 
     case AMQP_PROTOCOL_ID:
         transition_to_accepting_amqp(connection);
-        call_action(connection->state.amqp.tunnel.accept, connection->context, connection, requested_protocol_version);
+        call_action(connection->state.amqp_tunnel.tunnel.accept, connection->context, connection, requested_protocol_version);
         break;
 
     default:
@@ -251,7 +251,7 @@ static void transition_to_waiting_on_amqp_negotiation_request(amqp_connection_t 
 static void done_while_accepting_amqp(amqp_connection_t *connection)
 {
     amqp_connection_flag_set(connection, AMQP_CONNECTION_AMQP_CONNECTED);
-    transition_to_accepted(connection);
+    transition_to_tunnel_accepted(connection);
     // TODO - wait for the client to establish a link
 }
 static void fail_while_accepting_amqp(amqp_connection_t *connection)
@@ -275,16 +275,14 @@ static void transition_to_accepting_amqp(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
-static void shutdown_while_accepted(amqp_connection_t *connection)
+static void shutdown_while_tunnel_accepted(amqp_connection_t *connection)
 {
     connection->state.connection.drain(connection);
 }
-static void transition_to_accepted(amqp_connection_t *connection)
+static void transition_to_tunnel_accepted(amqp_connection_t *connection)
 {
     save_old_state();
-
     amqp__connection_default_state_initialization(connection, "Accepted");
-    connection->state.connection.shutdown = shutdown_while_accepted;
-
+    connection->state.connection.shutdown = shutdown_while_tunnel_accepted;
     trace_transition(old_state_name);
 }

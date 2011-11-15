@@ -398,11 +398,35 @@ static void default_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t 
     illegal_state(connection, "SaslMechanisms");
 }
 
+static void default_sasl_init(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    illegal_state(connection, "SaslInit");
+}
+
+static void default_sasl_challenge(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    illegal_state(connection, "SaslChallenge");
+}
+
+static void default_sasl_challenge_response(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    illegal_state(connection, "SaslChallengeResponse");
+}
+
+static void default_sasl_outcome(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    illegal_state(connection, "SaslOutcome");
+}
+
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
 {
     connection->state.sasl.connect = default_connect;
     connection->state.sasl.done = default_done;
     connection->state.sasl.tunnel.accept = default_tunnel_establish;
     connection->state.sasl.messages.mechanisms = default_sasl_mechanisms;
+    connection->state.sasl.messages.init = default_sasl_init;
+    connection->state.sasl.messages.challenge = default_sasl_challenge;
+    connection->state.sasl.messages.response = default_sasl_challenge_response;
+    connection->state.sasl.messages.outcome = default_sasl_outcome;
     connection->state.sasl.name = new_state_name;
 }

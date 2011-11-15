@@ -28,9 +28,6 @@
 
 static void transition_to_initialized(amqp_connection_t *connection);
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name);
-static void transition_to_failed(amqp_connection_t *connection);
-static void transition_to_sending_header_response(amqp_connection_t *connection);
-static void transition_to_negotiated(amqp_connection_t *connection);
 
 void amqp_connection_amqp_initialize(amqp_connection_t *connection)
 {
@@ -42,7 +39,6 @@ static void cleanup_resources(amqp_connection_t *connection)
 }
 void amqp_connection_amqp_cleanup(amqp_connection_t *connection)
 {
-//    trace_cleanup();
     cleanup_resources(connection);
 }
 
@@ -51,81 +47,29 @@ int amqp_connection_amqp_is_state(const amqp_connection_t *connection, const cha
     return connection->state.amqp.name != 0 ? (strcmp(connection->state.amqp.name, state_name) == 0) : false;
 }
 
-static void amqp_done_callback(amqp_connection_t *connection)
+//static
+void amqp_done_callback(amqp_connection_t *connection)
 {
     connection->state.amqp.done(connection);
 }
 
-static void amqp_version_accepted(amqp_connection_t *connection)
+static void start_while_initialized(amqp_connection_t *connection)
 {
-    transition_to_negotiated(connection);
-    connection->specification_version.supported.amqp = connection->specification_version.required.amqp;
-    connection->state.connection.done(connection);
+    not_implemented(todo);
 }
-static void amqp_version_rejected(amqp_connection_t *connection, uint32_t version)
+static void wait_while_initialized(amqp_connection_t *connection)
 {
-    transition_to_failed(connection);
-    connection->specification_version.supported.amqp = version;
-    connection->state.connection.fail(connection);
-}
-static void amqp_connect_while_initialized(amqp_connection_t *connection)
-{
-    connection->state.negotiator.reset(connection);
-    connection->state.negotiator.start(connection, connection->specification_version.required.amqp, amqp_version_accepted, amqp_version_rejected);
-}
-
-static void tunnel_accept_while_initialized(amqp_connection_t *connection, uint32_t requested_version)
-{
-    uint32_t supported_version;
-
-    assert(amqp_version_protocol_id(requested_version) == AMQP_PROTOCOL_ID);
-
-    supported_version = amqp_negotiator_choose_amqp_protocol_version(connection, requested_version);
-
-    if (requested_version != supported_version)
-    {
-        transition_to_failed(connection);
-        amqp_connection_trace(connection, "requested amqp version: %08x, supported version: %08x", requested_version, supported_version);
-        call_action(connection->state.connection.mode.server.reject, connection->context, connection, supported_version);
-        return;
-    }
-
-    transition_to_sending_header_response(connection);
-    call_action(connection->state.negotiator.send, connection->context, connection, supported_version, amqp_done_callback);
+    not_implemented(todo);
 }
 static void transition_to_initialized(amqp_connection_t *connection)
 {
     default_state_initialization(connection, "Initialized");
-    connection->state.amqp.connect = amqp_connect_while_initialized;
-    connection->state.amqp.tunnel.accept = tunnel_accept_while_initialized;
-    trace_transition("Created");
-}
-static void transition_to_failed(amqp_connection_t *connection)
-{
-    save_old_state();
-    default_state_initialization(connection, "Failed");
-    trace_transition(old_state_name);
+    connection->state.amqp.start = start_while_initialized;
+    connection->state.amqp.wait = wait_while_initialized;
+    trace_transition("Initialized");
 }
 
-static void done_while_sending_header_response(amqp_connection_t *connection)
-{
-    transition_to_negotiated(connection);
-    call_action(connection->state.connection.done, connection->context, connection);
-}
-static void transition_to_sending_header_response(amqp_connection_t *connection)
-{
-    save_old_state();
-    default_state_initialization(connection, "SendingHeader");
-    connection->state.amqp.done = done_while_sending_header_response;
-    trace_transition(old_state_name);
-}
 
-static void transition_to_negotiated(amqp_connection_t *connection)
-{
-    save_old_state();
-    default_state_initialization(connection, "Negotiated");
-    trace_transition(old_state_name);
-}
 
 /**********************************************
  Default states
@@ -138,9 +82,14 @@ static void illegal_state(amqp_connection_t *connection, const char *event)
     amqp_fatal_program_error("Connection amqp state error");
 }
 
-static void default_connect(amqp_connection_t *connection)
+static void default_start(amqp_connection_t *connection)
 {
     illegal_state(connection, "Start");
+}
+
+static void default_wait(amqp_connection_t *connection)
+{
+    illegal_state(connection, "Wait");
 }
 
 static void default_done(amqp_connection_t *connection)
@@ -148,16 +97,11 @@ static void default_done(amqp_connection_t *connection)
     illegal_state(connection, "Done");
 }
 
-static void default_tunnel_establish(amqp_connection_t *connection, uint32_t version)
-{
-    illegal_state(connection, "TunnelEstablish");
-}
-
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
 {
-    connection->state.amqp.connect = default_connect;
+    connection->state.amqp.start = default_start;
+    connection->state.amqp.wait = default_wait;
     connection->state.amqp.done = default_done;
 
-    connection->state.amqp.tunnel.accept = default_tunnel_establish;
     connection->state.amqp.name = new_state_name;
 }
