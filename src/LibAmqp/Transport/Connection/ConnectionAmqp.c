@@ -33,6 +33,8 @@ static void default_state_initialization(amqp_connection_t *connection, const ch
 static void transition_to_writing_open_frame(amqp_connection_t *connection);
 static void transition_to_open_sent(amqp_connection_t *connection);
 
+static void transition_to_waiting_for_open_frame(amqp_connection_t *connection);
+
 void amqp_connection_amqp_initialize(amqp_connection_t *connection)
 {
     transition_to_initialized(connection);
@@ -58,6 +60,7 @@ void amqp_received_out_of_sequence_frame(amqp_connection_t *connection, amqp_fra
                 (unsigned long long) amqp_frame_descriptor_full_id(frame), connection->state.sasl.name, connection->state.connection.name);
 
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_AMQP_ERROR | AMQP_CONNECTION_FRAME_SEQUENCE_ERROR);
+    amqp_frame_cleanup(connection->context, frame);
     connection->state.amqp.close(connection);
 }
 
@@ -104,8 +107,9 @@ void send_open_while_initialized(amqp_connection_t *connection)
 static
 void wait_on_open_while_initialized(amqp_connection_t *connection)
 {
+    transition_to_waiting_for_open_frame(connection);
     connection->state.frame.enable(connection);
-    not_implemented(todo);
+    connection->state.frame.read(connection, connection->buffer.read, frame_available_callback);
 }
 static
 void transition_to_initialized(amqp_connection_t *connection)
@@ -142,6 +146,17 @@ static void transition_to_open_sent(amqp_connection_t *connection)
 /**********************************************
  Server states
  *********************************************/
+static void open_while_waiting_for_open_frame(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    amqp_process_open_frame(connection, frame);
+}
+static void transition_to_waiting_for_open_frame(amqp_connection_t *connection)
+{
+    save_old_state();
+    default_state_initialization(connection, "WaitingOnOpen");
+    connection->state.amqp.frame.open = open_while_waiting_for_open_frame;
+    trace_transition(old_state_name);
+}
 
 /**********************************************
  Default states

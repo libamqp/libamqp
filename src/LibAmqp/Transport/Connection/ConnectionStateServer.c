@@ -251,7 +251,7 @@ static void done_while_accepting_amqp(amqp_connection_t *connection)
 {
     amqp_connection_flag_set(connection, AMQP_CONNECTION_AMQP_CONNECTED);
     transition_to_tunnel_accepted(connection);
-    // TODO - wait for the client to establish a link
+    connection->state.amqp.wait_on_open(connection);
 }
 static void fail_while_accepting_amqp(amqp_connection_t *connection)
 {

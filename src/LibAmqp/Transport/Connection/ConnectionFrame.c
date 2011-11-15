@@ -188,7 +188,6 @@ static void illegal_state(amqp_connection_t *connection, const char *event)
 
 static void default_enable(amqp_connection_t *connection)
 {
-    illegal_state(connection, "Enable");
 }
 static void default_read(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_frame_available_f frame_available_callback)
 {

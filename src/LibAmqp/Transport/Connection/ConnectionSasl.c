@@ -83,6 +83,8 @@ static void received_out_of_sequence_sasl_frame(amqp_connection_t *connection, a
 
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_SASL_ERROR | AMQP_CONNECTION_FRAME_SEQUENCE_ERROR);
 
+    amqp_frame_cleanup(connection->context, frame);
+
     // TODO - consider if fail is the right action
     connection->state.connection.fail(connection);
 }

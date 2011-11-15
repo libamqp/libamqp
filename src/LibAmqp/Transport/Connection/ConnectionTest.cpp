@@ -161,4 +161,15 @@ SUITE(Connection)
         amqp_connection_shutdown(context, connection);
         loop_while_running();
     }
+
+    TEST_FIXTURE(ConnectionFixture, connection_should_open_amqp_connection)
+    {
+        connection->state.connection.mode.client.connect(connection, "localhost", 54321);
+        loop_until_connection_state_is("AqmpTunnelEstablished");
+        loop_until_connection_amqp_state_is("OpenSent");
+        CHECK_EQUAL("OpenSent", connection->state.amqp.name);
+        amqp_connection_shutdown(context, connection);
+        loop_while_running();
+        CHECK(0);
+    }
 }

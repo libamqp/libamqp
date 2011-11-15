@@ -58,6 +58,18 @@ SUITE(ConnectionAmqp)
 
     TEST_FIXTURE(ConnectionAmqpFixture, amqp_send_open)
     {
+        connection->state.amqp.send_open(connection);
+
+        CHECK_EQUAL("OpenSent", connection->state.amqp.name);
+
+        frame = amqp_decode_amqp_frame(context, write_copy);
+        ASSERT(frame != 0);
+//        amqp_type_dump(context, 1, frame->type);
+        CHECK_EQUAL(0x10U, frame->descriptor.id);
+    }
+
+    TEST_FIXTURE(ConnectionAmqpFixture, amqp_send_open_reply)
+    {
 //        {
 //            &test_data::sasl_protocol_1_0_0,
 //            &test_data::sasl_mechanisms_frame,
@@ -67,14 +79,14 @@ SUITE(ConnectionAmqp)
 //
 //        set_test_data_for_read(test_frames);
 
-        connection->state.amqp.send_open(connection);
-
-        CHECK_EQUAL("OpenSent", connection->state.amqp.name);
-
-        frame = amqp_decode_amqp_frame(context, write_copy);
-        ASSERT(frame != 0);
-        amqp_type_dump(context, 1, frame->type);
-        CHECK_EQUAL(0x10U, frame->descriptor.id);
+//        connection->state.amqp.send_open(connection);
+//
+//        CHECK_EQUAL("OpenSent", connection->state.amqp.name);
+//
+//        frame = amqp_decode_amqp_frame(context, write_copy);
+//        ASSERT(frame != 0);
+//        amqp_type_dump(context, 1, frame->type);
+//        CHECK_EQUAL(0x10U, frame->descriptor.id);
         CHECK(0);
     }
 
