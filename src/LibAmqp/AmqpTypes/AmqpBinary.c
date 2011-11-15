@@ -94,4 +94,27 @@ uint32_t amqp_binary_hash(amqp_binary_t *binary)
     return amqp_variable_hash(&binary->v);
 }
 
+int amqp_binary_index_of(amqp_binary_t *binary, int c, int starting_position)
+{
+    while (starting_position < binary->v.size)
+    {
+        if (amqp_binary_byte_get_at(binary, starting_position) == c)
+        {
+            return starting_position;
+        }
+        starting_position++;
+    }
+    return -1;
+}
 
+uint8_t *amqp_binary_sub_sequence(amqp_context_t *context, amqp_binary_t *binary, size_t start, size_t length)
+{
+    uint8_t *result = amqp_malloc(context, length + 1);
+    // TODO - use block copies
+    int i;
+    for (i = 0; i < length; i++)
+    {
+        result[i] = amqp_binary_byte_get_at(binary, start + i);
+    }
+    return result;
+}

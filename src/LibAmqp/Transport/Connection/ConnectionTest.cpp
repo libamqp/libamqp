@@ -79,7 +79,6 @@ SUITE(Connection)
         amqp_connection_shutdown(context, connection);
         loop_while_running();
         CHECK(!amqp_connection_is(connection, AMQP_CONNECTION_RUNNING));
-        CHECK(0);
     }
 
     class ConnectionHookFixture : public ConnectionFixture
@@ -105,8 +104,6 @@ SUITE(Connection)
         };
         return &hooks;
     }
-/*
-
     TEST_FIXTURE(ConnectionHookFixture, connection_should_reject_sasl_version)
     {
         context->debug.level = 0;
@@ -137,32 +134,32 @@ SUITE(Connection)
         connection->state.connection.mode.client.connect(connection, "localhost", 54321);
         loop_while_socket_state_is("Connecting");
         loop_while_connection_state_is("ConnectingSasl");
-        CHECK_EQUAL("ConnectingSasl", connection->state.connection.name);
+        CHECK_EQUAL("ConnectingAmqp", connection->state.connection.name);
         amqp_connection_shutdown(context, connection);
         loop_while_running();
         CHECK_EQUAL("Stopped", connection->state.connection.name);
     }
-*/
-//    TEST_FIXTURE(ConnectionFixture, connection_should_establish_amqp_tunnel)
-//    {
-//        connection->protocols = AMQP_PROTOCOL_AMQP;
-//        connection->state.connection.mode.client.connect(connection, "localhost", 54321);
-//        loop_while_socket_state_is("Connecting");
-//        loop_while_connection_state_is("ConnectingAmqp");
-//        CHECK_EQUAL("Connected", connection->state.connection.name);
-//        amqp_connection_shutdown(context, connection);
-//        loop_while_running();
-//        CHECK_EQUAL("Stopped", connection->state.connection.name);
-//    }
 
-//    TEST_FIXTURE(ConnectionFixture, connection_should_establish_sasl_and_amqp_tunnels)
-//    {
-//        connection->state.connection.mode.client.connect(connection, "localhost", 54321);
-//        loop_while_socket_state_is("Connecting");
-//        loop_while_connection_state_is("ConnectingSasl");
-//        loop_while_connection_state_is("ConnectingAmqp");
-//        CHECK_EQUAL("Connected", connection->state.connection.name);
-//        amqp_connection_shutdown(context, connection);
-//        loop_while_running();
-//    }
+    TEST_FIXTURE(ConnectionFixture, connection_should_establish_amqp_tunnel)
+    {
+        connection->protocols = AMQP_PROTOCOL_AMQP;
+        connection->state.connection.mode.client.connect(connection, "localhost", 54321);
+        loop_while_socket_state_is("Connecting");
+        loop_while_connection_state_is("ConnectingAmqp");
+        CHECK_EQUAL("AqmpTunnelEstablished", connection->state.connection.name);
+        amqp_connection_shutdown(context, connection);
+        loop_while_running();
+        CHECK_EQUAL("Stopped", connection->state.connection.name);
+    }
+
+    TEST_FIXTURE(ConnectionFixture, connection_should_establish_sasl_and_amqp_tunnels)
+    {
+        connection->state.connection.mode.client.connect(connection, "localhost", 54321);
+        loop_while_socket_state_is("Connecting");
+        loop_while_connection_state_is("ConnectingSasl");
+        loop_while_connection_state_is("ConnectingAmqp");
+        CHECK_EQUAL("AqmpTunnelEstablished", connection->state.connection.name);
+        amqp_connection_shutdown(context, connection);
+        loop_while_running();
+    }
 }

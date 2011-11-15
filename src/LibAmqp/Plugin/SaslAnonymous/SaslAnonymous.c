@@ -26,7 +26,8 @@ static void cleanup_instance_handler(amqp_context_t *context, amqp_sasl_plugin_t
     AMQP_FREE(context, sasl_plugin);
 }
 
-static amqp_type_t *initial_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_buffer_t *buffer, amqp_sasl_identity_t *identity_hooks)
+static
+amqp_type_t *initial_response_encoder(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_sasl_identity_t *identity_hooks, amqp_buffer_t *buffer)
 {
     const char *email;
 
@@ -37,11 +38,18 @@ static amqp_type_t *initial_response_handler(amqp_context_t *context, amqp_sasl_
     return amqp_encode_binary(context, buffer, (unsigned char *) email, strlen(email));
 }
 
+static
+int initial_response_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin, amqp_sasl_identity_t *identity_hooks, amqp_security_sasl_init_t *init_response)
+{
+    not_implemented(todo);
+}
+
 static amqp_sasl_plugin_t *instance_create_handler(amqp_context_t *context, amqp_sasl_plugin_t *sasl_plugin)
 {
     amqp_sasl_plugin_t *result = amqp_sasl_plugin_base_instance_create(context, sasl_plugin);
 
     result->essence.instance.cleanup_instance_handler = cleanup_instance_handler;
+    result->essence.instance.initial_response_encoder = initial_response_encoder;
     result->essence.instance.initial_response_handler = initial_response_handler;
 
     return result;

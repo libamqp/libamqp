@@ -26,6 +26,7 @@
 #include "Transport/Frame/Frame.h"
 
 #include "Transport/Sasl/ServerSasl.h"
+#include "Transport/Sasl/ClientSasl.h"
 
 #include "debug_helper.h"
 
@@ -56,12 +57,9 @@ SUITE(Sasl)
 
     TEST_FIXTURE(ServerSaslFixture, encode_sasl_mechanisms)
     {
-//        amqp_sasl_prepare_mechanisms_frame(connection);
-
-        CHECK(0);
-    /*
         test_data::sasl_mechanisms_frame.transfer_to(decode_buffer);
         frame = amqp_decode_sasl_frame(context, decode_buffer);
+
         ASSERT(frame != 0);
 
         amqp_sasl_process_mechanisms_frame(connection, frame);
@@ -76,6 +74,5 @@ SUITE(Sasl)
         CHECK(amqp_type_is_symbol(amqp_type_list_element(described, 0)));
         CHECK(amqp_type_is_binary(amqp_type_list_element(described, 1)));
         CHECK(amqp_type_is_string(amqp_type_list_element(described, 2)));
-     */
     }
 }

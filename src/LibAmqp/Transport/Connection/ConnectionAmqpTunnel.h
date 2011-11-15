@@ -14,27 +14,18 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_SASL_SERVER_SASL_H
-#define LIBAMQP_TRANSPORT_SASL_SERVER_SASL_H
+#ifndef LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_AMQP_TUNNEL_H
+#define LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_AMQP_TUNNEL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-#ifndef LIBAMQP_BUFFER_T_TYPE
-#define LIBAMQP_BUFFER_T_TYPE
-typedef struct amqp_buffer_t amqp_buffer_t;
-#endif
+#include "libamqp_common.h"
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
 #define LIBAMQP_AMQP_CONTEXT_TYPE_T
 typedef struct amqp_context_t amqp_context_t;
-#endif
-
-#ifndef LIBAMQP_AMQP_TYPE_T
-#define LIBAMQP_AMQP_TYPE_T
-typedef struct amqp_type_t amqp_type_t;
 #endif
 
 #ifndef LIBAMQP_AMQP_CONNECTION_TYPE_T
@@ -42,16 +33,9 @@ typedef struct amqp_type_t amqp_type_t;
 typedef struct amqp_connection_t amqp_connection_t;
 #endif
 
-#ifndef LIBAMQP_AMQP_FRAME_TYPE_T
-#define LIBAMQP_AMQP_FRAME_TYPE_T
-typedef struct amqp_frame_t amqp_frame_t;
-#endif
-
-
-extern int amqp_sasl_prepare_mechanisms_frame(amqp_connection_t *connection);
-
-extern int amqp_sasl_process_init_frame(amqp_connection_t *connection, amqp_frame_t *frame);
-extern int amqp_sasl_process_challenge_response_frame(amqp_connection_t *connection, amqp_frame_t *frame);
+extern void amqp_connection_amqp_tunnel_initialize(amqp_connection_t *connection);
+extern void amqp_connection_amqp_tunnel_cleanup(amqp_connection_t *connection);
+extern int amqp_connection_amqp_tunnel_is_state(const amqp_connection_t *connection, const char *state_name);
 
 #ifdef __cplusplus
 }

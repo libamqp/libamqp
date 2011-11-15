@@ -32,6 +32,7 @@ extern "C" {
 #include "Transport/Connection/ConnectionNegotiation.h"
 #include "Transport/Connection/ConnectionTls.h"
 #include "Transport/Connection/ConnectionSasl.h"
+#include "Transport/Connection/ConnectionAmqpTunnel.h"
 #include "Transport/Connection/ConnectionAmqp.h"
 #include "Transport/Connection/ConnectionFrame.h"
 
@@ -178,12 +179,20 @@ typedef struct amqp_connection_sasl_state_t
     } messages;
 } amqp_connection_sasl_state_t;
 
-typedef struct amqp_connection_amqp_state_t
+typedef struct amqp_connection_amqp_tunnel_state_t
 {
     const char *name;
     amqp_connection_action_f connect;
     amqp_connection_action_f done;
     amqp_connection_tunnel_actions_t tunnel;
+} amqp_connection_amqp_tunnel_state_t;
+
+typedef struct amqp_connection_amqp_state_t
+{
+    const char *name;
+    amqp_connection_action_f start;
+    amqp_connection_action_f wait;
+    amqp_connection_action_f done;
     struct {
         amqp_message_dispatch_t open;
         amqp_message_dispatch_t begin;
@@ -282,6 +291,7 @@ struct amqp_connection_t
 
         amqp_connection_tls_state_t tls;
         amqp_connection_sasl_state_t sasl;
+        amqp_connection_amqp_tunnel_state_t amqp_tunnel;
         amqp_connection_amqp_state_t amqp;
 
         amqp_connection_negotiator_state_t negotiator;

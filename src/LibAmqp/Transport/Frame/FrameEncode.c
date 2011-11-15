@@ -57,6 +57,7 @@ int amqp_encode_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, uint
     size_t performativce_offset, frame_size;
     int rc;
 
+    amqp_buffer_reset(buffer);
     amqp_buffer_advance_write_point(buffer, 8);
     performativce_offset = amqp_buffer_write_point(buffer);
 
@@ -104,7 +105,7 @@ static int amqp_sasl_init_field_encoder(amqp_connection_t *connection, amqp_buff
     }
 
     amqp_encode_symbol(connection->context, buffer, sasl_plugin->mechanism_name);
-    amqp_sasl_plugin_initial_response(connection->context, sasl_plugin, buffer, &connection->sasl.identity_hooks);
+    amqp_sasl_plugin_initial_response_encode(connection->context, sasl_plugin, &connection->sasl.identity_hooks, buffer);
     amqp_encode_string(connection->context, buffer, connection->socket.hostname ? connection->socket.hostname : "unknown-host");
     return 1;
 }
@@ -113,3 +114,37 @@ int  amqp_encode_sasl_init_frame(amqp_connection_t *connection, amqp_buffer_t *b
 {
     return amqp_encode_frame(connection, buffer, amqp_sasl_init_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_init_field_encoder, sasl_plugin);
 }
+
+
+static
+int amqp_sasl_outcome_field_encoder(amqp_connection_t *connection, amqp_buffer_t *buffer, void *arg)
+{
+    amqp_sasl_plugin_t *plugin = (amqp_sasl_plugin_t *) arg;
+    amqp_encode_ubyte(connection->context, buffer, plugin ? plugin->outcome : amqp_sasl_code_system_error);
+    return 1;
+}
+// TODO - this is only good when response is the result of init_reponse, not challenge response
+int  amqp_encode_sasl_outcome_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin)
+{
+    return amqp_encode_frame(connection, buffer, amqp_sasl_outcome_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_outcome_field_encoder, sasl_plugin);
+}
+
+//struct challenge_encoder_args
+//{
+//    amqp_sasl_plugin_t *plugin;
+//    amqp_security_sasl_init_t *init_response;
+//};
+//static int amqp_sasl_challenge_field_encoder(amqp_connection_t *connection, amqp_buffer_t *buffer, void *arg)
+//{
+//    struct challenge_encoder_args *challenge_encoder_args = (struct challenge_encoder_args *) arg;
+//
+//    amqp_sasl_plugin_challenge(connection->context, challenge_encoder_args->plugin, buffer, &connection->sasl.identity_hooks, challenge_encoder_args->init_response);
+//    return 1;
+//}
+int  amqp_encode_sasl_challenge_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin)
+{
+not_implemented(todo);
+//    struct challenge_encoder_args args = {.plugin = sasl_plugin, .init_response = init_response};
+//    return amqp_encode_frame(connection, buffer, amqp_sasl_challenge_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_challenge_field_encoder, &args);
+}
+

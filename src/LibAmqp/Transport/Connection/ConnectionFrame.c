@@ -82,6 +82,7 @@ static void read_while_enabled(amqp_connection_t *connection, amqp_buffer_t *buf
 {
     assert(connection && buffer && frame_available_callback);
 
+    amqp_buffer_reset(connection->buffer.read);
     transition_to_reading_frame_header(connection);
     connection->io.frame.buffer = buffer;
     connection->io.frame.frame_available_callback = frame_available_callback;

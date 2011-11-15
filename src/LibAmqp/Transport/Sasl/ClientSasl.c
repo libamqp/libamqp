@@ -66,13 +66,14 @@ int amqp_sasl_process_mechanisms_frame(amqp_connection_t *connection, amqp_frame
         return false;
     }
 }
+
 int amqp_sasl_process_challenge_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
     not_implemented(todo);
 }
+
 int amqp_sasl_process_outcome_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
     assert(frame && connection->sasl.plugin);
-
-    return amqp_sasl_plugin_outcome(connection->context, connection->sasl.plugin, &frame->frames.sasl.outcome);
+    return amqp_sasl_plugin_handle_outcome(connection->context, connection->sasl.plugin, &frame->frames.sasl.outcome);
 }

@@ -92,7 +92,6 @@ int amqp_variable_compare_with_cstr(amqp_variable_t *lhs, const char *rhs)
     return amqp_variable_compare_with_bytes(lhs, (const uint8_t *) rhs, strlen(rhs));
 }
 
-
 uint32_t amqp_variable_hash(amqp_variable_t *variable)
 {
     assert(variable != 0);

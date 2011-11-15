@@ -33,8 +33,7 @@ static void transition_to_connecting_socket(amqp_connection_t *connection);
 static void transition_to_connecting_tls(amqp_connection_t *connection);
 static void transition_to_connecting_sasl(amqp_connection_t *connection);
 static void transition_to_connecting_amqp(amqp_connection_t *connection);
-static void transition_to_connected(amqp_connection_t *connection);
-//static void transition_to_negotiating(amqp_connection_t *connection);
+static void transition_to_amqp_tunnel_established(amqp_connection_t *connection);
 
 void amqp_connection_client_state_initialize(amqp_connection_t *connection)
 {
@@ -80,7 +79,7 @@ static void start_next_protocol_on_connection(amqp_connection_t *connection)
     {
         transition_to_connecting_amqp(connection);
         clear_protocol_flag(connection, AMQP_PROTOCOL_AMQP);
-        connection->state.amqp.connect(connection);
+        connection->state.amqp_tunnel.connect(connection);
         return;
     }
 
@@ -161,8 +160,7 @@ static void transition_to_connecting_sasl(amqp_connection_t *connection)
 static void done_while_connecting_amqp(amqp_connection_t *connection)
 {
     amqp_connection_flag_set(connection, AMQP_CONNECTION_AMQP_CONNECTED);
-    transition_to_connected(connection);
-    // TODO - establish link
+    transition_to_amqp_tunnel_established(connection);
 }
 static void fail_while_connecting_amqp(amqp_connection_t *connection)
 {
@@ -181,44 +179,16 @@ static void transition_to_connecting_amqp(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
-//
-//static void shutdown_while_negotiating(amqp_connection_t *connection)
-//{
-//    connection->state.methods.stop(connection, false);
-//}
-//static void negotiation_complete_while_negotiating(amqp_connection_t *connection)
-//{
-//    amqp_connection_flag_set(connection, AMQP_CONNECTION_NEGOTIATED);
-//    transition_to_connected(connection);
-//}
-//static void negotiation_rejected_while_negotiating(amqp_connection_t *connection)
-//{
-//    amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_NEGOTIATION_REJECTED);
-//    connection->state.methods.stop(connection, true);
-//}
-// void transition_to_negotiating(amqp_connection_t *connection)
-//{
-//    save_old_state();
-//
-//    amqp__connection_default_state_initialization(connection, "Negotiating");
-//    connection->state.connection.shutdown = shutdown_while_negotiating;
-//    connection->state.connection.negotiation_complete = negotiation_complete_while_negotiating;
-//    connection->state.connection.negotiation_rejected = negotiation_rejected_while_negotiating;
-//
-//    trace_transition(old_state_name);
-//}
-
-static void shutdown_while_connected(amqp_connection_t *connection)
+static void shutdown_while_amqp_tunnel_established(amqp_connection_t *connection)
 {
-    // TODO - send close frames, etc
-    connection->state.connection.drain(connection);
+    connection->state.connection.hangup(connection);
 }
-static void transition_to_connected(amqp_connection_t *connection)
+static void transition_to_amqp_tunnel_established(amqp_connection_t *connection)
 {
     save_old_state();
 
-    amqp__connection_default_state_initialization(connection, "Connected");
-    connection->state.connection.shutdown = shutdown_while_connected;
+    amqp__connection_default_state_initialization(connection, "AqmpTunnelEstablished");
+    connection->state.connection.shutdown = shutdown_while_amqp_tunnel_established;
 
     trace_transition(old_state_name);
 }

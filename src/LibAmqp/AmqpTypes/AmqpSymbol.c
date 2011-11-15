@@ -94,7 +94,6 @@ amqp_symbol_t *amqp_symbol_create_from_type(amqp_context_t *context, amqp_type_t
     return result;
 }
 
-
 void amqp_symbol_hash_table_initialize(amqp_context_t *context, amqp_hash_table_t *map, int initial_capacity)
 {
     amqp_hash_table_initialize(context, map, initial_capacity, (amqp_hash_fn_t) amqp_symbol_hash, (amqp_compare_fn_t) amqp_symbol_compare);

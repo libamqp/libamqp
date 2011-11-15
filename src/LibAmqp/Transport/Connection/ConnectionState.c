@@ -56,6 +56,7 @@ void amqp_connection_state_initialize(amqp_connection_t *connection)
     amqp_connection_negotiator_initialize(connection);
     amqp_connection_tls_initialize(connection);
     amqp_connection_sasl_initialize(connection);
+    amqp_connection_amqp_tunnel_initialize(connection);
     amqp_connection_amqp_initialize(connection);
     amqp_connection_frame_reader_initialize(connection);
     connection->timer = amqp_timer_initialize(connection->context, timer_expiry_handler, connection);
@@ -67,6 +68,7 @@ void amqp_connection_state_cleanup(amqp_connection_t *connection)
     amqp_connection_frame_reader_cleanup(connection);
     amqp_connection_negotiator_cleanup(connection);
     amqp_connection_amqp_cleanup(connection);
+    amqp_connection_amqp_tunnel_cleanup(connection);
     amqp_connection_sasl_cleanup(connection);
     amqp_connection_tls_cleanup(connection);
     amqp_connection_reader_cleanup(connection);
