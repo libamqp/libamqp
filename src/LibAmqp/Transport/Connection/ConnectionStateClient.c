@@ -181,7 +181,7 @@ static void transition_to_connecting_amqp(amqp_connection_t *connection)
 
 static void shutdown_while_amqp_tunnel_established(amqp_connection_t *connection)
 {
-    connection->state.connection.hangup(connection);
+    connection->state.amqp.close(connection);
 }
 static void transition_to_amqp_tunnel_established(amqp_connection_t *connection)
 {

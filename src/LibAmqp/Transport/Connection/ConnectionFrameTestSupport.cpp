@@ -46,7 +46,7 @@ namespace SuiteConnectionFrame
 
     ConnectionFrameFixture::ConnectionFrameFixture()
     {
-        write_copy = 0;
+        write_copy = amqp_allocate_buffer(context);
         buffer = amqp_allocate_buffer(context);
 
         connection = amqp_connection_create(context);
@@ -64,10 +64,6 @@ namespace SuiteConnectionFrame
 
     void ConnectionFrameFixture::write_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f write_callback)
     {
-        if (write_copy == 0)
-        {
-            write_copy = amqp_allocate_buffer(connection->context);
-        }
         amqp_buffer_reset(write_copy);
         amqp_buffer_put_buffer_contents(write_copy, buffer);
         if (connection->trace_flags & AMQP_TRACE_CONNECTION_WRITER)

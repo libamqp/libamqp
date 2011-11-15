@@ -193,6 +193,7 @@ typedef struct amqp_connection_amqp_state_t
     amqp_connection_action_f done;
     amqp_connection_action_f send_open;
     amqp_connection_action_f wait_on_open;
+    amqp_connection_action_f close;
     struct {
         amqp_message_dispatch_t open;
         amqp_message_dispatch_t begin;
@@ -222,7 +223,8 @@ typedef struct amqp_connection_state_t
     const char *name;
     amqp_connection_action_f hangup;        // Just pull the plug
     amqp_connection_action_f drain;         // Close output and drain input
-    amqp_connection_action_f shutdown;      // Allow write complete then pull the plug on any reads
+    amqp_connection_action_f close;      // Allow write complete then pull the plug on any reads
+    amqp_connection_action_f shutdown;
     union {
         struct {
             amqp_connection_connect_f connect;
@@ -336,6 +338,8 @@ struct amqp_connection_t
     } io;
     struct {
         uint32_t max_frame_size;
+        uint16_t channel_max;
+        uint32_t idle_time_out;
     } limits;
     amqp_accept_handler_arguments_t *accept_handler_arguments;
     amqp_timer_t *timer;

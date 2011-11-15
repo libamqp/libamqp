@@ -125,7 +125,7 @@ static
 void sasl_version_accepted_callback(amqp_connection_t *connection)
 {
     // The broker has accepted our preferred sasl version and will next send it's supported SASL mechanisms
-    amqp_connection_trace(connection, "SASL version accepted");
+//    amqp_connection_trace(connection, "SASL version accepted");
     connection->specification_version.supported.sasl = connection->specification_version.required.sasl;
     transition_to_waiting_on_sasl_mechanisms(connection);
 
@@ -136,7 +136,7 @@ void sasl_version_accepted_callback(amqp_connection_t *connection)
 }
 static void sasl_version_rejected_callback(amqp_connection_t *connection, uint32_t version)
 {
-    amqp_connection_trace(connection, "SASL version rejected");
+//    amqp_connection_trace(connection, "SASL version rejected");
     transition_to_failed(connection);
     connection->specification_version.supported.sasl = version;
     connection->state.connection.fail(connection);
@@ -288,7 +288,6 @@ static void transition_to_writing_sasl_mechanisms_frame(amqp_connection_t *conne
 
 static void received_sasl_initial_response_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-SOUTS("received_sasl_initial_response_frame");
     int rc = amqp_sasl_process_init_frame(connection, frame);
     amqp_frame_cleanup(connection->context, frame);
     switch (rc)

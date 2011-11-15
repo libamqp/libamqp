@@ -328,9 +328,14 @@ static void default_drain(amqp_connection_t *connection)
     shutdown_connection(connection, amqp_cs_complete_write_drain_input_and_close_socket);
 }
 
-static void default_shutdown(amqp_connection_t *connection)
+static void default_close(amqp_connection_t *connection)
 {
     shutdown_connection(connection, amqp_cs_complete_write_and_close_socket);
+}
+
+static void default_shutdown(amqp_connection_t *connection)
+{
+    connection->state.connection.close(connection);
 }
 
 static void default_connect(amqp_connection_t *connection, const char *hostname, int port)
@@ -347,16 +352,6 @@ static void default_reject(amqp_connection_t *connection, uint32_t version)
 {
     illegal_state(connection, "Reject");
 }
-
-//static void default_write(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback)
-//{
-//    illegal_state(connection, "Write");
-//}
-
-//static void default_read(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_action_f done_callback)
-//{
-//    illegal_state(connection, "Read");
-//}
 
 static void default_done(amqp_connection_t *connection)
 {
@@ -379,6 +374,7 @@ void amqp__connection_default_state_initialization(amqp_connection_t *connection
 
     connection->state.connection.hangup = default_hangup;
     connection->state.connection.drain = default_drain;
+    connection->state.connection.close = default_close;
     connection->state.connection.shutdown = default_shutdown;
 
     if (connection->flags & AMQP_CONNECTION_SOCKET_ACCEPTED)

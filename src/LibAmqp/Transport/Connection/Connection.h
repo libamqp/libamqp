@@ -125,6 +125,8 @@ inline static void amqp_connection_failure_flag_clear(amqp_connection_t *connect
     connection->failure_flags &= ~flags;
 }
 
+extern const char *amqp_connection_target_host(amqp_connection_t *connection);
+
 #ifdef __cplusplus
 }
 #endif

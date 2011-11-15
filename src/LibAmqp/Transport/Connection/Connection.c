@@ -30,6 +30,8 @@ static amqp_connection_t *create_connection(amqp_context_t *context)
     result->specification_version.required.amqp = AMQP_PREFERRED_VERSION;
 
     result->limits.max_frame_size = context->limits.max_frame_size;
+    result->limits.channel_max = context->limits.channel_max;
+    result->limits.idle_time_out = context->limits.idle_time_out;
 
     result->sasl.identity_hooks = context->sasl.identity_hooks;
     return result;
@@ -45,7 +47,7 @@ amqp_connection_t *amqp_connection_create(amqp_context_t *context)
 
 void amqp_connection_destroy(amqp_context_t *context, amqp_connection_t *connection)
 {
-    connection->state.connection.hangup(connection);
+    connection->state.connection.shutdown(connection);
     amqp_connection_state_cleanup(connection);
     AMQP_FREE(context, connection);
 }
@@ -114,4 +116,9 @@ void amqp_connection_read(amqp_context_t *context, amqp_connection_t *connection
 {
     assert(connection && connection->context && connection->context->thread_event_loop);
     not_implemented(amqp_connection_read);
+}
+
+const char *amqp_connection_target_host(amqp_connection_t *connection)
+{
+    return connection->socket.hostname ? connection->socket.hostname : "unknown-host";
 }
