@@ -40,7 +40,14 @@ int amqp_string_is_null(amqp_string_t *string)
 }
 
 extern void amqp_string_initialize_from_type(amqp_context_t *context, amqp_string_t *string, amqp_type_t *type);
-extern amqp_string_t  *amqp_string_clone(amqp_context_t *context, amqp_string_t *source_string);
+extern amqp_string_t *amqp_string_create(amqp_context_t *context, const char *data, size_t size);
+extern void amqp_string_initialize(amqp_context_t *context, amqp_string_t *string, const char *data, size_t size);
+static inline
+amqp_string_t *amqp_string_create_from_cstr(amqp_context_t *context, const char *s)
+{
+    return amqp_string_create(context, s, strlen(s));
+}
+extern amqp_string_t *amqp_string_clone(amqp_context_t *context, amqp_string_t *source_string);
 
 extern amqp_string_t *amqp_string_create_from_type(amqp_context_t *context,  amqp_type_t *type);
 

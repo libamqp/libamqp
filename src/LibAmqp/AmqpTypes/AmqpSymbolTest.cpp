@@ -232,4 +232,13 @@ SUITE(AmqpTypesSymbol)
         CHECK(amqp_symbol_compare_with_cstr(symbol_b, "ABC") == 0);
     }
 
+    TEST_FIXTURE(AmqpSymbolFixture, symbol_clone)
+    {
+        const char *value = "symbol";
+        amqp_symbol_initialize(context, &ref, value, strlen(value));
+        CHECK(amqp_symbol_compare_with_cstr(&ref, value) == 0);
+
+        symbol_b = amqp_symbol_clone(context, &ref);
+        CHECK(amqp_symbol_compare_with_cstr(symbol_b, value) == 0);
+    }
 }

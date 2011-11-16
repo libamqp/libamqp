@@ -117,8 +117,12 @@ int amqp_variable_to_bytes(amqp_variable_t *variable, uint8_t *buffer, size_t bu
 }
 uint8_t *amqp_variable_clone_data(amqp_context_t *context, amqp_variable_t *source)
 {
-    uint8_t *result = amqp_malloc(context, source->size);
-    amqp_variable_to_bytes(source, result, source->size);
+    uint8_t *result = 0;
+    if (source->data || source->type)
+    {
+        result = amqp_malloc(context, source->size);
+        amqp_variable_to_bytes(source, result, source->size);
+    }
     return result;
 }
 

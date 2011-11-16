@@ -74,6 +74,37 @@ amqp_binary_t *amqp_binary_create_from_type(amqp_context_t *context, amqp_type_t
     return result;
 }
 
+void amqp_binary_initialize(amqp_context_t *context, amqp_binary_t *binary, const uint8_t *data, size_t size)
+{
+    static amqp_fn_table_t table = {
+        .dtor = initialize_dtor
+    };
+    binary->leader.fn_table = &table;
+    amqp_variable_initialize(&binary->v, amqp_duplicate(context, (const uint8_t *) data, size), size);
+}
+
+static amqp_binary_t *binary_create(amqp_context_t *context, const uint8_t *data, size_t size)
+{
+    static amqp_fn_table_t table = {
+        .dtor = create_dtor
+    };
+
+    amqp_binary_t *result = AMQP_MALLOC(context, amqp_binary_t);
+    result->leader.fn_table = &table;
+    amqp_variable_initialize(&result->v, data, size);
+    return result;
+}
+
+amqp_binary_t *amqp_binary_create(amqp_context_t *context, const uint8_t *data, size_t size)
+{
+    return binary_create(context, amqp_duplicate(context, (const uint8_t *) data, size), size);
+}
+
+amqp_binary_t *amqp_binary_clone(amqp_context_t *context, amqp_binary_t *source)
+{
+    return binary_create(context, amqp_variable_clone_data(context, &source->v), source->v.size);
+}
+
 int amqp_binary_to_bytes(amqp_binary_t *binary, uint8_t *buffer, size_t buffer_size)
 {
     return amqp_variable_to_bytes(&binary->v, buffer, buffer_size);
