@@ -40,6 +40,8 @@ int amqp_string_is_null(amqp_string_t *string)
 }
 
 extern void amqp_string_initialize_from_type(amqp_context_t *context, amqp_string_t *string, amqp_type_t *type);
+extern amqp_string_t  *amqp_string_clone(amqp_context_t *context, amqp_string_t *source_string);
+
 extern amqp_string_t *amqp_string_create_from_type(amqp_context_t *context,  amqp_type_t *type);
 
 static inline
@@ -55,12 +57,15 @@ size_t amqp_string_size(amqp_string_t *string)
 }
 
 extern int amqp_string_to_bytes(amqp_string_t *string, uint8_t *buffer, size_t buffer_size);
+
 extern int amqp_string_compare(amqp_string_t *lhs, amqp_string_t *rhs);
 extern int amqp_string_compare_with_cstr(amqp_string_t *lhs, const char *rhs);
 extern int amqp_string_compare_with_bytes(amqp_string_t *lhs, const uint8_t *rhs, size_t size);
+
 extern uint32_t amqp_string_hash(amqp_string_t *string);
 
 extern int amqp_string_print(amqp_context_t *context, amqp_string_t *string);
+extern const char *amqp_string_to_cstr(amqp_context_t *context, amqp_string_t *string);
 
 #ifdef __cplusplus
 }

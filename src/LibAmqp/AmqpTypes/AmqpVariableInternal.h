@@ -53,16 +53,14 @@ static inline void amqp_variable_initialize_as_null(amqp_variable_t *variable)
 
 extern uint8_t *amqp_duplicate(amqp_context_t *context, const uint8_t *data, size_t size);
 
-static inline
-int amqp_variable_to_bytes(amqp_variable_t *variable, uint8_t *buffer, size_t buffer_size)
-{
-    return amqp_type_copy_to(variable->type, buffer, buffer_size);
-}
+extern int amqp_variable_to_bytes(amqp_variable_t *variable, uint8_t *buffer, size_t buffer_size);
 
 extern int amqp_variable_compare(amqp_variable_t *lhs, amqp_variable_t *rhs);
 extern int amqp_variable_compare_with_cstr(amqp_variable_t *lhs, const char *rhs);
 extern int amqp_variable_compare_with_bytes(amqp_variable_t *lhs, const uint8_t *rhs, size_t size);
 extern uint32_t amqp_variable_hash(amqp_variable_t *variable);
+
+extern uint8_t *amqp_variable_clone_data(amqp_context_t *context, amqp_variable_t *source);
 
 #ifdef __cplusplus
 }

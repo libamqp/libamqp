@@ -38,5 +38,6 @@ void amqp_process_open_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
     assert(frame->descriptor.id == 0x10);
 
-not_implemented(todo);
+    
+    not_implemented(todo);
 }

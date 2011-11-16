@@ -101,3 +101,24 @@ uint32_t amqp_variable_hash(amqp_variable_t *variable)
         amqp_hash((void *) variable->data, variable->size);
 }
 
+int amqp_variable_to_bytes(amqp_variable_t *variable, uint8_t *buffer, size_t buffer_size)
+{
+    assert(variable->type || variable->data);
+    if (variable->type)
+    {
+        return amqp_type_copy_to(variable->type, buffer, buffer_size);
+    }
+    else
+    {
+        size_t size = buffer_size <= variable->size ? buffer_size : variable->size;
+        memcpy(buffer, variable->data, size);
+        return size;
+    }
+}
+uint8_t *amqp_variable_clone_data(amqp_context_t *context, amqp_variable_t *source)
+{
+    uint8_t *result = amqp_malloc(context, source->size);
+    amqp_variable_to_bytes(source, result, source->size);
+    return result;
+}
+
