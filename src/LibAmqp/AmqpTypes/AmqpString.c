@@ -69,7 +69,7 @@ void amqp_string_initialize(amqp_context_t *context, amqp_string_t *string, cons
     };
     string->leader.fn_table = &table;
 
-    amqp_variable_initialize(&string->v, amqp_duplicate(context, (const uint8_t *) data, size), size);
+    amqp_variable_initialize(&string->v, (uint8_t *) amqp_duplicate(context, data, size), size);
 }
 
 amqp_string_t *amqp_string_create_from_type(amqp_context_t *context, amqp_type_t *type)
@@ -100,7 +100,7 @@ amqp_string_t *string_create(amqp_context_t *context, const uint8_t *data, size_
 
 amqp_string_t *amqp_string_create(amqp_context_t *context, const char *data, size_t size)
 {
-    return string_create(context, amqp_duplicate(context, (const uint8_t *) data, size), size);
+    return string_create(context, (uint8_t *) amqp_duplicate(context, data, size), size);
 }
 
 amqp_string_t *amqp_string_clone(amqp_context_t *context, amqp_string_t *source_string)

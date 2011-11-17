@@ -77,6 +77,10 @@ void amqp_connection_state_cleanup(amqp_connection_t *connection)
 
     amqp_deallocate_buffer(connection->context, connection->buffer.write);
     amqp_deallocate_buffer(connection->context, connection->buffer.read);
+    
+    AMQP_FREE(connection->context, connection->amqp.connection.local_container_id);
+    AMQP_FREE(connection->context, connection->amqp.connection.remote_container_id);
+    AMQP_FREE(connection->context, connection->amqp.connection.hostname);
 }
 
 int amqp_connection_is_state(const amqp_connection_t *connection, const char *state_name)

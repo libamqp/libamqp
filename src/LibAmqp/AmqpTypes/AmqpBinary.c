@@ -80,7 +80,7 @@ void amqp_binary_initialize(amqp_context_t *context, amqp_binary_t *binary, cons
         .dtor = initialize_dtor
     };
     binary->leader.fn_table = &table;
-    amqp_variable_initialize(&binary->v, amqp_duplicate(context, (const uint8_t *) data, size), size);
+    amqp_variable_initialize(&binary->v, (uint8_t *) amqp_duplicate(context, (const char *) data, size), size);
 }
 
 static amqp_binary_t *binary_create(amqp_context_t *context, const uint8_t *data, size_t size)
@@ -97,7 +97,7 @@ static amqp_binary_t *binary_create(amqp_context_t *context, const uint8_t *data
 
 amqp_binary_t *amqp_binary_create(amqp_context_t *context, const uint8_t *data, size_t size)
 {
-    return binary_create(context, amqp_duplicate(context, (const uint8_t *) data, size), size);
+    return binary_create(context, (uint8_t *) amqp_duplicate(context, (const char *) data, size), size);
 }
 
 amqp_binary_t *amqp_binary_clone(amqp_context_t *context, amqp_binary_t *source)

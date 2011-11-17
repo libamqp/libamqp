@@ -57,7 +57,7 @@ void amqp_symbol_initialize(amqp_context_t *context, amqp_symbol_t *symbol, cons
         .dtor = initialize_dtor
     };
     symbol->leader.fn_table = &table;
-    amqp_variable_initialize(&symbol->v, amqp_duplicate(context, (const uint8_t *) data, size), size);
+    amqp_variable_initialize(&symbol->v, (uint8_t *) amqp_duplicate(context, data, size), size);
 }
 
 static amqp_symbol_t *symbol_create(amqp_context_t *context, const uint8_t *data, size_t size)
@@ -74,7 +74,7 @@ static amqp_symbol_t *symbol_create(amqp_context_t *context, const uint8_t *data
 
 amqp_symbol_t *amqp_symbol_create(amqp_context_t *context, const char *data, size_t size)
 {
-    return symbol_create(context, amqp_duplicate(context, (const uint8_t *) data, size), size);
+    return symbol_create(context, (uint8_t *) amqp_duplicate(context, data, size), size);
 }
 
 amqp_symbol_t *amqp_symbol_clone(amqp_context_t *context, amqp_symbol_t *source)

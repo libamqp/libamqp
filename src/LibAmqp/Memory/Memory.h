@@ -21,6 +21,7 @@ extern "C"
 {
 #endif
 
+#include <stdint.h>
 #include <stdlib.h>
 
 #ifndef LIBAMQP_AMQP_CONTEXT_TYPE_T
@@ -55,6 +56,9 @@ extern "C"
     extern void amqp_free(amqp_context_t *c, const void *p);
 
     extern void amqp_reset_malloc_allocation_stats();
+
+    extern char *amqp_duplicate(amqp_context_t *context, const char *data, size_t size);
+    extern char *amqp_duplicate_cstr(amqp_context_t *context, const char *s);
 
 #ifdef __cplusplus
 }

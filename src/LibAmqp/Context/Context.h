@@ -161,6 +161,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
                 amqp_sasl_plugin_node_t *sasl_plugin_list;
                 amqp_messaging_methods_t messaging;
             } plugins;
+            const char *container_id;
         } reference;
 
         struct
@@ -168,13 +169,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
             amqp_sasl_identity_t identity_hooks;
         } sasl;
 
-        struct
-        {
-            const char *container_id;
-        } amqp;
-
         amqp_event_loop_t *thread_event_loop;
-        int clone_count;
     };
 
     extern amqp_context_t *amqp_create_context();

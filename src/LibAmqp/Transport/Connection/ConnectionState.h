@@ -336,17 +336,24 @@ struct amqp_connection_t
             uint32_t frame_size;
         } frame;
     } io;
-    struct {
-        uint32_t max_frame_size;
-        uint16_t channel_max;
-        uint32_t idle_time_out;
-    } limits;
     amqp_accept_handler_arguments_t *accept_handler_arguments;
     amqp_timer_t *timer;
     struct {
         amqp_sasl_identity_t identity_hooks;
         amqp_sasl_plugin_t *plugin;
     } sasl;
+    struct {
+        struct {
+            const char *local_container_id;
+            const char *remote_container_id;
+            const char *hostname;
+            struct {
+                uint32_t max_frame_size;
+                uint16_t channel_max;
+                uint32_t idle_time_out;
+            } limits;
+        } connection;
+    } amqp;
 };
 
 extern void amqp_connection_state_initialize(amqp_connection_t *connection);

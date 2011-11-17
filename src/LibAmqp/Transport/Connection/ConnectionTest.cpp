@@ -61,10 +61,12 @@ SUITE(Connection)
     TEST_FIXTURE(ConnectionFixture, fixture_should_balance_allocations)
     {
     }
+
     TEST_FIXTURE(ConnectionFixture, limits_should_be_initialized)
     {
-        CHECK_EQUAL(AMQP_DEFAULT_MAX_FRAME_SIZE, connection->limits.max_frame_size);
+        CHECK_EQUAL(AMQP_DEFAULT_MAX_FRAME_SIZE, connection->amqp.connection.limits.max_frame_size);
     }
+
     TEST_FIXTURE(ConnectionFixture, connection_should_establish_socket_link)
     {
         CHECK_EQUAL("Initialized", connection->state.writer.name);

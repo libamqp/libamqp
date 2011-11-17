@@ -151,15 +151,12 @@ int  amqp_encode_sasl_challenge_frame(amqp_connection_t *connection, amqp_buffer
 static
 int amqp_open_field_encoder(amqp_connection_t *connection, amqp_buffer_t *buffer, void *arg)
 {
-    amqp_encode_string(connection->context, buffer, connection->context->amqp.container_id);
+    amqp_encode_string(connection->context, buffer, connection->amqp.connection.local_container_id);
     amqp_encode_string(connection->context, buffer, amqp_connection_target_host(connection));
-    if (connection->limits.max_frame_size < AMQP_MIN_MAX_FRAME_SIZE)
-    {
-        connection->limits.max_frame_size = AMQP_MIN_MAX_FRAME_SIZE;
-    }
-    amqp_encode_uint(connection->context, buffer, connection->limits.max_frame_size);
-    amqp_encode_ushort(connection->context, buffer, connection->limits.channel_max);
-    amqp_encode_uint(connection->context, buffer, connection->limits.idle_time_out);
+
+    amqp_encode_uint(connection->context, buffer, connection->amqp.connection.limits.max_frame_size);
+    amqp_encode_ushort(connection->context, buffer, connection->amqp.connection.limits.channel_max);
+    amqp_encode_uint(connection->context, buffer, connection->amqp.connection.limits.idle_time_out);
 
     return 1;
 }

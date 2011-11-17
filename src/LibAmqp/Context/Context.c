@@ -64,7 +64,6 @@ amqp_create_context()
 
     amqp__context_with_guard_t *result = AMQP_MALLOC(0, amqp__context_with_guard_t);
 
-    result->context.clone_count = 0;
     result->context.config.putc = amqp_context_default_debug_putc;
     result->context.config.max_listen_queue_length = 5;
 
@@ -86,10 +85,11 @@ amqp_create_context()
 
     // Danger Will Robinson - using context while initialzing it. So, do last.
     result->context.reference.amqp_descriptors = amqp_load_descriptors(&result->context);
+    result->context.reference.container_id = generate_container_id(&result->context);
+
     amqp_initialize_default_messaging_methods(&result->context.reference.plugins.messaging);
 
     amqp_context_register_identity_hooks(&result->context, default_identity_hook, default_identity_hook, default_identity_hook);
-    result->context.amqp.container_id = generate_container_id(&result->context);
 
     return (amqp_context_t *) result;
 }
@@ -99,8 +99,6 @@ amqp_context_t *amqp_context_clone(amqp_context_t *context)
     assert(context != 0);
 
     amqp__context_with_guard_t *result = AMQP_MALLOC(0, amqp__context_with_guard_t);
-
-    result->context.clone_count = context->clone_count++; // TODO - use a shared, safe, non static value
 
     result->context.config.putc = context->config.putc;
     result->context.config.max_listen_queue_length = context->config.max_listen_queue_length;
@@ -151,12 +149,12 @@ int amqp_context_destroy(amqp_context_t *context)
         }
         ((amqp__context_with_guard_t *) context)->multiple_delete_protection = 0;
 
-        amqp_free(context, context->amqp.container_id);
-        
+
         if (!context->reference.cloned)
         {
             amqp_context_free_sasl_plugins(context);
             amqp_descriptors_cleanup(context, context->reference.amqp_descriptors);
+            amqp_free(context, context->reference.container_id);
         }
 
         pools_ok = check_pool(context, &context->memory.amqp_buffer_t_pool) &&
@@ -317,7 +315,6 @@ void amqp_deallocate_print_buffer(amqp_context_t *context, uint8_t *buffer)
 static char *generate_container_id(amqp_context_t *context)
 {
     const size_t space = HOST_NAME_MAX + 64;
-    pid_t pid = getpid();
     char *hostname = (char *) amqp_malloc(context, HOST_NAME_MAX + 1);
     size_t hostname_length;
     if (gethostname(hostname, HOST_NAME_MAX) == -1)
@@ -326,6 +323,6 @@ static char *generate_container_id(amqp_context_t *context)
     }
     hostname[HOST_NAME_MAX] = '\0';
     hostname_length = strlen(hostname);
-    snprintf(&hostname[hostname_length], space - hostname_length, "-%ld:%d", (long) pid, context->clone_count);
+    snprintf(&hostname[hostname_length], space - hostname_length, "-something-else-needed");
     return hostname;
 }

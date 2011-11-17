@@ -51,8 +51,6 @@ static inline void amqp_variable_initialize_as_null(amqp_variable_t *variable)
     variable->data = 0;
 }
 
-extern uint8_t *amqp_duplicate(amqp_context_t *context, const uint8_t *data, size_t size);
-
 extern int amqp_variable_to_bytes(amqp_variable_t *variable, uint8_t *buffer, size_t buffer_size);
 
 extern int amqp_variable_compare(amqp_variable_t *lhs, amqp_variable_t *rhs);

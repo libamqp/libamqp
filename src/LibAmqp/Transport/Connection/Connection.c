@@ -29,9 +29,17 @@ static amqp_connection_t *create_connection(amqp_context_t *context)
     result->specification_version.required.sasl = AMQP_SASL_PREFERRED_VERSION;
     result->specification_version.required.amqp = AMQP_PREFERRED_VERSION;
 
-    result->limits.max_frame_size = context->limits.max_frame_size;
-    result->limits.channel_max = context->limits.channel_max;
-    result->limits.idle_time_out = context->limits.idle_time_out;
+    result->amqp.connection.limits.max_frame_size = context->limits.max_frame_size;
+    result->amqp.connection.limits.channel_max = context->limits.channel_max;
+    result->amqp.connection.limits.idle_time_out = context->limits.idle_time_out;
+
+    if (result->amqp.connection.limits.max_frame_size < AMQP_MIN_MAX_FRAME_SIZE)
+    {
+        result->amqp.connection.limits.max_frame_size = AMQP_MIN_MAX_FRAME_SIZE;
+    }
+
+    assert(context->reference.container_id);
+    result->amqp.connection.local_container_id = amqp_duplicate_cstr(context, context->reference.container_id);
 
     result->sasl.identity_hooks = context->sasl.identity_hooks;
     return result;

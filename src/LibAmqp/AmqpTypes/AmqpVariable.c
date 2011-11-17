@@ -25,12 +25,6 @@
 
 #include "debug_helper.h"
 
-uint8_t *amqp_duplicate(amqp_context_t *context, const uint8_t *data, size_t size)
-{
-    uint8_t *result = (uint8_t *) amqp_malloc(context, size);
-    memcpy(result, data, size);
-    return result;
-}
 
 static
 amqp_memory_t *data_to_block(amqp_variable_t *variable)
