@@ -150,7 +150,7 @@ static void transition_to_waiting_on_client_negotiation_request(amqp_connection_
 
 static void done_while_sending_error_message(amqp_connection_t *connection)
 {
-    connection->state.connection.drain(connection);
+    connection->state.shutdown.drain(connection);
 }
 static void transition_to_sending_error_message(amqp_connection_t *connection)
 {
@@ -213,7 +213,7 @@ static void fail_while_accepting_sasl(amqp_connection_t *connection)
 {
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_SASL_NEGOTIATION_REJECTED);
 //    amqp_connection_trace(connection, "SASL negotiation failed");
-    connection->state.connection.drain(connection);
+    connection->state.shutdown.drain(connection);
 }
 static void reject_while_accepting_sasl(amqp_connection_t *connection, uint32_t version)
 {

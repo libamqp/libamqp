@@ -220,9 +220,8 @@ typedef struct amqp_connection_frame_reader_state_t
 typedef struct amqp_connection_state_t
 {
     const char *name;
-    amqp_connection_action_f drain;         // Close output and drain input
-    amqp_connection_action_f close;      // Allow write complete then pull the plug on any reads
     amqp_connection_action_f shutdown;
+    amqp_connection_action_f fail;
     union {
         struct {
             amqp_connection_connect_f connect;
@@ -234,9 +233,14 @@ typedef struct amqp_connection_state_t
     } mode;
     amqp_connection_read_callback_f read_done;
     amqp_connection_action_f done;
-    amqp_connection_action_f fail;
     amqp_connection_action_f timeout;
 } amqp_connection_state_t;
+
+typedef struct amqp_shutdown_state_t
+{
+    amqp_connection_action_f drain;         // Close output and drain input
+    amqp_connection_action_f close;      // Allow write complete then pull the plug on any reads
+} amqp_shutdown_state_t;
 
 struct amqp_connection_socket_t
 {
@@ -285,6 +289,7 @@ struct amqp_connection_t
     } specification_version;
     struct {
         amqp_connection_state_t connection;
+        amqp_shutdown_state_t shutdown;
         amqp_connection_socket_state_t socket;
         amqp_connection_writer_state_t writer;
         amqp_connection_reader_state_t reader;

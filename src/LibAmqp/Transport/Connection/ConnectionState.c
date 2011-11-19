@@ -287,7 +287,7 @@ static void transition_to_timeout(amqp_connection_t *connection, const char *sta
     amqp__connection_default_state_initialization(connection, state_name);
     connection->state.connection.done = done_or_fail_while_timeout;
     connection->state.connection.fail = done_or_fail_while_timeout;
-    connection->state.connection.drain = do_nothing;
+    connection->state.shutdown.drain = do_nothing;
     connection->state.connection.shutdown = do_nothing;
     trace_transition(old_state_name);
 }
@@ -295,7 +295,7 @@ static void transition_to_stopped(amqp_connection_t *connection)
 {
     save_old_state();
     amqp__connection_default_state_initialization(connection, "Stopped");
-    connection->state.connection.drain = do_nothing;
+    connection->state.shutdown.drain = do_nothing;
     connection->state.connection.shutdown = do_nothing;
     trace_transition(old_state_name);
 }
@@ -304,7 +304,7 @@ static void transition_to_failed(amqp_connection_t *connection)
 {
     save_old_state();
     amqp__connection_default_state_initialization(connection, "Failed");
-    connection->state.connection.drain = do_nothing;
+    connection->state.shutdown.drain = do_nothing;
     connection->state.connection.shutdown = do_nothing;
     trace_transition(old_state_name);
 }
@@ -331,7 +331,12 @@ static void default_close(amqp_connection_t *connection)
 
 static void default_shutdown(amqp_connection_t *connection)
 {
-    connection->state.connection.close(connection);
+    connection->state.shutdown.close(connection);
+}
+
+static void default_fail(amqp_connection_t *connection)
+{
+    shutdown_connection(connection, amqp_cs_abort_socket);
 }
 
 static void default_connect(amqp_connection_t *connection, const char *hostname, int port)
@@ -359,18 +364,15 @@ static void default_timeout(amqp_connection_t *connection)
     illegal_state(connection, "Timeout");
 }
 
-static void default_fail(amqp_connection_t *connection)
-{
-    shutdown_connection(connection, amqp_cs_abort_socket);
-}
-
 void amqp__connection_default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
 {
     connection->state.connection.name = new_state_name;
 
-    connection->state.connection.drain = default_drain;
-    connection->state.connection.close = default_close;
+    connection->state.shutdown.drain = default_drain;
+    connection->state.shutdown.close = default_close;
+
     connection->state.connection.shutdown = default_shutdown;
+    connection->state.connection.fail = default_fail;
 
     if (connection->flags & AMQP_CONNECTION_SOCKET_ACCEPTED)
     {
@@ -383,7 +385,6 @@ void amqp__connection_default_state_initialization(amqp_connection_t *connection
     }
 
     connection->state.connection.done = default_done;
-    connection->state.connection.fail = default_fail;
     connection->state.connection.timeout = default_timeout;
 }
 

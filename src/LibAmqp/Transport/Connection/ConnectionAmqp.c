@@ -240,7 +240,7 @@ static void default_done(amqp_connection_t *connection)
 static void default_close(amqp_connection_t *connection)
 {
 //    TODO -  restore - connection->state.connection.drain(connection);
-    connection->state.connection.close(connection);
+    connection->state.shutdown.close(connection);
 }
 
 static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
