@@ -126,7 +126,6 @@ typedef struct amqp_connection_socket_state_t
     amqp_connection_action_f try_connect;
 } amqp_connection_socket_state_t;
 
-
 typedef void (*amqp_connection_fail_callback_f)(amqp_connection_t *connection, int errro_code);
 typedef void (*amqp_connection_negotiate_callback_f)(amqp_connection_t *connection, uint32_t version);
 typedef void (*amqp_message_dispatch_t)(amqp_connection_t *connection, amqp_frame_t *frame);
@@ -221,7 +220,6 @@ typedef struct amqp_connection_frame_reader_state_t
 typedef struct amqp_connection_state_t
 {
     const char *name;
-    amqp_connection_action_f hangup;        // Just pull the plug
     amqp_connection_action_f drain;         // Close output and drain input
     amqp_connection_action_f close;      // Allow write complete then pull the plug on any reads
     amqp_connection_action_f shutdown;

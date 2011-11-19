@@ -287,7 +287,6 @@ static void transition_to_timeout(amqp_connection_t *connection, const char *sta
     amqp__connection_default_state_initialization(connection, state_name);
     connection->state.connection.done = done_or_fail_while_timeout;
     connection->state.connection.fail = done_or_fail_while_timeout;
-    connection->state.connection.hangup = do_nothing;
     connection->state.connection.drain = do_nothing;
     connection->state.connection.shutdown = do_nothing;
     trace_transition(old_state_name);
@@ -296,7 +295,6 @@ static void transition_to_stopped(amqp_connection_t *connection)
 {
     save_old_state();
     amqp__connection_default_state_initialization(connection, "Stopped");
-    connection->state.connection.hangup = do_nothing;
     connection->state.connection.drain = do_nothing;
     connection->state.connection.shutdown = do_nothing;
     trace_transition(old_state_name);
@@ -306,7 +304,6 @@ static void transition_to_failed(amqp_connection_t *connection)
 {
     save_old_state();
     amqp__connection_default_state_initialization(connection, "Failed");
-    connection->state.connection.hangup = do_nothing;
     connection->state.connection.drain = do_nothing;
     connection->state.connection.shutdown = do_nothing;
     trace_transition(old_state_name);
@@ -320,11 +317,6 @@ static void illegal_state(amqp_connection_t *connection, const char *event)
             "Connection does not support \"%s\" while \"%s\".",
             event, connection->state.connection.name);
     amqp_fatal_program_error("Connection state error");
-}
-
-static void default_hangup(amqp_connection_t *connection)
-{
-    shutdown_connection(connection, amqp_cs_close_socket);
 }
 
 static void default_drain(amqp_connection_t *connection)
@@ -376,7 +368,6 @@ void amqp__connection_default_state_initialization(amqp_connection_t *connection
 {
     connection->state.connection.name = new_state_name;
 
-    connection->state.connection.hangup = default_hangup;
     connection->state.connection.drain = default_drain;
     connection->state.connection.close = default_close;
     connection->state.connection.shutdown = default_shutdown;
