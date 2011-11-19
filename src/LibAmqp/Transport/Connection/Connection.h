@@ -63,7 +63,9 @@ enum amqp_connection_flags
     AMQP_CONNECTION_SOCKET_ACCEPTED = 0x04,
     AMQP_CONNECTION_TLS_CONNECTED = 0x08,
     AMQP_CONNECTION_SASL_CONNECTED = 0x10,
-    AMQP_CONNECTION_AMQP_CONNECTED = 0x20
+    AMQP_CONNECTION_AMQP_CONNECTED = 0x20,  // AMQP - tunnel established
+    AMQP_CONNECTION_IS_CLIENT = 0x40,
+    AMQP_CONNECTION_IS_OPEN = 0x80,
 };
 enum amqp_connection_failure_flags
 {
@@ -105,6 +107,11 @@ inline static int amqp_connection_is(const amqp_connection_t *connection, int fl
 inline static int amqp_connection_is_running(const amqp_connection_t *connection)
 {
     return amqp_connection_is(connection, AMQP_CONNECTION_RUNNING);
+}
+
+inline static int amqp_connection_is_client(const amqp_connection_t *connection)
+{
+    return amqp_connection_is(connection, AMQP_CONNECTION_IS_CLIENT);
 }
 
 inline static void amqp_connection_flag_set(amqp_connection_t *connection, int flags)

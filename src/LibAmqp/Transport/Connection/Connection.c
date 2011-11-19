@@ -76,7 +76,6 @@ void amqp_connection_connect_to(amqp_context_t *context, amqp_connection_t *conn
         connection->state.connection.fail(connection);
         return;
     }
-
     connection->state.connection.mode.client.connect(connection, hostname, port_number);
 }
 

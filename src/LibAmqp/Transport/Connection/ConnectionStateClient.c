@@ -159,7 +159,7 @@ static void transition_to_connecting_sasl(amqp_connection_t *connection)
 
 static void done_while_connecting_amqp(amqp_connection_t *connection)
 {
-    amqp_connection_flag_set(connection, AMQP_CONNECTION_AMQP_CONNECTED);
+    amqp_connection_flag_set(connection, AMQP_CONNECTION_AMQP_CONNECTED | AMQP_CONNECTION_IS_CLIENT);
     transition_to_amqp_tunnel_established(connection);
     connection->state.amqp.send_open(connection);
 }

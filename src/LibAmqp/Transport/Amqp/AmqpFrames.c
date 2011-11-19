@@ -28,16 +28,31 @@
 
 #include "debug_helper.h"
 
+#define MIN(a, b) (((a) <= (b)) ? (a) : (b))
 
 int amqp_amqp_prepare_open_frame(amqp_connection_t *connection)
 {
     return amqp_encode_amqp_open(connection, connection->buffer.write);
 }
 
-void amqp_process_open_frame(amqp_connection_t *connection, amqp_frame_t *frame)
+int amqp_process_open_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    assert(frame->descriptor.id == 0x10);
+    amqp_transport_open_t *open_request;
 
-    
-    not_implemented(todo);
+    assert(frame && frame->descriptor.id == 0x10);
+
+    open_request = &frame->frames.amqp.open;
+    connection->amqp.connection.remote_container_id = amqp_string_to_cstr(connection->context, &open_request->container_id);
+    if (amqp_string_is_null(&open_request->hostname))
+    {
+        // TODO - if hostname from client is null, use the hostname that arrived in SASL or TLS handshake
+        not_implemented(todo);
+    }
+    connection->amqp.connection.hostname = amqp_string_to_cstr(connection->context, &open_request->hostname);
+
+    connection->amqp.connection.limits.max_frame_size = MIN(connection->amqp.connection.limits.max_frame_size, open_request->max_frame_size);
+    connection->amqp.connection.limits.channel_max = MIN(connection->amqp.connection.limits.channel_max, open_request->channel_max);
+    connection->amqp.connection.limits.idle_time_out = MIN(connection->amqp.connection.limits.idle_time_out, open_request->idle_time_out);
+
+    return amqp_encode_amqp_open(connection, connection->buffer.write);
 }

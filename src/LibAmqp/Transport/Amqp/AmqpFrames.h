@@ -48,7 +48,7 @@ typedef struct amqp_frame_t amqp_frame_t;
 #endif
 
 extern int amqp_amqp_prepare_open_frame(amqp_connection_t *connection);
-extern void amqp_process_open_frame(amqp_connection_t *connection, amqp_frame_t *frame);
+extern int amqp_process_open_frame(amqp_connection_t *connection, amqp_frame_t *frame);
 
 #ifdef __cplusplus
 }

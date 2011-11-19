@@ -152,14 +152,23 @@ static
 int amqp_open_field_encoder(amqp_connection_t *connection, amqp_buffer_t *buffer, void *arg)
 {
     amqp_encode_string(connection->context, buffer, connection->amqp.connection.local_container_id);
-    amqp_encode_string(connection->context, buffer, amqp_connection_target_host(connection));
-
+    if (amqp_connection_is_client(connection))
+    {
+        SOUTS("CLIENT");
+        amqp_encode_string(connection->context, buffer, amqp_connection_target_host(connection));
+    }
+    else
+    {
+        SOUTS("SERVER");
+        amqp_encode_null(connection->context, buffer);
+    }
     amqp_encode_uint(connection->context, buffer, connection->amqp.connection.limits.max_frame_size);
     amqp_encode_ushort(connection->context, buffer, connection->amqp.connection.limits.channel_max);
     amqp_encode_uint(connection->context, buffer, connection->amqp.connection.limits.idle_time_out);
 
     return 1;
 }
+
 int amqp_encode_amqp_open(amqp_connection_t *connection, amqp_buffer_t *buffer)
 {
     return amqp_encode_frame(connection, buffer, amqp_open_list_descriptor, AMQP_FRAME_TYPE, CHANNEL_ZERO, amqp_open_field_encoder, 0);
