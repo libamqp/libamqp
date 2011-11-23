@@ -274,14 +274,9 @@ static void transition_to_accepting_amqp(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
-static void shutdown_while_tunnel_accepted(amqp_connection_t *connection)
-{
-    connection->state.amqp.close(connection);
-}
 static void transition_to_tunnel_accepted(amqp_connection_t *connection)
 {
     save_old_state();
     amqp__connection_default_state_initialization(connection, "AmqpTunnelAccepted");
-    connection->state.connection.shutdown = shutdown_while_tunnel_accepted;
     trace_transition(old_state_name);
 }

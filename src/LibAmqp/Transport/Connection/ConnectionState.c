@@ -94,6 +94,12 @@ void amqp_connection_enable_io(amqp_connection_t *connection)
     connection->state.writer.enable(connection);
 }
 
+void amqp__shutdown_while_in_progress(amqp_connection_t *connection)
+{
+    amqp_connection_trace(connection, "Shutdown while shutdown in progress.");
+//    not_implemented(todo);
+}
+
 // Used by tests
 static void call_stopped_hook(amqp_connection_t *connection)
 {
@@ -197,11 +203,9 @@ static void timeout_while_stopping_output(amqp_connection_t *connection)
 static void transition_to_stopping_output(amqp_connection_t *connection)
 {
     save_old_state();
-
     amqp__connection_default_state_initialization(connection, "StoppingOutput");
     connection->state.connection.done = done_while_stopping_output;
     connection->state.connection.timeout = timeout_while_stopping_output;
-
     trace_transition(old_state_name);
 }
 

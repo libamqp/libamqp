@@ -168,10 +168,23 @@ SUITE(Connection)
     {
         connection->state.connection.mode.client.connect(connection, "localhost", 54321);
         loop_until_connection_state_is("AqmpTunnelEstablished");
-        loop_until_connection_amqp_state_is("OpenSent");
-        CHECK_EQUAL("OpenSent", connection->state.amqp.name);
+        loop_until_connection_amqp_state_is("Opened");
+        CHECK_EQUAL("Opened", connection->state.amqp.name);
+    }
+
+    TEST_FIXTURE(ConnectionFixture, shutdown_should_close_amqp_connection)
+    {
+        connection->state.connection.mode.client.connect(connection, "localhost", 54321);
+        loop_until_connection_state_is("AqmpTunnelEstablished");
+        loop_until_connection_amqp_state_is("Opened");
+        CHECK_EQUAL("Opened", connection->state.amqp.name);
         amqp_connection_shutdown(context, connection);
-        loop_while_running();
+
+        CHECK_EQUAL("CloseSent", connection->state.amqp.name);
+        loop_while_connection_amqp_state_is("CloseSent");
+
+
+        SOUTS(connection->state.amqp.name);
         CHECK(0);
     }
 }

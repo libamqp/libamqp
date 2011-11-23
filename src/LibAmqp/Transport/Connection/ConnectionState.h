@@ -192,7 +192,6 @@ typedef struct amqp_connection_amqp_state_t
     amqp_connection_action_f done;
     amqp_connection_action_f send_open;
     amqp_connection_action_f wait_on_open;
-    amqp_connection_action_f close;
     struct {
         amqp_message_dispatch_t open;
         amqp_message_dispatch_t begin;
@@ -369,6 +368,7 @@ extern void amqp__connection_default_state_initialization(amqp_connection_t *con
 
 extern void amqp_connection_state_cleanup(amqp_connection_t *connection);
 extern int amqp_connection_is_state(const amqp_connection_t *connection, const char *state_name);
+extern void amqp__shutdown_while_in_progress(amqp_connection_t *connection);
 
 #ifdef __cplusplus
 }

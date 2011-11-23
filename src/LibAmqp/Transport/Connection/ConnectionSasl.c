@@ -96,6 +96,14 @@ void write_complete_callback(amqp_connection_t *connection)
 }
 
 static
+int process_frame(amqp_connection_t *connection, amqp_frame_t *frame, int (*process_method)(amqp_connection_t *connection, amqp_frame_t *frame))
+{
+    int rc = process_method(connection, frame);
+    amqp_frame_cleanup(connection->context, frame);
+    return rc;
+}
+
+static
 void frame_available_callback(amqp_connection_t *connection, amqp_buffer_t *buffer)
 {
     amqp_frame_t *frame = amqp_decode_sasl_frame(connection->context, buffer);
@@ -108,13 +116,6 @@ void frame_available_callback(amqp_connection_t *connection, amqp_buffer_t *buff
     {
         amqp_connection_failed(connection, AMQP_ERROR_FRAME_DECODE_FAILED, AMQP_CONNECTION_SASL_FRAME_DECODE_ERROR, "Could not decode frame from broker during SASL handshake");
     }
-}
-
-static
-int process_frame(amqp_connection_t *connection, amqp_frame_t *frame, int rc)
-{
-    amqp_frame_cleanup(connection->context, frame);
-    return rc;
 }
 
 static
@@ -176,9 +177,7 @@ static void transition_to_initialized(amqp_connection_t *connection)
 
 static void received_sasl_mechanisms_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    if (process_frame(connection, frame,
-        amqp_sasl_process_mechanisms_frame(connection, frame)
-        ))
+    if (process_frame(connection, frame, amqp_sasl_process_mechanisms_frame))
     {
         transition_to_writing_sasl_init_frame(connection);
         connection->state.writer.commence_write(connection, connection->buffer.write, write_complete_callback);
@@ -213,9 +212,7 @@ static void transition_to_writing_sasl_init_frame(amqp_connection_t *connection)
 
 static void received_sasl_challenge_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    if (process_frame(connection, frame,
-        amqp_sasl_process_challenge_frame(connection, frame)
-        ))
+    if (process_frame(connection, frame, amqp_sasl_process_challenge_frame))
     {
         transition_to_writing_sasl_challenge_response_frame(connection);
         connection->state.writer.commence_write(connection, connection->buffer.write, write_complete_callback);
@@ -223,9 +220,7 @@ static void received_sasl_challenge_frame(amqp_connection_t *connection, amqp_fr
 }
 static void received_sasl_outcome_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    if (process_frame(connection, frame,
-        amqp_sasl_process_outcome_frame(connection, frame)
-        ))
+    if (process_frame(connection, frame, amqp_sasl_process_outcome_frame))
     {
         transition_to_negotiated(connection);
         call_action(connection->state.connection.done, connection->context, connection);
@@ -290,8 +285,7 @@ static void transition_to_writing_sasl_mechanisms_frame(amqp_connection_t *conne
 
 static void received_sasl_initial_response_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    int rc = amqp_sasl_process_init_frame(connection, frame);
-    amqp_frame_cleanup(connection->context, frame);
+    int rc = process_frame(connection, frame, amqp_sasl_process_init_frame);
     switch (rc)
     {
     case amqp_plugin_handler_outcome_accepted:

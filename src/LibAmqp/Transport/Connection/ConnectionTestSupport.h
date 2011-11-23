@@ -40,6 +40,11 @@
 #define loop_until_connection_amqp_state_is(s) \
     while (!amqp_connection_amqp_is_state(connection, s) && run_loop_with_timeout())
 
+#define loop_while_connection_amqp_state_is(s) \
+    while (amqp_connection_amqp_is_state(connection, s) && run_loop_with_timeout()); \
+    CHECK(!amqp_connection_amqp_is_state(connection, s))
+
+
 #define loop_while_running() \
     while (BaseConnectionFixture::running) \
     { \

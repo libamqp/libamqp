@@ -180,16 +180,9 @@ static void transition_to_connecting_amqp(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
-static void shutdown_while_amqp_tunnel_established(amqp_connection_t *connection)
-{
-    connection->state.amqp.close(connection);
-}
 static void transition_to_amqp_tunnel_established(amqp_connection_t *connection)
 {
     save_old_state();
-
     amqp__connection_default_state_initialization(connection, "AqmpTunnelEstablished");
-    connection->state.connection.shutdown = shutdown_while_amqp_tunnel_established;
-
     trace_transition(old_state_name);
 }
