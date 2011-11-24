@@ -30,6 +30,9 @@ extern int amqp_encode_sasl_init_frame(amqp_connection_t *connection, amqp_buffe
 extern int amqp_encode_sasl_challenge_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin);
 extern int amqp_encode_sasl_outcome_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin);
 
+extern int amqp_encode_amqp_open(amqp_connection_t *connection, amqp_buffer_t *buffer);
+extern int amqp_encode_amqp_close(amqp_connection_t *connection, amqp_buffer_t *buffer);
+
 #ifdef __cplusplus
 }
 #endif

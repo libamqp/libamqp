@@ -29,7 +29,17 @@ static amqp_connection_t *create_connection(amqp_context_t *context)
     result->specification_version.required.sasl = AMQP_SASL_PREFERRED_VERSION;
     result->specification_version.required.amqp = AMQP_PREFERRED_VERSION;
 
-    result->limits.max_frame_size = context->limits.max_frame_size;
+    result->amqp.connection.limits.max_frame_size = context->limits.max_frame_size;
+    result->amqp.connection.limits.channel_max = context->limits.channel_max;
+    result->amqp.connection.limits.idle_time_out = context->limits.idle_time_out;
+
+    if (result->amqp.connection.limits.max_frame_size < AMQP_MIN_MAX_FRAME_SIZE)
+    {
+        result->amqp.connection.limits.max_frame_size = AMQP_MIN_MAX_FRAME_SIZE;
+    }
+
+    assert(context->reference.container_id);
+    result->amqp.connection.local_container_id = amqp_duplicate_cstr(context, context->reference.container_id);
 
     result->sasl.identity_hooks = context->sasl.identity_hooks;
     return result;
@@ -45,7 +55,7 @@ amqp_connection_t *amqp_connection_create(amqp_context_t *context)
 
 void amqp_connection_destroy(amqp_context_t *context, amqp_connection_t *connection)
 {
-    connection->state.connection.hangup(connection);
+    connection->state.connection.shutdown(connection);
     amqp_connection_state_cleanup(connection);
     AMQP_FREE(context, connection);
 }
@@ -66,7 +76,6 @@ void amqp_connection_connect_to(amqp_context_t *context, amqp_connection_t *conn
         connection->state.connection.fail(connection);
         return;
     }
-
     connection->state.connection.mode.client.connect(connection, hostname, port_number);
 }
 
@@ -114,4 +123,9 @@ void amqp_connection_read(amqp_context_t *context, amqp_connection_t *connection
 {
     assert(connection && connection->context && connection->context->thread_event_loop);
     not_implemented(amqp_connection_read);
+}
+
+const char *amqp_connection_target_host(amqp_connection_t *connection)
+{
+    return connection->socket.hostname ? connection->socket.hostname : "unknown-host";
 }

@@ -160,7 +160,6 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_null(described->value.list.elements[field])); field++;
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
-
     }
 
     TEST_FIXTURE(DecodeFixture, broker_open_frame)

@@ -94,7 +94,8 @@ coverage:
 	./test-runner
 	./run-gcov.sh
 
-# $(OBJ) $(TEST_OBJ): Makefile
+
+$(OBJ) $(TEST_OBJ): Makefile
 
 print:
 	@echo TEST_HARNESS_INCLUDES=$(TEST_HARNESS_INCLUDES)

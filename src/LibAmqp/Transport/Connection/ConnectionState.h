@@ -126,7 +126,6 @@ typedef struct amqp_connection_socket_state_t
     amqp_connection_action_f try_connect;
 } amqp_connection_socket_state_t;
 
-
 typedef void (*amqp_connection_fail_callback_f)(amqp_connection_t *connection, int errro_code);
 typedef void (*amqp_connection_negotiate_callback_f)(amqp_connection_t *connection, uint32_t version);
 typedef void (*amqp_message_dispatch_t)(amqp_connection_t *connection, amqp_frame_t *frame);
@@ -176,7 +175,7 @@ typedef struct amqp_connection_sasl_state_t
         amqp_message_dispatch_t challenge;
         amqp_message_dispatch_t response;
         amqp_message_dispatch_t outcome;
-    } messages;
+    } frame;
 } amqp_connection_sasl_state_t;
 
 typedef struct amqp_connection_amqp_tunnel_state_t
@@ -190,9 +189,9 @@ typedef struct amqp_connection_amqp_tunnel_state_t
 typedef struct amqp_connection_amqp_state_t
 {
     const char *name;
-    amqp_connection_action_f start;
-    amqp_connection_action_f wait;
     amqp_connection_action_f done;
+    amqp_connection_action_f send_open;
+    amqp_connection_action_f wait_on_open;
     struct {
         amqp_message_dispatch_t open;
         amqp_message_dispatch_t begin;
@@ -203,7 +202,9 @@ typedef struct amqp_connection_amqp_state_t
         amqp_message_dispatch_t detach;
         amqp_message_dispatch_t end;
         amqp_message_dispatch_t close;
-    } messages;
+        
+        amqp_message_dispatch_t empty;
+    } frame;
 } amqp_connection_amqp_state_t;
 
 typedef struct amqp_connection_frame_reader_state_t
@@ -218,9 +219,8 @@ typedef struct amqp_connection_frame_reader_state_t
 typedef struct amqp_connection_state_t
 {
     const char *name;
-    amqp_connection_action_f hangup;        // Just pull the plug
-    amqp_connection_action_f drain;         // Close output and drain input
-    amqp_connection_action_f shutdown;      // Allow write complete then pull the plug on any reads
+    amqp_connection_action_f shutdown;
+    amqp_connection_action_f fail;
     union {
         struct {
             amqp_connection_connect_f connect;
@@ -230,13 +230,16 @@ typedef struct amqp_connection_state_t
             amqp_connection_negotiate_callback_f reject;
         } server;
     } mode;
-//    amqp_connection_write_f write;
-//    amqp_connection_read_f read;
     amqp_connection_read_callback_f read_done;
     amqp_connection_action_f done;
-    amqp_connection_action_f fail;
     amqp_connection_action_f timeout;
 } amqp_connection_state_t;
+
+typedef struct amqp_shutdown_state_t
+{
+    amqp_connection_action_f drain;         // Close output and drain input
+    amqp_connection_action_f close;      // Allow write complete then pull the plug on any reads
+} amqp_shutdown_state_t;
 
 struct amqp_connection_socket_t
 {
@@ -285,6 +288,7 @@ struct amqp_connection_t
     } specification_version;
     struct {
         amqp_connection_state_t connection;
+        amqp_shutdown_state_t shutdown;
         amqp_connection_socket_state_t socket;
         amqp_connection_writer_state_t writer;
         amqp_connection_reader_state_t reader;
@@ -334,15 +338,24 @@ struct amqp_connection_t
             uint32_t frame_size;
         } frame;
     } io;
-    struct {
-        uint32_t max_frame_size;
-    } limits;
     amqp_accept_handler_arguments_t *accept_handler_arguments;
     amqp_timer_t *timer;
     struct {
         amqp_sasl_identity_t identity_hooks;
         amqp_sasl_plugin_t *plugin;
     } sasl;
+    struct {
+        struct {
+            const char *local_container_id;
+            const char *remote_container_id;
+            const char *hostname;
+            struct {
+                uint32_t max_frame_size;
+                uint16_t channel_max;
+                uint32_t idle_time_out;
+            } limits;
+        } connection;
+    } amqp;
 };
 
 extern void amqp_connection_state_initialize(amqp_connection_t *connection);
@@ -355,6 +368,7 @@ extern void amqp__connection_default_state_initialization(amqp_connection_t *con
 
 extern void amqp_connection_state_cleanup(amqp_connection_t *connection);
 extern int amqp_connection_is_state(const amqp_connection_t *connection, const char *state_name);
+extern void amqp__shutdown_while_in_progress(amqp_connection_t *connection);
 
 #ifdef __cplusplus
 }

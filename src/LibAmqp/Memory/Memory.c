@@ -164,3 +164,13 @@ void amqp_reset_malloc_allocation_stats()
     not_implemented(amqp_reset_malloc_allocation_stats);
 }
 
+char *amqp_duplicate(amqp_context_t *context, const char *data, size_t size)
+{
+    char *result = (char *) amqp_malloc(context, size);
+    memcpy(result, data, size);
+    return result;
+}
+char *amqp_duplicate_cstr(amqp_context_t *context, const char *s)
+{
+    return amqp_duplicate(context, s, strlen(s));
+}

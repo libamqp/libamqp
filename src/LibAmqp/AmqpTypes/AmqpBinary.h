@@ -41,6 +41,10 @@ int amqp_binary_is_null(amqp_binary_t *binary)
 extern void amqp_binary_initialize_from_type(amqp_context_t *context, amqp_binary_t *binary, amqp_type_t *type);
 extern amqp_binary_t *amqp_binary_create_from_type(amqp_context_t *context,  amqp_type_t *type);
 
+extern void amqp_binary_initialize(amqp_context_t *context, amqp_binary_t *binary, const uint8_t *data, size_t size);
+extern amqp_binary_t *amqp_binary_create(amqp_context_t *context, const uint8_t *data, size_t size);
+extern amqp_binary_t *amqp_binary_clone(amqp_context_t *context, amqp_binary_t *source);
+
 static inline
 void amqp_binary_cleanup(amqp_context_t *context, amqp_binary_t *binary)
 {

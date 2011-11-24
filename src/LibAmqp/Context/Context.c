@@ -17,6 +17,9 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
+
+#include <unistd.h>
+
 #include "Context/Context.h"
 
 #include "Memory/Memory.h"
@@ -24,6 +27,8 @@
 #include "AmqpTypes/AmqpDescriptor.h"
 
 #include "debug_helper.h"
+
+static char *generate_container_id(amqp_context_t *context);
 
 typedef struct amqp__context_with_guard_t
 {
@@ -56,6 +61,7 @@ static const char *default_identity_hook(amqp_context_t *context)
 amqp_context_t *
 amqp_create_context()
 {
+
     amqp__context_with_guard_t *result = AMQP_MALLOC(0, amqp__context_with_guard_t);
 
     result->context.config.putc = amqp_context_default_debug_putc;
@@ -70,15 +76,21 @@ amqp_create_context()
     amqp_frame_initialize_pool(&result->context.memory.amqp_frame_t_pool);
 
     result->context.limits.max_frame_size = AMQP_DEFAULT_MAX_FRAME_SIZE;
+    result->context.limits.channel_max = AMQP_DEFAULT_CHANNEL_MAX;
+    result->context.limits.idle_time_out = AMQP_DEFAULT_IDLE_TIMEOUT;
+
     result->context.thread_event_loop = 0;
 
     result->context.reference.plugins.sasl_plugin_list = 0;
 
     // Danger Will Robinson - using context while initialzing it. So, do last.
     result->context.reference.amqp_descriptors = amqp_load_descriptors(&result->context);
+    result->context.reference.container_id = generate_container_id(&result->context);
+
     amqp_initialize_default_messaging_methods(&result->context.reference.plugins.messaging);
 
     amqp_context_register_identity_hooks(&result->context, default_identity_hook, default_identity_hook, default_identity_hook);
+
     return (amqp_context_t *) result;
 }
 
@@ -137,10 +149,12 @@ int amqp_context_destroy(amqp_context_t *context)
         }
         ((amqp__context_with_guard_t *) context)->multiple_delete_protection = 0;
 
+
         if (!context->reference.cloned)
         {
             amqp_context_free_sasl_plugins(context);
             amqp_descriptors_cleanup(context, context->reference.amqp_descriptors);
+            amqp_free(context, context->reference.container_id);
         }
 
         pools_ok = check_pool(context, &context->memory.amqp_buffer_t_pool) &&
@@ -295,4 +309,20 @@ uint8_t *amqp_allocate_print_buffer(amqp_context_t *context, size_t n)
 void amqp_deallocate_print_buffer(amqp_context_t *context, uint8_t *buffer)
 {
     free(buffer);
+}
+
+#define HOST_NAME_MAX 256
+static char *generate_container_id(amqp_context_t *context)
+{
+    const size_t space = HOST_NAME_MAX + 64;
+    char *hostname = (char *) amqp_malloc(context, HOST_NAME_MAX + 1);
+    size_t hostname_length;
+    if (gethostname(hostname, HOST_NAME_MAX) == -1)
+    {
+        strcpy(hostname, "UNKNOWN");
+    }
+    hostname[HOST_NAME_MAX] = '\0';
+    hostname_length = strlen(hostname);
+    snprintf(&hostname[hostname_length], space - hostname_length, "-something-else-needed");
+    return hostname;
 }

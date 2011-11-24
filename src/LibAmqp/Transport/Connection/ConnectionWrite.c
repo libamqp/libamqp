@@ -144,7 +144,7 @@ static void writer_fail(amqp_connection_t *connection, int error_code)
     cleanup_write_watcher(connection);
 
     transition_to_failed(connection);
-    amqp_io_error_code(connection->context, error_code, "Failure while writing to %s:%d", connection->socket.hostname, connection->socket.port_number);
+//    amqp_io_error_code(connection->context, error_code, "Failure while writing to %s:%d", connection->socket.hostname, connection->socket.port_number);
     connection->socket.errno_error_code = error_code;
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_WRITE_ERROR);
     connection->state.connection.fail(connection);

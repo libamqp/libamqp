@@ -25,12 +25,6 @@
 
 #include "debug_helper.h"
 
-uint8_t *amqp_duplicate(amqp_context_t *context, const uint8_t *data, size_t size)
-{
-    uint8_t *result = (uint8_t *) amqp_malloc(context, size);
-    memcpy(result, data, size);
-    return result;
-}
 
 static
 amqp_memory_t *data_to_block(amqp_variable_t *variable)
@@ -99,5 +93,30 @@ uint32_t amqp_variable_hash(amqp_variable_t *variable)
     return variable->type ?
         amqp_hash((void *) amqp_buffer_pointer(variable->type->value.variable.buffer, variable->type->position.index), variable->type->position.size) :
         amqp_hash((void *) variable->data, variable->size);
+}
+
+int amqp_variable_to_bytes(amqp_variable_t *variable, uint8_t *buffer, size_t buffer_size)
+{
+    assert(variable->type || variable->data);
+    if (variable->type)
+    {
+        return amqp_type_copy_to(variable->type, buffer, buffer_size);
+    }
+    else
+    {
+        size_t size = buffer_size <= variable->size ? buffer_size : variable->size;
+        memcpy(buffer, variable->data, size);
+        return size;
+    }
+}
+uint8_t *amqp_variable_clone_data(amqp_context_t *context, amqp_variable_t *source)
+{
+    uint8_t *result = 0;
+    if (source->data || source->type)
+    {
+        result = amqp_malloc(context, source->size);
+        amqp_variable_to_bytes(source, result, source->size);
+    }
+    return result;
 }
 

@@ -29,11 +29,13 @@ SUITE(AmqpTypes)
     public:
         AmqpBinaryFixture();
         ~AmqpBinaryFixture();
-
+        static const char *value;
     public:
         amqp_binary_t ref;
         amqp_binary_t *binary;
     };
+
+    const char *AmqpBinaryFixture::value = "binary array";
 
     AmqpBinaryFixture::AmqpBinaryFixture() : binary(0)
     {
@@ -64,7 +66,15 @@ SUITE(AmqpTypes)
         uint8_t data[32];
         memset(data, '\0', sizeof(data));
         amqp_binary_to_bytes(binary, data, sizeof(data));
-        CHECK_EQUAL((const char *) data, "binary array");
+        CHECK_EQUAL((const char *) data, value);
+    }
+
+    TEST_FIXTURE(AmqpBinaryFixture, binary_clone)
+    {
+        amqp_binary_initialize(context, &ref, (uint8_t *) value, strlen(value));
+        CHECK(amqp_binary_compare_with_bytes(&ref, (uint8_t *) value, strlen(value)) == 0);
+        binary = amqp_binary_clone(context, &ref);
+        CHECK(amqp_binary_compare_with_bytes(binary, (uint8_t *) value, strlen(value)) == 0);
     }
 
     TEST_FIXTURE(AmqpBinaryFixture, binary_type_access)

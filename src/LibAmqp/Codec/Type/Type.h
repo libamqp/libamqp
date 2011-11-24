@@ -417,15 +417,13 @@ amqp_type_t *amqp_type_get_described(amqp_type_t *type)
 static inline
 size_t amqp_type_copy_to(amqp_type_t *type, uint8_t *buffer, size_t amount)
 {
+    size_t size;
+
     assert(amqp_type_is_variable(type));
 
-    // TODO - push into buffer and do block copy of fragments
-    size_t i, j;
-    for (i = 0, j = type->position.index; i < type->position.size && i < amount; i++, j++)
-    {
-        buffer[i] = amqp_unchecked_getc_at(type->value.variable.buffer, j);
-    }
-    return i;
+    size = type->position.size > amount ? amount : type->position.size;
+    amqp_buffer_block_copy(type->value.variable.buffer, buffer, type->position.index, size);
+    return size;
 }
 
 static inline

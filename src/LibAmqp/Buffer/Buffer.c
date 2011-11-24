@@ -199,11 +199,42 @@ struct iovec *amqp_buffer_read_io_vec(amqp_buffer_t *buffer, int *iov_count)
 
     assert(n <= (buffer->capacity - buffer->limit.index));
 
+
     *iov_count = amqp_buffer_fill_io_vec(buffer, n, block, offset);
 
     return &buffer->io_vectors[0];
 }
 
+void amqp_buffer_block_copy(amqp_buffer_t *buffer, unsigned char *destination, size_t start, size_t size)
+{
+    size_t block = start >> AMQP_FRAGMENT_INDEX_BITS;
+    size_t offset = start & AMQP_FRAGMENT_INDEX_MASK;
+    size_t first_fragment_size = AMQP_BUFFER_FRAGMENT_SIZE - offset;
+
+    if (size <= first_fragment_size)
+    {
+        memcpy(destination, &buffer->fragments[block][offset], size);
+        return;
+    }
+
+    memcpy(destination, &buffer->fragments[block][offset], first_fragment_size);
+    destination += first_fragment_size;
+    size -= first_fragment_size;
+
+    while (size > AMQP_BUFFER_FRAGMENT_SIZE)
+    {
+        block++;
+        memcpy(destination, buffer->fragments[block], AMQP_BUFFER_FRAGMENT_SIZE);
+        destination += AMQP_BUFFER_FRAGMENT_SIZE;
+        size -= AMQP_BUFFER_FRAGMENT_SIZE;
+    }
+    if (size > 0)
+    {
+        memcpy(destination, buffer->fragments[block], size);
+    }
+}
+
+// TODO - remove these
 void amqp_buffer_reference(amqp_buffer_t *buffer)
 {
     buffer->reference_count++;

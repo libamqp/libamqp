@@ -62,6 +62,16 @@ void amqp_string_initialize_from_type(amqp_context_t *context, amqp_string_t *st
     amqp_variable_initialize_from_type(&string->v, type);
 }
 
+void amqp_string_initialize(amqp_context_t *context, amqp_string_t *string, const char *data, size_t size)
+{
+    static amqp_fn_table_t table = {
+        .dtor = initialize_dtor
+    };
+    string->leader.fn_table = &table;
+
+    amqp_variable_initialize(&string->v, (uint8_t *) amqp_duplicate(context, data, size), size);
+}
+
 amqp_string_t *amqp_string_create_from_type(amqp_context_t *context, amqp_type_t *type)
 {
     static amqp_fn_table_t table = {
@@ -73,6 +83,29 @@ amqp_string_t *amqp_string_create_from_type(amqp_context_t *context, amqp_type_t
     result->leader.fn_table = &table;
     amqp_variable_initialize_from_type(&result->v, type);
     return result;
+}
+
+static
+amqp_string_t *string_create(amqp_context_t *context, const uint8_t *data, size_t size)
+{
+    static amqp_fn_table_t table = {
+        .dtor = create_dtor
+    };
+
+    amqp_string_t *result = AMQP_MALLOC(context, amqp_string_t);
+    result->leader.fn_table = &table;
+    amqp_variable_initialize(&result->v, data, size);
+    return result;
+}
+
+amqp_string_t *amqp_string_create(amqp_context_t *context, const char *data, size_t size)
+{
+    return string_create(context, (uint8_t *) amqp_duplicate(context, data, size), size);
+}
+
+amqp_string_t *amqp_string_clone(amqp_context_t *context, amqp_string_t *source_string)
+{
+    return string_create(context, amqp_variable_clone_data(context, &source_string->v), source_string->v.size);
 }
 
 int amqp_string_to_bytes(amqp_string_t *string, uint8_t *buffer, size_t buffer_size)
@@ -109,3 +142,9 @@ int amqp_string_print(amqp_context_t *context, amqp_string_t *string)
     }
     return i;
 }
+
+const char *amqp_string_to_cstr(amqp_context_t *context, amqp_string_t *string)
+{
+    return !amqp_string_is_null(string) ? (char *) amqp_variable_clone_data(context, &string->v) : 0;
+}
+

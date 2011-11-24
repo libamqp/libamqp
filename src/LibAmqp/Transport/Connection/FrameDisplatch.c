@@ -22,91 +22,91 @@
 
 void amqp_dispatch_sasl_mechanisms(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.sasl.messages.mechanisms;
+    amqp_message_dispatch_t dispatch = connection->state.sasl.frame.mechanisms;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_sasl_init(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.sasl.messages.init;
+    amqp_message_dispatch_t dispatch = connection->state.sasl.frame.init;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_sasl_challenge(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.sasl.messages.challenge;
+    amqp_message_dispatch_t dispatch = connection->state.sasl.frame.challenge;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_sasl_response(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.sasl.messages.response;
+    amqp_message_dispatch_t dispatch = connection->state.sasl.frame.response;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_sasl_outcome(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.sasl.messages.outcome;
+    amqp_message_dispatch_t dispatch = connection->state.sasl.frame.outcome;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_amqp_open(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.amqp.messages.open;
+    amqp_message_dispatch_t dispatch = connection->state.amqp.frame.open;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_amqp_begin(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.amqp.messages.begin;
+    amqp_message_dispatch_t dispatch = connection->state.amqp.frame.begin;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_amqp_attach(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.amqp.messages.attach;
+    amqp_message_dispatch_t dispatch = connection->state.amqp.frame.attach;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_amqp_flow(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.amqp.messages.flow;
+    amqp_message_dispatch_t dispatch = connection->state.amqp.frame.flow;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_amqp_transfer(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.amqp.messages.transfer;
+    amqp_message_dispatch_t dispatch = connection->state.amqp.frame.transfer;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_amqp_disposition(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.amqp.messages.disposition;
+    amqp_message_dispatch_t dispatch = connection->state.amqp.frame.disposition;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_amqp_detach(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.amqp.messages.detach;
+    amqp_message_dispatch_t dispatch = connection->state.amqp.frame.detach;
     assert(dispatch);
     dispatch(connection, frame);
 }
 
 void amqp_dispatch_amqp_end(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.amqp.messages.end;
+    amqp_message_dispatch_t dispatch = connection->state.amqp.frame.end;
     assert(dispatch);
     dispatch(connection, frame);
 }
@@ -114,7 +114,7 @@ void amqp_dispatch_amqp_end(amqp_connection_t *connection, amqp_frame_t *frame)
 
 void amqp_dispatch_amqp_close(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    amqp_message_dispatch_t dispatch = connection->state.amqp.messages.close;
+    amqp_message_dispatch_t dispatch = connection->state.amqp.frame.close;
     assert(dispatch);
     dispatch(connection, frame);
 }
