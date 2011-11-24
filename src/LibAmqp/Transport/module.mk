@@ -13,7 +13,8 @@ SRC += $(wildcard $(MODULE)/*.c) \
     $(wildcard $(MODULE)/Connection/*.c) \
     $(wildcard $(MODULE)/Decode/*.c) \
     $(wildcard $(MODULE)/Sasl/*.c) \
-    $(wildcard $(MODULE)/Frame/*.c)
+    $(wildcard $(MODULE)/Frame/*.c) \
+    $(wildcard $(MODULE)/Amqp/*.c)
 
 TEST_SRC += $(wildcard  \
     $(MODULE)/*Test.cpp) \
@@ -22,4 +23,5 @@ TEST_SRC += $(wildcard  \
     $(wildcard $(MODULE)/LowLevel/*.cpp) \
     $(wildcard $(MODULE)/Connection/*.cpp) \
     $(wildcard $(MODULE)/Sasl/*.cpp) \
-    $(wildcard $(MODULE)/Frame/*.cpp)
+    $(wildcard $(MODULE)/Frame/*.cpp) \
+    $(wildcard $(MODULE)/Amqp/*.cpp)

@@ -63,6 +63,15 @@ SUITE(AmqpTypes)
         CHECK_EQUAL((const char *) data, test_data::lorem_ipsum);
     }
 
+    TEST_FIXTURE(AmqpStringFixture, string_clone)
+    {
+        const char *value = "Hello World";
+        amqp_string_initialize(context, &ref, value, strlen(value));
+        CHECK(amqp_string_compare_with_cstr(&ref, value) == 0);
+        string = amqp_string_clone(context, &ref);
+        CHECK(amqp_string_compare_with_cstr(string, value) == 0);
+    }
+
     TEST_FIXTURE(AmqpStringFixture, string_compare)
     {
         test_data::hello_world.transfer_to(buffer);

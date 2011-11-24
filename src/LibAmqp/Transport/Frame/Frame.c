@@ -302,3 +302,13 @@ void amqp_frame_dump(amqp_context_t *context, amqp_frame_t *frame)
     amqp_type_dump(context, 2, frame->type);
     amqp_context_putc(context, '\n');
 }
+
+uint64_t amqp_frame_descriptor_full_id(amqp_frame_t *frame)
+{
+    if (frame == 0)
+    {
+        return -1;
+    }
+    return (uint64_t) frame->descriptor.domain << 32 | frame->descriptor.id;
+}
+

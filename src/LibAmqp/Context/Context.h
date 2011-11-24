@@ -148,6 +148,8 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
         {
             // TODO - move into config
             uint32_t max_frame_size;
+            uint16_t channel_max;
+            uint32_t idle_time_out;
         } limits;
 
         struct
@@ -159,6 +161,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
                 amqp_sasl_plugin_node_t *sasl_plugin_list;
                 amqp_messaging_methods_t messaging;
             } plugins;
+            const char *container_id;
         } reference;
 
         struct

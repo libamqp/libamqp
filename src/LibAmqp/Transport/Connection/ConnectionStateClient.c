@@ -144,7 +144,7 @@ static void fail_while_connecting_sasl(amqp_connection_t *connection)
 {
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_SASL_NEGOTIATION_REJECTED);
     amqp_connection_trace(connection, "SASL negotiation failed");
-    connection->state.connection.drain(connection);
+    connection->state.shutdown.drain(connection);
 }
 static void transition_to_connecting_sasl(amqp_connection_t *connection)
 {
@@ -159,14 +159,15 @@ static void transition_to_connecting_sasl(amqp_connection_t *connection)
 
 static void done_while_connecting_amqp(amqp_connection_t *connection)
 {
-    amqp_connection_flag_set(connection, AMQP_CONNECTION_AMQP_CONNECTED);
+    amqp_connection_flag_set(connection, AMQP_CONNECTION_AMQP_CONNECTED | AMQP_CONNECTION_IS_CLIENT);
     transition_to_amqp_tunnel_established(connection);
+    connection->state.amqp.send_open(connection);
 }
 static void fail_while_connecting_amqp(amqp_connection_t *connection)
 {
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_AMQP_NEGOTIATION_REJECTED);
     amqp_connection_trace(connection, "AMQP negotiation failed");
-    connection->state.connection.drain(connection);
+    connection->state.shutdown.drain(connection);
 }
 static void transition_to_connecting_amqp(amqp_connection_t *connection)
 {
@@ -179,16 +180,9 @@ static void transition_to_connecting_amqp(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
-static void shutdown_while_amqp_tunnel_established(amqp_connection_t *connection)
-{
-    connection->state.connection.hangup(connection);
-}
 static void transition_to_amqp_tunnel_established(amqp_connection_t *connection)
 {
     save_old_state();
-
     amqp__connection_default_state_initialization(connection, "AqmpTunnelEstablished");
-    connection->state.connection.shutdown = shutdown_while_amqp_tunnel_established;
-
     trace_transition(old_state_name);
 }

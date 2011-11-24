@@ -63,7 +63,10 @@ enum amqp_connection_flags
     AMQP_CONNECTION_SOCKET_ACCEPTED = 0x04,
     AMQP_CONNECTION_TLS_CONNECTED = 0x08,
     AMQP_CONNECTION_SASL_CONNECTED = 0x10,
-    AMQP_CONNECTION_AMQP_CONNECTED = 0x20
+    AMQP_CONNECTION_AMQP_CONNECTED = 0x20,  // AMQP - tunnel established
+    AMQP_CONNECTION_IS_CLIENT = 0x40,
+    AMQP_CONNECTION_IS_OPEN = 0x80,
+    AMQP_CONNECTION_IS_CLOSING = 0x100,
 };
 enum amqp_connection_failure_flags
 {
@@ -80,6 +83,7 @@ enum amqp_connection_failure_flags
     AMQP_CONNECTION_AMQP_ERROR = 0x0400,
     AMQP_CONNECTION_SASL_FRAME_DECODE_ERROR = 0x0800,
     AMQP_CONNECTION_AMQP_FRAME_DECODE_ERROR = 0x1000,
+    AMQP_CONNECTION_FRAME_SEQUENCE_ERROR = 0x2000,
 };
 
 extern amqp_connection_t *amqp_connection_create(amqp_context_t *context);
@@ -105,6 +109,11 @@ inline static int amqp_connection_is_running(const amqp_connection_t *connection
     return amqp_connection_is(connection, AMQP_CONNECTION_RUNNING);
 }
 
+inline static int amqp_connection_is_client(const amqp_connection_t *connection)
+{
+    return amqp_connection_is(connection, AMQP_CONNECTION_IS_CLIENT);
+}
+
 inline static void amqp_connection_flag_set(amqp_connection_t *connection, int flags)
 {
     connection->flags |= flags;
@@ -112,6 +121,19 @@ inline static void amqp_connection_flag_set(amqp_connection_t *connection, int f
 inline static void amqp_connection_flag_clear(amqp_connection_t *connection, int flags)
 {
     connection->flags &= ~flags;
+}
+// TODO - rename following 3
+inline static void flag_amqp_connection_opened(amqp_connection_t *connection)
+{
+    amqp_connection_flag_set(connection, AMQP_CONNECTION_IS_OPEN);
+}
+inline static void flag_amqp_connection_closing(amqp_connection_t *connection)
+{
+    amqp_connection_flag_set(connection, AMQP_CONNECTION_IS_CLOSING);
+}
+inline static void flag_amqp_connection_closed(amqp_connection_t *connection)
+{
+    amqp_connection_flag_clear(connection, AMQP_CONNECTION_IS_OPEN | AMQP_CONNECTION_IS_CLOSING);
 }
 
 inline static void amqp_connection_failure_flag_set(amqp_connection_t *connection, int flags)
@@ -122,6 +144,8 @@ inline static void amqp_connection_failure_flag_clear(amqp_connection_t *connect
 {
     connection->failure_flags &= ~flags;
 }
+
+extern const char *amqp_connection_target_host(amqp_connection_t *connection);
 
 #ifdef __cplusplus
 }

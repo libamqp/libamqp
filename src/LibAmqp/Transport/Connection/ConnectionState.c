@@ -77,6 +77,10 @@ void amqp_connection_state_cleanup(amqp_connection_t *connection)
 
     amqp_deallocate_buffer(connection->context, connection->buffer.write);
     amqp_deallocate_buffer(connection->context, connection->buffer.read);
+    
+    AMQP_FREE(connection->context, connection->amqp.connection.local_container_id);
+    AMQP_FREE(connection->context, connection->amqp.connection.remote_container_id);
+    AMQP_FREE(connection->context, connection->amqp.connection.hostname);
 }
 
 int amqp_connection_is_state(const amqp_connection_t *connection, const char *state_name)
@@ -88,6 +92,12 @@ void amqp_connection_enable_io(amqp_connection_t *connection)
 {
     connection->state.reader.enable(connection);
     connection->state.writer.enable(connection);
+}
+
+void amqp__shutdown_while_in_progress(amqp_connection_t *connection)
+{
+    amqp_connection_trace(connection, "Shutdown while shutdown in progress.");
+//    not_implemented(todo);
 }
 
 // Used by tests
@@ -193,11 +203,9 @@ static void timeout_while_stopping_output(amqp_connection_t *connection)
 static void transition_to_stopping_output(amqp_connection_t *connection)
 {
     save_old_state();
-
     amqp__connection_default_state_initialization(connection, "StoppingOutput");
     connection->state.connection.done = done_while_stopping_output;
     connection->state.connection.timeout = timeout_while_stopping_output;
-
     trace_transition(old_state_name);
 }
 
@@ -283,8 +291,7 @@ static void transition_to_timeout(amqp_connection_t *connection, const char *sta
     amqp__connection_default_state_initialization(connection, state_name);
     connection->state.connection.done = done_or_fail_while_timeout;
     connection->state.connection.fail = done_or_fail_while_timeout;
-    connection->state.connection.hangup = do_nothing;
-    connection->state.connection.drain = do_nothing;
+    connection->state.shutdown.drain = do_nothing;
     connection->state.connection.shutdown = do_nothing;
     trace_transition(old_state_name);
 }
@@ -292,8 +299,7 @@ static void transition_to_stopped(amqp_connection_t *connection)
 {
     save_old_state();
     amqp__connection_default_state_initialization(connection, "Stopped");
-    connection->state.connection.hangup = do_nothing;
-    connection->state.connection.drain = do_nothing;
+    connection->state.shutdown.drain = do_nothing;
     connection->state.connection.shutdown = do_nothing;
     trace_transition(old_state_name);
 }
@@ -302,8 +308,7 @@ static void transition_to_failed(amqp_connection_t *connection)
 {
     save_old_state();
     amqp__connection_default_state_initialization(connection, "Failed");
-    connection->state.connection.hangup = do_nothing;
-    connection->state.connection.drain = do_nothing;
+    connection->state.shutdown.drain = do_nothing;
     connection->state.connection.shutdown = do_nothing;
     trace_transition(old_state_name);
 }
@@ -318,19 +323,24 @@ static void illegal_state(amqp_connection_t *connection, const char *event)
     amqp_fatal_program_error("Connection state error");
 }
 
-static void default_hangup(amqp_connection_t *connection)
-{
-    shutdown_connection(connection, amqp_cs_close_socket);
-}
-
 static void default_drain(amqp_connection_t *connection)
 {
     shutdown_connection(connection, amqp_cs_complete_write_drain_input_and_close_socket);
 }
 
-static void default_shutdown(amqp_connection_t *connection)
+static void default_close(amqp_connection_t *connection)
 {
     shutdown_connection(connection, amqp_cs_complete_write_and_close_socket);
+}
+
+static void default_shutdown(amqp_connection_t *connection)
+{
+    connection->state.shutdown.close(connection);
+}
+
+static void default_fail(amqp_connection_t *connection)
+{
+    shutdown_connection(connection, amqp_cs_abort_socket);
 }
 
 static void default_connect(amqp_connection_t *connection, const char *hostname, int port)
@@ -348,16 +358,6 @@ static void default_reject(amqp_connection_t *connection, uint32_t version)
     illegal_state(connection, "Reject");
 }
 
-//static void default_write(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback)
-//{
-//    illegal_state(connection, "Write");
-//}
-
-//static void default_read(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_action_f done_callback)
-//{
-//    illegal_state(connection, "Read");
-//}
-
 static void default_done(amqp_connection_t *connection)
 {
     illegal_state(connection, "Done");
@@ -368,18 +368,15 @@ static void default_timeout(amqp_connection_t *connection)
     illegal_state(connection, "Timeout");
 }
 
-static void default_fail(amqp_connection_t *connection)
-{
-    shutdown_connection(connection, amqp_cs_abort_socket);
-}
-
 void amqp__connection_default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
 {
     connection->state.connection.name = new_state_name;
 
-    connection->state.connection.hangup = default_hangup;
-    connection->state.connection.drain = default_drain;
+    connection->state.shutdown.drain = default_drain;
+    connection->state.shutdown.close = default_close;
+
     connection->state.connection.shutdown = default_shutdown;
+    connection->state.connection.fail = default_fail;
 
     if (connection->flags & AMQP_CONNECTION_SOCKET_ACCEPTED)
     {
@@ -392,7 +389,6 @@ void amqp__connection_default_state_initialization(amqp_connection_t *connection
     }
 
     connection->state.connection.done = default_done;
-    connection->state.connection.fail = default_fail;
     connection->state.connection.timeout = default_timeout;
 }
 

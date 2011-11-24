@@ -61,9 +61,10 @@ SUITE(Connection)
     TEST_FIXTURE(ConnectionFixture, fixture_should_balance_allocations)
     {
     }
+
     TEST_FIXTURE(ConnectionFixture, limits_should_be_initialized)
     {
-        CHECK_EQUAL(AMQP_DEFAULT_MAX_FRAME_SIZE, connection->limits.max_frame_size);
+        CHECK_EQUAL(AMQP_DEFAULT_MAX_FRAME_SIZE, connection->amqp.connection.limits.max_frame_size);
     }
 
     TEST_FIXTURE(ConnectionFixture, connection_should_establish_socket_link)
@@ -161,5 +162,29 @@ SUITE(Connection)
         CHECK_EQUAL("AqmpTunnelEstablished", connection->state.connection.name);
         amqp_connection_shutdown(context, connection);
         loop_while_running();
+    }
+
+    TEST_FIXTURE(ConnectionFixture, connection_should_open_amqp_connection)
+    {
+        connection->state.connection.mode.client.connect(connection, "localhost", 54321);
+        loop_until_connection_state_is("AqmpTunnelEstablished");
+        loop_until_connection_amqp_state_is("Opened");
+        CHECK_EQUAL("Opened", connection->state.amqp.name);
+    }
+
+    TEST_FIXTURE(ConnectionFixture, shutdown_should_close_amqp_connection)
+    {
+        connection->state.connection.mode.client.connect(connection, "localhost", 54321);
+        loop_until_connection_state_is("AqmpTunnelEstablished");
+        loop_until_connection_amqp_state_is("Opened");
+        CHECK_EQUAL("Opened", connection->state.amqp.name);
+        amqp_connection_shutdown(context, connection);
+
+        CHECK_EQUAL("CloseSent", connection->state.amqp.name);
+        loop_while_connection_amqp_state_is("CloseSent");
+
+
+        SOUTS(connection->state.amqp.name);
+        CHECK(0);
     }
 }

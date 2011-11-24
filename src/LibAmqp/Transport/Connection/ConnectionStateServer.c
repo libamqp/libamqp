@@ -150,7 +150,7 @@ static void transition_to_waiting_on_client_negotiation_request(amqp_connection_
 
 static void done_while_sending_error_message(amqp_connection_t *connection)
 {
-    connection->state.connection.drain(connection);
+    connection->state.shutdown.drain(connection);
 }
 static void transition_to_sending_error_message(amqp_connection_t *connection)
 {
@@ -212,9 +212,8 @@ static void done_while_accepting_sasl(amqp_connection_t *connection)
 static void fail_while_accepting_sasl(amqp_connection_t *connection)
 {
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_SASL_NEGOTIATION_REJECTED);
-    amqp_connection_trace(connection, "SASL negotiation failed");
-    break_two();
-    connection->state.connection.drain(connection);
+//    amqp_connection_trace(connection, "SASL negotiation failed");
+    connection->state.shutdown.drain(connection);
 }
 static void reject_while_accepting_sasl(amqp_connection_t *connection, uint32_t version)
 {
@@ -252,7 +251,7 @@ static void done_while_accepting_amqp(amqp_connection_t *connection)
 {
     amqp_connection_flag_set(connection, AMQP_CONNECTION_AMQP_CONNECTED);
     transition_to_tunnel_accepted(connection);
-    // TODO - wait for the client to establish a link
+    connection->state.amqp.wait_on_open(connection);
 }
 static void fail_while_accepting_amqp(amqp_connection_t *connection)
 {
@@ -275,14 +274,9 @@ static void transition_to_accepting_amqp(amqp_connection_t *connection)
     trace_transition(old_state_name);
 }
 
-static void shutdown_while_tunnel_accepted(amqp_connection_t *connection)
-{
-    connection->state.connection.drain(connection);
-}
 static void transition_to_tunnel_accepted(amqp_connection_t *connection)
 {
     save_old_state();
-    amqp__connection_default_state_initialization(connection, "Accepted");
-    connection->state.connection.shutdown = shutdown_while_tunnel_accepted;
+    amqp__connection_default_state_initialization(connection, "AmqpTunnelAccepted");
     trace_transition(old_state_name);
 }

@@ -85,7 +85,6 @@ SUITE(ConnectionSasl)
     {
         static test_data::TestData *test_frames[] =
         {
-//            &test_data::sasl_protocol_1_0_0,
             &test_data::sasl_init_frame,
             0
         };
@@ -95,6 +94,5 @@ SUITE(ConnectionSasl)
         set_test_data_for_read(test_frames);
         connection->state.sasl.tunnel.accept(connection, AMQP_SASL_PREFERRED_VERSION);
         CHECK_EQUAL("Negotiated", connection->state.sasl.name);
-//        CHECK(0);
     }
 }
