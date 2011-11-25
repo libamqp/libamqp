@@ -36,7 +36,9 @@ SUITE(ConnectionSocket)
         connect_to("unknown-dodgy-host.localdomain", 54321);
         CHECK(!amqp_connection_is(connection, AMQP_CONNECTION_RUNNING));
         CHECK_EQUAL("Failed", connection->state.socket.name);
-        CHECK_EQUAL("client: error: eai_error(8): state=Resolving; Failed to lookup a valid address for unknown-dodgy-host.localdomain:54321", message_buffer);
+        char buffer[128];
+        snprintf(buffer, sizeof(buffer), "client: error: eai_error(%d): state=Resolving; Failed to lookup a valid address for unknown-dodgy-host.localdomain:54321", EAI_NONAME);
+        CHECK_EQUAL(buffer, message_buffer);
     }
 
     TEST_FIXTURE(ConnectionSocketFixture, connection_can_be_stopped)
