@@ -28,7 +28,6 @@
 
 #include "debug_helper.h"
 
-
 size_t amqp_buffer_grow(amqp_context_t *context, amqp_buffer_t *buffer, size_t new_size)
 {
     if (new_size > AMQP_BUFFER_MAX_SIZE)

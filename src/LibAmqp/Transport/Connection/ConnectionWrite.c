@@ -80,17 +80,15 @@ static void call_done_callback(amqp_connection_t *connection)
     done_callback(connection);
 }
 
+
 static void write_what_is_available(amqp_connection_t *connection)
 {
     int n;
-    struct iovec *io_vec;
     int available_for_write = amqp_buffer_available(connection->io.write.buffer);
 
     while (available_for_write > 0)
     {
-        int iov_count;
-        io_vec = amqp_buffer_read_io_vec(connection->io.write.buffer, &iov_count);
-        if ((n = writev(connection->socket.fd, io_vec, iov_count)) == -1)
+        if ((n = amqp_buffer_write(connection->socket.fd, connection->io.write.buffer)) == -1)
         {
             break;
         }
