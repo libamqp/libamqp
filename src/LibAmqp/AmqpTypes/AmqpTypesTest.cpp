@@ -27,8 +27,7 @@ SUITE(AmqpTypes)
 {
     // If a field is added to a generated type one of these will fail.
     // These may become annoying if types change frequently
-    // TODO - delete these once AMQP becomes an Oasis specification
-
+#ifdef __LP64__
     TEST_FIXTURE(AmqpTypesFixture, type_sizes)
     {
         CHECK_EQUAL(72U, sizeof(amqp_type_t));
@@ -97,4 +96,5 @@ SUITE(AmqpTypes)
         CHECK_EQUAL(40U, sizeof(amqp_messaging_amqp_value_t));
         CHECK_EQUAL(32U, sizeof(amqp_messaging_footer_t));
     }
+#endif
 }
