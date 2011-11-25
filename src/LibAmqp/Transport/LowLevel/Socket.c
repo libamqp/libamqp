@@ -115,8 +115,12 @@ int amqp_set_socket_to_ignore_sigpipe(amqp_socket_t fd)
     int value = 1;
     return amqp_set_socket_option(fd, SO_NOSIGPIPE, value);
 #else
-#error "Ignore SIGPIPE"
+#ifdef MSG_NOSIGNAL
+    return 0;
+#else
+#error "Neither SO_NOSIGPIPE nor MSG_NOSIGNAL is available. (Must ignore SIGPIPE)"
     return -1;
-#endif
-#endif
+#endif /* MSG_NOSIGNAL */
+#endif /* SO_NOSIGPIPE */
+#endif /* AMQP_WINDOWS_PORT */
 }

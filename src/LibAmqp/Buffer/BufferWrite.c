@@ -16,21 +16,35 @@
 
 #include <assert.h>
 #include <limits.h>
-#include <string.h>
-#include <ctype.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
 
 #include "Buffer/Buffer.h"
 #include "Buffer/BufferInternal.h"
 #include "Memory/Memory.h"
 #include "Misc/Bits.h"
-
 #include "Context/Context.h"
 
 #include "debug_helper.h"
+
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL    0
+#endif
 
 int amqp_buffer_write(int fd, amqp_buffer_t *buffer)
 {
     int iov_count;
     struct iovec *io_vec = amqp_buffer_read_io_vec(buffer, &iov_count);
-    return writev(fd, io_vec, iov_count);
+    struct msghdr header = {
+        .msg_name = 0,
+        .msg_namelen = 0,
+        .msg_iov = io_vec,
+        .msg_iovlen = iov_count,
+        .msg_control = 0,
+        .msg_controllen = 0,
+        .msg_flags = 0
+    };
+    
+    return sendmsg(fd, &header, MSG_NOSIGNAL);
 }
