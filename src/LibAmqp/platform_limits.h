@@ -32,6 +32,10 @@ extern "C" {
 #define LONG_BIT (sizeof(long) * CHAR_BIT)
 #endif
 
+#ifndef HOST_NAME_MAX 
+#define HOST_NAME_MAX 256
+#endif
+
 #ifdef __cplusplus
 }
 #endif

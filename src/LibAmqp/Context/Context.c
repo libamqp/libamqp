@@ -311,7 +311,6 @@ void amqp_deallocate_print_buffer(amqp_context_t *context, uint8_t *buffer)
     free(buffer);
 }
 
-#define HOST_NAME_MAX 256
 static char *generate_container_id(amqp_context_t *context)
 {
     const size_t space = HOST_NAME_MAX + 64;

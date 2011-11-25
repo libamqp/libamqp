@@ -17,6 +17,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "Buffer/Buffer.h"
 #include "Buffer/BufferInternal.h"

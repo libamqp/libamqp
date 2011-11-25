@@ -116,6 +116,7 @@ int amqp_set_socket_to_ignore_sigpipe(amqp_socket_t fd)
     return amqp_set_socket_option(fd, SO_NOSIGPIPE, value);
 #else
 #error "Ignore SIGPIPE"
+    return -1;
 #endif
 #endif
 }
