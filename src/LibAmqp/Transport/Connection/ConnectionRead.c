@@ -35,7 +35,15 @@
 #define trace_transition(old_state_name)
 #endif
 
-static void default_state_initialization(amqp_connection_t *connection, const char *state_name);
+#define DEFINE_TRANSITION_TO(state) \
+static void initialise_actions_for ## state(amqp_connection_t *connection); \
+static void transition_to_ ## state(amqp_connection_t *connection) \
+{ \
+    default_state_initialization(connection, #state, initialise_actions_for ## state); \
+} \
+static void initialise_actions_for ## state(amqp_connection_t *connection)
+
+static void default_state_initialization(amqp_connection_t *connection, const char *state_name, void (*initializer)(amqp_connection_t *connection));
 static void transition_to_initialized(amqp_connection_t *connection);
 static void transition_to_enabled(amqp_connection_t *connection);
 static void transition_to_reading(amqp_connection_t *connection);
@@ -220,7 +228,7 @@ static void reset_while_initialized(amqp_connection_t *connection)
 }
 static void transition_to_initialized(amqp_connection_t *connection)
 {
-    default_state_initialization(connection, "Initialized");
+    default_state_initialization(connection, "Initialized", 0);
     connection->state.reader.enable = enable_while_initialized;
     connection->state.reader.stop = stop_while_initialized;
     connection->state.reader.reset = reset_while_initialized;
@@ -242,7 +250,7 @@ static void transition_to_enabled(amqp_connection_t *connection)
 {
     save_old_state();
 
-    default_state_initialization(connection, "Enabled");
+    default_state_initialization(connection, "Enabled", 0);
     connection->state.reader.commence_read = commence_read_while_enabled;
     connection->state.reader.continue_read = next_read_while_enabled;
     connection->state.reader.stop = reader_stop;
@@ -263,7 +271,7 @@ static void commence_read_while_eof(amqp_connection_t *connection, amqp_buffer_t
 static void transition_to_eof(amqp_connection_t *connection)
 {
     save_old_state();
-    default_state_initialization(connection, "Eof");
+    default_state_initialization(connection, "Eof", 0);
     connection->state.reader.commence_read = commence_read_while_eof;
     trace_transition(old_state_name);
 }
@@ -277,7 +285,7 @@ static void transition_to_eof_alerted(amqp_connection_t *connection)
 {
     // Here to cause a failure if application code ignores the first notification of EOF
     save_old_state();
-    default_state_initialization(connection, "EofAlerted");
+    default_state_initialization(connection, "EofAlerted", 0);
     connection->state.reader.reset = reset_while_eof_alerted;
     trace_transition(old_state_name);
 }
@@ -292,30 +300,25 @@ static void reset_while_reading(amqp_connection_t *connection)
     amqp_io_event_watcher_stop(connection->io.read.watcher);
     transition_to_enabled(connection);
 }
-static void transition_to_reading(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO(reading)
 {
-    save_old_state();
-
-    default_state_initialization(connection, "Reading");
     connection->state.reader.continue_read = next_read_while_reading;
     connection->state.reader.reset = reset_while_reading;
     connection->state.reader.stop = reader_stop;
     connection->state.reader.fail = reader_fail;
-
-    trace_transition(old_state_name);
 }
 
 static void transition_to_stopped(amqp_connection_t *connection)
 {
     save_old_state();
-    default_state_initialization(connection, "Stopped");
+    default_state_initialization(connection, "Stopped", 0);
     trace_transition(old_state_name);
 }
 
 static void transition_to_failed(amqp_connection_t *connection)
 {
     save_old_state();
-    default_state_initialization(connection, "Failed");
+    default_state_initialization(connection, "Failed", 0);
     trace_transition(old_state_name);
 }
 
@@ -356,8 +359,10 @@ static void default_read_fail(amqp_connection_t *connection, int error_code)
     illegal_read_state(connection, "Fail");
 }
 
-static void default_state_initialization(amqp_connection_t *connection, const char *state_name)
+static void default_state_initialization(amqp_connection_t *connection, const char *state_name, void (*action_initializer)(amqp_connection_t *connection))
 {
+    save_old_state();
+
     connection->state.reader.enable = default_read_enable;
     connection->state.reader.commence_read = default_commence_read;
     connection->state.reader.continue_read = default_read_next;
@@ -366,5 +371,9 @@ static void default_state_initialization(amqp_connection_t *connection, const ch
     connection->state.reader.fail = default_read_fail;
 
     connection->state.reader.name = state_name;
+
+    if (action_initializer) action_initializer(connection);
+    
+    trace_transition(old_state_name);
 }
 
