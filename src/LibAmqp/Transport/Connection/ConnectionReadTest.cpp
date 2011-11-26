@@ -62,32 +62,32 @@ SUITE(ConnectionRead)
     TEST_FIXTURE(ConnectionReadFixture, stop_without_read)
     {
         amqp_connection_reader_initialize(connection);
-        CHECK_EQUAL("Initialized", connection->state.reader.name);
+        CHECK_EQUAL("initialized", connection->state.reader.name);
         connection->state.reader.enable(connection);
-        CHECK_EQUAL("Enabled", connection->state.reader.name);
+        CHECK_EQUAL("enabled", connection->state.reader.name);
 
         connection->state.reader.stop(connection);
-        CHECK_EQUAL("Stopped", connection->state.reader.name);
+        CHECK_EQUAL("stopped", connection->state.reader.name);
     }
 
     TEST_FIXTURE(ConnectionReadFixture, stop_without_prior_enable)
     {
         amqp_connection_reader_initialize(connection);
-        CHECK_EQUAL("Initialized", connection->state.reader.name);
+        CHECK_EQUAL("initialized", connection->state.reader.name);
 
         connection->state.reader.stop(connection);
-        CHECK_EQUAL("Stopped", connection->state.reader.name);
+        CHECK_EQUAL("stopped", connection->state.reader.name);
 
         connection->state.reader.stop(connection);
-        CHECK_EQUAL("Stopped", connection->state.reader.name);
+        CHECK_EQUAL("stopped", connection->state.reader.name);
     }
 
     TEST_FIXTURE(ConnectionReadFixture, reader_states)
     {
         amqp_connection_reader_initialize(connection);
-        CHECK_EQUAL("Initialized", connection->state.reader.name);
+        CHECK_EQUAL("initialized", connection->state.reader.name);
         connection->state.reader.enable(connection);
-        CHECK_EQUAL("Enabled", connection->state.reader.name);
+        CHECK_EQUAL("enabled", connection->state.reader.name);
 
         write_size(write_buffer, 1);
         amqp_buffer_putc(write_buffer, 'X');
@@ -98,20 +98,20 @@ SUITE(ConnectionRead)
         while (run_loop_with_timeout() && amqp_connection_reader_is_state(connection, "reading"));
 
         CHECK_EQUAL("Enabled", connection->state.writer.name);
-        CHECK_EQUAL("Enabled", connection->state.reader.name);
+        CHECK_EQUAL("enabled", connection->state.reader.name);
 
         CHECK_EQUAL(1U, amqp_buffer_read_size_field(read_buffer, 4));
         CHECK_EQUAL('X', amqp_buffer_getc(read_buffer));
 
         connection->state.reader.stop(connection);
-        CHECK_EQUAL("Stopped", connection->state.reader.name);
+        CHECK_EQUAL("stopped", connection->state.reader.name);
     }
 
     TEST_FIXTURE(ConnectionReadFixture, read_small_message)
     {
         amqp_connection_reader_initialize(connection);
         connection->state.reader.enable(connection);
-        CHECK_EQUAL("Enabled", connection->state.reader.name);
+        CHECK_EQUAL("enabled", connection->state.reader.name);
 
         const char *hello_world = "Hello World";
         write_size(write_buffer, strlen(hello_world));
@@ -135,14 +135,14 @@ SUITE(ConnectionRead)
         CHECK_EQUAL(hello_world, buffer);
 
         connection->state.reader.stop(connection);
-        CHECK_EQUAL("Stopped", connection->state.reader.name);
+        CHECK_EQUAL("stopped", connection->state.reader.name);
     }
 
     TEST_FIXTURE(ConnectionReadFixture, read_huge_message)
     {
         amqp_connection_reader_initialize(connection);
         connection->state.reader.enable(connection);
-        CHECK_EQUAL("Enabled", connection->state.reader.name);
+        CHECK_EQUAL("enabled", connection->state.reader.name);
 
         const size_t size = 32 * 1024 - 4;
         amqp_buffer_grow(context, write_buffer, size + 4);
@@ -158,7 +158,7 @@ SUITE(ConnectionRead)
         connection->state.reader.commence_read(connection, read_buffer, size + 4, read_callback);
 
         while (run_loop_with_timeout() && amqp_connection_reader_is_state(connection, "reading"));
-        CHECK_EQUAL("Enabled", connection->state.reader.name);
+        CHECK_EQUAL("enabled", connection->state.reader.name);
 
         CHECK_EQUAL(size, amqp_buffer_read_size_field(read_buffer, 4));
 
@@ -174,7 +174,7 @@ SUITE(ConnectionRead)
         CHECK(failures < 5);
 
         connection->state.reader.stop(connection);
-        CHECK_EQUAL("Stopped", connection->state.reader.name);
+        CHECK_EQUAL("stopped", connection->state.reader.name);
     }
 
 }
