@@ -69,7 +69,7 @@ SUITE(Connection)
 
     TEST_FIXTURE(ConnectionFixture, connection_should_establish_socket_link)
     {
-        CHECK_EQUAL("Initialized", connection->state.writer.name);
+        CHECK_EQUAL("initialized", connection->state.writer.name);
         CHECK_EQUAL("initialized", connection->state.reader.name);
         connection->state.connection.mode.client.connect(connection, "localhost", 54321);
 

@@ -76,24 +76,24 @@ SUITE(ConnectionWrite)
     TEST_FIXTURE(ConnectionWriteFixture, stop_without_write)
     {
         amqp_connection_writer_initialize(connection);
-        CHECK_EQUAL("Initialized", connection->state.writer.name);
+        CHECK_EQUAL("initialized", connection->state.writer.name);
         connection->state.writer.enable(connection);
-        CHECK_EQUAL("Enabled", connection->state.writer.name);
+        CHECK_EQUAL("enabled", connection->state.writer.name);
 
         connection->state.writer.stop(connection, write_callback);
-        CHECK_EQUAL("Stopped", connection->state.writer.name);
+        CHECK_EQUAL("stopped", connection->state.writer.name);
     }
 
     TEST_FIXTURE(ConnectionWriteFixture, stop_without_prior_enable)
     {
         amqp_connection_writer_initialize(connection);
-        CHECK_EQUAL("Initialized", connection->state.writer.name);
+        CHECK_EQUAL("initialized", connection->state.writer.name);
 
         connection->state.writer.stop(connection, write_callback);
-        CHECK_EQUAL("Stopped", connection->state.writer.name);
+        CHECK_EQUAL("stopped", connection->state.writer.name);
 
         connection->state.writer.stop(connection, write_callback);
-        CHECK_EQUAL("Stopped", connection->state.writer.name);
+        CHECK_EQUAL("stopped", connection->state.writer.name);
     }
 
     /* TODO - restore - read_reply() hangs on 64-bit linux

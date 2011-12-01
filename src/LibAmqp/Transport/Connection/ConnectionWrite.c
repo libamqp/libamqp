@@ -36,7 +36,15 @@
 #define trace_transition(old_state_name)
 #endif
 
-static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name);
+#define DEFINE_TRANSITION_TO(state) \
+static void initialise_actions_for ## state(amqp_connection_t *connection); \
+static void transition_to_ ## state(amqp_connection_t *connection) \
+{ \
+    default_state_initialization(connection, #state, initialise_actions_for ## state); \
+} \
+static void initialise_actions_for ## state(amqp_connection_t *connection)
+
+static void default_state_initialization(amqp_connection_t *connection, const char *state_name, void (*action_initializer)(amqp_connection_t *connection));
 
 static void transition_to_initialized(amqp_connection_t *connection);
 static void transition_to_enabled(amqp_connection_t *connection);
@@ -182,13 +190,11 @@ static void abort_while_initialized(amqp_connection_t *connection)
 {
     transition_to_stopped(connection);
 }
-static void transition_to_initialized(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO(initialized)
 {
-    default_state_initialization(connection, "Initialized");
     connection->state.writer.enable = enable_while_initialized;
     connection->state.writer.stop = stop_while_initialized;
     connection->state.writer.abort = abort_while_initialized;
-    trace_transition("Created");
 }
 
 static void commence_write_while_enabled(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback)
@@ -201,17 +207,12 @@ static void next_write_while_enabled(amqp_connection_t *connection)
     // Most likely a spurious io event, just stop the watcher.
     amqp_io_event_watcher_stop(connection->io.write.watcher);
 }
-static void transition_to_enabled(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO(enabled)
 {
-    save_old_state();
-
-    default_state_initialization(connection, "Enabled");
     connection->state.writer.commence_write = commence_write_while_enabled;
     connection->state.writer.continue_write = next_write_while_enabled;
     connection->state.writer.stop = writer_stop;
     connection->state.writer.fail = writer_fail;
-
-    trace_transition(old_state_name);
 }
 
 static void commence_write_while_writing(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback)
@@ -235,16 +236,13 @@ static void write_complete_while_writing(amqp_connection_t *connection)
     transition_to_enabled(connection);
     call_done_callback(connection);
 }
-static void transition_to_writing(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO(writing)
 {
-    save_old_state();
-    default_state_initialization(connection, "Writing");
     connection->state.writer.commence_write = commence_write_while_writing;
     connection->state.writer.continue_write = next_write_while_writing;
     connection->state.writer.stop = stop_while_writing;
     connection->state.writer.fail = writer_fail;
     connection->state.writer.write_complete = write_complete_while_writing;
-    trace_transition(old_state_name);
 }
 
 static void next_write_while_stopping(amqp_connection_t *connection)
@@ -260,34 +258,25 @@ static void fail_while_stopping(amqp_connection_t *connection, int error_code)
 {
     // Nothing to do here
 }
-static void transition_to_stopping(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO(stopping)
 {
-    save_old_state();
-    default_state_initialization(connection, "Stopping");
     connection->state.writer.continue_write = next_write_while_stopping;
     connection->state.writer.write_complete = write_complete_while_stopping;
     connection->state.writer.fail = fail_while_stopping;
-    trace_transition(old_state_name);
 }
 
 static void abort_while_stopped_or_failed(amqp_connection_t *connection)
 {
     // Nothing to do here
 }
-static void transition_to_stopped(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO(stopped)
 {
-    save_old_state();
-    default_state_initialization(connection, "Stopped");
     connection->state.writer.abort = abort_while_stopped_or_failed;
-    trace_transition(old_state_name);
 }
 
-static void transition_to_failed(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO(failed)
 {
-    save_old_state();
-    default_state_initialization(connection, "Failed");
     connection->state.writer.abort = abort_while_stopped_or_failed;
-    trace_transition(old_state_name);
 }
 
 /* Default writer states */
@@ -335,8 +324,12 @@ static void default_write_complete(amqp_connection_t *connection)
     illegal_write_state(connection, "WriteComplete");
 }
 
-static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
+static void default_state_initialization(amqp_connection_t *connection, const char *state_name, void (*action_initializer)(amqp_connection_t *connection))
 {
+    save_old_state();
+
+//    assert(action_initializer);
+
     connection->state.writer.enable = default_write_enable;
     connection->state.writer.commence_write = default_commence_write;
     connection->state.writer.continue_write = default_write_next;
@@ -345,6 +338,9 @@ static void default_state_initialization(amqp_connection_t *connection, const ch
     connection->state.writer.fail = default_write_fail;
     connection->state.writer.write_complete = default_write_complete;
 
-    connection->state.writer.name = new_state_name;
-}
+    connection->state.writer.name = state_name;
 
+    action_initializer(connection);
+
+    trace_transition(old_state_name);
+}

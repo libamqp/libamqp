@@ -97,7 +97,7 @@ SUITE(ConnectionRead)
         CHECK_EQUAL("reading", connection->state.reader.name);
         while (run_loop_with_timeout() && amqp_connection_reader_is_state(connection, "reading"));
 
-        CHECK_EQUAL("Enabled", connection->state.writer.name);
+        CHECK_EQUAL("enabled", connection->state.writer.name);
         CHECK_EQUAL("enabled", connection->state.reader.name);
 
         CHECK_EQUAL(1U, amqp_buffer_read_size_field(read_buffer, 4));
