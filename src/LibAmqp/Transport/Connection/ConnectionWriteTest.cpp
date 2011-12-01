@@ -56,17 +56,30 @@ SUITE(ConnectionWrite)
     int ConnectionWriteFixture::read_reply(size_t n)
     {
         if (reply) free(reply);
-        amqp_set_socket_to_blocking(connection->socket.fd);
         reply = (unsigned char *) malloc(n);
         size_t needed = n;
         size_t so_far = 0;
         int c;
-        while ((c = read(connection->socket.fd, reply + so_far, needed)) != -1 && (needed > 0))
+        while (needed > 0)
         {
-            needed -= c;
-            so_far += c;
+            while ((c = read(connection->socket.fd, reply + so_far, needed)) != -1 && (needed > 0))
+            {
+                needed -= c;
+                so_far += c;
+            }
+            if (c == -1 && (errno == EAGAIN || errno == EWOULDBLOCK))
+            {
+                if (amqp_connection_writer_is_state(connection, "writing"))
+                {
+                    int ok = run_loop_with_timeout();
+                    if (!ok)
+                    {
+                        return -1;
+                    }
+                }
+            }
         }
-        return c == -1 ? -1 : n;
+        return c == -1 ? -1 : so_far;
     }
 
     TEST_FIXTURE(ConnectionWriteFixture, verify_fixture_cleans_resources)
@@ -76,52 +89,49 @@ SUITE(ConnectionWrite)
     TEST_FIXTURE(ConnectionWriteFixture, stop_without_write)
     {
         amqp_connection_writer_initialize(connection);
-        CHECK_EQUAL("Initialized", connection->state.writer.name);
+        CHECK_EQUAL("initialized", connection->state.writer.name);
         connection->state.writer.enable(connection);
-        CHECK_EQUAL("Enabled", connection->state.writer.name);
+        CHECK_EQUAL("enabled", connection->state.writer.name);
 
         connection->state.writer.stop(connection, write_callback);
-        CHECK_EQUAL("Stopped", connection->state.writer.name);
+        CHECK_EQUAL("stopped", connection->state.writer.name);
     }
 
     TEST_FIXTURE(ConnectionWriteFixture, stop_without_prior_enable)
     {
         amqp_connection_writer_initialize(connection);
-        CHECK_EQUAL("Initialized", connection->state.writer.name);
+        CHECK_EQUAL("initialized", connection->state.writer.name);
 
         connection->state.writer.stop(connection, write_callback);
-        CHECK_EQUAL("Stopped", connection->state.writer.name);
+        CHECK_EQUAL("stopped", connection->state.writer.name);
 
         connection->state.writer.stop(connection, write_callback);
-        CHECK_EQUAL("Stopped", connection->state.writer.name);
+        CHECK_EQUAL("stopped", connection->state.writer.name);
     }
 
-    /* TODO - restore - read_reply() hangs on 64-bit linux
     TEST_FIXTURE(ConnectionWriteFixture, write_small_message)
     {
         amqp_connection_writer_initialize(connection);
-        CHECK_EQUAL("Initialized", connection->state.writer.name);
+        CHECK_EQUAL("initialized", connection->state.writer.name);
         connection->state.writer.enable(connection);
-        CHECK_EQUAL("Enabled", connection->state.writer.name);
+        CHECK_EQUAL("enabled", connection->state.writer.name);
 
         write_size(write_buffer, 1);
         amqp_buffer_putc(write_buffer, 'X');
-
-        while (amqp_connection_writer_is_state(connection, "Writing") && run_loop_with_timeout());
 
         connection->state.writer.commence_write(connection, write_buffer, write_callback);
         read_reply(5);
 
         CHECK_EQUAL('X', reply[4]);
         connection->state.writer.stop(connection, write_callback);
-        CHECK_EQUAL("Stopped", connection->state.writer.name);
+        CHECK_EQUAL("stopped", connection->state.writer.name);
     }
 
     TEST_FIXTURE(ConnectionWriteFixture, write_huge_message)
     {
         amqp_connection_writer_initialize(connection);
         connection->state.writer.enable(connection);
-        CHECK_EQUAL("Enabled", connection->state.writer.name);
+        CHECK_EQUAL("enabled", connection->state.writer.name);
 
         const size_t size = 64 * 1024;
         amqp_buffer_grow(context, write_buffer, size);
@@ -131,10 +141,6 @@ SUITE(ConnectionWrite)
             amqp_buffer_putc(write_buffer, 19 + i % 67);
         }
         connection->state.writer.commence_write(connection, write_buffer, write_callback);
-        while (amqp_connection_writer_is_state(connection, "Writing") && run_loop_with_timeout())
-        {
-            printf("%s\n", connection->state.writer.name);
-        }
 
         read_reply(size);
 
@@ -149,7 +155,6 @@ SUITE(ConnectionWrite)
         }
         CHECK(failures < 5);
         connection->state.writer.stop(connection, write_callback);
-        CHECK_EQUAL("Stopped", connection->state.writer.name);
+        CHECK_EQUAL("stopped", connection->state.writer.name);
     }
-    */
 }
