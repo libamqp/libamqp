@@ -128,7 +128,6 @@ SUITE(Connection)
 
         CHECK(connection->failure_flags & AMQP_CONNECTION_AMQP_NEGOTIATION_REJECTED);
     }
-
     TEST_FIXTURE(ConnectionFixture, connection_should_establish_sasl_tunnel)
     {
         connection->protocols = AMQP_PROTOCOL_SASL | AMQP_PROTOCOL_AMQP;

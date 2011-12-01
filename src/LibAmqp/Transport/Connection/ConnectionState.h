@@ -113,6 +113,7 @@ typedef struct amqp_connection_reader_state_t
     amqp_connection_action_f reset;             // TODO - need to review implementation, it's rather crap atm
     amqp_connection_action_f stop;
     amqp_connection_error_f fail;
+    amqp_connection_action_f delayed_read;
 } amqp_connection_reader_state_t;
 
 typedef struct amqp_connection_socket_state_t
@@ -318,19 +319,17 @@ struct amqp_connection_t
         amqp_buffer_t *write;
     } buffer;
     struct {
-        struct
-        {
-            amqp_buffer_t *buffer;
+        struct {
             amqp_connection_action_f done_callback;
+            amqp_buffer_t *buffer;
             amqp_io_event_watcher_t *watcher;
         } write;
-        struct
-        {
-            amqp_buffer_t *buffer;
+        struct {
             amqp_connection_read_callback_f read_callback;
-            amqp_io_event_watcher_t *watcher;
+            amqp_buffer_t *buffer;
             size_t n_required;
             size_t satisfied;
+            amqp_io_event_watcher_t *watcher;
         } read;
         struct {
             amqp_buffer_t *buffer;
