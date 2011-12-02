@@ -162,16 +162,19 @@ SUITE(ConnectionRead)
 
         CHECK_EQUAL(size, amqp_buffer_read_size_field(read_buffer, 4));
 
-        int failures = 0;
         for (size_t i = 0; i < size; i++)
         {
             int c = amqp_buffer_getc(read_buffer);
             int expect = 19 + i % 67;
-            CHECK_EQUAL(expect, c);
-            if (expect != c) failures++;
-            if (failures > 5) break;
+	    if (expect != c)
+	    {	
+		CHECK_EQUAL(expect, c);
+		SOUTV(i);
+		SOUTV(expect);
+		SOUTV(c);
+		break;
+	    }
         }
-        CHECK(failures < 5);
 
         connection->state.reader.stop(connection);
         CHECK_EQUAL("stopped", connection->state.reader.name);
