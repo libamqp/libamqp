@@ -30,6 +30,8 @@ SUITE(ConnectionRead)
     static void read_callback(amqp_connection_t *connection, amqp_buffer_t *buffer, int amount);
     static void write_callback(amqp_connection_t *connection);
 
+    static bool reading;
+    static bool writing;
     public:
     };
 
@@ -40,6 +42,8 @@ SUITE(ConnectionRead)
         loop_while_socket_state_is("Connecting");
         amqp_connection_writer_initialize(connection);
         connection->state.writer.enable(connection);
+
+        reading = writing = true;
     }
 
     ConnectionReadFixture::~ConnectionReadFixture()
@@ -47,12 +51,18 @@ SUITE(ConnectionRead)
         connection->state.writer.stop(connection, write_callback);
     }
 
+    bool ConnectionReadFixture::reading;
+    bool ConnectionReadFixture::writing;
+
     void ConnectionReadFixture::write_callback(amqp_connection_t *connection)
     {
+//        SOUTS("write_callback called");
+        writing = false;
     }
 
     void ConnectionReadFixture::read_callback(amqp_connection_t *connection, amqp_buffer_t *buffer, int amount)
     {
+        reading = false;
     }
 
     TEST_FIXTURE(ConnectionReadFixture, verify_fixture_clean_resources)
@@ -95,7 +105,8 @@ SUITE(ConnectionRead)
         connection->state.reader.commence_read(connection, read_buffer, 5, read_callback);
 
         CHECK_EQUAL("reading", connection->state.reader.name);
-        while (run_loop_with_timeout() && amqp_connection_reader_is_state(connection, "reading"));
+//        while (run_loop_with_timeout() && amqp_connection_reader_is_state(connection, "reading"));
+        while (run_loop_with_timeout() && (writing || reading));
 
         CHECK_EQUAL("enabled", connection->state.writer.name);
         CHECK_EQUAL("enabled", connection->state.reader.name);
@@ -120,7 +131,8 @@ SUITE(ConnectionRead)
         connection->state.writer.commence_write(connection, write_buffer, write_callback);
         connection->state.reader.commence_read(connection, read_buffer, strlen(hello_world) + 4, read_callback);
 
-        while (run_loop_with_timeout() && amqp_connection_reader_is_state(connection, "reading"));
+//        while (run_loop_with_timeout() && amqp_connection_reader_is_state(connection, "reading"));
+        while (run_loop_with_timeout() && (writing || reading));
 
         uint32_t size = amqp_buffer_read_size_field(read_buffer, 4);
         CHECK_EQUAL(size, strlen(hello_world));
@@ -157,7 +169,9 @@ SUITE(ConnectionRead)
         amqp_buffer_grow(context, read_buffer, size + 4);
         connection->state.reader.commence_read(connection, read_buffer, size + 4, read_callback);
 
-        while (run_loop_with_timeout() && amqp_connection_reader_is_state(connection, "reading"));
+        while (run_loop_with_timeout() && (writing || reading));
+//        while (run_loop_with_timeout() && amqp_connection_writer_is_state(connection, "writing"));
+//        while (run_loop_with_timeout() && amqp_connection_reader_is_state(connection, "reading"));
         CHECK_EQUAL("enabled", connection->state.reader.name);
 
         CHECK_EQUAL(size, amqp_buffer_read_size_field(read_buffer, 4));
