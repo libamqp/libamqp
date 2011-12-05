@@ -107,29 +107,26 @@ SUITE(Connection)
     }
     TEST_FIXTURE(ConnectionHookFixture, connection_should_reject_sasl_version)
     {
-        context->debug.level = 0;
+	context->debug.level = 0;
+	//connection->trace_flags = -1;
         connection->protocols = AMQP_PROTOCOL_SASL | AMQP_PROTOCOL_AMQP;
         connection->state.connection.mode.client.connect(connection, "localhost", 54321);
         loop_while_socket_state_is("Connecting");
         loop_while_connection_state_is("ConnectingSasl");
-        // TODO - Ensure that transition to draining input is a by product of number of cores and not a bug
-        while (amqp_connection_amqp_is_state(connection, "DrainingInput") && run_loop_with_timeout());
+	loop_until_connection_state_is("Stopped");
         CHECK_EQUAL("Stopped", connection->state.connection.name);
-        loop_while_running();
-
         CHECK(connection->failure_flags & AMQP_CONNECTION_SASL_NEGOTIATION_REJECTED);
     }
     TEST_FIXTURE(ConnectionHookFixture, connection_should_reject_amqp_version)
     {
         context->debug.level = 0;
+	//connection->trace_flags = -1;
         connection->protocols = AMQP_PROTOCOL_AMQP;
         connection->state.connection.mode.client.connect(connection, "localhost", 54321);
         loop_while_socket_state_is("Connecting");
         loop_while_connection_state_is("ConnectingAmqp");
-        // TODO - Ensure that transition to draining input is a by product of number of cores and not a bug
-        while (amqp_connection_amqp_is_state(connection, "DrainingInput") && run_loop_with_timeout());
+	loop_until_connection_state_is("Stopped");
         CHECK_EQUAL("Stopped", connection->state.connection.name);
-
         CHECK(connection->failure_flags & AMQP_CONNECTION_AMQP_NEGOTIATION_REJECTED);
     }
     TEST_FIXTURE(ConnectionFixture, connection_should_establish_sasl_tunnel)
