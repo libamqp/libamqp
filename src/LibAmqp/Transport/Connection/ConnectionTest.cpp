@@ -112,6 +112,7 @@ SUITE(Connection)
         connection->state.connection.mode.client.connect(connection, "localhost", 54321);
         loop_while_socket_state_is("Connecting");
         loop_while_connection_state_is("ConnectingSasl");
+        loop_while_connection_state_is("DrainingInput");
         CHECK_EQUAL("Stopped", connection->state.connection.name); // TODO - Should it be Failed
         loop_while_running();
 
@@ -124,6 +125,7 @@ SUITE(Connection)
         connection->state.connection.mode.client.connect(connection, "localhost", 54321);
         loop_while_socket_state_is("Connecting");
         loop_while_connection_state_is("ConnectingAmqp");
+        loop_while_connection_state_is("DrainingInput");
         CHECK_EQUAL("Stopped", connection->state.connection.name); // TODO - Should it be Failed
 
         CHECK(connection->failure_flags & AMQP_CONNECTION_AMQP_NEGOTIATION_REJECTED);
