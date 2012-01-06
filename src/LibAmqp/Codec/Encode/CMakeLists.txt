@@ -1,8 +1,6 @@
 SET(AMQP_SOURCES
   Encode.c
   Encode.h
-  EncodeFramingTypes.c
-  EncodeFramingTypes.h
 )
 
 SET(AMQP_TEST_SOURCES

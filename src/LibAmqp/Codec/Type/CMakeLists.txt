@@ -3,8 +3,6 @@ SET(AMQP_SOURCES
   EncodingMetaData.h
   Type.c
   Type.h
-  TypeEncodeMetaData.c
-  TypeEncodeMetaData.h
   TypeMethods.c
   TypeMethods.h
   TypePrint.c
