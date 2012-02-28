@@ -17,31 +17,8 @@
 #ifndef LIBAMQP_BUFFER_BUFFER_TEST_SUPPORT_H
 #define LIBAMQP_BUFFER_BUFFER_TEST_SUPPORT_H
 
-#include "Memory/PoolTestSupport.h"
+#include "Context/Context.h"
 #include "Buffer/Buffer.h"
-
-namespace SuiteBuffer
-{
-    class BufferFixture : public SuitePool::PoolFixture
-    {
-    public:
-        BufferFixture()
-        {
-            amqp_buffer_initialize_pool(&pool);
-            buffer = (amqp_buffer_t *) amqp_allocate(&m_context, &pool);
-        }
-        ~BufferFixture()
-        {
-            amqp_deallocate(&m_context, &pool, buffer);
-        }
-        void load_buffer(unsigned char *p, size_t n)
-        {
-            amqp_buffer_puts(buffer, p, n);
-        }
-    public:
-        amqp_buffer_t *buffer;
-    };
-}
 
 namespace t
 {

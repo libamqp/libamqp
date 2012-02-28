@@ -15,19 +15,27 @@
  */
 
 #include <TestHarness.h>
-#include "Transport/Sasl/SaslTestSupport.h"
-#include "Codec/CodecTestSupport.h"
+
+#include "Context/TestSupport/ContextHolder.h"
+#include "Context/TestSupport/BufferHolder.h"
+#include "Context/TestSupport/TypeHolder.h"
+
 #include "AmqpTypes/AmqpSymbol.h"
 #include "AmqpTypes/AmqpMultiple.h"
+
 #include "Plugin/SaslPlain/SaslPlain.h"
 #include "Plugin/SaslAnonymous/SaslAnonymous.h"
-#include "Codec/Type/TypePrint.h"
+
+#include "Transport/Sasl/SaslMechanisms.h"
 
 #include "debug_helper.h"
 
 SUITE(Sasl)
 {
-    class SaslMechanismsFixture : public SuiteSasl::BaseSaslFixture
+    class SaslMechanismsFixture :
+            public virtual TestSupport::ContextHolder,
+            public virtual TestSupport::BufferHolder,
+            public virtual TestSupport::TypeHolder
     {
     public:
         SaslMechanismsFixture();

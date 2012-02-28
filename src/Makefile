@@ -31,9 +31,11 @@ INCLUDES :=
 TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
-TEST_RUNNER_ARGS := --exclude SlowRunning
+TEST_RUNNER_ARGS := --exclude SlowRunning WorkInProgress
 #TEST_RUNNER_ARGS := BasicDecode CodecDecode IntegerDecode NumericDecode VariableTypeDecoder CompoundTypeDecode BadDataDecoder  CodecEncode CompoundEncoding VariableTypesEncoding
-#TEST_RUNNER_ARGS :=  CodecDecode
+#TEST_RUNNER_ARGS := WorkInProgress
+TEST_RUNNER_ARGS := Session
+TEST_RUNNER_ARGS :=  Frame Connection
 JENKINS_BUILD_OPTIONS :=
 
 SAMPLE_SRC :=
@@ -48,6 +50,15 @@ BUILD_OPTIONS += -DLIBAMQP_DISABLE_BUFFER_INLINE
 # BUILD_OPTIONS += -DLIBAMQP_DISABLE_FAST_MUTEX
 # BUILD_OPTIONS += -DLIBAMQP_DISABLE_TEST_HOOKS
 BUILD_OPTIONS += -DLIBAMQP_TRACE_CONNECT_STATE
+
+# Danger Will Robinson!!!
+# Only define this if you need to debug repeated frees of the same memory block.
+# A side effect of it's use is that freed blocks are leaked so that the location
+# of the a prior free can be remembered.
+# BUILD_OPTIONS += -DLIBAMQP_DEBUG_DOUBLE_FREE
+
+# Define this if you need to see what pool allocation are not being freed.
+BUILD_OPTIONS += -DLIBAMQP_DEBUG_ALLOCATIONS
 
 CPPFLAGS = $(patsubst %,-I%, $(INCLUDES)) $(patsubst %,-I%, $(TEST_HARNESS_INCLUDES)) $(BUILD_OPTIONS) $(JENKINS_BUILD_OPTIONS)
 # CFLAGS += -g -O3 -Wall -Werror -std=c99 -pedantic -D_POSIX_C_SOURCE=200112L -fasm
@@ -73,7 +84,9 @@ $(LIBAMQP_LIB): $(patsubst %.o,$(LIBAMQP_LIB)(%.o), $(OBJ))
 tests::	test-runner
 
 debug:	all
-	gdb ./test-runner
+	@echo "set args $(TEST_RUNNER_ARGS)" >> gdb-cmd-args
+	gdb -x gdb-cmd-args ./test-runner
+	@rm -f gdb-cmd-args
 	
 check::	all
 	./test-runner $(TEST_RUNNER_ARGS)
@@ -94,8 +107,7 @@ coverage:
 	./test-runner
 	./run-gcov.sh
 
-
-$(OBJ) $(TEST_OBJ): Makefile
+#$(OBJ) $(TEST_OBJ): Makefile
 
 print:
 	@echo TEST_HARNESS_INCLUDES=$(TEST_HARNESS_INCLUDES)
@@ -163,5 +175,5 @@ samples: $(SAMPLE_OBJ)
 
 .PHONY:	generate
 generate:
-	../scripts/generate
+	cd ../scripts/; ./generate
 

@@ -15,7 +15,7 @@
  */
 
 #include <TestHarness.h>
-#include "Transport/LowLevel/EventThreadTestSupport.h"
+#include "Transport/LowLevel/EventThreadTestFixture.h"
 #include "debug_helper.h"
 
 #include "Transport/LowLevel/EventThread.h"
@@ -25,7 +25,7 @@ static void event_thread_handler(amqp_event_thread_t *event_thread)
     amqp_event_thread_run_loop(event_thread);
 }
 
-SUITE(Transport)
+SUITE(TransportLowLevel)
 {
     TEST(event_thread_no_fixture)
     {
@@ -41,14 +41,14 @@ SUITE(Transport)
         CHECK(outer_allocations_ok);
     }
 
-    TEST_FIXTURE(EventThreadFixture, event_thread_providing_loop)
+    TEST_FIXTURE(EventThreadTestFixture, event_thread_providing_loop)
     {
         struct ev_loop *loop = ev_default_loop(0);
-        m_event_thread = amqp_event_thread_initialize(context, EventThreadFixture::basic_event_thread_handler, loop, 0, "evt");
+        m_event_thread = amqp_event_thread_initialize(context, EventThreadTestFixture::basic_event_thread_handler, loop, 0, "evt");
     }
 
-    TEST_FIXTURE(EventThreadFixture, event_thread_without_loop)
+    TEST_FIXTURE(EventThreadTestFixture, event_thread_without_loop)
     {
-        m_event_thread = amqp_event_thread_initialize(context, EventThreadFixture::basic_event_thread_handler, 0, 0, "evt");
+        m_event_thread = amqp_event_thread_initialize(context, EventThreadTestFixture::basic_event_thread_handler, 0, 0, "evt");
     }
 }

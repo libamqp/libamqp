@@ -30,7 +30,8 @@
 #include "debug_helper.h"
 
 const char *labels[] = {
-    "connection", "socket", "reader", "writer", "negotiation", "tls", "sasl", "amqp"
+    "connection", "socket", "reader", "writer", "negotiation", "tls", "sasl", "amqp-tunnel", "amqp",
+    "disconnect", "frame-read", "frame-decode", "application"
 };
 
 static void connection_source(amqp_connection_t *connection, char *buffer, size_t buffer_size)
@@ -104,6 +105,6 @@ void _amqp_connection_trace_transition(amqp_connection_t *connection, const char
     int index = amqp_trailing_zeros_32(flag);
     const char *label = index < size ? labels[index] : "Doh!";
 
-    _amqp_connection_trace(connection, filename, line_number, "%s - transitioned from %s to %s", label, old_state_name, state_name);
+    _amqp_connection_trace(connection, filename, line_number, "%s - transitioned from %s to %s", label, old_state_name ? old_state_name : "created", state_name);
 }
 

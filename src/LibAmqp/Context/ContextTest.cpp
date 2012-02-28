@@ -16,19 +16,19 @@
 
 #include <TestHarness.h>
 
-#include "Context/ContextTestSupport.h"
+#include "Context/ContextTestFixture.h"
 
 // TODO - these tests should not be looking into buffer internals
 #include "Buffer/BufferInternal.h"
 
 SUITE(Context)
 {
-    TEST_FIXTURE(ContextFixture, fixture_dtor_should_not_raise_an_exception)
+    TEST_FIXTURE(ContextTestFixture, fixture_dtor_should_not_raise_an_exception)
     {
         // nothing to do here
     }
 
-    TEST_FIXTURE(ContextFixture, clone_should_balance_its_allocation_counts)
+    TEST_FIXTURE(ContextTestFixture, clone_should_balance_its_allocation_counts)
     {
         amqp_context_t *clone = amqp_context_clone(context);
         amqp_buffer_t *buffer = amqp_allocate_buffer(clone);
@@ -43,7 +43,7 @@ SUITE(Context)
         CHECK(clone_allocations_ok);
     }
 
-    TEST_FIXTURE(ContextFixture, fixture_should_have_a_usable_decode_buffer)
+    TEST_FIXTURE(ContextTestFixture, fixture_should_have_a_usable_decode_buffer)
     {
         static unsigned char bytes[] = { 0x01, 0xa5, 0x03 };
         test_data::TestData test_bytes(bytes, sizeof(bytes));

@@ -21,7 +21,6 @@
 extern "C" {
 #endif
 
-
 #ifndef LIBAMQP_BUFFER_T_TYPE
 #define LIBAMQP_BUFFER_T_TYPE
 typedef struct amqp_buffer_t amqp_buffer_t;
@@ -42,16 +41,29 @@ typedef struct amqp_type_t amqp_type_t;
 typedef struct amqp_connection_t amqp_connection_t;
 #endif
 
+#ifndef LIBAMQP_AMQP_SESSION_TYPE_T
+#define LIBAMQP_AMQP_SESSION_TYPE_T
+typedef struct amqp_session_t amqp_session_t;
+#endif
+
 #ifndef LIBAMQP_AMQP_FRAME_TYPE_T
 #define LIBAMQP_AMQP_FRAME_TYPE_T
 typedef struct amqp_frame_t amqp_frame_t;
 #endif
 
-extern int amqp_prepare_open_frame(amqp_connection_t *connection);
-extern int amqp_process_open_frame(amqp_connection_t *connection, amqp_frame_t *frame);
 
-extern int amqp_prepare_close_frame(amqp_connection_t *connection);
+extern int amqp_send_amqp_open_frame(amqp_connection_t *connection);
+
+extern int amqp_send_empty_frame(amqp_connection_t *connection);
+extern int amqp_send_amqp_close_frame(amqp_connection_t *connection);
 extern int amqp_process_close_frame(amqp_connection_t *connection, amqp_frame_t *frame);
+
+extern int amqp_process_open_frame_from_client(amqp_connection_t *connection, amqp_frame_t *frame);
+extern int amqp_process_open_frame_from_broker(amqp_connection_t *connection, amqp_frame_t *frame);
+
+extern int amqp_send_amqp_begin_frame(amqp_connection_t *connection, amqp_session_t *session);
+extern int amqp_process_begin_frame(amqp_connection_t *connection, amqp_frame_t *frame);
+
 
 #ifdef __cplusplus
 }

@@ -17,30 +17,16 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/CodecTestSupport.h"
+#include "Codec/Decode/DecodeTestFixture.h"
+
 #include "Codec/Decode/Decode.h"
 #include "Codec/Type/TypeExtension.h"
 
-
 #include "Codec/Type/Type.h"
 
-
-SUITE(VariableTypeDecoder)
+SUITE(CodecDecode)
 {
-    class DecodeFixture : public SuiteCodec::CodecFixture
-    {
-    public:
-        DecodeFixture() : result(0) {}
-        ~DecodeFixture()
-        {
-            AMQP_FREE(context, result);
-        }
-
-    public:
-        char *result;
-    };
-        
-    TEST_FIXTURE(DecodeFixture, decode_binary)
+    TEST_FIXTURE(DecodeTestFixture, decode_binary)
     {
         load_decode_buffer(test_data::bin_8);
         type = amqp_decode(context, decode_buffer);
@@ -54,7 +40,7 @@ SUITE(VariableTypeDecoder)
         CHECK_EQUAL("binary array", (result = amqp_convert_bytes_to_cstr(context, type)));
     }
 
-    TEST_FIXTURE(DecodeFixture, decode_large_binary)
+    TEST_FIXTURE(DecodeTestFixture, decode_large_binary)
     {
         load_decode_buffer(test_data::bin_32);
         type = amqp_decode(context, decode_buffer);
@@ -68,7 +54,7 @@ SUITE(VariableTypeDecoder)
         CHECK_EQUAL("big binary array", (result = amqp_convert_bytes_to_cstr(context, type)));
     }
 
-    TEST_FIXTURE(DecodeFixture, UTF8String)
+    TEST_FIXTURE(DecodeTestFixture, UTF8String)
     {
         load_decode_buffer(test_data::hello_world);
         type = amqp_decode(context, decode_buffer);
@@ -82,7 +68,7 @@ SUITE(VariableTypeDecoder)
         CHECK_EQUAL("Hello World", (result = amqp_convert_bytes_to_cstr(context, type)));
     }
 
-    TEST_FIXTURE(DecodeFixture, LongUtf8String)
+    TEST_FIXTURE(DecodeTestFixture, LongUtf8String)
     {
         load_decode_buffer(test_data::hello_big_world);
         type = amqp_decode(context, decode_buffer);
@@ -96,7 +82,7 @@ SUITE(VariableTypeDecoder)
         CHECK_EQUAL("Hello Big World", (result = amqp_convert_bytes_to_cstr(context, type)));
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeLargeSymbol)
+    TEST_FIXTURE(DecodeTestFixture, DecodeLargeSymbol)
     {
         load_decode_buffer(test_data::foo_bar_symbol_32);
         type = amqp_decode(context, decode_buffer);
@@ -110,7 +96,7 @@ SUITE(VariableTypeDecoder)
         CHECK_EQUAL("FooBar", (result = amqp_convert_bytes_to_cstr(context, type)));
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeSymbol)
+    TEST_FIXTURE(DecodeTestFixture, DecodeSymbol)
     {
         load_decode_buffer(test_data::foo_symbol_8);
         type = amqp_decode(context, decode_buffer);
@@ -124,7 +110,7 @@ SUITE(VariableTypeDecoder)
         CHECK_EQUAL("Foo", (result = amqp_convert_bytes_to_cstr(context, type)));
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeInvalidSymbol)
+    TEST_FIXTURE(DecodeTestFixture, DecodeInvalidSymbol)
     {
         load_decode_buffer(test_data::bad_symbol);
         context->debug.level = 0;

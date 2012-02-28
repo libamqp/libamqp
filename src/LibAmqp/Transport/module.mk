@@ -10,6 +10,7 @@ MODULE = LibAmqp/Transport
 
 SRC += $(wildcard $(MODULE)/*.c) \
     $(wildcard $(MODULE)/LowLevel/*.c) \
+    $(wildcard $(MODULE)/Connection/IO/*.c) \
     $(wildcard $(MODULE)/Connection/*.c) \
     $(wildcard $(MODULE)/Decode/*.c) \
     $(wildcard $(MODULE)/Sasl/*.c) \
@@ -18,9 +19,13 @@ SRC += $(wildcard $(MODULE)/*.c) \
 
 TEST_SRC += $(wildcard  \
     $(MODULE)/*Test.cpp) \
-    $(wildcard $(MODULE)/*TestSupport.cpp) \
+    $(wildcard $(MODULE)/DummyBroker/TestSupport/*.cpp) \
     $(wildcard $(MODULE)/DummyBroker/*.c) \
+    $(wildcard $(MODULE)/LowLevel/TestSupport/*.cpp) \
+    $(wildcard $(MODULE)/Frame/TestSupport/*.cpp) \
     $(wildcard $(MODULE)/LowLevel/*.cpp) \
+    $(wildcard $(MODULE)/Connection/TestSupport/*.cpp) \
+    $(wildcard $(MODULE)/Connection/IO/*.cpp) \
     $(wildcard $(MODULE)/Connection/*.cpp) \
     $(wildcard $(MODULE)/Sasl/*.cpp) \
     $(wildcard $(MODULE)/Frame/*.cpp) \

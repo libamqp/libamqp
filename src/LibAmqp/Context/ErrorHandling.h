@@ -61,6 +61,8 @@ enum amqp_error_code_t {
     AMQP_ERROR_INCOMPLETE_FRAME_HEADER,
     AMQP_ERROR_INCOMPLETE_FRAME,
     AMQP_ERROR_MEMORY_ERROR,
+    AMQP_ERROR_BLOCK_NOT_FREED,
+    AMQP_ERROR_OBJECT_NOT_DEALLOCATED,
     AMQP_ERROR_ILLEGAL_STATE,
     AMQP_ERROR_NEGOTIATION_FAILED,
     AMQP_ERROR_NO_PROTOCOL,
@@ -87,8 +89,8 @@ enum amqp_error_code_t {
     AMQP_ERROR_OUT_OF_SEQUENCE_AMQP_FRAME,
 };
 
-
-#define amqp_error(context, code, ...) _amqp_error(context, 1, __FILE__, __LINE__, 0, #code, code, "" __VA_ARGS__)
+#define amqp_error_mnemonic(c)      #c, c
+#define amqp_error(context, code, ...) _amqp_error(context, 1, __FILE__, __LINE__, 0, amqp_error_mnemonic(code), "" __VA_ARGS__)
 extern void _amqp_error(amqp_context_t *context, int level, const char * filename, int line_number, const char *source, const char *error_mnemonic, int error_code, const char *format, ...);
 extern void _vamqp_error(amqp_context_t *context, int level, const char *filename, int line_number, const char *source, const char *error_mnemonic, int error_code, const char *format, va_list args);
 

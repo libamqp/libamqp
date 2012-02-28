@@ -44,7 +44,6 @@ int amqp_context_printf(amqp_context_t *context, int level, const char *format, 
     {
         amqp_context_putc(context, buffer[i]);
     }
-
     return n;
 }
 

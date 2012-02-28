@@ -14,7 +14,7 @@ SET(AMQP_TEST_SOURCES
   EncodeFramingTypesTest.cpp
   EncodeNullTypeTest.cpp
   EncodeVariableWidthTest.cpp
-  EncodeTestSupport.h
+  EncodeTestFixture.h
 )
 
 # $Id: CMakeLists.txt,v 1.14 2011/03/16 12:33:34 erk Exp $

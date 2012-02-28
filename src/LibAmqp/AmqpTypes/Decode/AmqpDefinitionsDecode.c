@@ -50,16 +50,21 @@ int amqp_decode_mandatory_multiple_type_symbol(amqp_context_t *context, amqp_typ
 
 int amqp_decode_mandatory_primitive_sasl_code(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, uint8_t *result)
 {
-    if (amqp_decode_mandatory_primitive_ubyte(context, field, field_number, total_fields, result))
+    int rc = amqp_decode_mandatory_primitive_ubyte(context, field, field_number, total_fields, result);
+    if (rc)
     {
-        return *result <= amqp_sasl_code_temp_system_error;
+        if (*result > amqp_sasl_code_temp_system_error)
+        {
+            amqp_field_range_error(context, field_number, total_fields, "SASL code value out of range: %d.", (int) *result);
+            return false;
+        }
     }
-    return false;
+    return rc;
 }
 
-int amqp_decode_primitive_sender_settle_mode(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_sender_settle_mode_t *result, amqp_sender_settle_mode_t default_value)
+int amqp_decode_primitive_sender_settle_mode(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, amqp_sender_settle_mode_t *result, amqp_sender_settle_mode_t default_value)
 {
-    int rc = amqp_decode_primitive_ubyte(context, field, field_number, total_fields, result, default_value);
+    int rc = amqp_decode_primitive_ubyte(context, field, field_number, total_fields, null_flag, result, default_value);
     if (rc)
     {
         if (*result > amqp_sender_settle_mode_mixed)
@@ -71,9 +76,9 @@ int amqp_decode_primitive_sender_settle_mode(amqp_context_t *context, amqp_type_
     return rc;
 }
 
-int amqp_decode_primitive_receiver_settle_mode(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_receiver_settle_mode_t *result, amqp_receiver_settle_mode_t default_value)
+int amqp_decode_primitive_receiver_settle_mode(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, amqp_receiver_settle_mode_t *result, amqp_receiver_settle_mode_t default_value)
 {
-    int rc = amqp_decode_primitive_ubyte(context, field, field_number, total_fields, result, default_value);
+    int rc = amqp_decode_primitive_ubyte(context, field, field_number, total_fields, null_flag, result, default_value);
     if (rc)
     {
         if (*result > amqp_receiver_settle_mode_second)
@@ -85,108 +90,29 @@ int amqp_decode_primitive_receiver_settle_mode(amqp_context_t *context, amqp_typ
     return rc;
 }
 
-int amqp_decode_primitive_handle(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_handle_t *result, uint32_t default_value)
+int amqp_decode_primitive_handle(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, amqp_handle_t *result, uint32_t default_value)
 {
-    if (amqp_type_is_null(field))
-    {
-        result->provided = false;
-        result->value = default_value;
-        return true;
-    }
-
-    if (amqp_type_is_uint(field))
-    {
-        result->provided = true;
-        result->value = amqp_type_to_uint(field);
-        return true;
-    }
-
-    result->provided = false;
-    amqp_decode_field_error(context, field_number, total_fields, "Expected a field of type (uint) handle.");
-    return false;
+    return amqp_decode_primitive_uint(context, field, field_number, total_fields, null_flag, result, default_value);
 }
 
 int amqp_decode_mandatory_primitive_handle(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_handle_t *result)
 {
-    if (amqp_type_is_null(field))
-    {
-        result->provided = false;
-        amqp_mandatory_field_missing_error(context, field_number, total_fields, "(uint) handle");
-        return false;
-    }
-
-    if (amqp_type_is_uint(field))
-    {
-        result->provided = true;
-        result->value = amqp_type_to_uint(field);
-        return true;
-    }
-
-    result->provided = false;
-    amqp_decode_field_error(context, field_number, total_fields, "Expected a field of type (uint) handle.");
-    return false;
+    return amqp_decode_mandatory_primitive_uint(context, field, field_number, total_fields, result);
 }
 
-int amqp_decode_primitive_sequence_no(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_sequence_no_t *result, uint32_t default_value)
+int amqp_decode_primitive_sequence_no(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, amqp_sequence_no_t *result, uint32_t default_value)
 {
-    if (amqp_type_is_null(field))
-    {
-        result->provided = false;
-        result->value = default_value;
-        return true;
-    }
-
-    if (amqp_type_is_uint(field))
-    {
-        result->provided = true;
-        result->value = amqp_type_to_uint(field);
-        return true;
-    }
-
-    result->provided = false;
-    amqp_decode_field_error(context, field_number, total_fields, "Expected a field of type (uint) sequence-no.");
-    return false;
+    return amqp_decode_primitive_uint(context, field, field_number, total_fields, null_flag, result, default_value);
 }
 
 int amqp_decode_mandatory_primitive_sequence_no(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_sequence_no_t *result)
 {
-    if (amqp_type_is_null(field))
-    {
-        result->provided = false;
-        amqp_mandatory_field_missing_error(context, field_number, total_fields, "(uint) sequence-no");
-        return false;
-    }
-
-    if (amqp_type_is_uint(field))
-    {
-        result->provided = true;
-        result->value = amqp_type_to_uint(field);
-        return true;
-    }
-
-    result->provided = false;
-    amqp_decode_field_error(context, field_number, total_fields, "Expected a field of type (uint) sequence-no.");
-    return false;
+    return amqp_decode_mandatory_primitive_uint(context, field, field_number, total_fields, result);
 }
 
-int amqp_decode_primitive_message_format(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_message_format_t *result, uint32_t default_value)
+int amqp_decode_primitive_message_format(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, amqp_message_format_t *result, uint32_t default_value)
 {
-    if (amqp_type_is_null(field))
-    {
-        result->provided = false;
-        result->value = default_value;
-        return true;
-    }
-    if (amqp_type_is_uint(field))
-    {
-        result->provided = true;
-        result->value = amqp_type_to_uint(field);
-        return true;
-    }
-
-    result->provided = false;
-    amqp_decode_field_error(context, field_number, total_fields, "Expected a field of type (uint) message-format.");
-    return false;
+    return amqp_decode_primitive_uint(context, field, field_number, total_fields, null_flag, result, default_value);
 }
 
 void amqp_amqp_error_cleanup(amqp_context_t *context, amqp_error_t *error)

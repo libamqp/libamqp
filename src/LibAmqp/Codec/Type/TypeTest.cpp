@@ -16,13 +16,14 @@
 
 #include <TestHarness.h>
 
-#include "Context/ContextTestSupport.h"
+#include "Context/TestSupport/ContextHolder.h"
 #include "Codec/Type/Type.h"
-
 
 SUITE(Type)
 {
-    class TypeFixture : public SuiteContext::ContextFixture
+    class TypeFixture :
+            public virtual TestSupport::ContextHolder
+
     {
     public:
         TypeFixture() : type(0) {}

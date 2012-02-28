@@ -42,7 +42,7 @@ amqp_dummy_broker_t *amqp_dummy_broker_initialize(amqp_context_t *context, int l
     amqp_event_loop_t *default_event_loop = 0;
 
     amqp_dummy_broker_t *result = AMQP_MALLOC(context, amqp_dummy_broker_t);
-    result->accept_handler_arguments = amqp_accept_handler_arguments_initialize(context, test_hooks);
+    result->accept_handler_arguments = amqp_accept_handler_arguments_initialize(context, test_hooks, 0);
     result->listener_thread = amqp_listener_thread_initialize(context, default_event_loop, listen_port_number, accept_handler, "dummy-broker", result->accept_handler_arguments);
     return result;
 }

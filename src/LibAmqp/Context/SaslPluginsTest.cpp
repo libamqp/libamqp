@@ -16,7 +16,7 @@
 
 #include <TestHarness.h>
 
-#include "Context/ContextTestSupport.h"
+#include "Context/TestSupport/ContextHolder.h"
 #include "Plugin/Sasl.h"
 #include "AmqpTypes/AmqpSymbol.h"
 
@@ -24,7 +24,8 @@
 
 SUITE(Context)
 {
-    class BaseSaslPluginsFixture : public ContextFixture
+    class BaseSaslPluginsFixture :
+            public virtual TestSupport::ContextHolder
     {
     public:
         BaseSaslPluginsFixture()

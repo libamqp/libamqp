@@ -133,18 +133,21 @@ uint32_t amqp_string_hash(amqp_string_t *string)
     return amqp_variable_hash(&string->v);
 }
 
-int amqp_string_print(amqp_context_t *context, amqp_string_t *string)
-{
-    int i;
-    for (i = 0; i < string->v.size; i++)
-    {
-        amqp_context_putc(context, amqp_type_get_byte_at(string->v.type, i));
-    }
-    return i;
-}
-
 const char *amqp_string_to_cstr(amqp_context_t *context, amqp_string_t *string)
 {
+    // TODO - not a utf8 conversion
     return !amqp_string_is_null(string) ? (char *) amqp_variable_clone_data(context, &string->v) : 0;
 }
 
+int amqp_string_print(amqp_context_t *context, amqp_string_t *string)
+{
+    const char *c_str = amqp_string_to_cstr(context, string);
+    int n_chars = strlen(c_str);
+    int i;
+    for (i = 0; i < n_chars; i++)
+    {
+        amqp_context_putc(context, c_str[i]);
+    }
+    amqp_free(context, c_str);
+    return i;
+}

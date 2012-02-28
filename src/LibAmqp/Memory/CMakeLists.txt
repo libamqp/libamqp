@@ -8,11 +8,9 @@ SET(AMQP_SOURCES
 
 SET(AMQP_TEST_SOURCES
   MemoryTest.cpp
-  MemoryTestSupport.cpp
-  MemoryTestSupport.h
+  MemoryTestFixture.cpp
+  MemoryTestFixture.h
   PoolTest.cpp
-  PoolTestSupport.cpp
-  PoolTestSupport.h
 )
 
 # $Id: CMakeLists.txt,v 1.14 2011/03/16 12:33:34 erk Exp $

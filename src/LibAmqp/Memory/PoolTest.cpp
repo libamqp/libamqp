@@ -13,11 +13,185 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-#include "Memory/PoolTestSupport.h"
+#include <stdlib.h>
+
+#include "libamqp_common.h"
+#include <TestHarness.h>
+#include "Memory/MemoryTestFixture.h"
+
+#include "Memory/Pool.h"
+#include "Memory/PoolInternal.h"
+
 #include "debug_helper.h"
+
+#define CHECK_POOL_ALLOCATIONS(pool) \
+    do \
+    { \
+        try { \
+            if (UnitTest::Check((pool)->stats.outstanding_allocations != 0)) \
+                UnitTest::CurrentTest::Results()->OnTestFailure(*UnitTest::CurrentTest::Details(), "Number of allocates from pool does not match number of deletes."); \
+        } \
+        catch (...) { \
+            UnitTest::CurrentTest::Results()->OnTestFailure(*UnitTest::CurrentTest::Details(), "Unhandled exception in CHECK_POOL_ALLOCATIONS()"); \
+        } \
+    } while (0)
 
 SUITE(Pool)
 {
+    typedef struct test_type_t
+    {
+        char important_stuff[16];
+    } test_type_t;
+
+    class PoolAllocator
+    {
+    public:
+        PoolAllocator(amqp_context_t *context, amqp_memory_pool_t *pool_);
+        ~PoolAllocator();
+        test_type_t *allocate_one();
+        void remove_one();
+
+    private:
+        int count, capacity;
+        amqp_context_t *m_context;
+        amqp_memory_pool_t *pool;
+        test_type_t **allocations;
+    };
+
+    // TODO -  exposing too much from pool internal tests to other suites.
+    class PoolFixture : public SuiteMemory::MemoryTestFixture
+    {
+    public:
+        PoolFixture();
+        ~PoolFixture();
+        void initialize_pool(int n);
+        void initialize_pool();
+        test_type_t *allocate_from_pool(int n);
+        test_type_t *allocate_from_pool();
+        void return_last_allocated_to_pool();
+
+    public:
+        amqp_memory_pool_t pool;
+
+    private:
+        PoolAllocator *allocator;
+    };
+
+    class InitializedPoolFixture : public PoolFixture
+    {
+    public:
+        InitializedPoolFixture()
+        {
+            initialize_pool();
+        }
+        ~InitializedPoolFixture() { }
+    };
+
+        PoolAllocator::PoolAllocator(amqp_context_t *context, amqp_memory_pool_t *pool_) :  count(0), capacity(256), m_context(context), pool(pool_)
+    {
+    }
+
+    PoolAllocator::~PoolAllocator()
+    {
+        for (int i = 0; i < count; i++)
+        {
+            amqp_deallocate(m_context, pool, allocations[i]);
+        }
+        free(allocations);
+    }
+
+    test_type_t *PoolAllocator::allocate_one()
+    {
+        if (count == 0)
+        {
+            allocations = (test_type_t **) malloc(sizeof(test_type_t *) * capacity);
+        }
+        if (count == capacity)
+        {
+            capacity *= 2;
+            allocations = (test_type_t **) realloc(allocations, sizeof(test_type_t *) * capacity);
+        }
+        return allocations[count++] = (test_type_t *) amqp_allocate(m_context, pool);
+    }
+
+    void PoolAllocator::remove_one()
+    {
+        if (count > 0)
+        {
+            count--;
+            amqp_deallocate(m_context, pool, allocations[count]);
+        }
+    }
+
+    PoolFixture::PoolFixture() : allocator(0)
+    {
+        memset(&pool, '\0', sizeof(pool));
+    }
+
+    PoolFixture::~PoolFixture()
+    {
+        delete allocator;
+        if (pool.initialized)
+        {
+            CHECK_POOL_ALLOCATIONS(&pool);
+        }
+    }
+
+    static void allocate_callback(amqp_context_t *context, amqp_memory_pool_t *pool, test_type_t *object)
+    {
+        for (int i = 0; i < (int) sizeof(object->important_stuff); i++)
+        {
+            object->important_stuff[i] = 'A' + i;
+        }
+    }
+
+    static void deallocate_callback(amqp_context_t *context, amqp_memory_pool_t *pool, void *object)
+    {
+    }
+
+    void PoolFixture::initialize_pool(int n)
+    {
+        CHECK(n > 128);
+        if (!pool.initialized)
+        {
+            amqp_initialize_pool_suggesting_block_size(&pool, sizeof(test_type_t), n, "test");
+            amqp_pool_specify_initialization_callbacks(&pool, (amqp_pool_callback_t) allocate_callback, deallocate_callback);
+        }
+    }
+
+    void PoolFixture::initialize_pool()
+    {
+        if (!pool.initialized)
+        {
+            amqp_initialize_pool(&pool, sizeof(test_type_t), "test");
+            amqp_pool_specify_initialization_callbacks(&pool, (amqp_pool_callback_t) allocate_callback, deallocate_callback);
+        }
+    }
+
+    test_type_t *PoolFixture::allocate_from_pool(int n)
+    {
+        test_type_t *result;
+        if (allocator == 0)
+        {
+            allocator = new PoolAllocator(&m_context, &pool);
+        }
+        for (int i = 0; i < n; i++)
+        {
+            result = allocator->allocate_one();
+        }
+        return result;
+    }
+
+    test_type_t *PoolFixture::allocate_from_pool()
+    {
+        return allocate_from_pool(1);
+    }
+
+    void PoolFixture::return_last_allocated_to_pool()
+    {
+        allocator->remove_one();
+    }
+
     TEST_FIXTURE(InitializedPoolFixture, callback_should_initialize_object)
     {
         test_type_t *p = (test_type_t *) amqp_allocate(&m_context, &pool);
@@ -39,11 +213,65 @@ SUITE(Pool)
         amqp_deallocate(&m_context, &pool, q);
     }
 #else
+
+#ifdef LIBAMQP_DEBUG_ALLOCATIONS
+    TEST_FIXTURE(InitializedPoolFixture, allocation_should_initialize_chain)
+    {
+        test_type_t *p = (test_type_t *) amqp_allocate(&m_context, &pool);
+        CHECK_NOT_NULL(p);
+
+        amqp_memory_allocation_t *allocation = pool.allocation_chain;
+
+        CHECK_EQUAL(allocation->header.debug.previous, &pool.allocation_chain);
+        CHECK_EQUAL(allocation->header.debug.next, (void *) 0);
+
+        CHECK_EQUAL((test_type_t *) &allocation->data, p);
+
+        amqp_deallocate(&m_context, &pool, p);
+    }
+
+    TEST_FIXTURE(InitializedPoolFixture, many_allocations_should_grow_chain)
+    {
+        test_type_t *p = (test_type_t *) amqp_allocate(&m_context, &pool);
+        CHECK_NOT_NULL(p);
+
+        amqp_memory_allocation_t *allocation_p = pool.allocation_chain;
+
+        test_type_t *q = (test_type_t *) amqp_allocate(&m_context, &pool);
+        CHECK_NOT_NULL(q);
+
+        amqp_memory_allocation_t *allocation_q = pool.allocation_chain;
+        CHECK_EQUAL((test_type_t *) &allocation_q->data, q);
+
+        CHECK_EQUAL(allocation_q->header.debug.previous, &pool.allocation_chain);
+        CHECK_EQUAL(allocation_q->header.debug.next, allocation_p);
+
+        amqp_deallocate(&m_context, &pool, q);
+        amqp_deallocate(&m_context, &pool, p);
+    }
+
+    TEST_FIXTURE(InitializedPoolFixture, deleting_an_allocation_should_shrink_chain)
+    {
+        test_type_t *p = (test_type_t *) amqp_allocate(&m_context, &pool);
+        test_type_t *q = (test_type_t *) amqp_allocate(&m_context, &pool);
+
+        amqp_deallocate(&m_context, &pool, q);
+
+        amqp_memory_allocation_t *allocation = pool.allocation_chain;
+        CHECK_EQUAL((test_type_t *) &allocation->data, p);
+        CHECK_EQUAL(allocation->header.debug.previous, &pool.allocation_chain);
+        CHECK_EQUAL(allocation->header.debug.next, (void *) 0);
+
+        amqp_deallocate(&m_context, &pool, p);
+        CHECK_EQUAL(pool.allocation_chain, (void *) 0);
+    }
+#endif
+
     TEST_FIXTURE(InitializedPoolFixture, first_allocate_from_pool_allocates_block)
     {
         CHECK_NULL(pool.block_list);
 
-        amqp_memory_pool_t *p = (amqp_memory_pool_t *) amqp_allocate(&m_context, &pool);
+        test_type_t *p = (test_type_t *) amqp_allocate(&m_context, &pool);
         CHECK_NOT_NULL(p);
 
         CHECK_NOT_NULL(pool.block_list);
@@ -248,7 +476,6 @@ SUITE(Pool)
         {
             return_last_allocated_to_pool(); // return last allocated by call to allocate_from_pool();
         }
-
 
         CHECK_NULL(pool.block_list); // assert that there are no blocks left
     }

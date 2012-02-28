@@ -16,43 +16,68 @@
 
 #include <TestHarness.h>
 
-#include "Transport/Connection/ConnectionFrameTestSupport.h"
+#include "Context/TestSupport/ContextHolder.h"
+#include "Transport/Connection/TestSupport/ConnectionHolder.h"
+
+#include "Transport/Connection/TestSupport/WriteInterceptor.h"
+#include "Transport/Connection/TestSupport/ReadInterceptor.h"
+
 #include "TestData/TestFrames.h"
 
 #include "debug_helper.h"
 SUITE(ConnectionFrame)
 {
+    class ConnectionFrameFixture :
+            public virtual TestSupport::ClientConnectionHolder,
+            public virtual TestSupport::ContextHolder,
+            public TestSupport::WriteInterceptor,
+            public TestSupport::ReadInterceptor
+    {
+    public:
+        ConnectionFrameFixture() { }
+        ~ConnectionFrameFixture() { }
+
+    protected:
+        static void frame_read_callback(amqp_connection_t *connection, amqp_buffer_t *buffer);
+    };
+
+    void ConnectionFrameFixture::frame_read_callback(amqp_connection_t *connection, amqp_buffer_t *buffer)
+    {
+    }
+
     TEST_FIXTURE(ConnectionFrameFixture, fixture_should_balance_allocations)
     {
         CHECK(connection->state.frame.name != 0);
-        CHECK_EQUAL("Initialized", connection->state.frame.name);
+        CHECK_EQUAL("initialized", connection->state.frame.name);
     }
 
     TEST_FIXTURE(ConnectionFrameFixture, enable_frame)
     {
         connection->state.frame.enable(connection);
-        CHECK_EQUAL("Enabled", connection->state.frame.name);
+        CHECK_EQUAL("enabled", connection->state.frame.name);
 
         connection->state.frame.stop(connection);
-        CHECK_EQUAL("Stopped", connection->state.frame.name);
+        CHECK_EQUAL("stopped", connection->state.frame.name);
     }
 
     TEST_FIXTURE(ConnectionFrameFixture, stop_while_stopped)
     {
         connection->state.frame.enable(connection);
         connection->state.frame.stop(connection);
-        CHECK_EQUAL("Stopped", connection->state.frame.name);
+        CHECK_EQUAL("stopped", connection->state.frame.name);
 
         connection->state.frame.stop(connection);
-        CHECK_EQUAL("Stopped", connection->state.frame.name);
+        CHECK_EQUAL("stopped", connection->state.frame.name);
     }
 
     TEST_FIXTURE(ConnectionFrameFixture, read_minimal_frame)
     {
         set_test_data_for_read(test_data::minimal_frame_header);
         connection->state.frame.enable(connection);
-        connection->state.frame.read(connection, buffer, done_callback);
-        CHECK_EQUAL("Enabled", connection->state.frame.name);
+        amqp_buffer_t *buffer = amqp_allocate_buffer(context);
+        connection->state.frame.read(connection, buffer, frame_read_callback);
+        amqp_deallocate_buffer(context, buffer);
+        CHECK_EQUAL("enabled", connection->state.frame.name);
         CHECK_EQUAL(8U, connection->io.frame.frame_size);
     }
 
@@ -60,8 +85,10 @@ SUITE(ConnectionFrame)
     {
         set_test_data_for_read(test_data::sasl_mechanisms_frame);
         connection->state.frame.enable(connection);
-        connection->state.frame.read(connection, buffer, done_callback);
-        CHECK_EQUAL("Enabled", connection->state.frame.name);
+        amqp_buffer_t *buffer = amqp_allocate_buffer(context);
+        connection->state.frame.read(connection, buffer, frame_read_callback);
+        amqp_deallocate_buffer(context, buffer);
+        CHECK_EQUAL("enabled", connection->state.frame.name);
         CHECK_EQUAL(0x15U, connection->io.frame.frame_size);
     }
 }

@@ -18,7 +18,7 @@
 #include "Transport/Transport.h"
 
 #include "Context/Context.h"
-#include "Transport/LowLevel/EventThreadTestSupport.h"
+#include "Transport/LowLevel/EventThreadTestFixture.h"
 #include "Transport/LowLevel/Listener.h"
 #include "Transport/LowLevel/Connect.h"
 
@@ -28,12 +28,12 @@
 
 #include "debug_helper.h"
 
-SUITE(Transport)
+SUITE(TransportLowLevel)
 {
-    class ListenerFixture : public EventThreadFixture
+    class ListenerFixture : public EventThreadTestFixture
     {
     public:
-        ListenerFixture() : EventThreadFixture()
+        ListenerFixture() : EventThreadTestFixture()
         {
             m_event_thread = ListenerFixture::thread_create(context);
         }

@@ -14,30 +14,19 @@
    limitations under the License.
  */
 
-#include "Context/Context.h"
-#include "Transport/Connection/Connections.h"
-#include "Transport/Connection/Connection.h"
-#include "Transport/Connection/ConnectionTrace.h"
+#include "Transport/Connection/ConnectionStateMachine.h"
+
+#include "Transport/Connection/AcceptedConnections.h"
 #include "Transport/Connection/ConnectionTestHook.h"
 
-#include "debug_helper.h"
-
-#ifdef LIBAMQP_TRACE_CONNECT_STATE
-#define save_old_state()  const char* old_state_name = connection->state.connection.name
-#define trace_transition(old_state_name) amqp_connection_trace_transition(connection, AMQP_TRACE_CONNECTION, old_state_name, connection->state.connection.name)
-#else
-#define save_old_state()
-#define trace_transition(old_state_name)
-#endif
-
-static void transition_to_waiting_on_client_negotiation_request(amqp_connection_t *connection);
-static void transition_to_accepting_tls(amqp_connection_t *connection);
-static void transition_to_waiting_on_tls_tunnelled_request(amqp_connection_t *connection);
-static void transition_to_accepting_sasl(amqp_connection_t *connection);
-static void transition_to_waiting_on_amqp_negotiation_request(amqp_connection_t *connection);
-static void transition_to_accepting_amqp(amqp_connection_t *connection);
-static void transition_to_tunnel_accepted(amqp_connection_t *connection);
-static void transition_to_sending_error_message(amqp_connection_t *connection);
+DECLARE_TRANSITION_FUNCTION(waiting_on_client_negotiation_request);
+DECLARE_TRANSITION_FUNCTION(accepting_tls);
+DECLARE_TRANSITION_FUNCTION(waiting_on_tls_tunnelled_request);
+DECLARE_TRANSITION_FUNCTION(accepting_sasl);
+DECLARE_TRANSITION_FUNCTION(waiting_on_amqp_negotiation_request);
+DECLARE_TRANSITION_FUNCTION(accepting_amqp);
+DECLARE_TRANSITION_FUNCTION(tunnel_accepted);
+DECLARE_TRANSITION_FUNCTION(sending_error_message);
 
 static void client_request_callback(amqp_connection_t *connection, uint32_t requested_protocol_version)
 {
@@ -50,7 +39,7 @@ static void connection_done_callback(amqp_connection_t *connection)
 
 void amqp_connection_server_state_initialize(amqp_connection_t *connection, int fd, struct sockaddr_storage *client_address, socklen_t address_size)
 {
-    transition_to_waiting_on_client_negotiation_request(connection);
+    transition_to_state(connection, waiting_on_client_negotiation_request);
 
     amqp_connection_state_initialize(connection);
     amqp_connection_accepted_socket_initialize(connection, fd, client_address, address_size);
@@ -63,7 +52,7 @@ void amqp_connection_server_state_initialize(amqp_connection_t *connection, int 
 
 static void reject_protocol_version(amqp_connection_t *connection, uint32_t version)
 {
-    transition_to_sending_error_message(connection);
+    transition_to_state(connection, sending_error_message);
     connection->state.negotiator.send(connection, version, connection_done_callback);
 }
 static void could_not_parse_header(amqp_connection_t *connection)
@@ -113,17 +102,17 @@ static void establish_tunnel_after_client_request(amqp_connection_t *connection,
     switch (protocol_id)
     {
     case AMQP_TLS_PROTOCOL_ID:
-        transition_to_accepting_tls(connection);
+        transition_to_state(connection, accepting_tls);
         call_action(connection->state.tls.tunnel.accept, connection->context, connection, requested_protocol_version);
         break;
 
     case AMQP_SASL_PROTOCOL_ID:
-        transition_to_accepting_sasl(connection);
+        transition_to_state(connection, accepting_sasl);
         call_action(connection->state.sasl.tunnel.accept, connection->context, connection, requested_protocol_version);
         break;
 
     case AMQP_PROTOCOL_ID:
-        transition_to_accepting_amqp(connection);
+        transition_to_state(connection, accepting_amqp);
         call_action(connection->state.amqp_tunnel.tunnel.accept, connection->context, connection, requested_protocol_version);
         break;
 
@@ -138,31 +127,23 @@ static void begin_while_waiting_on_client_negotiation_request(amqp_connection_t 
     int accepted_protocols = AMQP_PROTOCOL_AMQP | AMQP_PROTOCOL_SASL | AMQP_PROTOCOL_TLS;
     establish_tunnel_after_client_request(connection, requested_protocol_version, accepted_protocols);
 }
-static void transition_to_waiting_on_client_negotiation_request(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(waiting_on_client_negotiation_request)
 {
-    save_old_state();
-
-    amqp__connection_default_state_initialization(connection, "WaitingForClientNegotiation");
     connection->state.connection.mode.server.begin = begin_while_waiting_on_client_negotiation_request;
-
-    trace_transition(old_state_name);
 }
 
 static void done_while_sending_error_message(amqp_connection_t *connection)
 {
     connection->state.shutdown.drain(connection);
 }
-static void transition_to_sending_error_message(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(sending_error_message)
 {
-    save_old_state();
-    amqp__connection_default_state_initialization(connection, "SendingErrorHeaderResponse");
     connection->state.connection.done = done_while_sending_error_message;
-    trace_transition(old_state_name);
 }
 
 static void done_while_accepting_tls(amqp_connection_t *connection)
 {
-    transition_to_waiting_on_tls_tunnelled_request(connection);
+    transition_to_state(connection, waiting_on_tls_tunnelled_request);
     amqp_connection_flag_set(connection, AMQP_CONNECTION_TLS_CONNECTED);
     connection->state.negotiator.reset(connection);
     connection->state.negotiator.wait(connection, client_request_callback);
@@ -177,16 +158,11 @@ static void reject_while_accepting_tls(amqp_connection_t *connection, uint32_t v
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_TLS_NEGOTIATION_REJECTED);
     reject_protocol_version(connection, version);
 }
-static void transition_to_accepting_tls(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(accepting_tls)
 {
-    save_old_state();
-
-    amqp__connection_default_state_initialization(connection, "AcceptingTls");
     connection->state.connection.done = done_while_accepting_tls;
     connection->state.connection.fail = fail_while_accepting_tls;
     connection->state.connection.mode.server.reject = reject_while_accepting_tls;
-
-    trace_transition(old_state_name);
 }
 
 static void begin_while_waiting_on_tls_tunnelled_request(amqp_connection_t *connection, uint32_t requested_protocol_version)
@@ -194,17 +170,14 @@ static void begin_while_waiting_on_tls_tunnelled_request(amqp_connection_t *conn
     int accepted_protocols = AMQP_PROTOCOL_AMQP | AMQP_PROTOCOL_SASL;
     establish_tunnel_after_client_request(connection, requested_protocol_version, accepted_protocols);
 }
-static void transition_to_waiting_on_tls_tunnelled_request(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(waiting_on_tls_tunnelled_request)
 {
-    save_old_state();
-    amqp__connection_default_state_initialization(connection, "WaitingForTlsTunnelled");
     connection->state.connection.mode.server.begin = begin_while_waiting_on_tls_tunnelled_request;
-    trace_transition(old_state_name);
 }
 
 static void done_while_accepting_sasl(amqp_connection_t *connection)
 {
-    transition_to_waiting_on_amqp_negotiation_request(connection);
+    transition_to_state(connection, waiting_on_amqp_negotiation_request);
     amqp_connection_flag_set(connection, AMQP_CONNECTION_SASL_CONNECTED);
     connection->state.negotiator.reset(connection);
     connection->state.negotiator.wait(connection, client_request_callback);
@@ -220,16 +193,11 @@ static void reject_while_accepting_sasl(amqp_connection_t *connection, uint32_t 
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_SASL_NEGOTIATION_REJECTED);
     reject_protocol_version(connection, version);
 }
-static void transition_to_accepting_sasl(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(accepting_sasl)
 {
-    save_old_state();
-
-    amqp__connection_default_state_initialization(connection, "AcceptingSasl");
     connection->state.connection.done = done_while_accepting_sasl;
     connection->state.connection.fail = fail_while_accepting_sasl;
     connection->state.connection.mode.server.reject = reject_while_accepting_sasl;
-
-    trace_transition(old_state_name);
 }
 
 static void begin_while_waiting_on_amqp_negotiation_request(amqp_connection_t *connection, uint32_t requested_protocol_version)
@@ -237,20 +205,15 @@ static void begin_while_waiting_on_amqp_negotiation_request(amqp_connection_t *c
     int accepted_protocols = AMQP_PROTOCOL_AMQP;
     establish_tunnel_after_client_request(connection, requested_protocol_version, accepted_protocols);
 }
-static void transition_to_waiting_on_amqp_negotiation_request(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(waiting_on_amqp_negotiation_request)
 {
-    save_old_state();
-
-    amqp__connection_default_state_initialization(connection, "WaitingForAmqpRequest");
     connection->state.connection.mode.server.begin = begin_while_waiting_on_amqp_negotiation_request;
-
-    trace_transition(old_state_name);
 }
 
 static void done_while_accepting_amqp(amqp_connection_t *connection)
 {
     amqp_connection_flag_set(connection, AMQP_CONNECTION_AMQP_CONNECTED);
-    transition_to_tunnel_accepted(connection);
+    transition_to_state(connection, tunnel_accepted);
     connection->state.amqp.wait_on_open(connection);
 }
 static void fail_while_accepting_amqp(amqp_connection_t *connection)
@@ -262,21 +225,24 @@ static void reject_while_accepting_amqp(amqp_connection_t *connection, uint32_t 
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_AMQP_NEGOTIATION_REJECTED);
     reject_protocol_version(connection, version);
 }
-static void transition_to_accepting_amqp(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(accepting_amqp)
 {
-    save_old_state();
-
-    amqp__connection_default_state_initialization(connection, "AcceptingAmqp");
     connection->state.connection.done = done_while_accepting_amqp;
     connection->state.connection.fail = fail_while_accepting_amqp;
     connection->state.connection.mode.server.reject = reject_while_accepting_amqp;
-
-    trace_transition(old_state_name);
 }
 
-static void transition_to_tunnel_accepted(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(tunnel_accepted)
 {
-    save_old_state();
-    amqp__connection_default_state_initialization(connection, "AmqpTunnelAccepted");
-    trace_transition(old_state_name);
+}
+
+static void default_state_initialization(amqp_connection_t *connection, const char *state_name, void (*action_initializer)(amqp_connection_t *connection) LIBAMQP_TRACE_STATE_ARGS_DECL)
+{
+    save_old_state(connection->state.connection.name);
+
+    amqp__connection_default_state_initialization(connection, state_name);
+
+    action_initializer(connection);
+
+    trace_state_transition(AMQP_TRACE_CONNECTION, connection->state.connection.name);
 }

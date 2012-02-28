@@ -34,7 +34,7 @@ function generate_types
 function generate_frame_decode
 {
     local dest_dir="${base_dir}/Transport/Decode"
-    generate_files generate-decode-methods "$1" "${dest_dir}" "$2.gen"
+    generate_files generate-frame-decode-methods "$1" "${dest_dir}" "$2.gen"
 }
 
 function generate_type_decode

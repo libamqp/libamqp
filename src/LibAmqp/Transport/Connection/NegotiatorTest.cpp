@@ -16,21 +16,30 @@
 
 #include <TestHarness.h>
 
-#include "Transport/Connection/ConnectionTestSupport.h"
+#include "Transport/Connection/TestSupport/ConnectionHolder.h"
+#include "Context/TestSupport/DecodeBufferHolder.h"
+#include "Context/TestSupport/BufferHolder.h"
+#include "Plugin/TestSupport/SaslPluginHolder.h"
+#include "Transport/Connection/TestSupport/BufferReadInterceptor.h"
+#include "Transport/Connection/TestSupport/WriteInterceptor.h"
+#include "Context/TestSupport/TypeHolder.h"
+#include "Transport/Frame/TestSupport/FrameHolder.h"
+
 #include "Transport/Connection/Negotiator.h"
 
 #include "debug_helper.h"
 
 SUITE(ConnectionNegotiation)
 {
-    class NegotiationFixture : public SuiteConnection::BaseConnectionFixture
+    class NegotiationTestFixture :
+            public TestSupport::UnconnectedConnectionHolder,
+            public virtual TestSupport::BufferHolder,
+            public virtual TestSupport::WriteInterceptor,
+            public virtual TestSupport::BufferReadInterceptor
     {
     public:
-        NegotiationFixture();
-        ~NegotiationFixture();
-
-        static void write_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback);
-        static void read_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f done_callback);
+        NegotiationTestFixture();
+        ~NegotiationTestFixture();
 
         static void done_callback(amqp_connection_t *connection);
         static void reject_callback(amqp_connection_t *connection, uint32_t version);
@@ -38,49 +47,24 @@ SUITE(ConnectionNegotiation)
 
     public:
         static uint32_t broker_version;
-        amqp_buffer_t *buffer;
     };
 
-    uint32_t NegotiationFixture::broker_version = AMQP_PREFERRED_VERSION;
+    uint32_t NegotiationTestFixture::broker_version = AMQP_PREFERRED_VERSION;
 
-    NegotiationFixture::NegotiationFixture()
+    NegotiationTestFixture::NegotiationTestFixture()
     {
-        connection = amqp_connection_create(context);
-        buffer = amqp_allocate_buffer(context);
     }
 
-    NegotiationFixture::~NegotiationFixture()
+    NegotiationTestFixture::~NegotiationTestFixture()
     {
-        amqp_deallocate_buffer(context, buffer);
-        amqp_connection_destroy(context, connection);
     }
 
-    void NegotiationFixture::write_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback)
+    TEST_FIXTURE(NegotiationTestFixture, fixture_should_balance_allocations)
     {
-        if (done_callback)
-        {
-            done_callback(connection);
-        }
-    }
-    void NegotiationFixture::read_intercept(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f done_callback)
-    {
-        amqp_negotiator_encode_version(connection->context, NegotiationFixture::broker_version, buffer);
-        if (done_callback)
-        {
-            if (buffer == 0)
-            {
-                amqp_allocate_buffer(connection->context);
-            }
-            done_callback(connection, buffer, amqp_buffer_size(buffer));
-        }
+        CHECK_EQUAL("initialized", connection->state.negotiator.name);
     }
 
-    TEST_FIXTURE(NegotiationFixture, fixture_should_balance_allocations)
-    {
-        CHECK_EQUAL("Initialized", connection->state.negotiator.name);
-    }
-
-    TEST_FIXTURE(NegotiationFixture, encode_prefered_version)
+    TEST_FIXTURE(NegotiationTestFixture, encode_prefered_version)
     {
         amqp_negotiator_encode_version(context, AMQP_PREFERRED_VERSION, buffer);
 
@@ -94,7 +78,7 @@ SUITE(ConnectionNegotiation)
         CHECK_EQUAL(AMQP_PROTOCOL_REVISION, amqp_buffer_getc(buffer));
     }
 
-    TEST_FIXTURE(NegotiationFixture, decode_prefered_version)
+    TEST_FIXTURE(NegotiationTestFixture, decode_prefered_version)
     {
         amqp_buffer_putc(buffer, 'A');
         amqp_buffer_putc(buffer, 'M');
@@ -108,30 +92,32 @@ SUITE(ConnectionNegotiation)
         CHECK_EQUAL((uint32_t) AMQP_PREFERRED_VERSION, amqp_negotiator_decode_version(context, buffer));
     }
 
-    void NegotiationFixture::done_callback(amqp_connection_t *connection)
+    void NegotiationTestFixture::done_callback(amqp_connection_t *connection)
     {
     }
-    void NegotiationFixture::reject_callback(amqp_connection_t *connection, uint32_t version)
+    void NegotiationTestFixture::reject_callback(amqp_connection_t *connection, uint32_t version)
     {
-    }
-    TEST_FIXTURE(NegotiationFixture, client_offer)
-    {
-        connection->state.writer.commence_write = write_intercept;
-        connection->state.reader.commence_read = read_intercept;
-
-        connection->state.negotiator.start(connection, AMQP_PREFERRED_VERSION, NegotiationFixture::done_callback, NegotiationFixture::reject_callback);
-        CHECK_EQUAL("Negotiated", connection->state.negotiator.name);
     }
 
-    void NegotiationFixture::request_callback(amqp_connection_t *connection, uint32_t version)
+    TEST_FIXTURE(NegotiationTestFixture, client_offer)
+    {
+        amqp_negotiator_encode_version(connection->context, NegotiationTestFixture::broker_version, buffer);
+        set_data_for_read(buffer);
+
+        connection->state.negotiator.start(connection, AMQP_PREFERRED_VERSION, NegotiationTestFixture::done_callback, NegotiationTestFixture::reject_callback);
+        CHECK_EQUAL("negotiated", connection->state.negotiator.name);
+    }
+
+    void NegotiationTestFixture::request_callback(amqp_connection_t *connection, uint32_t version)
     {
     }
-    TEST_FIXTURE(NegotiationFixture, broker_response)
+
+    TEST_FIXTURE(NegotiationTestFixture, broker_response)
     {
-        connection->state.writer.commence_write = write_intercept;
-        connection->state.reader.commence_read = read_intercept;
+        amqp_negotiator_encode_version(connection->context, NegotiationTestFixture::broker_version, buffer);
+        set_data_for_read(buffer);
 
         connection->state.negotiator.wait(connection, request_callback);
-        CHECK_EQUAL("WaitToSendServerResponse", connection->state.negotiator.name);
+        CHECK_EQUAL("waiting_to_send_server_response", connection->state.negotiator.name);
     }
 }

@@ -24,14 +24,22 @@ extern "C" {
 #include "Transport/Frame/Frame.h"
 #include "Plugin/Sasl.h"
 
-extern int amqp_encode_sasl_mechanisms_frame(amqp_connection_t *connection, amqp_buffer_t *buffer);
-extern int amqp_encode_sasl_init_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin);
 
-extern int amqp_encode_sasl_challenge_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin);
-extern int amqp_encode_sasl_outcome_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin);
+#ifndef LIBAMQP_AMQP_SESSION_TYPE_T
+#define LIBAMQP_AMQP_SESSION_TYPE_T
+typedef struct amqp_session_t amqp_session_t;
+#endif
 
-extern int amqp_encode_amqp_open(amqp_connection_t *connection, amqp_buffer_t *buffer);
-extern int amqp_encode_amqp_close(amqp_connection_t *connection, amqp_buffer_t *buffer);
+extern amqp_buffer_t *amqp_encode_sasl_mechanisms_frame(amqp_connection_t *connection);
+extern amqp_buffer_t *amqp_encode_sasl_init_frame(amqp_connection_t *connection, amqp_sasl_plugin_t *sasl_plugin);
+
+extern amqp_buffer_t *amqp_encode_sasl_challenge_frame(amqp_connection_t *connection, amqp_sasl_plugin_t *sasl_plugin);
+extern amqp_buffer_t *amqp_encode_sasl_outcome_frame(amqp_connection_t *connection, amqp_sasl_plugin_t *sasl_plugin);
+
+extern amqp_buffer_t *amqp_encode_amqp_open(amqp_connection_t *connection);
+extern amqp_buffer_t *amqp_encode_amqp_close(amqp_connection_t *connection);
+extern amqp_buffer_t *amqp_encode_empty_frame(amqp_connection_t *connection);
+extern amqp_buffer_t *amqp_encode_amqp_begin(amqp_connection_t *connection, amqp_session_t *session);
 
 #ifdef __cplusplus
 }

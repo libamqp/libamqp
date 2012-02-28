@@ -58,11 +58,12 @@ typedef uint8_t amqp_receiver_settle_mode_t;
 
 typedef uint32_t amqp_milliseconds_t;
 typedef uint32_t amqp_seconds_t;
+typedef uint32_t amqp_handle_t;
 typedef amqp_binary_t amqp_delivery_tag_t;
-//typedef uint32_t amqp_sequence_no_t;    // RFC-1982 sequence number
-//typedef amqp_sequence_no_t amqp_delivery_number_t;
-//typedef amqp_sequence_no_t amqp_transfer_number_t;
-//typedef uint32_t amqp_message_format_t;
+typedef uint32_t amqp_sequence_no_t;    // RFC-1982 sequence number
+typedef amqp_sequence_no_t amqp_delivery_number_t;
+typedef amqp_sequence_no_t amqp_transfer_number_t;
+typedef uint32_t amqp_message_format_t;
 typedef amqp_multiple_symbol_t amqp_multiple_ietf_language_tag_t;
 
 typedef amqp_map_t amqp_property_fields_t;
@@ -80,23 +81,23 @@ typedef int  amqp_terminus_durability_t;
 typedef int  amqp_terminus_expiry_policy_t;
 typedef int  amqp_filter_set_t;
 
-typedef struct amqp_handle_t
-{
-    int provided;
-    uint32_t value;
-} amqp_handle_t;
-
-typedef struct amqp_sequence_no_t
-{
-    int provided;
-    uint32_t value;
-} amqp_sequence_no_t;
-
-typedef struct amqp_message_format_t
-{
-    int provided;
-    uint32_t value;
-} amqp_message_format_t;
+//typedef struct amqp_handle_t
+//{
+//    int provided;
+//    uint32_t value;
+//} amqp_handle_t;
+//
+//typedef struct amqp_sequence_no_t
+//{
+//    int provided;
+//    uint32_t value;
+//} amqp_sequence_no_t;
+//
+//typedef struct amqp_message_format_t
+//{
+//    int provided;
+//    uint32_t value;
+//} amqp_message_format_t;
 
 #ifdef __cplusplus
 }

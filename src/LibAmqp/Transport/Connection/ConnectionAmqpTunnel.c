@@ -14,27 +14,16 @@
    limitations under the License.
  */
 
-#include "Context/Context.h"
-#include "Transport/Connection/Connection.h"
-#include "Transport/Connection/ConnectionTrace.h"
+#include "Transport/Connection/ConnectionStateMachine.h"
 
-#ifdef LIBAMQP_TRACE_CONNECT_STATE
-#define save_old_state()  const char* old_state_name = connection->state.amqp_tunnel.name
-#define trace_transition(old_state_name) amqp_connection_trace_transition(connection, AMQP_TRACE_CONNECTION_AMQP, old_state_name, connection->state.amqp_tunnel.name)
-#else
-#define save_old_state()
-#define trace_transition(old_state_name)
-#endif
-
-static void transition_to_initialized(amqp_connection_t *connection);
-static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name);
-static void transition_to_failed(amqp_connection_t *connection);
-static void transition_to_sending_header_response(amqp_connection_t *connection);
-static void transition_to_negotiated(amqp_connection_t *connection);
+DECLARE_TRANSITION_FUNCTION(initialized);
+DECLARE_TRANSITION_FUNCTION(failed);
+DECLARE_TRANSITION_FUNCTION(sending_header_response);
+DECLARE_TRANSITION_FUNCTION(negotiated);
 
 void amqp_connection_amqp_tunnel_initialize(amqp_connection_t *connection)
 {
-    transition_to_initialized(connection);
+    transition_to_state(connection, initialized);
 }
 
 static void cleanup_resources(amqp_connection_t *connection)
@@ -58,13 +47,13 @@ static void amqp_done_callback(amqp_connection_t *connection)
 
 static void amqp_version_accepted(amqp_connection_t *connection)
 {
-    transition_to_negotiated(connection);
+    transition_to_state(connection, negotiated);
     connection->specification_version.supported.amqp = connection->specification_version.required.amqp;
     connection->state.connection.done(connection);
 }
 static void amqp_version_rejected(amqp_connection_t *connection, uint32_t version)
 {
-    transition_to_failed(connection);
+    transition_to_state(connection, failed);
     connection->specification_version.supported.amqp = version;
     connection->state.connection.fail(connection);
 }
@@ -84,47 +73,36 @@ static void tunnel_accept_while_initialized(amqp_connection_t *connection, uint3
 
     if (requested_version != supported_version)
     {
-        transition_to_failed(connection);
+        transition_to_state(connection, failed);
         amqp_connection_trace(connection, "requested amqp version: %08x, supported version: %08x", requested_version, supported_version);
         call_action(connection->state.connection.mode.server.reject, connection->context, connection, supported_version);
         return;
     }
 
-    transition_to_sending_header_response(connection);
+    transition_to_state(connection, sending_header_response);
     call_action(connection->state.negotiator.send, connection->context, connection, supported_version, amqp_done_callback);
 }
-static void transition_to_initialized(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(initialized)
 {
-    default_state_initialization(connection, "Initialized");
     connection->state.amqp_tunnel.connect = amqp_connect_while_initialized;
     connection->state.amqp_tunnel.tunnel.accept = tunnel_accept_while_initialized;
-    trace_transition("Created");
 }
-static void transition_to_failed(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(failed)
 {
-    save_old_state();
-    default_state_initialization(connection, "Failed");
-    trace_transition(old_state_name);
 }
 
 static void done_while_sending_header_response(amqp_connection_t *connection)
 {
-    transition_to_negotiated(connection);
+    transition_to_state(connection, negotiated);
     call_action(connection->state.connection.done, connection->context, connection);
 }
-static void transition_to_sending_header_response(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(sending_header_response)
 {
-    save_old_state();
-    default_state_initialization(connection, "SendingHeader");
     connection->state.amqp_tunnel.done = done_while_sending_header_response;
-    trace_transition(old_state_name);
 }
 
-static void transition_to_negotiated(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(negotiated)
 {
-    save_old_state();
-    default_state_initialization(connection, "Negotiated");
-    trace_transition(old_state_name);
 }
 
 /**********************************************
@@ -153,11 +131,17 @@ static void default_tunnel_establish(amqp_connection_t *connection, uint32_t ver
     illegal_state(connection, "TunnelEstablish");
 }
 
-static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
+static void default_state_initialization(amqp_connection_t *connection, const char *state_name, void (*action_initializer)(amqp_connection_t *connection) LIBAMQP_TRACE_STATE_ARGS_DECL)
 {
+    save_old_state(connection->state.amqp_tunnel.name);
+
     connection->state.amqp_tunnel.connect = default_connect;
     connection->state.amqp_tunnel.done = default_done;
-
     connection->state.amqp_tunnel.tunnel.accept = default_tunnel_establish;
-    connection->state.amqp_tunnel.name = new_state_name;
+
+    connection->state.amqp_tunnel.name = state_name;
+
+    action_initializer(connection);
+
+    trace_state_transition(AMQP_TRACE_CONNECTION_AMQP_TUNNEL, connection->state.amqp_tunnel.name);
 }

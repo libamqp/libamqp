@@ -14,30 +14,30 @@
    limitations under the License.
  */
 
-#include "AmqpTypes/AmqpTypesTestSupport.h"
+#include "AmqpTypes/AmqpTypesTestFixture.h"
 #include "AmqpTypes/AmqpSymbol.h"
 
 SUITE(AmqpTypes)
 {
-    class AmqpSymbolMapFixture  : public AmqpTypesFixture
+    class AmqpSymbolMapTestFixture  : public AmqpTypesTestFixture
     {
     public:
-        AmqpSymbolMapFixture();
-        ~AmqpSymbolMapFixture();
+        AmqpSymbolMapTestFixture();
+        ~AmqpSymbolMapTestFixture();
 
     public:
         amqp_hash_table_t map;
     };
 
-    AmqpSymbolMapFixture::AmqpSymbolMapFixture()
+    AmqpSymbolMapTestFixture::AmqpSymbolMapTestFixture()
     {
     }
 
-    AmqpSymbolMapFixture::~AmqpSymbolMapFixture()
+    AmqpSymbolMapTestFixture::~AmqpSymbolMapTestFixture()
     {
     }
 
-    TEST_FIXTURE(AmqpSymbolMapFixture, symbol_map_should_not_trigger_allocation_errors)
+    TEST_FIXTURE(AmqpSymbolMapTestFixture, symbol_map_should_not_trigger_allocation_errors)
     {
         amqp_symbol_hash_table_initialize(context, &map, 63);
         for (int i = 0; i < key_count(); i++)
@@ -48,7 +48,7 @@ SUITE(AmqpTypes)
         amqp_symbol_hash_table_cleanup(context, &map);
     }
 
-    TEST_FIXTURE(AmqpSymbolMapFixture, symbol_map_put_and_get_are_nothing_special)
+    TEST_FIXTURE(AmqpSymbolMapTestFixture, symbol_map_put_and_get_are_nothing_special)
     {
         amqp_symbol_hash_table_initialize(context, &map, 63);
         amqp_symbol_t *symbol = amqp_symbol_create(context, keys[6], strlen(keys[6]));

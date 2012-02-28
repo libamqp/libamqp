@@ -13,7 +13,7 @@ SET(AMQP_TEST_SOURCES
   DecodeNumberTest.cpp
   DecodeStringTest.cpp
   DecodeSymbolTest.cpp
-  DecodeTestSupport.h
+  DecodeTestFixture.h
 )
 
 # $Id: CMakeLists.txt,v 1.14 2011/03/16 12:33:34 erk Exp $

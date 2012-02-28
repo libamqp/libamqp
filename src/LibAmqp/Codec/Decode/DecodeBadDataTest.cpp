@@ -17,29 +17,22 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/CodecTestSupport.h"
+#include "Codec/Decode/DecodeTestFixture.h"
+
 #include "Codec/Type/Type.h"
 
-SUITE(BadDataDecoder)
+SUITE(CodecDecode)
 {
     using test_data::TestData;
     
-    class DecodeFixture : public SuiteCodec::CodecFixture
-    {
-    public:
-        DecodeFixture() {}
-        ~DecodeFixture() { }
-    public:
-    };
-    
-    TEST_FIXTURE(DecodeFixture, EndOfBuffer)
+    TEST_FIXTURE(DecodeTestFixture, EndOfBuffer)
     {
         load_decode_buffer(test_data::empty_buffer);
         type = amqp_decode(context, decode_buffer);
         CHECK_NULL(type);
     }
 
-    TEST_FIXTURE(DecodeFixture, BadFormatCode)
+    TEST_FIXTURE(DecodeTestFixture, BadFormatCode)
     {
         load_decode_buffer(test_data::bad_format_code);
         type = amqp_decode_supress_messages(context, decode_buffer);
@@ -47,7 +40,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_UNKNOWN_FORMAT_CODE, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, BadFixedFormatCode)
+    TEST_FIXTURE(DecodeTestFixture, BadFixedFormatCode)
     {
         test_data_def(bad_data, 
             0x46,
@@ -60,7 +53,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_UNKNOWN_FORMAT_CODE, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, InvalidFormatCode)
+    TEST_FIXTURE(DecodeTestFixture, InvalidFormatCode)
     {
         test_data_def(bad_data,
             0x3f,
@@ -72,7 +65,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_UNKNOWN_FORMAT_CODE, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeBadULong)
+    TEST_FIXTURE(DecodeTestFixture, DecodeBadULong)
     {
         test_data_def(bad_data, 
             0x80, 0x10, 0x07, 0x03, 0x01
@@ -84,7 +77,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeBadUInt)
+    TEST_FIXTURE(DecodeTestFixture, DecodeBadUInt)
     {
         test_data_def(bad_data, 
             0x70, 0xff, 0xff
@@ -96,7 +89,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeBadUShort)
+    TEST_FIXTURE(DecodeTestFixture, DecodeBadUShort)
     {
         test_data_def(bad_data, 
             0x60, 0xff,
@@ -108,7 +101,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeBadUByte)
+    TEST_FIXTURE(DecodeTestFixture, DecodeBadUByte)
     {
         test_data_def(bad_data, 
             0x50
@@ -120,7 +113,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeBadLong)
+    TEST_FIXTURE(DecodeTestFixture, DecodeBadLong)
     {
         test_data_def(bad_data, 
             0x81, 0x10, 0x07, 0x03, 0x01
@@ -132,7 +125,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeBadInt)
+    TEST_FIXTURE(DecodeTestFixture, DecodeBadInt)
     {
         test_data_def(bad_data, 
             0x71, 0xff, 0xff
@@ -144,7 +137,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeBadShort)
+    TEST_FIXTURE(DecodeTestFixture, DecodeBadShort)
     {
         test_data_def(bad_data, 
             0x61, 0xff,
@@ -156,7 +149,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeBadByte)
+    TEST_FIXTURE(DecodeTestFixture, DecodeBadByte)
     {
         test_data_def(bad_data, 
             0x51
@@ -168,7 +161,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeBadSymbol)
+    TEST_FIXTURE(DecodeTestFixture, DecodeBadSymbol)
     {
         test_data_def(bad_data, 
             0xa3, 3, 'F', 'o'
@@ -180,7 +173,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeBadLargeSymbol)
+    TEST_FIXTURE(DecodeTestFixture, DecodeBadLargeSymbol)
     {
         test_data_def(bad_data, 
             0xb3, 0, 0, 0, 6, 'F', 'o', 'o', 'B', 'a'
@@ -192,7 +185,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, BadFloat)
+    TEST_FIXTURE(DecodeTestFixture, BadFloat)
     {
         test_data_def(bad_data, 
             0x72, 0x42, 0xf6, 0xe9
@@ -204,7 +197,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, BadDouble)
+    TEST_FIXTURE(DecodeTestFixture, BadDouble)
     {
         test_data_def(bad_data, 
             0x82, 0x42, 0xf6, 0xe9
@@ -216,7 +209,7 @@ SUITE(BadDataDecoder)
         CHECK_EQUAL(AMQP_ERROR_BUFFER_WOULD_OVERRUN, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeBadString)
+    TEST_FIXTURE(DecodeTestFixture, DecodeBadString)
     {
         test_data_def(bad_data, 
             0xA1, 0x0B, 'B', 'a', 'd', ' ', 'W', 'o', 'r', 'l', 'd'

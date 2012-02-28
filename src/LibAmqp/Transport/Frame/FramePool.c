@@ -35,7 +35,7 @@ void amqp_cleanup_amqp_frame_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp
 
 void amqp_frame_initialize_pool(amqp_memory_pool_t *pool)
 {
-    amqp_initialize_pool_suggesting_block_size(pool, sizeof(amqp_frame_t), 2048);
+    amqp_initialize_pool_suggesting_block_size(pool, sizeof(amqp_frame_t), 2048, "frame");
     amqp_pool_specify_initialization_callbacks(pool, (amqp_pool_callback_t) amqp_initialize_amqp_frame_t, (amqp_pool_callback_t) amqp_cleanup_amqp_frame_t);
 }
 

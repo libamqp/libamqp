@@ -55,6 +55,7 @@ static inline
 amqp_symbol_t *amqp_multiple_symbol_get(amqp_multiple_symbol_t *multiple, int element)
 {
     assert(multiple != 0);
+    assert(element >= 0 && element < multiple->size);
 
     return (multiple->size > 0 && element < multiple->size) ? &multiple->symbols[element] : 0;
 }

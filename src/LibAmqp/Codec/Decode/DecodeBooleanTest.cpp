@@ -17,12 +17,12 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/Decode/DecodeTestSupport.h"
+#include "Codec/Decode/DecodeTestFixture.h"
 #include "Codec/Type/Type.h"
 
 SUITE(CodecDecode)
 {
-    TEST_FIXTURE(DecodeFixture, ZeroByteTrue)
+    TEST_FIXTURE(DecodeTestFixture, ZeroByteTrue)
     {
         load_decode_buffer(test_data::true_0);
         type = amqp_decode(context, decode_buffer);
@@ -37,7 +37,7 @@ SUITE(CodecDecode)
         CHECK(amqp_type_to_boolean(type));
     }
 
-    TEST_FIXTURE(DecodeFixture, ZeroByteFalse)
+    TEST_FIXTURE(DecodeTestFixture, ZeroByteFalse)
     {
         load_decode_buffer(test_data::false_0);
         type = amqp_decode(context, decode_buffer);
@@ -52,7 +52,7 @@ SUITE(CodecDecode)
         CHECK(!amqp_type_to_boolean(type));
     }
 
-    TEST_FIXTURE(DecodeFixture, SingleByteTrue)
+    TEST_FIXTURE(DecodeTestFixture, SingleByteTrue)
     {
         load_decode_buffer(test_data::true_1);
         type = amqp_decode(context, decode_buffer);
@@ -67,7 +67,7 @@ SUITE(CodecDecode)
         CHECK(amqp_type_to_boolean(type));
     }
 
-    TEST_FIXTURE(DecodeFixture, SingleByteFalse)
+    TEST_FIXTURE(DecodeTestFixture, SingleByteFalse)
     {
         load_decode_buffer(test_data::false_1);
         type = amqp_decode(context, decode_buffer);
@@ -81,7 +81,7 @@ SUITE(CodecDecode)
         CHECK(!amqp_type_to_boolean(type));
     }
 
-    TEST_FIXTURE(DecodeFixture, DecodeSimpleBooleanArray)
+    TEST_FIXTURE(DecodeTestFixture, DecodeSimpleBooleanArray)
     {
         load_decode_buffer(test_data::boolean_array);
         type = amqp_decode(context, decode_buffer);

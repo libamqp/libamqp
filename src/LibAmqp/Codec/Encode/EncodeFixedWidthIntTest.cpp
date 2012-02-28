@@ -17,12 +17,12 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/Encode/EncodeTestSupport.h"
+#include "Codec/Encode/EncodeTestFixture.h"
 
 
 SUITE(CodecEncode)
 {
-    TEST_FIXTURE(EncodeFixture, EncodeInt)
+    TEST_FIXTURE(EncodeTestFixture, EncodeInt)
     {
         type = amqp_encode_int(context, buffer, -129);
 
@@ -33,7 +33,7 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x04, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, EncodeIntWithSmallValueShouldEncodeSmallInt)
+    TEST_FIXTURE(EncodeTestFixture, EncodeIntWithSmallValueShouldEncodeSmallInt)
     {
         type = amqp_encode_int(context, buffer, -3);
 
@@ -44,7 +44,7 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x01, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, EncodeIntWithZeroValueShouldEncodeShortIntWithZeroValue)
+    TEST_FIXTURE(EncodeTestFixture, EncodeIntWithZeroValueShouldEncodeShortIntWithZeroValue)
     {
         type = amqp_encode_int(context, buffer, 0);
 
@@ -55,7 +55,7 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x01, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, EncodeSmallInt)
+    TEST_FIXTURE(EncodeTestFixture, EncodeSmallInt)
     {
         type = amqp_encode_small_int(context, buffer, -3);
 
@@ -66,7 +66,7 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x01, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, explicit_encode_small_int_with_zero_value_should_encode_small_int)
+    TEST_FIXTURE(EncodeTestFixture, explicit_encode_small_int_with_zero_value_should_encode_small_int)
     {
         type = amqp_encode_small_int(context, buffer, 0U);
 

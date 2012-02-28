@@ -26,7 +26,7 @@ extern "C" {
 
 #define AMQP_DESCRIPTOR_DOMAIN  0x00
 
-typedef enum amqp_frame_descriptor_id_t
+typedef enum amqp_descriptor_id_t
 {
     amqp_open_list_descriptor = 0x00000010,
     amqp_begin_list_descriptor = 0x00000011,
@@ -73,9 +73,11 @@ typedef enum amqp_frame_descriptor_id_t
     amqp_amqp_sequence_list_descriptor = 0x00000076,
     amqp_amqp_value_wildcard_descriptor = 0x00000077,
     amqp_footer_map_descriptor = 0x00000078,
-} amqp_frame_descriptor_id_t;
+} amqp_descriptor_id_t;
 
-typedef enum amqp_frame_type_type_t
+
+// TODO - not much use - remove
+typedef enum amqp_descriptor_kind_t
 {
     amqp_empty_frame = 1,
     amqp_unsupported_descriptor,
@@ -87,13 +89,13 @@ typedef enum amqp_frame_type_type_t
     amqp_message_format_descriptor_space,
     amqp_transactions_descriptor_space,
 
-} amqp_frame_type_type_t;
+} amqp_descriptor_kind_t;
 
 typedef struct amqp_descriptor_t
 {
     uint32_t domain;
     uint32_t id;
-    amqp_frame_type_type_t group;
+    amqp_descriptor_kind_t kind; // TODO - not much use - remove
 } amqp_descriptor_t;
 
 typedef struct amqp_symbolic_descriptor_t

@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-#include "Memory/MemoryTestSupport.h"
+#include "Memory/MemoryTestFixture.h"
 
 SUITE(Memory)
 {
@@ -23,7 +23,7 @@ SUITE(Memory)
         char padding[100];
     } test_type_t;
 
-    TEST_FIXTURE(MemoryFixture, outstanding_allocations_should_match_count_of_blocks_not_freed)
+    TEST_FIXTURE(MemoryTestFixture, outstanding_allocations_should_match_count_of_blocks_not_freed)
     {
         test_type_t *p, *q, *r;
 
@@ -45,7 +45,7 @@ SUITE(Memory)
         CHECK_EQUAL(0UL,  m_context.memory.allocation_stats.outstanding_allocations);
     }
 
-    TEST_FIXTURE(MemoryFixture, allocate_macro_should_increase_allocated_block_count)
+    TEST_FIXTURE(MemoryTestFixture, allocate_macro_should_increase_allocated_block_count)
     {
         test_type_t *q;
         q = AMQP_MALLOC(&m_context, test_type_t);

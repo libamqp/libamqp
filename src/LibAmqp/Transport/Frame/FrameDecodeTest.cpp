@@ -17,7 +17,10 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/CodecTestSupport.h"
+#include "Context/TestSupport/ContextHolder.h"
+#include "Context/TestSupport/DecodeBufferHolder.h"
+#include "Context/TestSupport/TypeHolder.h"
+
 #include "Codec/Decode/Decode.h"
 
 #include "Codec/Type/Type.h"
@@ -33,11 +36,14 @@ SUITE(FrameTypeDecode)
     // These tests ensure that the AMQP encoded part of a frame can be decoded. If these
     // fail the problem is most likely the test data, not the frame decoder
 
-    class DecodeFixture : public SuiteCodec::CodecFixture
+    class FrameTypeDecodeTestFixture : 
+            public virtual TestSupport::ContextHolder,
+            public virtual TestSupport::DecodeBufferHolder,
+            public virtual TestSupport::TypeHolder
     {
     public:
-        DecodeFixture() : result(0) {}
-        ~DecodeFixture()
+        FrameTypeDecodeTestFixture() : result(0) {}
+        ~FrameTypeDecodeTestFixture()
         {
             AMQP_FREE(context, result);
         }
@@ -49,7 +55,7 @@ SUITE(FrameTypeDecode)
         amqp_type_t *described;
     };
 
-    TEST_FIXTURE(DecodeFixture, multiple_symbol_null)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, multiple_symbol_null)
     {
         test_data::multiple_symbol_null.transfer_to(decode_buffer);
         type = amqp_decode(context, decode_buffer);
@@ -57,7 +63,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_null(type));
     }
 
-    TEST_FIXTURE(DecodeFixture, multiple_symbol_one_value)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, multiple_symbol_one_value)
     {
         test_data::multiple_symbol_one_value.transfer_to(decode_buffer);
         type = amqp_decode(context, decode_buffer);
@@ -65,7 +71,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_symbol(type));
     }
 
-    TEST_FIXTURE(DecodeFixture, multiple_symbol_many_values)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, multiple_symbol_many_values)
     {
         test_data::multiple_symbol_many_values.transfer_to(decode_buffer);
         type = amqp_decode(context, decode_buffer);
@@ -75,7 +81,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_symbol(type->value.array.elements[0]));
     }
 
-    void DecodeFixture::load(test_data::TestData &data)
+    void FrameTypeDecodeTestFixture::load(test_data::TestData &data)
     {
         load_decode_buffer(data);
         amqp_buffer_advance_read_index(decode_buffer, 8);
@@ -89,31 +95,31 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_list(described));
     }
 
-    TEST_FIXTURE(DecodeFixture, sasl_mechanisms_frame_with_invalid_descriptor_id)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, sasl_mechanisms_frame_with_invalid_descriptor_id)
     {
         load(test_data::sasl_mechanisms_frame_with_invalid_descriptor_id);
         CHECK_EQUAL(63U, amqp_type_to_ulong(descriptor));
     }
 
-    TEST_FIXTURE(DecodeFixture, test_decode_of_sasl_mechanisms_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, test_decode_of_sasl_mechanisms_frame)
     {
         load(test_data::sasl_mechanisms_frame);
         CHECK_EQUAL(64U, amqp_type_to_ulong(descriptor));
     }
 
-    TEST_FIXTURE(DecodeFixture, test_decode_of_sasl_mechanisms_frame_using_large_long)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, test_decode_of_sasl_mechanisms_frame_using_large_long)
     {
         load(test_data::sasl_mechanisms_frame_long);
         CHECK_EQUAL(64U, amqp_type_to_ulong(descriptor));
     }
 
-    TEST_FIXTURE(DecodeFixture, test_decode_of_sasl_mechanisms_frame_using_symbol)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, test_decode_of_sasl_mechanisms_frame_using_symbol)
     {
         load(test_data::sasl_mechanisms_frame_symbol);
         CHECK(amqp_type_is_symbol(descriptor));
     }
 
-    TEST_FIXTURE(DecodeFixture, test_decode_of_sasl_init)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, test_decode_of_sasl_init)
     {
         load(test_data::sasl_init_frame);
         CHECK_EQUAL(65U, amqp_type_to_ulong(descriptor));
@@ -122,7 +128,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_binary(described->value.list.elements[1]));
         CHECK(amqp_type_is_string(described->value.list.elements[2]));
     }
-    TEST_FIXTURE(DecodeFixture, test_decode_of_sasl_init_frame_captured)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, test_decode_of_sasl_init_frame_captured)
     {
         load(test_data::sasl_init_frame_captured);
         CHECK_EQUAL(65U, amqp_type_to_ulong(descriptor));
@@ -132,7 +138,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_string(described->value.list.elements[2]));
     }
 
-    TEST_FIXTURE(DecodeFixture, sasl_outcome_frame_auth_error)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, sasl_outcome_frame_auth_error)
     {
         load(test_data::sasl_outcome_frame_auth_error);
 
@@ -142,7 +148,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_binary(described->value.list.elements[1]));
     }
 
-    TEST_FIXTURE(DecodeFixture, client_open_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, client_open_frame)
     {
         load(test_data::client_open_frame);
 
@@ -162,7 +168,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
     }
 
-    TEST_FIXTURE(DecodeFixture, broker_open_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, broker_open_frame)
     {
         load(test_data::broker_open_frame);
 
@@ -182,7 +188,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
     }
 
-    TEST_FIXTURE(DecodeFixture, client_begin_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, client_begin_frame)
     {
         load(test_data::client_begin_frame);
 
@@ -200,7 +206,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
     }
 
-    TEST_FIXTURE(DecodeFixture, broker_begin_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, broker_begin_frame)
     {
         load(test_data::broker_begin_frame);
 
@@ -218,7 +224,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_map(described->value.list.elements[field])); field++;
     }
 
-    TEST_FIXTURE(DecodeFixture, close_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, close_frame)
     {
         load(test_data::close_frame);
 
@@ -229,7 +235,7 @@ SUITE(FrameTypeDecode)
         CHECK(amqp_type_is_composite(described->value.list.elements[field])); field++;
     }
 
-    TEST_FIXTURE(DecodeFixture, close_confirm_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, close_confirm_frame)
     {
         load(test_data::close_confirm_frame);
 
@@ -238,7 +244,7 @@ SUITE(FrameTypeDecode)
 
     }
 
-    TEST_FIXTURE(DecodeFixture, client_attach_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, client_attach_frame)
     {
         load(test_data::client_attach_frame);
 
@@ -272,7 +278,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(14, field);
     }
 
-    TEST_FIXTURE(DecodeFixture, broker_attach_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, broker_attach_frame)
     {
         load(test_data::broker_attach_frame);
 
@@ -304,7 +310,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(14, field);
     }
 
-    TEST_FIXTURE(DecodeFixture, flow_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, flow_frame)
     {
         load(test_data::flow_frame);
         CHECK_EQUAL(0x13U, amqp_type_to_ulong(descriptor));
@@ -326,7 +332,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(11, field);
     }
 
-    TEST_FIXTURE(DecodeFixture, broker_flow_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, broker_flow_frame)
     {
         load(test_data::broker_flow_frame);
 
@@ -348,7 +354,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(11, field);
     }
 
-    TEST_FIXTURE(DecodeFixture, ya_flow_frame)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, ya_flow_frame)
     {
         load(test_data::ya_flow_frame);
 
@@ -370,7 +376,7 @@ SUITE(FrameTypeDecode)
         CHECK_EQUAL(11, field);
     }
 
-    TEST_FIXTURE(DecodeFixture, transfer_frame_id_0)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, transfer_frame_id_0)
     {
         load(test_data::transfer_frame_id_0);
 
@@ -393,7 +399,7 @@ SUITE(FrameTypeDecode)
 //        amqp_type_print(context,  described);
     }
 
-    TEST_FIXTURE(DecodeFixture, transfer_frame_id_256)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, transfer_frame_id_256)
     {
         load(test_data::transfer_frame_id_256);
 
@@ -416,7 +422,7 @@ SUITE(FrameTypeDecode)
 //        amqp_type_print(context,  described);
     }
 
-    TEST_FIXTURE(DecodeFixture, transfer_frame_id_677)
+    TEST_FIXTURE(FrameTypeDecodeTestFixture, transfer_frame_id_677)
     {
         load(test_data::transfer_frame_id_677);
 

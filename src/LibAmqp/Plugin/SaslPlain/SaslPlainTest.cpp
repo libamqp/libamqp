@@ -15,14 +15,16 @@
  */
 
 #include <TestHarness.h>
-#include "Plugin/SaslPlain/SaslPlain.h"
+#include "Context/TestSupport/ContextHolder.h"
+#include "Context/TestSupport/BufferHolder.h"
 
-#include "Context/ContextTestSupport.h"
-#include "Context/Context.h"
+#include "Plugin/SaslPlain/SaslPlain.h"
 
 SUITE(PluginSaslPlain)
 {
-    class PluginSaslPlainFixture : public SuiteContext::ContextFixture
+    class PluginSaslPlainFixture :
+            public virtual TestSupport::ContextHolder,
+            public virtual TestSupport::BufferHolder
     {
     public:
         PluginSaslPlainFixture();
@@ -59,7 +61,7 @@ SUITE(PluginSaslPlain)
 
     TEST_FIXTURE(PluginSaslPlainFixture, encode_initial_response)
     {
-        type = amqp_sasl_plugin_initial_response_encode(context, instance, &identity_hooks, decode_buffer);
+        type = amqp_sasl_plugin_initial_response_encode(context, instance, &identity_hooks, buffer);
         CHECK(amqp_type_is_binary(type));
         size_t expected_size = strlen(provide_login(context)) + strlen(provide_password(context)) + 2;
         CHECK_EQUAL(expected_size, type->position.size);

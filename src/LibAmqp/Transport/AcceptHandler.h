@@ -48,9 +48,10 @@ struct amqp_accept_handler_arguments_t
 {
     amqp_connections_t *connections;
     amqp_connection_test_hook_t *test_hooks;
+    void *user_data;
 };
 
-extern amqp_accept_handler_arguments_t *amqp_accept_handler_arguments_initialize(amqp_context_t *context, amqp_connection_test_hook_t *test_hooks);
+extern amqp_accept_handler_arguments_t *amqp_accept_handler_arguments_initialize(amqp_context_t *context, amqp_connection_test_hook_t *test_hooks, void *user_data);
 extern void amqp_accept_handler_arguments_destroy(amqp_context_t *context, amqp_accept_handler_arguments_t *arguments);
 
 #ifdef __cplusplus

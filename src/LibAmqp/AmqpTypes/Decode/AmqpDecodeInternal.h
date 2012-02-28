@@ -65,11 +65,15 @@ decode_primitive_ ## ft(amqp_context_t *context, amqp_type_t *field, int field_n
     *result = amqp_type_to_ ## ft(field); \
     return true; \
 } \
-int amqp_decode_primitive_ ## ft(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, t *result, t default_value) \
+int amqp_decode_primitive_ ## ft(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, t *result, t default_value) \
 { \
     if (amqp_type_is_null(field)) \
     { \
         *result = default_value; \
+        if (null_flag) \
+        { \
+            *null_flag = true; \
+        } \
         return true; \
     } \
     return decode_primitive_ ## ft(context, field, field_number, total_fields, result); \

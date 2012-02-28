@@ -14,16 +14,16 @@
    limitations under the License.
  */
 
-#include "AmqpTypes/AmqpTypesTestSupport.h"
+#include "AmqpTypes/AmqpTypesTestFixture.h"
 #include "AmqpTypes/AmqpDescriptor.h"
 
 SUITE(AmqpTypes)
 {
-    class AmqpDescriptorFixture  : public AmqpTypesFixture
+    class AmqpDescriptorTestFixture  : public AmqpTypesTestFixture
     {
     public:
-        AmqpDescriptorFixture();
-        ~AmqpDescriptorFixture();
+        AmqpDescriptorTestFixture();
+        ~AmqpDescriptorTestFixture();
 
         static const char *descriptor;
 
@@ -32,21 +32,21 @@ SUITE(AmqpTypes)
         amqp_hash_table_t *map;
     };
 
-    const char *AmqpDescriptorFixture::descriptor = "amqp:sasl-mechanisms:list";
+    const char *AmqpDescriptorTestFixture::descriptor = "amqp:sasl-mechanisms:list";
 
-    AmqpDescriptorFixture::AmqpDescriptorFixture()
+    AmqpDescriptorTestFixture::AmqpDescriptorTestFixture()
     {
         map = amqp_load_descriptors(context);
         amqp_symbol_initialize(context, &symbol, descriptor, strlen(descriptor));
     }
 
-    AmqpDescriptorFixture::~AmqpDescriptorFixture()
+    AmqpDescriptorTestFixture::~AmqpDescriptorTestFixture()
     {
         amqp_symbol_cleanup(context, &symbol);
         amqp_descriptors_cleanup(context, map);
     }
 
-    TEST_FIXTURE(AmqpDescriptorFixture, lookup_descriptor_using_map_api)
+    TEST_FIXTURE(AmqpDescriptorTestFixture, lookup_descriptor_using_map_api)
     {
         amqp_descriptor_t *d = (amqp_descriptor_t *) amqp_symbol_hash_table_get(map, &symbol);
 
@@ -58,7 +58,7 @@ SUITE(AmqpTypes)
         }
     }
 
-    TEST_FIXTURE(AmqpDescriptorFixture, lookup_descriptor)
+    TEST_FIXTURE(AmqpDescriptorTestFixture, lookup_descriptor)
     {
         amqp_descriptor_t *d = amqp_descriptor_lookup(map, &symbol);
 
@@ -70,7 +70,7 @@ SUITE(AmqpTypes)
         }
     }
 
-    TEST_FIXTURE(AmqpDescriptorFixture, lookup_descriptor_using_context)
+    TEST_FIXTURE(AmqpDescriptorTestFixture, lookup_descriptor_using_context)
     {
         amqp_descriptor_t *d = amqp_context_descriptor_lookup(context, &symbol);
 

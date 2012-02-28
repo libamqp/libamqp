@@ -1,3 +1,4 @@
+
 /*
    Copyright 2011-2012 StormMQ Limited
 
@@ -14,45 +15,31 @@
    limitations under the License.
  */
 
-#include "Context/Context.h"
-#include "Transport/Connection/Connections.h"
-#include "Transport/Connection/Connection.h"
-#include "Transport/Connection/ConnectionTrace.h"
-#include "debug_helper.h"
+#include "Transport/Connection/ConnectionStateMachine.h"
 
-#ifdef LIBAMQP_TRACE_CONNECT_STATE
-#define save_old_state()  const char* old_state_name = connection->state.connection.name
-#define trace_transition(old_state_name) amqp_connection_trace_transition(connection, AMQP_TRACE_CONNECTION, old_state_name, connection->state.connection.name)
-#else
-#define save_old_state()
-#define trace_transition(old_state_name)
-#endif
-
-static void transition_to_initialized(amqp_connection_t *connection);
-static void transition_to_connecting_socket(amqp_connection_t *connection);
-static void transition_to_connecting_tls(amqp_connection_t *connection);
-static void transition_to_connecting_sasl(amqp_connection_t *connection);
-static void transition_to_connecting_amqp(amqp_connection_t *connection);
-static void transition_to_amqp_tunnel_established(amqp_connection_t *connection);
+DECLARE_TRANSITION_FUNCTION(initialized);
+DECLARE_TRANSITION_FUNCTION(connecting_socket);
+DECLARE_TRANSITION_FUNCTION(connecting_tls);
+DECLARE_TRANSITION_FUNCTION(connecting_sasl);
+DECLARE_TRANSITION_FUNCTION(connecting_amqp);
+DECLARE_TRANSITION_FUNCTION(amqp_tunnel_established);
 
 void amqp_connection_client_state_initialize(amqp_connection_t *connection)
 {
-    transition_to_initialized(connection);
+    transition_to_state(connection, initialized);
     amqp_connection_socket_initialize(connection);
     amqp_connection_state_initialize(connection);
 }
 
 static void connect_while_initialized(amqp_connection_t *connection, const char *hostname, int port_number)
 {
-    transition_to_connecting_socket(connection);
+    transition_to_state(connection, connecting_socket);
     amqp_connection_flag_set(connection, AMQP_CONNECTION_RUNNING);
     connection->state.socket.connect(connection, hostname, port_number);
 }
-static void transition_to_initialized(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(initialized)
 {
-    amqp__connection_default_state_initialization(connection, "Initialized");
     connection->state.connection.mode.client.connect = connect_while_initialized;
-    trace_transition("Created");
 }
 
 static void clear_protocol_flag(amqp_connection_t *connection, int flag)
@@ -63,21 +50,21 @@ static void start_next_protocol_on_connection(amqp_connection_t *connection)
 {
     if (connection->data.handshake.protocols & AMQP_PROTOCOL_TLS)
     {
-        transition_to_connecting_tls(connection);
+        transition_to_state(connection, connecting_tls);
         clear_protocol_flag(connection, AMQP_PROTOCOL_TLS);
         connection->state.tls.connect(connection);
         return;
     }
     if (connection->data.handshake.protocols & AMQP_PROTOCOL_SASL)
     {
-        transition_to_connecting_sasl(connection);
+        transition_to_state(connection, connecting_sasl);
         clear_protocol_flag(connection, AMQP_PROTOCOL_SASL);
         connection->state.sasl.connect(connection);
         return;
     }
     if (connection->data.handshake.protocols & AMQP_PROTOCOL_AMQP)
     {
-        transition_to_connecting_amqp(connection);
+        transition_to_state(connection, connecting_amqp);
         clear_protocol_flag(connection, AMQP_PROTOCOL_AMQP);
         connection->state.amqp_tunnel.connect(connection);
         return;
@@ -103,15 +90,10 @@ static void fail_while_connecting_socket(amqp_connection_t *connection)
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_SOCKET_CONNECT_FAILED);
     not_implemented(fail_while_connecting_tls);
 }
-static void transition_to_connecting_socket(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(connecting_socket)
 {
-    save_old_state();
-
-    amqp__connection_default_state_initialization(connection, "ConnectingSocket");
     connection->state.connection.done = done_while_connecting_socket;
     connection->state.connection.fail = fail_while_connecting_socket;
-
-    trace_transition(old_state_name);
 }
 
 static void done_while_connecting_tls(amqp_connection_t *connection)
@@ -124,15 +106,10 @@ static void fail_while_connecting_tls(amqp_connection_t *connection)
     amqp_connection_failure_flag_set(connection, AMQP_CONNECTION_TLS_NEGOTIATION_REJECTED);
     not_implemented(fail_while_connecting_tls);
 }
-static void transition_to_connecting_tls(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(connecting_tls)
 {
-    save_old_state();
-
-    amqp__connection_default_state_initialization(connection, "ConnectingTls");
     connection->state.connection.done = done_while_connecting_tls;
     connection->state.connection.fail = fail_while_connecting_tls;
-
-    trace_transition(old_state_name);
 }
 
 static void done_while_connecting_sasl(amqp_connection_t *connection)
@@ -146,21 +123,16 @@ static void fail_while_connecting_sasl(amqp_connection_t *connection)
     amqp_connection_trace(connection, "SASL negotiation failed");
     connection->state.shutdown.drain(connection);
 }
-static void transition_to_connecting_sasl(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(connecting_sasl)
 {
-    save_old_state();
-
-    amqp__connection_default_state_initialization(connection, "ConnectingSasl");
     connection->state.connection.done = done_while_connecting_sasl;
     connection->state.connection.fail = fail_while_connecting_sasl;
-
-    trace_transition(old_state_name);
 }
 
 static void done_while_connecting_amqp(amqp_connection_t *connection)
 {
     amqp_connection_flag_set(connection, AMQP_CONNECTION_AMQP_CONNECTED | AMQP_CONNECTION_IS_CLIENT);
-    transition_to_amqp_tunnel_established(connection);
+    transition_to_state(connection, amqp_tunnel_established);
     connection->state.amqp.send_open(connection);
 }
 static void fail_while_connecting_amqp(amqp_connection_t *connection)
@@ -169,20 +141,23 @@ static void fail_while_connecting_amqp(amqp_connection_t *connection)
     amqp_connection_trace(connection, "AMQP negotiation failed");
     connection->state.shutdown.drain(connection);
 }
-static void transition_to_connecting_amqp(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(connecting_amqp)
 {
-    save_old_state();
-
-    amqp__connection_default_state_initialization(connection, "ConnectingAmqp");
     connection->state.connection.done = done_while_connecting_amqp;
     connection->state.connection.fail = fail_while_connecting_amqp;
-
-    trace_transition(old_state_name);
 }
 
-static void transition_to_amqp_tunnel_established(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(amqp_tunnel_established)
 {
-    save_old_state();
-    amqp__connection_default_state_initialization(connection, "AqmpTunnelEstablished");
-    trace_transition(old_state_name);
+}
+
+static void default_state_initialization(amqp_connection_t *connection, const char *state_name, void (*action_initializer)(amqp_connection_t *connection) LIBAMQP_TRACE_STATE_ARGS_DECL)
+{
+    save_old_state(connection->state.connection.name);
+
+    amqp__connection_default_state_initialization(connection, state_name);
+
+    action_initializer(connection);
+
+    trace_state_transition(AMQP_TRACE_CONNECTION, connection->state.connection.name);
 }

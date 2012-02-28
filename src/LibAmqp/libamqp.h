@@ -44,7 +44,8 @@ extern "C" {
 #define AMQP_MIN_MAX_FRAME_SIZE     512
 #define AMQP_FRAME_HEADER_SIZE      8
 
-#define AMQP_DEFAULT_MAX_FRAME_SIZE ((uint32_t) ((1 << 24) - 1))
+//#define AMQP_DEFAULT_MAX_FRAME_SIZE ((uint32_t) ((1 << 24) - 1))
+#define AMQP_DEFAULT_MAX_FRAME_SIZE ((uint32_t) 4096)
 #define AMQP_DEFAULT_CHANNEL_MAX ((uint16_t) 16)
 #define AMQP_DEFAULT_IDLE_TIMEOUT ((uint32_t) 15 * 1000 * 2)
 

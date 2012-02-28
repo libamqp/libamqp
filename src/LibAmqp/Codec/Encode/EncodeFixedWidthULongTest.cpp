@@ -17,12 +17,12 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/Encode/EncodeTestSupport.h"
+#include "Codec/Encode/EncodeTestFixture.h"
 
 
 SUITE(CodecEncode)
 {
-    TEST_FIXTURE(EncodeFixture, EncodeULong)
+    TEST_FIXTURE(EncodeTestFixture, EncodeULong)
     {
         type = amqp_encode_ulong(context, buffer, 18446744073709551614ULL);
 
@@ -33,7 +33,7 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x08, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, EncodeULongWithZeroValueShouldEncodeULongZero)
+    TEST_FIXTURE(EncodeTestFixture, EncodeULongWithZeroValueShouldEncodeULongZero)
     {
         type = amqp_encode_ulong(context, buffer, 0U);
 
@@ -45,7 +45,7 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x00, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, EncodeULongWithSmallValueShouldEncodeSmallUlong)
+    TEST_FIXTURE(EncodeTestFixture, EncodeULongWithSmallValueShouldEncodeSmallUlong)
     {
         type = amqp_encode_ulong(context, buffer, 254U);
 
@@ -55,7 +55,7 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x01, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, ExplicitEncodeUlongZero)
+    TEST_FIXTURE(EncodeTestFixture, ExplicitEncodeUlongZero)
     {
         type = amqp_encode_ulong0(context, buffer);
 
@@ -67,7 +67,7 @@ SUITE(CodecEncode)
         CHECK_EQUAL((size_t) 0x00, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, EncodeSmallULong)
+    TEST_FIXTURE(EncodeTestFixture, EncodeSmallULong)
     {
         type = amqp_encode_small_ulong(context, buffer, 254UL);
 
@@ -77,7 +77,7 @@ SUITE(CodecEncode)
         CHECK_BUFFERS_MATCH(buffer, test_data::ulong_small);
     }
 
-    TEST_FIXTURE(EncodeFixture, explicit_encode_small_ulong_with_zero_value_should_encode_small_ulong_not_ulong_zero)
+    TEST_FIXTURE(EncodeTestFixture, explicit_encode_small_ulong_with_zero_value_should_encode_small_ulong_not_ulong_zero)
     {
         type = amqp_encode_small_ulong(context, buffer, 0U);
 

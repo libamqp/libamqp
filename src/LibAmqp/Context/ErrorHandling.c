@@ -63,7 +63,7 @@ void _amqp_io_error(amqp_context_t *context, int level, const char * filename, i
         snprintf(extra, sizeof(extra), "%s(%d)", message, context->error_code);
 
         va_start(args, format);
-        (*context->debug.outputter)(&context->debug.arg, filename, line_number, context->debug.name, "io error", source, extra, format, args);
+        (*context->debug.outputter)(context, &context->debug.arg, filename, line_number, context->debug.name, "io error", source, extra, format, args);
         va_end(args);
     }
 }
@@ -77,7 +77,7 @@ void _vamqp_error(amqp_context_t *context, int level, const char *filename, int 
         char extra[128];
         snprintf(extra, sizeof(extra), "%s(%d)", shorten_error_mnemonic(error_mnemonic), error_code);
 
-        (*context->debug.outputter)(&context->debug.arg, filename, line_number, context->debug.name, "error", source, extra, format, args);
+        (*context->debug.outputter)(context, &context->debug.arg, filename, line_number, context->debug.name, "error", source, extra, format, args);
     }
 }
 
@@ -97,7 +97,7 @@ void _amqp_debug(amqp_context_t *context, int level, const char * filename, int 
     {
         va_list args;
         va_start(args, format);
-        (*context->debug.outputter)(&context->debug.arg, filename, line_number, context->debug.name, "debug", source, function, format, args);
+        (*context->debug.outputter)(context, &context->debug.arg, filename, line_number, context->debug.name, "debug", source, function, format, args);
         va_end(args);
     }
 }
@@ -106,7 +106,7 @@ void _vamqp_trace(amqp_context_t *context, int level, const char *filename, int 
 {
     if (context->debug.outputter && level < context->debug.level)
     {
-        (*context->debug.outputter)(&context->debug.arg, filename, line_number, context->debug.name, "trace", source, 0, format, args);
+        (*context->debug.outputter)(context, &context->debug.arg, filename, line_number, context->debug.name, "trace", source, 0, format, args);
     }
 }
 
@@ -130,7 +130,8 @@ static void write_to_stderr(const char *buffer, size_t n)
 
 static void print_error_message(const char *leader, const char *message)
 {
-    char buffer[128];
+// TODO -  128 byte buffer is not large enough, allocate a larger buffer on heap
+    char buffer[256];
     int leader_length = strlen(leader);
     int message_length = strlen(message);
     int limit = sizeof(buffer) - leader_length - 2;

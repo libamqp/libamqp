@@ -16,8 +16,10 @@
 
 #include "Context/Context.h"
 #include "Transport/LowLevel/ListenerThread.h"
-#include "Transport/Connection/Connections.h"
 #include "Transport/Connection/Connection.h"
+#include "Transport/Connection/AcceptedConnections.h"
+
+#include "Transport/Connection/ConnectionTrace.h"
 
 static amqp_connection_t *create_connection(amqp_context_t *context)
 {
@@ -91,6 +93,7 @@ amqp_connection_t *amqp_connection_accept(amqp_context_t *context, int fd, struc
     result->accept_handler_arguments = arguments;
 
     amqp_connection_server_state_initialize(result, fd, client_address, address_size);
+//    result->trace_flags  = ~(AMQP_TRACE_CONNECTION_READER | AMQP_TRACE_CONNECTION_WRITER | AMQP_TRACE_CONNECTION_NEGOTIATION);
     amqp_connections_add(context, arguments->connections, result);
     return result;
 }
@@ -110,13 +113,9 @@ void amqp_connection_shutdown(amqp_context_t *context, amqp_connection_t *connec
     assert(connection);
     assert(connection->context);
     assert(connection->context->thread_event_loop);
-    connection->state.connection.shutdown(connection);
-}
 
-void amqp_connection_write(amqp_context_t *context, amqp_connection_t *connection, amqp_buffer_t *buffer)
-{
-    assert(connection && connection->context && connection->context->thread_event_loop);
-    not_implemented(amqp_connection_write);
+    trace_application_command(connection, "amqp_connection_shutdown() called");
+    connection->state.connection.shutdown(connection);
 }
 
 void amqp_connection_read(amqp_context_t *context, amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required)

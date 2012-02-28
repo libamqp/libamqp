@@ -30,7 +30,6 @@ extern "C" {
 typedef struct amqp_connection_test_hook_t amqp_connection_test_hook_t;
 #endif
 
-
 #ifndef LIBAMQP_DISABLE_TEST_HOOKS
 #define amqp_call_test_hook(connection, hook) \
 if (connection->accept_handler_arguments->test_hooks && connection->accept_handler_arguments->test_hooks->hook) \

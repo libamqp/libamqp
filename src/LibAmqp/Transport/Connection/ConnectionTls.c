@@ -14,24 +14,13 @@
    limitations under the License.
  */
 
-#include "Context/Context.h"
-#include "Transport/Connection/Connection.h"
-#include "Transport/Connection/ConnectionTrace.h"
+#include "Transport/Connection/ConnectionStateMachine.h"
 
-#ifdef LIBAMQP_TRACE_CONNECT_STATE
-#define save_old_state()  const char* old_state_name = connection->state.tls.name
-#define trace_transition(old_state_name) amqp_connection_trace_transition(connection, AMQP_TRACE_CONNECTION_TLS, old_state_name, connection->state.tls.name)
-#else
-#define save_old_state()
-#define trace_transition(old_state_name)
-#endif
-
-static void transition_to_initialized(amqp_connection_t *connection);
-static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name);
+DECLARE_TRANSITION_FUNCTION(initialized);
 
 void amqp_connection_tls_initialize(amqp_connection_t *connection)
 {
-    transition_to_initialized(connection);
+    transition_to_state(connection, initialized);
 }
 
 static void cleanup_resources(amqp_connection_t *connection)
@@ -57,19 +46,16 @@ static void version_rejected(amqp_connection_t *connection, uint32_t version)
 }
 static void start_while_initialized(amqp_connection_t *connection)
 {
-//    not_implemented(start_while_initialized);
     connection->state.negotiator.start(connection, connection->specification_version.required.tls, version_accepted, version_rejected);
 }
 static void tunnel_accept_while_initialized(amqp_connection_t *connection, uint32_t requested_version)
 {
     not_implemented(tunnel_accept_while_initialized);
 }
-static void transition_to_initialized(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(initialized)
 {
-    default_state_initialization(connection, "Initialized");
     connection->state.tls.connect = start_while_initialized;
     connection->state.tls.tunnel.accept = tunnel_accept_while_initialized;
-    trace_transition("Created");
 }
 
 /**********************************************
@@ -93,9 +79,16 @@ static void default_tunnel_establish(amqp_connection_t *connection, uint32_t ver
     illegal_state(connection, "TunnelEstablish");
 }
 
-static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
+static void default_state_initialization(amqp_connection_t *connection, const char *state_name, void (*action_initializer)(amqp_connection_t *connection) LIBAMQP_TRACE_STATE_ARGS_DECL)
 {
+    save_old_state(connection->state.tls.name);
+
     connection->state.tls.connect = default_connect;
     connection->state.tls.tunnel.accept = default_tunnel_establish;
-    connection->state.tls.name = new_state_name;
+
+    connection->state.tls.name = state_name;
+
+    action_initializer(connection);
+
+    trace_state_transition(AMQP_TRACE_CONNECTION_TLS, connection->state.tls.name);
 }

@@ -30,15 +30,15 @@ int amqp_decode_mandatory_type_binary(amqp_context_t *context, amqp_type_t *fiel
 int amqp_decode_mandatory_type_string(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_string_t *string);
 int amqp_decode_mandatory_type_map(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, amqp_map_t *map);
 
-int amqp_decode_primitive_byte(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int8_t *result, int8_t default_value);
-int amqp_decode_primitive_ubyte(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, uint8_t *result, uint8_t default_value);
-int amqp_decode_primitive_short(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int16_t *result, int16_t default_value);
-int amqp_decode_primitive_ushort(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, uint16_t *result, uint16_t default_value);
-int amqp_decode_primitive_int(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int32_t *result, int32_t default_value);
-int amqp_decode_primitive_uint(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, uint32_t *result, uint32_t default_value);
-int amqp_decode_primitive_long(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int64_t *result, int64_t default_value);
-int amqp_decode_primitive_ulong(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, uint64_t *result, uint64_t default_value);
-int amqp_decode_primitive_boolean(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *result, int default_value);
+int amqp_decode_primitive_byte(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, int8_t *result, int8_t default_value);
+int amqp_decode_primitive_ubyte(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, uint8_t *result, uint8_t default_value);
+int amqp_decode_primitive_short(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, int16_t *result, int16_t default_value);
+int amqp_decode_primitive_ushort(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, uint16_t *result, uint16_t default_value);
+int amqp_decode_primitive_int(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, int32_t *result, int32_t default_value);
+int amqp_decode_primitive_uint(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, uint32_t *result, uint32_t default_value);
+int amqp_decode_primitive_long(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, int64_t *result, int64_t default_value);
+int amqp_decode_primitive_ulong(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, uint64_t *result, uint64_t default_value);
+int amqp_decode_primitive_boolean(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int *null_flag, int *result, int default_value);
 
 int amqp_decode_mandatory_primitive_byte(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, int8_t *result);
 int amqp_decode_mandatory_primitive_ubyte(amqp_context_t *context, amqp_type_t *field, int field_number, int total_fields, uint8_t *result);

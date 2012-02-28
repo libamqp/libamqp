@@ -22,6 +22,7 @@
 
 #include "libamqp_common.h"
 
+#include "Context/DebugParams.h"
 #include "Context/ErrorHandling.h"
 #include "Memory/Memory.h"
 #include "Memory/Pool.h"
@@ -123,7 +124,7 @@ amqp_memory_allocation_t *find_free_allocation_within_block(amqp_memory_pool_t *
 }
 
 static
-void *allocate_object(amqp_context_t *c, amqp_memory_pool_t *pool)
+void *allocate_object(amqp_context_t *c, amqp_memory_pool_t *pool AMQP_DEBUG_PARAMS_DECL)
 {
     amqp_memory_allocation_t *free_allocation;
     amqp_memory_block_t *block_with_free_space = find_block_with_free_space((amqp_memory_block_t *) pool->block_list);
@@ -139,11 +140,29 @@ void *allocate_object(amqp_context_t *c, amqp_memory_pool_t *pool)
     	amqp_fatal_program_error("allocation from pool does not belong to correct block (set break on amqp_pool_break() to debug)");
     }
 
+#ifdef LIBAMQP_DEBUG_ALLOCATIONS
+    free_allocation->header.debug.file_name = file_name;
+    free_allocation->header.debug.line_number = line_number;
+
+    // update current list head node
+    if (pool->allocation_chain)
+    {
+        pool->allocation_chain->header.debug.previous = &free_allocation->header.debug.next;
+    }
+
+    // update new node
+    free_allocation->header.debug.next = pool->allocation_chain;
+    free_allocation->header.debug.previous = &pool->allocation_chain;
+
+    // update list
+    pool->allocation_chain = free_allocation;
+#endif
+
     return  &free_allocation->data;
 }
 #endif
 
-void *amqp_allocate(amqp_context_t *c, amqp_memory_pool_t *pool)
+void *amqp__allocate(amqp_context_t *c, amqp_memory_pool_t *pool AMQP_DEBUG_PARAMS_DECL)
 {
     void *result;
 
@@ -155,7 +174,7 @@ void *amqp_allocate(amqp_context_t *c, amqp_memory_pool_t *pool)
     result = amqp_malloc(c, pool->object_size);
 #else
     assert(pool->object_size_in_fragments != 0);
-    result = allocate_object(c, pool);
+    result = allocate_object(c, pool AMQP_DEBUG_ARGS);
 #endif
 
     (*pool->initializer_callback)(c, pool, result);
@@ -194,6 +213,15 @@ void delete_object(amqp_context_t *c, amqp_memory_pool_t *pool, void *pooled_obj
 	amqp_pool_break();
     	amqp_fatal_program_error("The trailing guard on allocation has been corrupted. (set break on amqp_pool_break() to debug)");
     }
+
+#ifdef LIBAMQP_DEBUG_ALLOCATIONS
+    *allocation->header.debug.previous = allocation->header.debug.next;
+
+    if (allocation->header.debug.next)
+    {
+        allocation->header.debug.next->header.debug.previous = allocation->header.debug.previous;
+    }
+#endif
 
     block = allocation->header.block;
     index = allocation->header.index;
@@ -256,7 +284,7 @@ size_t calculate_block_offset_to_first_allocation()
 static
 size_t calculate_offset_to_allocation_data()
 {
-    amqp_memory_block_t sample_allocation;
+    amqp_memory_allocation_t sample_allocation;
     size_t result = (unsigned char *) &sample_allocation.data - (unsigned char *) &sample_allocation.header;
     return result;
 }
@@ -302,7 +330,7 @@ size_t preferred_block_size()
     return LONG_BIT > 32 ? 2048 : 1024;
 }
 
-void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t pooled_object_size, size_t suggested_block_size)
+void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t pooled_object_size, size_t suggested_block_size, const char *pool_name)
 {
     memset(pool, '\0', sizeof(amqp_memory_pool_t));
 #ifndef LIBAMQP_DISABLE_MEMORY_POOL
@@ -327,12 +355,13 @@ void amqp_initialize_pool_suggesting_block_size(amqp_memory_pool_t *pool, size_t
 #endif
     pool->initializer_callback = default_callback;
     pool->destroyer_callback = default_callback ;
+    pool->name = pool_name;
     pool->initialized = true;
 }
 
-void amqp_initialize_pool(amqp_memory_pool_t *pool, size_t pooled_object_size)
+void amqp_initialize_pool(amqp_memory_pool_t *pool, size_t pooled_object_size, const char *pool_name)
 {
-    amqp_initialize_pool_suggesting_block_size(pool, pooled_object_size, preferred_block_size());
+    amqp_initialize_pool_suggesting_block_size(pool, pooled_object_size, preferred_block_size(), pool_name);
 }
 
 void amqp_pool_specify_initialization_callbacks(amqp_memory_pool_t *pool, amqp_pool_callback_t initializer_callback, amqp_pool_callback_t destroyer_callback)
@@ -344,3 +373,25 @@ void amqp_pool_specify_initialization_callbacks(amqp_memory_pool_t *pool, amqp_p
     pool->destroyer_callback = destroyer_callback;
 }
 
+// TODO -  save pool_name in pool
+int amqp_check_pool_is_empty(amqp_context_t *context, amqp_memory_pool_t *pool)
+{
+    if (pool->stats.outstanding_allocations != 0)
+    {
+#ifdef LIBAMQP_DEBUG_ALLOCATIONS
+        amqp_memory_allocation_t *node = pool->allocation_chain;
+        while (node)
+        {
+            const char *file_name = node->header.debug.file_name;
+            int line_number = node->header.debug.line_number;
+            node = node->header.debug.next;
+            _amqp_error(context, 1, file_name, line_number, 0, amqp_error_mnemonic(AMQP_ERROR_OBJECT_NOT_DEALLOCATED),
+                    "Object allocated here from pool \"%s\" was not deallocated", pool->name);
+        }
+#else
+        amqp_error(context, AMQP_ERROR_MEMORY_ERROR, "Pool \"%s\" has %d outstanding allocations.", pool->name, pool->stats.outstanding_allocations);
+#endif /* LIBAMQP_DEBUG_ALLOCATIONS */
+        return false;
+    }
+    return true;
+}

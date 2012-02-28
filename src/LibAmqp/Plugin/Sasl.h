@@ -51,6 +51,7 @@ typedef struct amqp_sasl_plugin_state_t amqp_sasl_plugin_state_t;
 #endif
 
 enum {
+    amqp_sasl_frame_process_error,
     amqp_plugin_handler_failed,
     amqp_plugin_handler_challenge,
     amqp_plugin_handler_outcome_accepted,

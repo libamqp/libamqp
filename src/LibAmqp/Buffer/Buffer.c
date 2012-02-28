@@ -82,7 +82,7 @@ void amqp_buffer_initialize_pool(amqp_memory_pool_t *pool)
     assert(amqp_is_power_of_two(AMQP_BUFFER_FRAGMENT_SIZE));
     assert(AMQP_FRAGMENT_INDEX_BITS == amqp_trailing_zeros(AMQP_BUFFER_FRAGMENT_SIZE));
 
-    amqp_initialize_pool_suggesting_block_size(pool, sizeof(amqp_buffer_t), 1024);
+    amqp_initialize_pool_suggesting_block_size(pool, sizeof(amqp_buffer_t), 1024, "buffer");
     amqp_pool_specify_initialization_callbacks(pool, (amqp_pool_callback_t) amqp_initialize_amqp_buffer_t, (amqp_pool_callback_t) amqp_cleanup_amqp_buffer_t);
 }
 

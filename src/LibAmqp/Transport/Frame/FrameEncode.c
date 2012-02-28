@@ -26,6 +26,9 @@
 #define DEFAULT_TYPE_SPECIFIC_FIELD   0
 #define DEFAULT_FIELDS_ENCODER_ARG   0
 #define CHANNEL_ZERO   0
+#define NO_ENCODER_ARG   0
+#define NO_FIELD_ENCODER   0
+
 
 typedef int (*amqp_frame_encoder_t)(amqp_connection_t *connection, amqp_buffer_t *buffer, void *encoder_arg);
 
@@ -53,26 +56,32 @@ int encode_performative(amqp_connection_t *connection, amqp_buffer_t *buffer, ui
 }
 
 static
-int amqp_encode_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, uint64_t id, uint8_t frame_type, uint16_t frame_type_specific, amqp_frame_encoder_t fields_encoder, void *encoder_arg)
+amqp_buffer_t *amqp_encode_frame(amqp_connection_t *connection, uint64_t id, uint8_t frame_type, uint16_t frame_type_specific, amqp_frame_encoder_t fields_encoder, void *encoder_arg)
 {
-    size_t performativce_offset, frame_size;
+    size_t performative_offset, frame_size;
     int rc;
+    amqp_buffer_t *buffer = amqp_allocate_buffer(connection->context);
 
-    amqp_buffer_reset(buffer);
     amqp_buffer_advance_write_point(buffer, 8);
-    performativce_offset = amqp_buffer_write_point(buffer);
+    performative_offset = amqp_buffer_write_point(buffer);
 
     rc = encode_performative(connection, buffer, id, fields_encoder, encoder_arg);
 
-    frame_size = amqp_buffer_size(buffer);
-    amqp_buffer_set_write_index(buffer, 0);
-    amqp_buffer_write_uint32(buffer, frame_size);
-    amqp_buffer_write_uint8(buffer, performativce_offset / AMQP_FRAME_HEADER_DATA_OFFSET_MULTIPLIER);
-    amqp_buffer_write_uint8(buffer, frame_type);
-    amqp_buffer_write_uint16(buffer, frame_type_specific);
-    amqp_buffer_set_write_index(buffer, frame_size);
+    if (rc)
+    {
+        frame_size = amqp_buffer_size(buffer);
+        amqp_buffer_set_write_index(buffer, 0);
+        amqp_buffer_write_uint32(buffer, frame_size);
+        amqp_buffer_write_uint8(buffer, performative_offset / AMQP_FRAME_HEADER_DATA_OFFSET_MULTIPLIER);
+        amqp_buffer_write_uint8(buffer, frame_type);
+        amqp_buffer_write_uint16(buffer, frame_type_specific);
+        amqp_buffer_set_write_index(buffer, frame_size);
 
-    return rc;
+        return buffer;
+    }
+
+    amqp_deallocate_buffer(connection->context, buffer);
+    return 0;
 }
 
 static int amqp_sasl_mechanisms_field_encoder(amqp_connection_t *connection, amqp_buffer_t *buffer, void *ignored)
@@ -82,15 +91,15 @@ static int amqp_sasl_mechanisms_field_encoder(amqp_connection_t *connection, amq
         amqp_connection_failed(connection, AMQP_ERROR_SASL_PLUGINS_REGISTERED, AMQP_CONNECTION_SASL_ERROR, "Cannot construct SASL Mechanisms list. No SASL plugins registered.");
         return 0;
     }
-    // TODO use a differet plugin list for server and client.
+    // TODO use a different plugin list for server and client.
     amqp_sasl_mechanisms_encode(connection->context, buffer);
     return 1;
 }
 
-int amqp_encode_sasl_mechanisms_frame(amqp_connection_t *connection, amqp_buffer_t *buffer)
+amqp_buffer_t *amqp_encode_sasl_mechanisms_frame(amqp_connection_t *connection)
 {
-    assert(connection && buffer);
-    return amqp_encode_frame(connection, buffer, amqp_sasl_mechanisms_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_mechanisms_field_encoder, DEFAULT_FIELDS_ENCODER_ARG);
+    assert(connection);
+    return amqp_encode_frame(connection, amqp_sasl_mechanisms_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_mechanisms_field_encoder, DEFAULT_FIELDS_ENCODER_ARG);
 }
 
 static int amqp_sasl_init_field_encoder(amqp_connection_t *connection, amqp_buffer_t *buffer, void *arg)
@@ -111,9 +120,9 @@ static int amqp_sasl_init_field_encoder(amqp_connection_t *connection, amqp_buff
     return 1;
 }
 
-int  amqp_encode_sasl_init_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin)
+amqp_buffer_t *amqp_encode_sasl_init_frame(amqp_connection_t *connection, amqp_sasl_plugin_t *sasl_plugin)
 {
-    return amqp_encode_frame(connection, buffer, amqp_sasl_init_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_init_field_encoder, sasl_plugin);
+    return amqp_encode_frame(connection, amqp_sasl_init_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_init_field_encoder, sasl_plugin);
 }
 
 static
@@ -124,9 +133,9 @@ int amqp_sasl_outcome_field_encoder(amqp_connection_t *connection, amqp_buffer_t
     return 1;
 }
 // TODO - this is only good when response is the result of init_response, not challenge response
-int  amqp_encode_sasl_outcome_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin)
+amqp_buffer_t * amqp_encode_sasl_outcome_frame(amqp_connection_t *connection, amqp_sasl_plugin_t *sasl_plugin)
 {
-    return amqp_encode_frame(connection, buffer, amqp_sasl_outcome_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_outcome_field_encoder, sasl_plugin);
+    return amqp_encode_frame(connection, amqp_sasl_outcome_list_descriptor, AMQP_SASL_FRAME_TYPE, DEFAULT_TYPE_SPECIFIC_FIELD, amqp_sasl_outcome_field_encoder, sasl_plugin);
 }
 
 //struct challenge_encoder_args
@@ -141,7 +150,7 @@ int  amqp_encode_sasl_outcome_frame(amqp_connection_t *connection, amqp_buffer_t
 //    amqp_sasl_plugin_challenge(connection->context, challenge_encoder_args->plugin, buffer, &connection->sasl.identity_hooks, challenge_encoder_args->init_response);
 //    return 1;
 //}
-int  amqp_encode_sasl_challenge_frame(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_sasl_plugin_t *sasl_plugin)
+amqp_buffer_t *amqp_encode_sasl_challenge_frame(amqp_connection_t *connection, amqp_sasl_plugin_t *sasl_plugin)
 {
     not_implemented(todo);
 //    struct challenge_encoder_args args = {.plugin = sasl_plugin, .init_response = init_response};
@@ -167,9 +176,9 @@ int amqp_open_field_encoder(amqp_connection_t *connection, amqp_buffer_t *buffer
     return 1;
 }
 
-int amqp_encode_amqp_open(amqp_connection_t *connection, amqp_buffer_t *buffer)
+amqp_buffer_t *amqp_encode_amqp_open(amqp_connection_t *connection)
 {
-    return amqp_encode_frame(connection, buffer, amqp_open_list_descriptor, AMQP_FRAME_TYPE, CHANNEL_ZERO, amqp_open_field_encoder, 0);
+    return amqp_encode_frame(connection, amqp_open_list_descriptor, AMQP_FRAME_TYPE, CHANNEL_ZERO, amqp_open_field_encoder, NO_ENCODER_ARG);
 }
 
 static
@@ -178,7 +187,48 @@ int amqp_close_field_encoder(amqp_connection_t *connection, amqp_buffer_t *buffe
     return 1;
 }
 
-int amqp_encode_amqp_close(amqp_connection_t *connection, amqp_buffer_t *buffer)
+amqp_buffer_t *amqp_encode_amqp_close(amqp_connection_t *connection)
 {
-    return amqp_encode_frame(connection, buffer, amqp_close_list_descriptor, AMQP_FRAME_TYPE, CHANNEL_ZERO, amqp_close_field_encoder, 0);
+    return amqp_encode_frame(connection, amqp_close_list_descriptor, AMQP_FRAME_TYPE, CHANNEL_ZERO, amqp_close_field_encoder, NO_ENCODER_ARG);
+}
+
+amqp_buffer_t *amqp_encode_empty_frame(amqp_connection_t *connection)
+{
+    amqp_buffer_t *buffer = amqp_allocate_buffer(connection->context);
+
+    amqp_buffer_write_uint32(buffer, 8);
+    amqp_buffer_write_uint8(buffer, 2);
+    amqp_buffer_write_uint8(buffer, AMQP_FRAME_TYPE);
+    amqp_buffer_write_uint16(buffer, 0);
+
+    return buffer;
+}
+
+static int amqp_begin_field_encoder(amqp_connection_t *connection, amqp_buffer_t *buffer, void *arg)
+{
+    amqp_session_t *session = (amqp_session_t *) arg;
+
+    if (session->remote_defined)
+    {
+        amqp_encode_ushort(connection->context, buffer, session->remote.channel);
+    }
+    else
+    {
+        amqp_encode_null(connection->context, buffer);
+    }
+    
+    amqp_encode_uint(connection->context, buffer, session->local.next_outgoing_id);
+    amqp_encode_uint(connection->context, buffer, session->local.incomming_window);
+    amqp_encode_uint(connection->context, buffer, session->local.outgoing_window);
+    amqp_encode_uint(connection->context, buffer, session->local.handle_max);
+    // capabilities
+    // capabilities
+    // properties
+
+    return 1;
+}
+
+amqp_buffer_t *amqp_encode_amqp_begin(amqp_connection_t *connection, amqp_session_t *session)
+{
+    return amqp_encode_frame(connection, amqp_begin_list_descriptor, AMQP_FRAME_TYPE, session->local.channel, amqp_begin_field_encoder, session);
 }

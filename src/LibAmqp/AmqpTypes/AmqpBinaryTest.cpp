@@ -15,7 +15,7 @@
  */
 
 #include <TestHarness.h>
-#include "AmqpTypes/AmqpTypesTestSupport.h"
+#include "AmqpTypes/AmqpTypesTestFixture.h"
 
 #include "AmqpTypes/AmqpBinary.h"
 #include "Codec/Type/TypeExtension.h"
@@ -24,31 +24,31 @@
 
 SUITE(AmqpTypes)
 {
-    class AmqpBinaryFixture  : public AmqpTypesFixture
+    class AmqpBinaryTestFixture  : public AmqpTypesTestFixture
     {
     public:
-        AmqpBinaryFixture();
-        ~AmqpBinaryFixture();
+        AmqpBinaryTestFixture();
+        ~AmqpBinaryTestFixture();
         static const char *value;
     public:
         amqp_binary_t ref;
         amqp_binary_t *binary;
     };
 
-    const char *AmqpBinaryFixture::value = "binary array";
+    const char *AmqpBinaryTestFixture::value = "binary array";
 
-    AmqpBinaryFixture::AmqpBinaryFixture() : binary(0)
+    AmqpBinaryTestFixture::AmqpBinaryTestFixture() : binary(0)
     {
         memset(&ref, '\0', sizeof(amqp_binary_t));
     }
 
-    AmqpBinaryFixture::~AmqpBinaryFixture()
+    AmqpBinaryTestFixture::~AmqpBinaryTestFixture()
     {
         amqp_binary_cleanup(context, &ref);
         amqp_binary_cleanup(context, binary);
     }
 
-    TEST_FIXTURE(AmqpBinaryFixture, binary_type_create_from_type)
+    TEST_FIXTURE(AmqpBinaryTestFixture, binary_type_create_from_type)
     {
         test_data::bin_8.transfer_to(buffer);
         type = amqp_decode(context, buffer);
@@ -57,7 +57,7 @@ SUITE(AmqpTypes)
         CHECK_EQUAL(12U, amqp_binary_size(binary));
     }
 
-    TEST_FIXTURE(AmqpBinaryFixture, binary_type_copy_to)
+    TEST_FIXTURE(AmqpBinaryTestFixture, binary_type_copy_to)
     {
         test_data::bin_8.transfer_to(buffer);
         type = amqp_decode(context, buffer);
@@ -69,7 +69,7 @@ SUITE(AmqpTypes)
         CHECK_EQUAL((const char *) data, value);
     }
 
-    TEST_FIXTURE(AmqpBinaryFixture, binary_clone)
+    TEST_FIXTURE(AmqpBinaryTestFixture, binary_clone)
     {
         amqp_binary_initialize(context, &ref, (uint8_t *) value, strlen(value));
         CHECK(amqp_binary_compare_with_bytes(&ref, (uint8_t *) value, strlen(value)) == 0);
@@ -77,7 +77,7 @@ SUITE(AmqpTypes)
         CHECK(amqp_binary_compare_with_bytes(binary, (uint8_t *) value, strlen(value)) == 0);
     }
 
-    TEST_FIXTURE(AmqpBinaryFixture, binary_type_access)
+    TEST_FIXTURE(AmqpBinaryTestFixture, binary_type_access)
     {
         test_data::bin_8.transfer_to(buffer);
         type = amqp_decode(context, buffer);

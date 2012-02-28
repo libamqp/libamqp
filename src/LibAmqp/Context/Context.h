@@ -24,9 +24,11 @@
 #include "Memory/Pool.h"
 #include "Buffer/Buffer.h"
 #include "Codec/Type/Type.h"
+#include "Context/DebugParams.h"
 #include "Context/ErrorHandling.h"
 #include "Context/SaslIdentity.h"
 #include "Messaging/MessagingPlugin.h"
+#include "Thread/Thread.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -88,6 +90,10 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     typedef struct amqp_symbol_t amqp_symbol_t;
 #endif
 
+#define amqp_allocate_buffer(c)     amqp__allocate_buffer((c) AMQP_DEBUG_PARAMS)
+#define amqp_allocate_frame(c)      amqp__allocate_frame((c) AMQP_DEBUG_PARAMS)
+#define amqp_allocate_type(c)       amqp__allocate_type((c) AMQP_DEBUG_PARAMS)
+
     typedef int amqp_debug_print_c_t(int c);
 
     typedef union amqp_outputter_arg_t
@@ -100,7 +106,7 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
         } buffered;
     } amqp_outputter_arg_t;
 
-    typedef void (*amqp_outputter_t)(amqp_outputter_arg_t *desc, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format, va_list args);
+    typedef void (*amqp_outputter_t)(amqp_context_t *context, amqp_outputter_arg_t *desc, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format, va_list args);
 
     struct amqp_context_t
     {
@@ -136,6 +142,11 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
             amqp_memory_pool_t amqp_buffer_t_pool;
             amqp_memory_pool_t amqp_type_t_pool;
             amqp_memory_pool_t amqp_frame_t_pool;
+#ifdef LIBAMQP_DEBUG_ALLOCATIONS
+            struct {
+                amqp__memory_block_t *allocated_blocks;
+            } debug;
+#endif
         } memory;
 
         struct
@@ -155,6 +166,10 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
         struct
         {
             int cloned;
+            amqp_mutex_t *output_mutex;
+        } shared;
+        struct
+        {
             amqp_hash_table_t *amqp_descriptors;
             struct
             {
@@ -176,13 +191,13 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     extern amqp_context_t *amqp_context_clone(amqp_context_t *context);
     extern int amqp_context_destroy(amqp_context_t *context);
 
-    extern amqp_type_t *amqp_allocate_type(amqp_context_t *context);
+    extern amqp_type_t *amqp__allocate_type(amqp_context_t *context AMQP_DEBUG_PARAMS_DECL);
     extern void amqp_deallocate_type(amqp_context_t *context, amqp_type_t *type);
 
-    extern amqp_buffer_t *amqp_allocate_buffer(amqp_context_t *context);
+    extern amqp_buffer_t *amqp__allocate_buffer(amqp_context_t *context AMQP_DEBUG_PARAMS_DECL);
     extern void amqp_deallocate_buffer(amqp_context_t *context, amqp_buffer_t *type);
 
-    extern amqp_frame_t *amqp_allocate_frame(amqp_context_t *context);
+    extern amqp_frame_t *amqp__allocate_frame(amqp_context_t *context AMQP_DEBUG_PARAMS_DECL);
     extern void amqp_deallocate_frame(amqp_context_t *context, amqp_frame_t *type);
 
     extern amqp_debug_print_c_t *amqp_context_define_putc_function(amqp_context_t *context, amqp_debug_print_c_t *putc);
@@ -192,8 +207,8 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
     extern int amqp_context_set_print_indent(amqp_context_t *context, int indent);
     extern int amqp_context_set_auto_indent(amqp_context_t *context, int amount);
 
-    extern void amqp_buffer_outputter(amqp_outputter_arg_t *dest, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format, va_list args);
-    extern void amqp_stream_outputter(amqp_outputter_arg_t *dest, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format, va_list args);
+    extern void amqp_buffer_outputter(amqp_context_t *context, amqp_outputter_arg_t *dest, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format, va_list args);
+    extern void amqp_stream_outputter(amqp_context_t *context, amqp_outputter_arg_t *dest, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format, va_list args);
     extern void amqp_restore_outputter(amqp_context_t *context);
     extern void amqp_output_to_buffer(amqp_context_t *context, char *buffer, size_t buffer_size);
 
@@ -209,6 +224,10 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
 
     extern uint8_t *amqp_allocate_print_buffer(amqp_context_t *context, size_t n);
     extern void amqp_deallocate_print_buffer(amqp_context_t *context, uint8_t *buffer);
+
+    extern void amqp_outputter_lock(amqp_context_t *context);
+    extern void amqp_outputter_unlock(amqp_context_t *context);
+
 #ifdef __cplusplus
 }
 #endif

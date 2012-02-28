@@ -17,24 +17,14 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/CodecTestSupport.h"
+#include "Codec/Decode/DecodeTestFixture.h"
+
 #include "Codec/Decode/Decode.h"
 #include "Codec/Type/Type.h"
 
-SUITE(NumericDecode)
+SUITE(CodecDecode)
 {
-    class DecodeFixture : public SuiteCodec::CodecFixture
-    {
-    public:
-        DecodeFixture() {}
-        ~DecodeFixture()
-        {
-        }
-
-    public:
-    };
-
-    TEST_FIXTURE(DecodeFixture, Float)
+    TEST_FIXTURE(DecodeTestFixture, Float)
     {
         load_decode_buffer(test_data::float_4);
 
@@ -45,7 +35,7 @@ SUITE(NumericDecode)
         CHECK_CLOSE(123.456f, amqp_type_to_float(type), 0.00005);
     }
 
-    TEST_FIXTURE(DecodeFixture, Double)
+    TEST_FIXTURE(DecodeTestFixture, Double)
     {
         load_decode_buffer(test_data::double_8);
 

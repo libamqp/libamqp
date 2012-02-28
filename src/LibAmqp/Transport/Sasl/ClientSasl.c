@@ -30,12 +30,6 @@
 
 #include "debug_helper.h"
 
-static
-int amqp_encode_sasl_init_response(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
-{
-    amqp_buffer_reset(connection->buffer.write);
-    return amqp_encode_sasl_init_frame(connection, connection->buffer.write, plugin);
-}
 
 static
 void no_supported_sasl_mechanism_error(amqp_connection_t *connection, amqp_multiple_symbol_t *multiple)
@@ -48,6 +42,14 @@ void no_supported_sasl_mechanism_error(amqp_connection_t *connection, amqp_multi
     amqp_deallocate_print_buffer(connection->context, buffer);
 }
 
+static
+int amqp_send_sasl_init_response(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
+{
+    amqp_buffer_t *buffer = amqp_encode_sasl_init_frame(connection, plugin);
+    amqp_connection_write_buffer(connection, buffer);
+    return buffer != 0;
+}
+
 int amqp_sasl_process_mechanisms_frame(amqp_connection_t *connection, amqp_frame_t *frame)
 {
     // client has received the mechanisms from from the broker.
@@ -58,7 +60,7 @@ int amqp_sasl_process_mechanisms_frame(amqp_connection_t *connection, amqp_frame
     if (plugin)
     {
         connection->sasl.plugin = plugin;
-        return amqp_encode_sasl_init_response(connection, plugin);
+        return amqp_send_sasl_init_response(connection, plugin);
     }
     else
     {

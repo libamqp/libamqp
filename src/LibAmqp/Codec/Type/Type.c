@@ -58,7 +58,7 @@ void amqp_cleanup_amqp_type_t(amqp_context_t *c, amqp_memory_pool_t *pool, amqp_
 
 void amqp_type_initialize_pool(amqp_memory_pool_t *pool)
 {
-    amqp_initialize_pool_suggesting_block_size(pool, sizeof(amqp_type_t), 2048);
+    amqp_initialize_pool_suggesting_block_size(pool, sizeof(amqp_type_t), 2048, "type");
     amqp_pool_specify_initialization_callbacks(pool, (amqp_pool_callback_t) amqp_initialize_amqp_type_t, (amqp_pool_callback_t) amqp_cleanup_amqp_type_t);
 }
 

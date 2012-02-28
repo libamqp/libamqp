@@ -20,4 +20,10 @@
 #include <UnitTest++.h>
 #include "ExtraChecks.h"
 
+class TestParameters
+{
+public:
+    static int port;
+    static int secondary_port;
+};
 #endif

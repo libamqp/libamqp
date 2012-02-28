@@ -42,17 +42,19 @@ typedef enum amqp_connection_trace_flag_t
     AMQP_TRACE_CONNECTION_NEGOTIATION = 0X00000010,
     AMQP_TRACE_CONNECTION_TLS = 0X00000020,
     AMQP_TRACE_CONNECTION_SASL = 0X00000040,
-    AMQP_TRACE_CONNECTION_AMQP = 0X00000080,
-    AMQP_TRACE_DISCONNECTS = 0X00000100,
-    AMQP_TRACE_FRAME_READER = 0X00000200,
-    AMQP_TRACE_DECODED_FRAME = 0X00000400,
+    AMQP_TRACE_CONNECTION_AMQP_TUNNEL = 0X00000080,
+    AMQP_TRACE_CONNECTION_AMQP = 0X00000100,
+    AMQP_TRACE_DISCONNECTS = 0X00000200,
+    AMQP_TRACE_FRAME_READER = 0X00000400,
+    AMQP_TRACE_DECODED_FRAME = 0X00000800,
+    AMQP_TRACE_APP_COMMAND = 0X00001000,
 } amqp_connection_trace_flag_t;
 
 #ifdef LIBAMQP_TRACE_CONNECT_STATE
-#define amqp_connection_trace_transition(connection, flag, old_state_name, state_name) \
+#define amqp_connection_trace_transition(connection, file, line, flag, old_state_name, state_name) \
     if (connection->trace_flags & flag) \
     { \
-        _amqp_connection_trace_transition(connection, __FILE__, __LINE__, flag, old_state_name, state_name); \
+        _amqp_connection_trace_transition(connection, file, line, flag, old_state_name, state_name); \
     }
 #define amqp_trace_decoded_frame(connection, frame) \
     if (connection->trace_flags & AMQP_TRACE_DECODED_FRAME) \
@@ -82,6 +84,23 @@ extern void _amqp_connection_error(amqp_connection_t *connection, const char * f
 
 #define amqp_connection_failed(connection, code, flags, ...) _amqp_connection_failed(connection, __FILE__, __LINE__, #code, code, flags, "" __VA_ARGS__)
 extern void _amqp_connection_failed(amqp_connection_t *connection, const char *filename, int line_number, const char *error_mnemonic, int error_code, uint32_t failure_flag, const char *format, ...);
+
+
+#ifdef LIBAMQP_TRACE_CONNECT_STATE
+#define trace_disconnect(connection, ...) \
+if (connection->trace_flags & AMQP_TRACE_DISCONNECTS) \
+{ \
+    _amqp_connection_trace(connection, __FILE__, __LINE__, __VA_ARGS__); \
+}
+#define trace_application_command(connection, ...) \
+if (connection->trace_flags & AMQP_TRACE_APP_COMMAND) \
+{ \
+    _amqp_connection_trace(connection, __FILE__, __LINE__, __VA_ARGS__); \
+}
+#else
+#define trace_disconnect(context, format,  ...)
+#define trace_application_command(context, format,  ...)
+#endif
 
 #ifdef __cplusplus
 }

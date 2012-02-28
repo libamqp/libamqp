@@ -118,3 +118,10 @@ void amqp_dispatch_amqp_close(amqp_connection_t *connection, amqp_frame_t *frame
     assert(dispatch);
     dispatch(connection, frame);
 }
+
+void amqp_dispatch_empty_frame(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    amqp_message_dispatch_t dispatch = connection->state.amqp.frame.empty;
+    assert(dispatch);
+    dispatch(connection, frame);
+}

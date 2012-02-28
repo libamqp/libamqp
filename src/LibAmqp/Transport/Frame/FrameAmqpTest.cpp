@@ -16,7 +16,7 @@
 
 #include <TestHarness.h>
 #include "Transport/Frame/Frame.h"
-#include "Transport/Frame/FrameTestSupport.h"
+#include "Transport/Frame/FrameTestFixture.h"
 
 #include "Codec/Decode/Decode.h"
 #include "Codec/Type/TypePrint.h"
@@ -24,7 +24,17 @@
 
 SUITE(Frame)
 {
-    TEST_FIXTURE(FrameFixture, client_open_frame)
+    TEST_FIXTURE(FrameTestFixture, client_open_frame_with_trailing_garbage)
+    {
+        test_data::client_open_frame_with_trailing_garbage.transfer_to(decode_buffer);
+        frame = amqp_decode_amqp_frame(context, decode_buffer);
+
+        ASSERT(frame != 0);
+        ASSERT(0);
+        // TODO - garbage data is ignored
+    }
+
+    TEST_FIXTURE(FrameTestFixture, client_open_frame)
     {
         test_data::client_open_frame.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -49,7 +59,7 @@ SUITE(Frame)
         CHECK(amqp_map_is_null_or_empty(&open->properties));
     }
 
-    TEST_FIXTURE(FrameFixture, broker_open_frame)
+    TEST_FIXTURE(FrameTestFixture, broker_open_frame)
     {
         test_data::broker_open_frame.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -74,7 +84,7 @@ SUITE(Frame)
         CHECK(amqp_map_is_null_or_empty(&open->properties));
     }
 
-    TEST_FIXTURE(FrameFixture, client_begin_frame)
+    TEST_FIXTURE(FrameTestFixture, client_begin_frame)
     {
         test_data::client_begin_frame.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -85,12 +95,15 @@ SUITE(Frame)
         amqp_transport_begin_t *begin = &frame->frames.amqp.begin;
 
 //        amqp_type_print(context, frame->type);
+//        SOUTVX(frame->null_field_flags);
 
         CHECK_EQUAL(0U, begin->remote_channel);   // TODO -  was null, not 0 in frame
-        CHECK_EQUAL(0U, begin->next_outgoing_id.value);
+        CHECK(begin->remote_channel_is_null);
+
+        CHECK_EQUAL(0U, begin->next_outgoing_id);
         CHECK_EQUAL(2147483647U, begin->incoming_window);
         CHECK_EQUAL(2147483647U, begin->outgoing_window);
-        CHECK_EQUAL(15U, begin->handle_max.value);
+        CHECK_EQUAL(15U, begin->handle_max);
 
         CHECK(amqp_multiple_symbol_is_null(&begin->offered_capabilities));
         CHECK(amqp_multiple_symbol_is_null(&begin->desired_capabilities));
@@ -98,7 +111,7 @@ SUITE(Frame)
         CHECK(amqp_map_is_null_or_empty(&begin->properties));
     }
 
-    TEST_FIXTURE(FrameFixture, broker_begin_frame)
+    TEST_FIXTURE(FrameTestFixture, broker_begin_frame)
     {
         test_data::broker_begin_frame.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -111,10 +124,10 @@ SUITE(Frame)
 //        amqp_type_print(context, frame->type);
 
         CHECK_EQUAL(0U, begin->remote_channel);
-        CHECK_EQUAL(0U, begin->next_outgoing_id.value);
+        CHECK_EQUAL(0U, begin->next_outgoing_id);
         CHECK_EQUAL(2147483647U, begin->incoming_window);
         CHECK_EQUAL(2147483647U, begin->outgoing_window);
-        CHECK_EQUAL(15U, begin->handle_max.value);
+        CHECK_EQUAL(15U, begin->handle_max);
 
         CHECK(amqp_multiple_symbol_is_null(&begin->offered_capabilities));
         CHECK(amqp_multiple_symbol_is_null(&begin->desired_capabilities));
@@ -122,7 +135,7 @@ SUITE(Frame)
         CHECK(amqp_map_is_null_or_empty(&begin->properties));
     }
 
-    TEST_FIXTURE(FrameFixture, close_frame)
+    TEST_FIXTURE(FrameTestFixture, close_frame)
     {
         test_data::close_frame.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -140,7 +153,7 @@ SUITE(Frame)
         CHECK(amqp_map_is_null_or_empty(&close->error.info));
     }
 
-    TEST_FIXTURE(FrameFixture, close_confirm_frame)
+    TEST_FIXTURE(FrameTestFixture, close_confirm_frame)
     {
         test_data::close_confirm_frame.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -155,7 +168,7 @@ SUITE(Frame)
         CHECK(close->error.is_null);
     }
 
-    TEST_FIXTURE(FrameFixture, client_attach_frame)
+    TEST_FIXTURE(FrameTestFixture, client_attach_frame)
     {
         test_data::client_attach_frame.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -168,7 +181,7 @@ SUITE(Frame)
 //        amqp_type_print(context, frame->type);
 
         CHECK(amqp_string_compare_with_cstr(&attach->name, "sender-link-name") == 0);
-        CHECK_EQUAL(0U, attach->handle.value);
+        CHECK_EQUAL(0U, attach->handle);
         CHECK(!attach->role);
         CHECK(attach->snd_settle_mode == amqp_sender_settle_mode_settled);
         CHECK(attach->rcv_settle_mode == amqp_receiver_settle_mode_first); // TODO - was null in frame
@@ -179,14 +192,14 @@ SUITE(Frame)
 //        amqp_type_print(context, attach->target.type);
         CHECK(amqp_map_is_null_or_empty(&attach->unsettled));
         CHECK(attach->incomplete_unsettled == false);
-        CHECK_EQUAL(0U, attach->initial_delivery_count.value);
+        CHECK_EQUAL(0U, attach->initial_delivery_count);
         CHECK_EQUAL(0U, attach->max_message_size); // TODO - not provided
         CHECK(amqp_multiple_symbol_is_null(&attach->offered_capabilities));
         CHECK(amqp_multiple_symbol_is_null(&attach->desired_capabilities));
         CHECK(amqp_map_is_null_or_empty(&attach->properties));
     }
 
-    TEST_FIXTURE(FrameFixture, broker_attach_frame)
+    TEST_FIXTURE(FrameTestFixture, broker_attach_frame)
     {
         test_data::broker_attach_frame.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -199,7 +212,7 @@ SUITE(Frame)
 //        amqp_type_print(context, frame->type);
 
         CHECK(amqp_string_compare_with_cstr(&attach->name, "sender-link-name") == 0);
-        CHECK_EQUAL(0U, attach->handle.value);
+        CHECK_EQUAL(0U, attach->handle);
         CHECK(attach->role);
         CHECK(attach->snd_settle_mode == amqp_sender_settle_mode_unsettled);
         CHECK(attach->rcv_settle_mode == amqp_receiver_settle_mode_first); // TODO - was null in frame
@@ -211,14 +224,14 @@ SUITE(Frame)
 
         CHECK(amqp_map_is_null_or_empty(&attach->unsettled));
         CHECK(attach->incomplete_unsettled == false);           // TODO - not provided
-        CHECK_EQUAL(0U, attach->initial_delivery_count.value);
+        CHECK_EQUAL(0U, attach->initial_delivery_count);
         CHECK_EQUAL(0U, attach->max_message_size); // TODO - not provided
         CHECK(amqp_multiple_symbol_is_null(&attach->offered_capabilities));
         CHECK(amqp_multiple_symbol_is_null(&attach->desired_capabilities));
         CHECK(amqp_map_is_null_or_empty(&attach->properties));
     }
 
-    TEST_FIXTURE(FrameFixture, flow_frame)
+    TEST_FIXTURE(FrameTestFixture, flow_frame)
     {
         test_data::flow_frame.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -230,21 +243,21 @@ SUITE(Frame)
 
 //        amqp_type_print(context, frame->type);
 
-        CHECK_EQUAL(0U, flow->next_incoming_id.value);
-        CHECK(flow->next_incoming_id.provided);
+        CHECK_EQUAL(0U, flow->next_incoming_id);
+        CHECK(!flow->next_incoming_id_is_null);
 
         CHECK_EQUAL(2147483647U, flow->incoming_window);
 
-        CHECK_EQUAL(0U, flow->next_outgoing_id.value);
-        CHECK(flow->next_outgoing_id.provided);
+        CHECK_EQUAL(0U, flow->next_outgoing_id);
+        CHECK(!flow->next_outgoing_id_is_null);
 
         CHECK_EQUAL(2147483647U, flow->outgoing_window);
 
-        CHECK_EQUAL(0U, flow->handle.value);
-        CHECK(flow->handle.provided);
+        CHECK_EQUAL(0U, flow->handle);
+        CHECK(!flow->handle_is_null);
 
-        CHECK_EQUAL(0U, flow->delivery_count.value);
-        CHECK(flow->delivery_count.provided);
+        CHECK_EQUAL(0U, flow->delivery_count);
+        CHECK(!flow->delivery_count_is_null);
 
         CHECK_EQUAL(0U, flow->link_credit);
         CHECK_EQUAL(0U, flow->available);
@@ -253,7 +266,7 @@ SUITE(Frame)
 
         CHECK(amqp_map_is_null_or_empty(&flow->properties));
     }
-    TEST_FIXTURE(FrameFixture, broker_flow_frame)
+    TEST_FIXTURE(FrameTestFixture, broker_flow_frame)
     {
         test_data::broker_flow_frame.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -265,21 +278,21 @@ SUITE(Frame)
 
 //        amqp_type_print(context, frame->type);
 
-        CHECK_EQUAL(0U, flow->next_incoming_id.value);
-        CHECK(flow->next_incoming_id.provided);
+        CHECK_EQUAL(0U, flow->next_incoming_id);
+        CHECK(!flow->next_incoming_id_is_null);
 
         CHECK_EQUAL(2147483647U, flow->incoming_window);
 
-        CHECK_EQUAL(0U, flow->next_outgoing_id.value);
-        CHECK(flow->next_outgoing_id.provided);
+        CHECK_EQUAL(0U, flow->next_outgoing_id);
+        CHECK(!flow->next_outgoing_id_is_null);
 
         CHECK_EQUAL(2147483647U, flow->outgoing_window);
 
-        CHECK_EQUAL(0U, flow->handle.value);
-        CHECK(flow->handle.provided);
+        CHECK_EQUAL(0U, flow->handle);
+        CHECK(!flow->handle_is_null);
 
-        CHECK_EQUAL(0U, flow->delivery_count.value);
-        CHECK(flow->delivery_count.provided);
+        CHECK_EQUAL(0U, flow->delivery_count);
+        CHECK(!flow->delivery_count_is_null);
 
         CHECK_EQUAL(4096U, flow->link_credit);
         CHECK_EQUAL(0U, flow->available);
@@ -289,7 +302,7 @@ SUITE(Frame)
         CHECK(amqp_map_is_null_or_empty(&flow->properties));
     }
 
-    TEST_FIXTURE(FrameFixture, ya_flow_frame)
+    TEST_FIXTURE(FrameTestFixture, ya_flow_frame)
     {
         test_data::ya_flow_frame.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -301,21 +314,21 @@ SUITE(Frame)
 
 //        amqp_type_print(context, frame->type);
 
-        CHECK_EQUAL(0U, flow->next_incoming_id.value);
-        CHECK(flow->next_incoming_id.provided);
+        CHECK_EQUAL(0U, flow->next_incoming_id);
+        CHECK(!flow->next_incoming_id_is_null);
 
         CHECK_EQUAL(2147483647U, flow->incoming_window);
 
-        CHECK_EQUAL(0U, flow->next_outgoing_id.value);
-        CHECK(flow->next_outgoing_id.provided);
+        CHECK_EQUAL(0U, flow->next_outgoing_id);
+        CHECK(!flow->next_outgoing_id_is_null);
 
         CHECK_EQUAL(2147483647U, flow->outgoing_window);
 
-        CHECK_EQUAL(0U, flow->handle.value);
-        CHECK(flow->handle.provided);
+        CHECK_EQUAL(0U, flow->handle);
+        CHECK(!flow->handle_is_null);
 
-        CHECK_EQUAL(0U, flow->delivery_count.value);
-        CHECK(flow->delivery_count.provided);
+        CHECK_EQUAL(0U, flow->delivery_count);
+        CHECK(!flow->delivery_count_is_null);
 
         CHECK_EQUAL(4096U, flow->link_credit);
         CHECK_EQUAL(0U, flow->available);
@@ -325,7 +338,7 @@ SUITE(Frame)
         CHECK(amqp_map_is_null_or_empty(&flow->properties));
     }
 
-    TEST_FIXTURE(FrameFixture, transfer_frame_id_0)
+    TEST_FIXTURE(FrameTestFixture, transfer_frame_id_0)
     {
         test_data::transfer_frame_id_0.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -335,13 +348,14 @@ SUITE(Frame)
 
         amqp_transport_transfer_t *transfer = &frame->frames.amqp.transfer;
 
-        CHECK_EQUAL(0U, transfer->handle.value);
-        CHECK(transfer->handle.provided);
+        CHECK_EQUAL(0U, transfer->handle);
+        CHECK(!transfer->handle_is_null);
 
-        CHECK_EQUAL(0U, transfer->delivery_id.value);
-        CHECK(transfer->delivery_id.provided);
-        CHECK_EQUAL(0U, transfer->message_format.value);
-        CHECK(transfer->message_format.provided);
+        CHECK_EQUAL(0U, transfer->delivery_id);
+        CHECK(!transfer->delivery_id_is_null);
+
+        CHECK_EQUAL(0U, transfer->message_format);
+        CHECK(!transfer->message_format_is_null);
         CHECK(transfer->settled);
         CHECK(!transfer->more);
         CHECK(amqp_wildcard_is_null(&transfer->state));
@@ -350,7 +364,7 @@ SUITE(Frame)
         CHECK(!transfer->batchable);
     }
     
-    TEST_FIXTURE(FrameFixture, transfer_frame_id_256)
+    TEST_FIXTURE(FrameTestFixture, transfer_frame_id_256)
     {
         test_data::transfer_frame_id_256.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -360,12 +374,15 @@ SUITE(Frame)
 
         amqp_transport_transfer_t *transfer = &frame->frames.amqp.transfer;
 
-        CHECK_EQUAL(0U, transfer->handle.value);
-        CHECK(transfer->handle.provided);
-        CHECK_EQUAL(256U, transfer->delivery_id.value);
-        CHECK(transfer->delivery_id.provided);
-        CHECK_EQUAL(0U, transfer->message_format.value);
-        CHECK(transfer->message_format.provided);
+        CHECK_EQUAL(0U, transfer->handle);
+        CHECK(!transfer->handle_is_null);
+
+        CHECK_EQUAL(256U, transfer->delivery_id);
+        CHECK(!transfer->delivery_id_is_null);
+
+        CHECK_EQUAL(0U, transfer->message_format);
+        CHECK(!transfer->message_format_is_null);
+
         CHECK(transfer->settled);
         CHECK(!transfer->more);
         CHECK(amqp_wildcard_is_null(&transfer->state));
@@ -374,7 +391,7 @@ SUITE(Frame)
         CHECK(!transfer->batchable);
     }
 
-    TEST_FIXTURE(FrameFixture, transfer_frame_id_677)
+    TEST_FIXTURE(FrameTestFixture, transfer_frame_id_677)
     {
         test_data::transfer_frame_id_677.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -384,12 +401,15 @@ SUITE(Frame)
 
         amqp_transport_transfer_t *transfer = &frame->frames.amqp.transfer;
 
-        CHECK_EQUAL(0U, transfer->handle.value);
-        CHECK(transfer->handle.provided);
-        CHECK_EQUAL(677U, transfer->delivery_id.value);
-        CHECK(transfer->delivery_id.provided);
-        CHECK_EQUAL(0U, transfer->message_format.value);
-        CHECK(transfer->message_format.provided);
+        CHECK_EQUAL(0U, transfer->handle);
+        CHECK(!transfer->handle_is_null);
+
+        CHECK_EQUAL(677U, transfer->delivery_id);
+        CHECK(!transfer->delivery_id_is_null);
+
+        CHECK_EQUAL(0U, transfer->message_format);
+        CHECK(!transfer->message_format_is_null);
+        
         CHECK(transfer->settled);
         CHECK(!transfer->more);
         CHECK(amqp_wildcard_is_null(&transfer->state));

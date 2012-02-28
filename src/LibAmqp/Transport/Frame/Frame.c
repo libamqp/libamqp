@@ -67,7 +67,7 @@ static int decode_symbolic_descriptor(amqp_context_t *context, amqp_buffer_t *bu
     {
         frame->descriptor.domain = descriptor->domain;
         frame->descriptor.id = descriptor->id;
-        frame->descriptor.group = descriptor->group;
+        frame->descriptor.kind = descriptor->kind;
         return true;
     }
 
@@ -100,7 +100,7 @@ static int decode_descriptor(amqp_context_t *context, amqp_buffer_t *buffer, amq
 
     frame->descriptor.domain = code >> 32;
     frame->descriptor.id = (uint32_t) code;
-    frame->descriptor.group = 0;
+    frame->descriptor.kind = 0;
 
     return true;
 }
@@ -211,7 +211,8 @@ static int decode_frame(amqp_context_t *context, amqp_buffer_t *buffer, amqp_fra
 
     if ((type = amqp_decode(context, buffer)) == 0)
     {
-        frame->descriptor.group = amqp_empty_frame;
+        frame->descriptor.kind = amqp_empty_frame;
+        frame->dispatch = amqp_dispatch_empty_frame;
         return true;
     }
 
@@ -298,9 +299,13 @@ void amqp_frame_cleanup(amqp_context_t *context, amqp_frame_t *frame)
 
 void amqp_frame_dump(amqp_context_t *context, amqp_frame_t *frame)
 {
+    amqp_outputter_lock(context);
+
     amqp_context_printf(context, 2, "Frame %08x:%08x - ", frame->descriptor.domain, frame->descriptor.id);
     amqp_type_dump(context, 2, frame->type);
     amqp_context_putc(context, '\n');
+
+    amqp_outputter_unlock(context);
 }
 
 uint64_t amqp_frame_descriptor_full_id(amqp_frame_t *frame)

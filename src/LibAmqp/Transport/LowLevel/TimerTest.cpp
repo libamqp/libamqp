@@ -15,13 +15,14 @@
  */
 
 #include <TestHarness.h>
-#include "Context/ContextTestSupport.h"
+#include "Context/ContextTestFixture.h"
 #include "Transport/LowLevel/Timer.h"
 #include "debug_helper.h"
 
 SUITE(SlowRunning)
 {
-    class TimerFixture : public SuiteContext::ContextFixture
+    class TimerFixture :
+            public virtual TestSupport::ContextHolder
     {
     public:
         TimerFixture()

@@ -33,7 +33,7 @@ typedef struct amqp_context_t amqp_context_t;
 typedef struct amqp_connections_t amqp_connections_t;
 #endif
 
-extern amqp_io_event_watcher_t *amqp_listener_initialize(amqp_context_t *context, amqp_event_loop_t *loop, int port_number, amqp_accept_event_handle_t accept_handler,  amqp_accept_handler_arguments_t *arguments);
+extern amqp_io_event_watcher_t *amqp_listener_initialize(amqp_context_t *context, amqp_event_loop_t *loop, int port_number, amqp_accept_event_handle_t accept_handler, amqp_accept_handler_arguments_t *arguments);
 extern void amqp_listener_destroy(amqp_context_t *context, amqp_io_event_watcher_t *accept_watcher);
 
 #ifdef __cplusplus

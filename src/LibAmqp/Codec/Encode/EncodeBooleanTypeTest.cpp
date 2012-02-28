@@ -17,13 +17,13 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/Encode/EncodeTestSupport.h"
+#include "Codec/Encode/EncodeTestFixture.h"
 
 #include "debug_helper.h"
 
 SUITE(CodecEncode)
 {
-    TEST_FIXTURE(EncodeFixture, EncodeTrue)
+    TEST_FIXTURE(EncodeTestFixture, EncodeTrue)
     {
         type = amqp_encode_boolean(context, buffer, 1);
 
@@ -38,7 +38,7 @@ SUITE(CodecEncode)
         CHECK(amqp_type_to_boolean(type));
     }
 
-    TEST_FIXTURE(EncodeFixture, EncodeFalse)
+    TEST_FIXTURE(EncodeTestFixture, EncodeFalse)
     {
         type = amqp_encode_boolean(context, buffer, 0);
 
@@ -53,7 +53,7 @@ SUITE(CodecEncode)
         CHECK(!amqp_type_to_boolean(type));
     }
 
-    TEST_FIXTURE(EncodeFixture, EncodeArrayOfBoolean)
+    TEST_FIXTURE(EncodeTestFixture, EncodeArrayOfBoolean)
     {
         type = amqp_encode_array_8(context, buffer);
             amqp_encode_boolean(context, buffer, true);
@@ -71,7 +71,7 @@ SUITE(CodecEncode)
         CHECK_EQUAL(0x56, type->value.array.elements[0]->constructor.format_code);
     }
 
-    TEST_FIXTURE(EncodeFixture, EncodeAndDecodeArrayOfBoolean)
+    TEST_FIXTURE(EncodeTestFixture, EncodeAndDecodeArrayOfBoolean)
     {
         type = amqp_encode_array_8(context, buffer);
             amqp_encode_boolean(context, buffer, true);

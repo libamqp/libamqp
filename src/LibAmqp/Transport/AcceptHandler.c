@@ -17,15 +17,16 @@
 #include "Context/Context.h"
 #include "Transport/AcceptHandler.h"
 
-#include "Transport/Connection/Connections.h"
+#include "Transport/Connection/AcceptedConnections.h"
 
 #include "debug_helper.h"
 
-amqp_accept_handler_arguments_t *amqp_accept_handler_arguments_initialize(amqp_context_t *context, amqp_connection_test_hook_t *test_hooks)
+amqp_accept_handler_arguments_t *amqp_accept_handler_arguments_initialize(amqp_context_t *context, amqp_connection_test_hook_t *test_hooks, void *user_data)
 {
     amqp_accept_handler_arguments_t *result = AMQP_MALLOC(context, amqp_accept_handler_arguments_t);
     result->connections = amqp_connections_initialize(context);
     result->test_hooks = test_hooks;
+    result->user_data = user_data;
     return result;
 }
 

@@ -81,6 +81,9 @@ extern int amqp_symbol_compare_with_cstr(amqp_symbol_t *lhs, const char *rhs);
 extern int amqp_symbol_compare_with_bytes(amqp_symbol_t *lhs, const uint8_t *rhs, size_t size);
 extern uint32_t amqp_symbol_hash(amqp_symbol_t *symbol);
 
+extern int amqp_symbol_print(amqp_context_t *context, amqp_symbol_t *symbol);
+extern const char *amqp_symbol_to_cstr(amqp_context_t *context, amqp_symbol_t *symbol);
+
 #ifdef __cplusplus
 }
 #endif

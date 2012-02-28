@@ -16,7 +16,12 @@
 
 #include <TestHarness.h>
 
-#include "Transport/Connection/ConnectionFrameTestSupport.h"
+#include "Buffer/BufferTestSupport.h"
+#include "Context/TestSupport/ContextHolder.h"
+#include "Transport/Connection/TestSupport/ConnectionHolder.h"
+#include "Transport/Connection/TestSupport/WriteInterceptor.h"
+#include "Transport/Connection/TestSupport/ReadInterceptor.h"
+
 #include "Transport/Frame/Frame.h"
 #include "TestData/TestFrames.h"
 #include "Codec/Type/TypePrint.h"
@@ -25,7 +30,11 @@
 
 SUITE(ConnectionAmqp)
 {
-    class ConnectionAmqpFixture : public SuiteConnectionFrame::ConnectionFrameFixture
+    class ConnectionAmqpFixture :
+            public virtual TestSupport::ClientConnectionHolder,
+            public virtual TestSupport::ContextHolder,
+            public TestSupport::WriteInterceptor,
+            public TestSupport::ReadInterceptor
     {
     public:
         ConnectionAmqpFixture();
@@ -46,6 +55,7 @@ SUITE(ConnectionAmqp)
         connection->socket.hostname = 0;
         amqp_frame_cleanup(context, frame);
     }
+
     void ConnectionAmqpFixture::do_nothing(amqp_connection_t *connection)
     {
     }
@@ -53,43 +63,43 @@ SUITE(ConnectionAmqp)
     TEST_FIXTURE(ConnectionAmqpFixture, fixture_should_balance_allocations)
     {
         CHECK(connection->state.frame.name != 0);
-        CHECK_EQUAL("Initialized", connection->state.amqp.name);
+        CHECK_EQUAL("initialized", connection->state.amqp.name);
     }
 
     TEST_FIXTURE(ConnectionAmqpFixture, amqp_send_open)
     {
         connection->state.amqp.send_open(connection);
 
-        CHECK_EQUAL("OpenSent", connection->state.amqp.name);
+        CHECK_EQUAL("open_sent", connection->state.amqp.name);
+//        t::amqp_buffer_dump(context, intercepted_write());
 
-        frame = amqp_decode_amqp_frame(context, write_copy);
+        frame = amqp_decode_amqp_frame(context, intercepted_write());
         ASSERT(frame != 0);
 //        amqp_type_dump(context, 1, frame->type);
         CHECK_EQUAL(0x10U, frame->descriptor.id);
     }
 
-    TEST_FIXTURE(ConnectionAmqpFixture, amqp_send_open_reply)
-    {
+//    TEST_FIXTURE(ConnectionAmqpFixture, amqp_send_open_reply)
+//    {
+//        static test_data::TestData *test_frames[] =
 //        {
-//            &test_data::sasl_protocol_1_0_0,
-//            &test_data::sasl_mechanisms_frame,
-//            &test_data::sasl_outcome_frame,
+//            &test_data::broker_open_frame,
+//            &test_data::close_confirm_frame,
 //            0
 //        };
 //
 //        set_test_data_for_read(test_frames);
-
+//
 //        connection->state.amqp.send_open(connection);
 //
-//        CHECK_EQUAL("OpenSent", connection->state.amqp.name);
-//
-//        frame = amqp_decode_amqp_frame(context, write_copy);
+//        CHECK_EQUAL("open_sent", connection->state.amqp.name);
+
+//        frame = amqp_decode_amqp_frame(context, intercepted_write());
 //        ASSERT(frame != 0);
 //        amqp_type_dump(context, 1, frame->type);
 //        CHECK_EQUAL(0x10U, frame->descriptor.id);
 //        CHECK(0);
-    }
-
+//    }
 
 //    TEST_FIXTURE(ConnectionAmqpFixture, sasl_server_side_handshake)
 //    {
@@ -103,6 +113,6 @@ SUITE(ConnectionAmqp)
 //        connection->state.negotiator.send = call_done_callback;
 //        set_test_data_for_read(test_frames);
 //        connection->state.sasl.tunnel.accept(connection, AMQP_SASL_PREFERRED_VERSION);
-//        CHECK_EQUAL("Negotiated", connection->state.sasl.name);
+//        CHECK_EQUAL("negotiated", connection->state.sasl.name);
 //    }
 }

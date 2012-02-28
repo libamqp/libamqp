@@ -16,11 +16,14 @@
 
 #include <TestHarness.h>
 
+#include "Buffer/BufferTestFixture.h"
 #include "Buffer/BufferTestSupport.h"
 #include "Buffer/BufferInternal.h"
 #include "Context/ErrorHandling.h"
 
 #include "debug_helper.h"
+
+#define NO_CONTEXT  0
 
 SUITE(Buffer)
 {
@@ -56,7 +59,7 @@ SUITE(Buffer)
         CHECK_EQUAL(1UL, pool.stats.outstanding_allocations);
         CHECK_EQUAL(1UL, pool.stats.total_allocation_calls);
 
-        amqp_deallocate(&m_context, &pool, buffer);
+        amqp_deallocate(NO_CONTEXT, &pool, buffer);
         buffer = 0;
 
         CHECK_EQUAL(0UL, pool.stats.outstanding_allocations);
@@ -211,7 +214,7 @@ SUITE(Buffer)
         const size_t size = 32 * 1024;
         CHECK_EQUAL(AMQP_BUFFER_FRAGMENT_SIZE, buffer->capacity);
 
-        amqp_buffer_grow(&m_context, buffer, size);
+        amqp_buffer_grow(NO_CONTEXT, buffer, size);
         CHECK_EQUAL(size, buffer->capacity);
 
         size_t i;
@@ -234,7 +237,7 @@ SUITE(Buffer)
     TEST_FIXTURE(BufferFixture, amqp_buffer_growt_rounds_to_fragment_size)
     {
         CHECK_EQUAL(AMQP_BUFFER_FRAGMENT_SIZE, buffer->capacity);
-        amqp_buffer_grow(&m_context, buffer, AMQP_BUFFER_FRAGMENT_SIZE + AMQP_BUFFER_FRAGMENT_SIZE / 2);
+        amqp_buffer_grow(NO_CONTEXT, buffer, AMQP_BUFFER_FRAGMENT_SIZE + AMQP_BUFFER_FRAGMENT_SIZE / 2);
         CHECK_EQUAL(AMQP_BUFFER_FRAGMENT_SIZE * 2, buffer->capacity);
     }
 
@@ -252,7 +255,7 @@ SUITE(Buffer)
     {
         int iov_count;
         const int size = AMQP_BUFFER_FRAGMENT_SIZE * 4;
-        amqp_buffer_grow(&m_context, buffer, size);
+        amqp_buffer_grow(NO_CONTEXT, buffer, size);
         struct iovec *p =  amqp_buffer_write_io_vec(buffer, AMQP_BUFFER_FRAGMENT_SIZE * 3, &iov_count);
 
         CHECK_EQUAL(3, iov_count);
@@ -273,7 +276,7 @@ SUITE(Buffer)
     {
         int iov_count;
         const int size = AMQP_BUFFER_FRAGMENT_SIZE * 4;
-        amqp_buffer_grow(&m_context, buffer, size);
+        amqp_buffer_grow(NO_CONTEXT, buffer, size);
         size_t amount = AMQP_BUFFER_FRAGMENT_SIZE / 2;
         int required = AMQP_BUFFER_FRAGMENT_SIZE * 3;
         amqp_buffer_advance_write_point(buffer, amount);
@@ -330,7 +333,7 @@ SUITE(Buffer)
     {
         int iov_count;
         const int size = AMQP_BUFFER_FRAGMENT_SIZE * 4;
-        amqp_buffer_grow(&m_context, buffer, size);
+        amqp_buffer_grow(NO_CONTEXT, buffer, size);
 
         size_t n = AMQP_BUFFER_FRAGMENT_SIZE * 3 + AMQP_BUFFER_FRAGMENT_SIZE / 4;
         size_t old_n = AMQP_BUFFER_FRAGMENT_SIZE / 5;

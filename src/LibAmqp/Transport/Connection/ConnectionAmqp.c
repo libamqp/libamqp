@@ -14,34 +14,20 @@
    limitations under the License.
  */
 
-#include "Context/Context.h"
-#include "Transport/Connection/Connection.h"
-#include "Transport/Connection/ConnectionTrace.h"
 #include "Transport/Frame/Frame.h"
 #include "Transport/Amqp/AmqpFrames.h"
+#include "Transport/Connection/ConnectionStateMachine.h"
 
-#ifdef LIBAMQP_TRACE_CONNECT_STATE
-#define save_old_state()  const char* old_state_name = connection->state.amqp.name
-#define trace_transition(old_state_name) amqp_connection_trace_transition(connection, AMQP_TRACE_CONNECTION_AMQP, old_state_name, connection->state.amqp.name)
-#else
-#define save_old_state()
-#define trace_transition(old_state_name)
-#endif
-
-static void transition_to_initialized(amqp_connection_t *connection);
-static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name);
-
-static void transition_to_writing_open_frame(amqp_connection_t *connection);
-static void transition_to_open_sent(amqp_connection_t *connection);
-static void transition_to_opened(amqp_connection_t *connection);
-static void transition_to_waiting_for_open_frame(amqp_connection_t *connection);
-static void transition_to_writing_open_after_open_received(amqp_connection_t *connection);
-//static void transition_to_writing_close_frame(amqp_connection_t *connection);
-//static void transition_to_close_sent(amqp_connection_t *connection);
+DECLARE_TRANSITION_FUNCTION(initialized);
+DECLARE_TRANSITION_FUNCTION(open_sent);
+DECLARE_TRANSITION_FUNCTION(opened);
+DECLARE_TRANSITION_FUNCTION(waiting_for_open_frame);
+DECLARE_TRANSITION_FUNCTION(close_sent);
+DECLARE_TRANSITION_FUNCTION(closed);
 
 void amqp_connection_amqp_initialize(amqp_connection_t *connection)
 {
-    transition_to_initialized(connection);
+    transition_to_state(connection, initialized);
 }
 
 static void cleanup_resources(amqp_connection_t *connection)
@@ -57,10 +43,14 @@ int amqp_connection_amqp_is_state(const amqp_connection_t *connection, const cha
     return connection->state.amqp.name != 0 ? (strcmp(connection->state.amqp.name, state_name) == 0) : false;
 }
 
-//static
-void shutdown_amqp_tunnel_once_opened(amqp_connection_t *connection)
+// start the idle timeouts with the longest delay that will give a reasonably accurate timeout check time.
+static void start_idle_timeouts(amqp_connection_t *connection)
 {
-    not_implemented(todo);
+    ev_tstamp local = connection->amqp.connection.timeout.local = connection->amqp.connection.limits.idle_time_out / 1000.0;
+    ev_tstamp remote = connection->amqp.connection.timeout.remote = connection->amqp.connection.remote_limits.idle_time_out / 2000.0;
+    ev_tstamp delay = connection->amqp.connection.timeout.period = (local < remote ? local : remote) / 2.0;
+
+    amqp_timer_start(connection->context, connection->timer, delay);
 }
 
 void amqp_received_out_of_sequence_frame(amqp_connection_t *connection, amqp_frame_t *frame)
@@ -105,125 +95,160 @@ void read_frame(amqp_connection_t *connection)
 }
 
 static
-void write_complete_callback(amqp_connection_t *connection)
-{
-    connection->state.amqp.done(connection);
-}
-static inline
-void write_frame(amqp_connection_t *connection)
-{
-    connection->state.writer.commence_write(connection, connection->buffer.write, write_complete_callback);
-}
-
-static
 void send_open_while_initialized(amqp_connection_t *connection)
 {
-    int rc = amqp_prepare_open_frame(connection);
+    int rc =  amqp_send_amqp_open_frame(connection);
     if (rc)
     {
-        transition_to_writing_open_frame(connection);
+        transition_to_state(connection, open_sent);
         connection->state.frame.enable(connection);
-        write_frame(connection);
+        read_frame(connection);
     }
 }
 static
 void wait_on_open_while_initialized(amqp_connection_t *connection)
 {
-    transition_to_waiting_for_open_frame(connection);
+    transition_to_state(connection, waiting_for_open_frame);
     connection->state.frame.enable(connection);
     read_frame(connection);
 }
-static
-void transition_to_initialized(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(initialized)
 {
-    default_state_initialization(connection, "Initialized");
     connection->state.amqp.send_open = send_open_while_initialized;
     connection->state.amqp.wait_on_open = wait_on_open_while_initialized;
-    trace_transition("Created");
+}
+
+static amqp_session_t *create_session(amqp_connection_t *connection)
+{
+not_implemented(todo);
+    amqp_session_t *result;
+    int channel = amqp_connection_next_channel(connection);
+    if (channel == -1)
+    {
+        return 0;
+    }
+
+    result = AMQP_MALLOC(connection->context, amqp_session_t);
+    connection->sessions.sessions[channel] = result;
+
+    amqp_session_initialize(connection, result, channel);
+    amqp_send_amqp_begin_frame(connection, result);
+
+    return result;
 }
 
 /**********************************************
  Client states
  *********************************************/
-static void done_while_writing_open(amqp_connection_t *connection)
+static void connection_opened(amqp_connection_t *connection)
 {
-    transition_to_open_sent(connection);
+    flag_amqp_connection_opened(connection);
+    transition_to_state(connection, opened);
+    start_idle_timeouts(connection);
     read_frame(connection);
 }
-static void transition_to_writing_open_frame(amqp_connection_t *connection)
-{
-    save_old_state();
-    default_state_initialization(connection, "WritingOpen");
-    connection->state.amqp.done = done_while_writing_open;
-    trace_transition(old_state_name);
-}
-
 static void open_received_after_open_sent(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    if (process_frame(connection, frame, amqp_process_open_frame))
+    if (process_frame(connection, frame, amqp_process_open_frame_from_broker))
     {
-        transition_to_opened(connection);
-        flag_amqp_connection_opened(connection);
+        connection_opened(connection);
+    }
+}
+static void keep_alive_while_open_sent(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    read_frame(connection);
+}
+DEFINE_TRANSITION_TO_STATE(open_sent)
+{
+    connection->state.amqp.frame.open = open_received_after_open_sent;
+    connection->state.amqp.frame.empty = keep_alive_while_open_sent;
+
+    // TODO  - caution - creating a session that may not be usable
+    connection->state.amqp.create_session = create_session;
+}
+
+/**********************************************
+ Server states
+ *********************************************/
+static void open_received_while_waiting_for_open_frame(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    int rc = process_frame(connection, frame, amqp_process_open_frame_from_client);
+    if (!rc)
+    {
+        return;
+    }
+
+    rc =  amqp_send_amqp_open_frame(connection);
+    if (rc);
+    {
+        connection_opened(connection);
+    }
+}
+DEFINE_TRANSITION_TO_STATE(waiting_for_open_frame)
+{
+    connection->state.amqp.frame.open = open_received_while_waiting_for_open_frame;
+}
+
+
+/**********************************************
+ Common states
+ *********************************************/
+
+static void discard_frame(amqp_connection_t *connection);
+static
+void discard_frame_after_close_received(amqp_connection_t *connection, amqp_buffer_t *buffer)
+{
+    discard_frame(connection);
+}
+static inline
+void discard_frame(amqp_connection_t *connection)
+{
+    connection->state.frame.read(connection, connection->buffer.read, discard_frame_after_close_received);
+}
+
+static void begin_connection_close(amqp_connection_t *connection)
+{
+    int rc =  amqp_send_amqp_close_frame(connection);
+    if (rc)
+    {
+        amqp_timer_start(connection->context, connection->timer, 3.0);  // TODO - remove magic no and put in config
+        transition_to_state(connection, close_sent);
+        flag_amqp_connection_closing(connection);
         read_frame(connection);
     }
 }
-static void transition_to_open_sent(amqp_connection_t *connection)
+static void application_close_while_opened(amqp_connection_t *connection)
 {
-    save_old_state();
-    default_state_initialization(connection, "OpenSent");
-    connection->state.amqp.frame.open = open_received_after_open_sent;
-    trace_transition(old_state_name);
+    begin_connection_close(connection);
 }
+static void timeout_expired_while_opened(amqp_connection_t *connection)
+{
+    ev_tstamp now = ev_now(connection->context->thread_event_loop);
 
-//static void shutdown_while_opened(amqp_connection_t *connection)
-//{
-//    int rc = amqp_prepare_close_frame(connection);
-//    connection->state.connection.shutdown = amqp__shutdown_while_in_progress;
-//
-//    flag_amqp_connection_closing(connection);
-//    if (rc)
-//    {
-//        transition_to_writing_close_frame(connection);
-//        write_frame(connection);
-//    }
-//}
+    if ((connection->io.read.last_read_time - now + connection->amqp.connection.timeout.local) < 0)
+    {
+        // TODO - include error details in the close frame
+        begin_connection_close(connection);
+        return;
+    }
+
+    if ((connection->io.write.last_write_time - now + connection->amqp.connection.timeout.remote) < 0)
+    {
+        amqp_send_empty_frame(connection);
+        return;
+    }
+}
 static void received_close_while_opened(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    flag_amqp_connection_closing(connection);
-//    amqp_prepare_close_frame(connection);
-    not_implemented(todo);
-}
-static void transition_to_opened(amqp_connection_t *connection)
-{
-    save_old_state();
-    default_state_initialization(connection, "Opened");
-//    connection->state.connection.shutdown = shutdown_while_opened;
-    connection->state.amqp.frame.close = received_close_while_opened;
-    trace_transition(old_state_name);
-}
-/*
-static void done_while_writing_close(amqp_connection_t *connection)
-{
-    transition_to_close_sent(connection);
-    read_frame(connection);
-}
-static void received_close_while_writing_close_frame(amqp_connection_t *connection, amqp_frame_t *frame)
-{
-    not_implemented(todo);
-}
-static void transition_to_writing_close_frame(amqp_connection_t *connection)
-{
-    save_old_state();
-    default_state_initialization(connection, "WritingCLose");
-    connection->state.amqp.done = done_while_writing_close;
-    connection->state.amqp.frame.close = received_close_while_writing_close_frame;
-    trace_transition(old_state_name);
-}
+    int rc;
 
-static void received_close_after_close_sent(amqp_connection_t *connection, amqp_frame_t *frame)
-{
-    int rc = process_frame(connection, frame, amqp_process_close_frame);
+    amqp_timer_start(connection->context, connection->timer, 3.0);  // TODO - remove magic no and put in config
+
     flag_amqp_connection_closed(connection);
+    transition_to_state(connection, closed);
+    process_frame(connection, frame, amqp_process_close_frame);
+    discard_frame(connection);                                       // TODO -  rename
+    rc = amqp_send_amqp_close_frame(connection);
     if (rc)
     {
         connection->state.shutdown.drain(connection);
@@ -231,64 +256,64 @@ static void received_close_after_close_sent(amqp_connection_t *connection, amqp_
     }
     connection->state.shutdown.close(connection);
 }
-static void transition_to_close_sent(amqp_connection_t *connection)
+static void keep_alive_while_opened(amqp_connection_t *connection, amqp_frame_t *frame)
 {
-    save_old_state();
-    default_state_initialization(connection, "CloseSent");
-    connection->state.amqp.frame.close = received_close_after_close_sent;
-    trace_transition(old_state_name);
+    read_frame(connection);
 }
-*/
-/**********************************************
- Server states
- *********************************************/
-static void open_received_while_waiting_for_open_frame(amqp_connection_t *connection, amqp_frame_t *frame)
-{
-    if (process_frame(connection, frame, amqp_process_open_frame))
-    {
-        transition_to_writing_open_after_open_received(connection);
-        write_frame(connection);
-    }
-}
-static void transition_to_waiting_for_open_frame(amqp_connection_t *connection)
-{
-    save_old_state();
-    default_state_initialization(connection, "WaitingOnOpen");
-    connection->state.amqp.frame.open = open_received_while_waiting_for_open_frame;
-    trace_transition(old_state_name);
-}
-
-static void done_while_writing_open_after_open_received(amqp_connection_t *connection)
-{
-    flag_amqp_connection_opened(connection);
-    transition_to_opened(connection);
-}
-static void transition_to_writing_open_after_open_received(amqp_connection_t *connection)
-{
-    save_old_state();
-    default_state_initialization(connection, "WritingOpenAfterOpenrReceived");
-    connection->state.amqp.done = done_while_writing_open_after_open_received;
-    trace_transition(old_state_name);
-}
-
-//static void close_while_receiver_opened(amqp_connection_t *connection, amqp_frame_t *frame)
+//static void amqp_begin_while_opened(amqp_connection_t *connection, amqp_frame_t *frame)
 //{
-//    int rc = amqp_prepare_close_frame(connection);
+//    int rc = process_frame(connection, frame, amqp_process_begin_frame);
 //    if (rc)
 //    {
-//        transition_to_writing_close_frame(connection);
-//        write_frame(connection);
+//        read_frame(connection);
 //    }
-//
-//    not_implemented(todo);
 //}
-//static void transition_to_receiver_opened(amqp_connection_t *connection)
-//{
-//    save_old_state();
-//    default_state_initialization(connection, "`ReceiverOpened");
-//    connection->state.amqp.frame.close = close_while_receiver_opened;
-//    trace_transition(old_state_name);
-//}
+DEFINE_TRANSITION_TO_STATE(opened)
+{
+    connection->state.connection.shutdown = application_close_while_opened;
+    connection->state.connection.timeout = timeout_expired_while_opened;
+    connection->state.amqp.frame.close = received_close_while_opened;
+    connection->state.amqp.frame.empty = keep_alive_while_opened;
+    connection->state.amqp.create_session = create_session;
+
+//    connection->state.amqp.frame.begin = amqp_begin_while_opened;
+}
+
+static void received_close_after_close_sent(amqp_connection_t *connection, amqp_frame_t *frame)
+{
+    int rc = process_frame(connection, frame, amqp_process_close_frame);
+    if (rc)
+    {
+        flag_amqp_connection_closed(connection);
+        transition_to_state(connection, closed);
+        connection->state.shutdown.drain(connection);
+        return;
+    }
+    connection->state.shutdown.close(connection);
+}
+static void timeout_expiry_while_close_sent(amqp_connection_t *connection)
+{
+    flag_amqp_connection_closed(connection);
+    transition_to_state(connection, closed);
+    connection->state.shutdown.drain(connection);
+}
+DEFINE_TRANSITION_TO_STATE(close_sent)
+{
+    connection->state.connection.shutdown = amqp__shutdown_while_in_progress;
+    connection->state.connection.timeout = timeout_expiry_while_close_sent;
+    connection->state.amqp.frame.close = received_close_after_close_sent;
+    // TODO -  ignore link extabllist, attacj, begin
+}
+
+static void timeout_expiry_while_closed(amqp_connection_t *connection)
+{
+    connection->state.shutdown.close(connection);
+}
+DEFINE_TRANSITION_TO_STATE(closed)
+{
+    connection->state.connection.timeout = timeout_expiry_while_closed;
+    connection->state.connection.shutdown = amqp__shutdown_while_in_progress;
+}
 
 /**********************************************
  Default states
@@ -311,16 +336,18 @@ static void default_wait_on_open(amqp_connection_t *connection)
     illegal_state(connection, "WaitOnOpen");
 }
 
-static void default_done(amqp_connection_t *connection)
+static amqp_session_t *default_create_session(amqp_connection_t *connection)
 {
-    illegal_state(connection, "Done");
+    return 0;
 }
-
-static void default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
+static void default_state_initialization(amqp_connection_t *connection, const char *state_name, void (*action_initializer)(amqp_connection_t *connection) LIBAMQP_TRACE_STATE_ARGS_DECL)
 {
+    save_old_state(connection->state.amqp.name);
+
     connection->state.amqp.send_open = default_send_open;
     connection->state.amqp.wait_on_open = default_wait_on_open;
-    connection->state.amqp.done = default_done;
+    connection->state.amqp.send_open = default_send_open;
+    connection->state.amqp.create_session = default_create_session;
 
     connection->state.amqp.frame.open = amqp_received_out_of_sequence_frame;
     connection->state.amqp.frame.begin = amqp_received_out_of_sequence_frame;
@@ -333,5 +360,9 @@ static void default_state_initialization(amqp_connection_t *connection, const ch
     connection->state.amqp.frame.close = amqp_received_out_of_sequence_frame;
     connection->state.amqp.frame.empty = amqp_received_out_of_sequence_frame;
 
-    connection->state.amqp.name = new_state_name;
+    connection->state.amqp.name = state_name;
+
+    action_initializer(connection);
+
+    trace_state_transition(AMQP_TRACE_CONNECTION_AMQP, connection->state.amqp.name);
 }

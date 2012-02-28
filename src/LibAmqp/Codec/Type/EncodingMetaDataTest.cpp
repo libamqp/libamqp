@@ -16,7 +16,7 @@
 
 #include <TestHarness.h>
 
-#include "Context/ContextTestSupport.h"
+#include "Context/TestSupport/ContextHolder.h"
 
 #include "Type.h"
 #include "Codec/Type/EncodingMetaData.h"
@@ -26,7 +26,8 @@ extern const int amqp__type_lookup_table_ntypes;
 
 SUITE(TypeMetaData)
 {
-    class TypeMetaDataFixture : public SuiteContext::ContextFixture
+    class TypeMetaDataFixture :
+            public virtual TestSupport::ContextHolder
     {
     public:
         TypeMetaDataFixture() {}

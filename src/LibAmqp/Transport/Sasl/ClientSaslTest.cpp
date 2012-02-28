@@ -15,9 +15,14 @@
  */
 
 #include <TestHarness.h>
+#include "Transport/Connection/TestSupport/ConnectionHolder.h"
+#include "Context/TestSupport/DecodeBufferHolder.h"
+#include "Plugin/TestSupport/SaslPluginHolder.h"
+#include "Transport/Connection/TestSupport/WriteInterceptor.h"
+#include "Context/TestSupport/TypeHolder.h"
+#include "Transport/Frame/TestSupport/FrameHolder.h"
+
 #include "Transport/Connection/Connection.h"
-#include "Transport/Sasl/SaslTestSupport.h"
-#include "Codec/CodecTestSupport.h"
 #include "AmqpTypes/AmqpSymbol.h"
 #include "AmqpTypes/AmqpMultiple.h"
 #include "Plugin/SaslPlain/SaslPlain.h"
@@ -26,14 +31,21 @@
 #include "Transport/Frame/Frame.h"
 
 #include "Transport/Sasl/ClientSasl.h"
+#include "Codec/Decode/Decode.h"
 
 #include "debug_helper.h"
 
-#include "Transport/Frame/FrameTestSupport.h"
+
 
 SUITE(Sasl)
 {
-    class ClientSaslFixture : public SuiteFrame::FrameFixture
+    class ClientSaslFixture :
+            public TestSupport::UnconnectedConnectionHolder,
+            public virtual TestSupport::DecodeBufferHolder,
+            public virtual TestSupport::SaslPluginHolder,
+            public virtual TestSupport::WriteInterceptor,
+            public virtual TestSupport::TypeHolder,
+            public virtual TestSupport::FrameHolder
     {
     public:
         ClientSaslFixture();
@@ -61,9 +73,11 @@ SUITE(Sasl)
         ASSERT(frame != 0);
 
         amqp_sasl_process_mechanisms_frame(connection, frame);
-        amqp_buffer_t *buffer = connection->buffer.write;
+
+        amqp_buffer_t *buffer = intercepted_write();
         amqp_buffer_advance_read_index(buffer, 8);
         type = amqp_decode(context, buffer);
+
         ASSERT(type);
         CHECK(amqp_type_is_valid(type));
         CHECK(amqp_type_is_composite(type));

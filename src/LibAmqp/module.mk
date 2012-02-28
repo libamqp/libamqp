@@ -6,7 +6,4 @@
 MODULE = LibAmqp
 INCLUDES += $(MODULE)
 
-SRC += $(wildcard $(MODULE)/*.c)
-
-
 

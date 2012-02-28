@@ -17,28 +17,16 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/CodecTestSupport.h"
+#include "Codec/Decode/DecodeTestFixture.h"
+
 #include "Codec/Decode/Decode.h"
 #include "Codec/Type/Type.h"
 
 #include "debug_helper.h"
 
-SUITE(CompoundTypeDecode)
+SUITE(CodecDecode)
 {
-    class DecodeFixture : public SuiteCodec::CodecFixture
-    {
-    public:
-        DecodeFixture() : result(0) {}
-        ~DecodeFixture()
-        {
-            AMQP_FREE(context, result);
-        }
-
-    public:
-        char *result;
-    };
-    
-    TEST_FIXTURE(DecodeFixture, SmallArray)
+    TEST_FIXTURE(DecodeTestFixture, SmallArray)
     {
         load_decode_buffer(test_data::array_shorts);
         type = amqp_decode(context, decode_buffer);
@@ -69,7 +57,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL((size_t) 0x02, type->value.array.elements[0]->position.size);
     }
 
-    TEST_FIXTURE(DecodeFixture, LargeList)
+    TEST_FIXTURE(DecodeTestFixture, LargeList)
     {
         load_decode_buffer(test_data::list);
         type = amqp_decode(context, decode_buffer);
@@ -123,13 +111,13 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL((size_t) 1, e->value.compound.count);
     }
 
-    TEST_FIXTURE(DecodeFixture, leak)
+    TEST_FIXTURE(DecodeTestFixture, leak)
     {
         load_decode_buffer(test_data::list);
         type = amqp_decode(context, decode_buffer);
     }
 
-    TEST_FIXTURE(DecodeFixture, Map)
+    TEST_FIXTURE(DecodeTestFixture, Map)
     {
         load_decode_buffer(test_data::map);
         type = amqp_decode(context, decode_buffer);
@@ -151,7 +139,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(0x81, amqp_type_map_element(type, 9)->constructor.format_code);
     }
 
-    TEST_FIXTURE(DecodeFixture, arrray_elements_are_contained)
+    TEST_FIXTURE(DecodeTestFixture, arrray_elements_are_contained)
     {
         load_decode_buffer(test_data::array_shorts);
         type = amqp_decode(context, decode_buffer);
@@ -163,7 +151,7 @@ SUITE(CompoundTypeDecode)
         CHECK(amqp_type_is_contained(type->value.array.elements[4]));
     }
 
-    TEST_FIXTURE(DecodeFixture, empty_array_of_symbols)
+    TEST_FIXTURE(DecodeTestFixture, empty_array_of_symbols)
     {
         test_data::empty_array_of_symbols.transfer_to(decode_buffer);
         type = amqp_decode(context, decode_buffer);
@@ -174,7 +162,7 @@ SUITE(CompoundTypeDecode)
         // TODO - check element type even
     }
 
-    TEST_FIXTURE(DecodeFixture, list_elements_are_contained)
+    TEST_FIXTURE(DecodeTestFixture, list_elements_are_contained)
     {
         load_decode_buffer(test_data::list);
         type = amqp_decode(context, decode_buffer);
@@ -186,7 +174,7 @@ SUITE(CompoundTypeDecode)
         CHECK(amqp_type_is_contained(amqp_type_list_element(type, 4)));
     }
 
-    TEST_FIXTURE(DecodeFixture, map_entries_are_contained)
+    TEST_FIXTURE(DecodeTestFixture, map_entries_are_contained)
     {
         load_decode_buffer(test_data::map);
         type = amqp_decode(context, decode_buffer);
@@ -203,7 +191,7 @@ SUITE(CompoundTypeDecode)
         CHECK(amqp_type_is_contained(amqp_type_map_element(type, 9)));
     }
 
-    TEST_FIXTURE(DecodeFixture, described_list)
+    TEST_FIXTURE(DecodeTestFixture, described_list)
     {
         load_decode_buffer(test_data::described_list);
 
@@ -241,7 +229,7 @@ SUITE(CompoundTypeDecode)
 
     }
 
-    TEST_FIXTURE(DecodeFixture, missing_descriptor)
+    TEST_FIXTURE(DecodeTestFixture, missing_descriptor)
     {
         context->debug.level = 0;
         load_decode_buffer(test_data::missing_descriptor);
@@ -250,7 +238,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(AMQP_ERROR_NO_DESCRIPTOR, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, missing_described_type)
+    TEST_FIXTURE(DecodeTestFixture, missing_described_type)
     {
         context->debug.level = 0;
         load_decode_buffer(test_data::missing_described_type);
@@ -259,7 +247,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(AMQP_ERROR_NO_DESCRIBED_TYPE, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, invalid_descriptor)
+    TEST_FIXTURE(DecodeTestFixture, invalid_descriptor)
     {
         context->debug.level = 0;
         load_decode_buffer(test_data::invalid_descriptor);
@@ -268,7 +256,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(AMQP_ERROR_DESCRIPTOR_INVALID, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, invalid_described_type)
+    TEST_FIXTURE(DecodeTestFixture, invalid_described_type)
     {
         context->debug.level = 0;
         load_decode_buffer(test_data::invalid_described_type);
@@ -277,7 +265,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL(AMQP_ERROR_DESCRIBED_INVALID, type->invalid_cause);
     }
 
-    TEST_FIXTURE(DecodeFixture, empty_map)
+    TEST_FIXTURE(DecodeTestFixture, empty_map)
     {
         load_decode_buffer(test_data::empty_map);
         type = amqp_decode(context, decode_buffer);
@@ -288,7 +276,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL((size_t) 0, type->value.map.count); // number of entries not elements
     }
 
-    TEST_FIXTURE(DecodeFixture, empty_list_8)
+    TEST_FIXTURE(DecodeTestFixture, empty_list_8)
     {
         load_decode_buffer(test_data::empty_list_8);
         type = amqp_decode(context, decode_buffer);
@@ -299,7 +287,7 @@ SUITE(CompoundTypeDecode)
         CHECK_EQUAL((size_t) 0, type->value.list.count);
     }
 
-    TEST_FIXTURE(DecodeFixture, empty_list_0)
+    TEST_FIXTURE(DecodeTestFixture, empty_list_0)
     {
         load_decode_buffer(test_data::empty_list_0);
         type = amqp_decode(context, decode_buffer);

@@ -32,9 +32,11 @@
 #include "debug_helper.h"
 
 
-int amqp_sasl_prepare_mechanisms_frame(amqp_connection_t *connection)
+int amqp_sasl_send_mechanisms_frame(amqp_connection_t *connection)
 {
-    return amqp_encode_sasl_mechanisms_frame(connection, connection->buffer.write);
+    amqp_buffer_t *buffer = amqp_encode_sasl_mechanisms_frame(connection);
+    amqp_connection_write_buffer(connection, buffer);
+    return buffer != 0;
 }
 
 static
@@ -79,10 +81,11 @@ int amqp_encode_sasl_challenge(amqp_connection_t *connection, amqp_sasl_plugin_t
 */
 
 static
-int amqp_encode_sasl_outcome(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
+int amqp_sasl_send_sasl_outcome(amqp_connection_t *connection, amqp_sasl_plugin_t *plugin)
 {
-    amqp_buffer_reset(connection->buffer.write);
-    return amqp_encode_sasl_outcome_frame(connection, connection->buffer.write, plugin);
+    amqp_buffer_t *buffer = amqp_encode_sasl_outcome_frame(connection, plugin);
+    amqp_connection_write_buffer(connection, buffer);
+    return buffer != 0;
 }
 
 /*
@@ -106,7 +109,10 @@ int amqp_sasl_process_init_frame(amqp_connection_t *connection, amqp_frame_t *fr
     switch (rc)
     {
     case amqp_plugin_handler_outcome_accepted:
-        amqp_encode_sasl_outcome(connection, plugin);
+        if (!amqp_sasl_send_sasl_outcome(connection, plugin))
+        {
+            return amqp_sasl_frame_process_error;
+        }
         break;
 
     case amqp_plugin_handler_challenge:

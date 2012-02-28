@@ -15,18 +15,18 @@
  */
 
 #include <TestHarness.h>
-#include "AmqpTypes/AmqpTypesTestSupport.h"
+#include "AmqpTypes/AmqpTypesTestFixture.h"
 
 #include "AmqpTypes/AmqpArray.h"
 #include "debug_helper.h"
 
 SUITE(AmqpTypes)
 {
-    class AmqpArrayFixture  : public AmqpTypesFixture
+    class AmqpArrayTestFixture  : public AmqpTypesTestFixture
     {
     public:
-        AmqpArrayFixture();
-        ~AmqpArrayFixture();
+        AmqpArrayTestFixture();
+        ~AmqpArrayTestFixture();
 
         int load_array();
 
@@ -35,30 +35,30 @@ SUITE(AmqpTypes)
         amqp_array_t *array;
     };
 
-    AmqpArrayFixture::AmqpArrayFixture() : array(0)
+    AmqpArrayTestFixture::AmqpArrayTestFixture() : array(0)
     {
         memset(&ref, '\0', sizeof(amqp_array_t));
     }
 
-    AmqpArrayFixture::~AmqpArrayFixture()
+    AmqpArrayTestFixture::~AmqpArrayTestFixture()
     {
         amqp_array_cleanup(context, &ref);
         amqp_array_cleanup(context, array);
     }
 
-    TEST_FIXTURE(AmqpArrayFixture, array_initialize)
+    TEST_FIXTURE(AmqpArrayTestFixture, array_initialize)
     {
         amqp_array_initialize(context, &ref, 13);
         CHECK_EQUAL(13U, amqp_array_count(&ref));
     }
 
-    TEST_FIXTURE(AmqpArrayFixture, array_create)
+    TEST_FIXTURE(AmqpArrayTestFixture, array_create)
     {
         array = amqp_array_create(context, 13);
         CHECK_EQUAL(13U, amqp_array_count(array));
     }
 
-    TEST_FIXTURE(AmqpArrayFixture, array_element_access)
+    TEST_FIXTURE(AmqpArrayTestFixture, array_element_access)
     {
         static const char *data[] = { "1", "2", "3", "4", "5"};
         array = amqp_array_create(context, 5);
@@ -75,7 +75,7 @@ SUITE(AmqpTypes)
         }
     }
 
-    TEST_FIXTURE(AmqpArrayFixture, array_type_access)
+    TEST_FIXTURE(AmqpArrayTestFixture, array_type_access)
     {
         static const short data[] = { 10, 11, 11, 13, 14 };
 

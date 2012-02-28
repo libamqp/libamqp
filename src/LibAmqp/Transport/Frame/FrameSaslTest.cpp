@@ -16,18 +16,18 @@
 
 #include <TestHarness.h>
 #include "Transport/Frame/Frame.h"
-#include "Transport/Frame/FrameTestSupport.h"
+#include "Transport/Frame/FrameTestFixture.h"
 
 #include "Codec/Decode/Decode.h"
 #include "debug_helper.h"
 
 SUITE(Frame)
 {
-    TEST_FIXTURE(FrameFixture, fixture_should_balance_allocations)
+    TEST_FIXTURE(FrameTestFixture, fixture_should_balance_allocations)
     {
     }
 
-    TEST_FIXTURE(FrameFixture, decode_minimal_frame)
+    TEST_FIXTURE(FrameTestFixture, decode_minimal_frame)
     {
         test_data::minimal_frame_header.transfer_to(decode_buffer);
         frame = amqp_decode_amqp_frame(context, decode_buffer);
@@ -36,13 +36,13 @@ SUITE(Frame)
         CHECK_EQUAL(8U, frame->data_offset);
         CHECK_EQUAL(AMQP_FRAME_TYPE, frame->frame_type);
         CHECK_EQUAL(1U, frame->type_specific.word);
-        CHECK_EQUAL(amqp_empty_frame, frame->descriptor.group);
+        CHECK_EQUAL(amqp_empty_frame, frame->descriptor.kind);
 
         CHECK_EQUAL(8U, amqp_buffer_index(decode_buffer));
         CHECK_EQUAL(0, amqp_buffer_available(decode_buffer));
     }
 
-    TEST_FIXTURE(FrameFixture, sasl_mechanisms_frame_with_invalid_descriptor_id)
+    TEST_FIXTURE(FrameTestFixture, sasl_mechanisms_frame_with_invalid_descriptor_id)
     {
         test_data::sasl_mechanisms_frame_with_invalid_descriptor_id.transfer_to(decode_buffer);
         context->debug.level = 0;
@@ -50,7 +50,7 @@ SUITE(Frame)
         ASSERT(frame == 0);
     }
 
-    TEST_FIXTURE(FrameFixture, decode_sasl_mechanisms_frame)
+    TEST_FIXTURE(FrameTestFixture, decode_sasl_mechanisms_frame)
     {
         test_data::sasl_mechanisms_frame.transfer_to(decode_buffer);
         frame = amqp_decode_sasl_frame(context, decode_buffer);
@@ -62,7 +62,7 @@ SUITE(Frame)
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 0), "PLAIN") == 0);
     }
 
-    TEST_FIXTURE(FrameFixture, sasl_mechanisms_frame_long)
+    TEST_FIXTURE(FrameTestFixture, sasl_mechanisms_frame_long)
     {
         test_data::sasl_mechanisms_frame_long.transfer_to(decode_buffer);
         frame = amqp_decode_sasl_frame(context, decode_buffer);
@@ -74,7 +74,7 @@ SUITE(Frame)
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 0), "PLAIN") == 0);
     }
 
-    TEST_FIXTURE(FrameFixture, sasl_mechanisms_frame_symbol)
+    TEST_FIXTURE(FrameTestFixture, sasl_mechanisms_frame_symbol)
     {
         test_data::sasl_mechanisms_frame_symbol.transfer_to(decode_buffer);
         frame = amqp_decode_sasl_frame(context, decode_buffer);
@@ -86,7 +86,7 @@ SUITE(Frame)
         CHECK(amqp_symbol_compare_with_cstr(amqp_multiple_symbol_get(multiple, 0), "ANONYMOUS") == 0);
     }
 
-    TEST_FIXTURE(FrameFixture, sasl_init_frame)
+    TEST_FIXTURE(FrameTestFixture, sasl_init_frame)
     {
         test_data::sasl_init_frame.transfer_to(decode_buffer);
         frame = amqp_decode_sasl_frame(context, decode_buffer);
@@ -105,7 +105,7 @@ SUITE(Frame)
         CHECK(amqp_string_compare_with_cstr(&frame->frames.sasl.init.hostname, "localhost.localdomain") == 0);
     }
 
-    TEST_FIXTURE(FrameFixture, sasl_init_frame_captured)
+    TEST_FIXTURE(FrameTestFixture, sasl_init_frame_captured)
     {
         test_data::sasl_init_frame_captured.transfer_to(decode_buffer);
         frame = amqp_decode_sasl_frame(context, decode_buffer);
@@ -126,7 +126,7 @@ SUITE(Frame)
         CHECK(amqp_string_compare_with_cstr(&frame->frames.sasl.init.hostname, "development.mysystem.mycompany.stormmq.com") == 0);
     }
 
-    TEST_FIXTURE(FrameFixture, sasl_outcome_frame)
+    TEST_FIXTURE(FrameTestFixture, sasl_outcome_frame)
     {
         test_data::sasl_outcome_frame.transfer_to(decode_buffer);
         frame = amqp_decode_sasl_frame(context, decode_buffer);
@@ -137,7 +137,7 @@ SUITE(Frame)
         CHECK(amqp_binary_is_null(&frame->frames.sasl.outcome.additional_data));
     }
 
-    TEST_FIXTURE(FrameFixture, sasl_outcome_frame_auth_error)
+    TEST_FIXTURE(FrameTestFixture, sasl_outcome_frame_auth_error)
     {
         test_data::sasl_outcome_frame_auth_error.transfer_to(decode_buffer);
         frame = amqp_decode_sasl_frame(context, decode_buffer);

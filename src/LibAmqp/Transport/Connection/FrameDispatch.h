@@ -53,6 +53,7 @@ extern void amqp_dispatch_amqp_disposition(amqp_connection_t *connection, amqp_f
 extern void amqp_dispatch_amqp_detach(amqp_connection_t *connection, amqp_frame_t *frame);
 extern void amqp_dispatch_amqp_end(amqp_connection_t *connection, amqp_frame_t *frame);
 extern void amqp_dispatch_amqp_close(amqp_connection_t *connection, amqp_frame_t *frame);
+extern void amqp_dispatch_empty_frame(amqp_connection_t *connection, amqp_frame_t *frame);
 
 #ifdef __cplusplus
 }

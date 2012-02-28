@@ -16,20 +16,39 @@
 
 #include <TestHarness.h>
 
-#include "Transport/Connection/ConnectionFrameTestSupport.h"
+#include "Context/TestSupport/ContextHolder.h"
+#include "Transport/Connection/TestSupport/ConnectionHolder.h"
+#include "Transport/Connection/TestSupport/WriteInterceptor.h"
+#include "Transport/Connection/TestSupport/ReadInterceptor.h"
+
+#include "Context/TestSupport/TestSupport.h"
 #include "TestData/TestFrames.h"
 
 #include "debug_helper.h"
+
 SUITE(ConnectionSasl)
 {
-    class ConnectionSaslFixture : public SuiteConnectionFrame::ConnectionFrameFixture
+    class ConnectionSaslFixture :
+            public virtual TestSupport::ClientConnectionHolder,
+            public virtual TestSupport::ContextHolder,
+            public virtual TestSupport::WriteInterceptor,
+            public virtual TestSupport::ReadInterceptor
     {
     public:
         ConnectionSaslFixture();
         ~ConnectionSaslFixture();
 
-    public:
+        static void done_callback(amqp_connection_t *connection);
+        static void done_callback(amqp_connection_t *connection, amqp_buffer_t *buffer);
     };
+
+    void ConnectionSaslFixture::done_callback(amqp_connection_t *connection)
+    {
+    }
+
+    void ConnectionSaslFixture::done_callback(amqp_connection_t *connection, amqp_buffer_t *buffer)
+    {
+    }
 
     ConnectionSaslFixture::ConnectionSaslFixture()
     {
@@ -44,7 +63,7 @@ SUITE(ConnectionSasl)
     TEST_FIXTURE(ConnectionSaslFixture, fixture_should_balance_allocations)
     {
         CHECK(connection->state.frame.name != 0);
-        CHECK_EQUAL("Initialized", connection->state.sasl.name);
+        CHECK_EQUAL("initialized", connection->state.sasl.name);
     }
 
     TEST_FIXTURE(ConnectionSaslFixture, sasl_version_rejection)
@@ -52,10 +71,10 @@ SUITE(ConnectionSasl)
         set_test_data_for_read(test_data::sasl_protocol_1_1_0);
         connection->state.sasl.connect(connection);
 
-        CHECK_EQUAL("NegotiationRejected", connection->state.negotiator.name);
-        CHECK_EQUAL("Failed", connection->state.connection.name);
+        CHECK_BUFFERS_MATCH(intercepted_write(), test_data::sasl_protocol_1_0_0);
+        CHECK_EQUAL("rejected", connection->state.negotiator.name);
+        CHECK_EQUAL("failed", connection->state.sasl.name);
 
-        CHECK_BUFFERS_MATCH(write_copy, test_data::sasl_protocol_1_0_0);
     }
 
     TEST_FIXTURE(ConnectionSaslFixture, sasl_client_side_handshake)
@@ -72,11 +91,11 @@ SUITE(ConnectionSasl)
 
         connection->state.sasl.connect(connection);
 
-        CHECK_EQUAL("Negotiated", connection->state.negotiator.name);
-        CHECK_EQUAL("Negotiated", connection->state.sasl.name);
+        CHECK_EQUAL("negotiated", connection->state.negotiator.name);
+        CHECK_EQUAL("negotiated", connection->state.sasl.name);
     }
 
-    static void call_done_callback(amqp_connection_t *connection, uint32_t version, amqp_connection_action_f done_callback)
+    static void dummy_send_action(amqp_connection_t *connection, uint32_t version, amqp_connection_action_f done_callback)
     {
         done_callback(connection);
     }
@@ -90,9 +109,9 @@ SUITE(ConnectionSasl)
         };
 
         amqp_connection_accepted_socket_initialize(connection, -1, 0, 0);
-        connection->state.negotiator.send = call_done_callback;
+        connection->state.negotiator.send = dummy_send_action;
         set_test_data_for_read(test_frames);
         connection->state.sasl.tunnel.accept(connection, AMQP_SASL_PREFERRED_VERSION);
-        CHECK_EQUAL("Negotiated", connection->state.sasl.name);
+        CHECK_EQUAL("negotiated", connection->state.sasl.name);
     }
 }

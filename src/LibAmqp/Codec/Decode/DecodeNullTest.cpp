@@ -17,12 +17,12 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/Decode/DecodeTestSupport.h"
+#include "Codec/Decode/DecodeTestFixture.h"
 #include "Codec/Type/Type.h"
 
 SUITE(CodecDecode)
 {
-    TEST_FIXTURE(DecodeFixture, Null)
+    TEST_FIXTURE(DecodeTestFixture, Null)
     {
         load_decode_buffer(test_data::null_0);
         type = amqp_decode(context, decode_buffer);

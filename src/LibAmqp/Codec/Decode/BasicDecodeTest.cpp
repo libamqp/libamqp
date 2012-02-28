@@ -21,23 +21,17 @@
 #include "TestData/TestData.h"
 #include "debug_helper.h"
 
-#include "Buffer/BufferTestSupport.h"
+#include "Codec/Decode/DecodeTestFixture.h"
 
-SUITE(BasicDecode)
+#include "Codec/CodecTestFixture.h"
+
+SUITE(CodecDecode)
 {
-    class BasicDecodeFixture : public SuiteBuffer::BufferFixture
+    TEST_FIXTURE(DecodeTestFixture, DecodeSixtyFourBitValueIntoType)
     {
-    public:
-        BasicDecodeFixture() { }
-        ~BasicDecodeFixture() { }
-    public:
-    };
-
-    TEST_FIXTURE(BasicDecodeFixture, DecodeSixtyFourBitValueIntoType)
-    {
-        test_data::double_8.transfer_to(buffer);
+        test_data::double_8.transfer_to(decode_buffer);
         amqp_type_t type;
-        amqp_ntoh_64(&type.value.b8, buffer, 1);
+        amqp_ntoh_64(&type.value.b8, decode_buffer, 1);
         CHECK_CLOSE(123.456, type.value.b8._double, 0.00001);
     }
 }

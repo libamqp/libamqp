@@ -61,8 +61,10 @@ static const char *default_identity_hook(amqp_context_t *context)
 amqp_context_t *
 amqp_create_context()
 {
-
     amqp__context_with_guard_t *result = AMQP_MALLOC(0, amqp__context_with_guard_t);
+
+    result->context.shared.output_mutex = AMQP_MALLOC(0, amqp_mutex_t);
+    amqp_mutex_initialize(result->context.shared.output_mutex);
 
     result->context.config.putc = amqp_context_default_debug_putc;
     result->context.config.max_listen_queue_length = 5;
@@ -114,8 +116,9 @@ amqp_context_t *amqp_context_clone(amqp_context_t *context)
 
     result->context.limits = context->limits;
 
+    result->context.shared.cloned = true;
+    result->context.shared.output_mutex = context->shared.output_mutex;
     result->context.reference = context->reference;
-    result->context.reference.cloned = true;
 
     result->context.thread_event_loop = 0;   // Don't clone the event loop. Need one per thread.
 
@@ -123,17 +126,6 @@ amqp_context_t *amqp_context_clone(amqp_context_t *context)
     amqp_context_register_identity_hooks(&result->context, default_identity_hook, default_identity_hook, default_identity_hook);
 
     return (amqp_context_t *) result;
-}
-
-#define check_pool(context, pool) check_pool_allocations(context, pool, #pool)
-static int check_pool_allocations(amqp_context_t *context, amqp_memory_pool_t *pool, const char *pool_name)
-{
-    if (pool->stats.outstanding_allocations != 0)
-    {
-        amqp_error(context, AMQP_ERROR_MEMORY_ERROR, "Pool  %s has %d outstanding allocations.", pool_name, pool->stats.outstanding_allocations);
-        return false;
-    }
-    return true;
 }
 
 int amqp_context_destroy(amqp_context_t *context)
@@ -150,20 +142,23 @@ int amqp_context_destroy(amqp_context_t *context)
         ((amqp__context_with_guard_t *) context)->multiple_delete_protection = 0;
 
 
-        if (!context->reference.cloned)
+        if (!context->shared.cloned)
         {
             amqp_context_free_sasl_plugins(context);
             amqp_descriptors_cleanup(context, context->reference.amqp_descriptors);
             amqp_free(context, context->reference.container_id);
         }
 
-        pools_ok = check_pool(context, &context->memory.amqp_buffer_t_pool) &&
-                check_pool(context, &context->memory.amqp_type_t_pool) &&
-                check_pool(context, &context->memory.amqp_frame_t_pool);
+        pools_ok = amqp_check_pool_is_empty(context, &context->memory.amqp_buffer_t_pool) &&
+                amqp_check_pool_is_empty(context, &context->memory.amqp_type_t_pool) &&
+                amqp_check_pool_is_empty(context, &context->memory.amqp_frame_t_pool);
 
-        if (!(allocations_ok = context->memory.allocation_stats.outstanding_allocations == 0))
+        allocations_ok = amqp_check_allocation_count(context);
+
+        if (!context->shared.cloned)
         {
-            amqp_error(context, AMQP_ERROR_MEMORY_ERROR, "Number of calls to malloc does not match numbers of calls to free - %d outstanding allocations.", context->memory.allocation_stats.outstanding_allocations);
+            amqp_mutex_destroy(context->shared.output_mutex);
+            amqp_free(0, context->shared.output_mutex);
         }
 
         AMQP_FREE(0, context);
@@ -171,9 +166,9 @@ int amqp_context_destroy(amqp_context_t *context)
     return pools_ok && allocations_ok;
 }
 
-amqp_type_t *amqp_allocate_type(amqp_context_t *context)
+amqp_type_t *amqp__allocate_type(amqp_context_t *context AMQP_DEBUG_PARAMS_DECL)
 {
-    return (amqp_type_t *) amqp_allocate(context, &context->memory.amqp_type_t_pool);
+    return (amqp_type_t *) amqp__allocate(context, &context->memory.amqp_type_t_pool AMQP_DEBUG_ARGS);
 }
 
 void amqp_deallocate_type(amqp_context_t *context, amqp_type_t *type)
@@ -184,9 +179,9 @@ void amqp_deallocate_type(amqp_context_t *context, amqp_type_t *type)
     }
 }
 
-amqp_buffer_t *amqp_allocate_buffer(amqp_context_t *context)
+amqp_buffer_t *amqp__allocate_buffer(amqp_context_t *context AMQP_DEBUG_PARAMS_DECL)
 {
-    return (amqp_buffer_t *) amqp_allocate(context, &context->memory.amqp_buffer_t_pool);
+    return (amqp_buffer_t *) amqp__allocate(context, &context->memory.amqp_buffer_t_pool AMQP_DEBUG_ARGS);
 }
 
 void amqp_deallocate_buffer(amqp_context_t *context, amqp_buffer_t *buffer)
@@ -197,9 +192,9 @@ void amqp_deallocate_buffer(amqp_context_t *context, amqp_buffer_t *buffer)
     }
 }
 
-amqp_frame_t *amqp_allocate_frame(amqp_context_t *context)
+amqp_frame_t *amqp__allocate_frame(amqp_context_t *context AMQP_DEBUG_PARAMS_DECL)
 {
-    return (amqp_frame_t *) amqp_allocate(context, &context->memory.amqp_frame_t_pool);
+    return (amqp_frame_t *) amqp__allocate(context, &context->memory.amqp_frame_t_pool AMQP_DEBUG_ARGS);
 }
 
 void amqp_deallocate_frame(amqp_context_t *context, amqp_frame_t *frame)
@@ -210,13 +205,24 @@ void amqp_deallocate_frame(amqp_context_t *context, amqp_frame_t *frame)
     }
 }
 
+void amqp_outputter_lock(amqp_context_t *context)
+{
+    amqp_mutex_lock(context->shared.output_mutex);
+}
+void amqp_outputter_unlock(amqp_context_t *context)
+{
+    amqp_mutex_unlock(context->shared.output_mutex);
+}
+
 // TODO - lock error output stream
-void amqp_stream_outputter(amqp_outputter_arg_t *dest, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format,
+void amqp_stream_outputter(amqp_context_t *context, amqp_outputter_arg_t *dest, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format,
         va_list args)
 {
     FILE *stream = dest->stream;
 
     flockfile(stream);
+
+    amqp_outputter_lock(context);
 
     if (filename)
     {
@@ -245,15 +251,18 @@ void amqp_stream_outputter(amqp_outputter_arg_t *dest, const char *filename, int
     fputc('\n', stream);
     fflush(stream);
     funlockfile(stream);
+    amqp_outputter_unlock(context);
+
 }
 
 // TODO - lock error output stream
-void amqp_buffer_outputter(amqp_outputter_arg_t *dest, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format, va_list args)
+void amqp_buffer_outputter(amqp_context_t *context, amqp_outputter_arg_t *dest, const char *filename, int line_number, const char *context_name, const char *label, const char *source, const char *extra, const char *format, va_list args)
 {
     char *buffer = dest->buffered.buffer;
     size_t buffer_size = dest->buffered.buffer_size;
     int n;
 
+    amqp_outputter_lock(context);
     if (context_name[0])
     {
         n = snprintf(buffer, buffer_size, "%s: ", context_name);
@@ -285,6 +294,7 @@ void amqp_buffer_outputter(amqp_outputter_arg_t *dest, const char *filename, int
     {
         vsnprintf(buffer, buffer_size, format, args);
     }
+    amqp_outputter_unlock(context);
 }
 
 void amqp_output_to_buffer(amqp_context_t *context, char *buffer, size_t buffer_size)

@@ -150,3 +150,20 @@ uint32_t amqp_symbol_hash(amqp_symbol_t *symbol)
     return amqp_variable_hash(&symbol->v);
 }
 
+const char *amqp_symbol_to_cstr(amqp_context_t *context, amqp_symbol_t *symbol)
+{
+    return !amqp_symbol_is_null(symbol) ? (char *) amqp_variable_clone_data(context, &symbol->v) : 0;
+}
+
+int amqp_symbol_print(amqp_context_t *context, amqp_symbol_t *symbol)
+{
+    const char *c_str = amqp_symbol_to_cstr(context, symbol);
+    int i;
+    for (i = 0; i < symbol->v.size; i++)
+    {
+        amqp_context_putc(context, c_str[i]);
+    }
+    amqp_free(context, c_str);
+    return i;
+}
+

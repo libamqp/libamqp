@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_STATE_H
-#define LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_STATE_H
+#ifndef LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_H
+#define LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,6 +40,16 @@ typedef struct amqp_context_t amqp_context_t;
 #ifndef LIBAMQP_AMQP_CONNECTION_TYPE_T
 #define LIBAMQP_AMQP_CONNECTION_TYPE_T
 typedef struct amqp_connection_t amqp_connection_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_CAPABILITIES_TYPE_T
+#define LIBAMQP_AMQP_CAPABILITIES_TYPE_T
+typedef struct amqp_capabilities_t amqp_capabilities_t;
+#endif
+
+#ifndef LIBAMQP_AMQP_PROPERTIES_TYPE_T
+#define LIBAMQP_AMQP_PROPERTIES_TYPE_T
+typedef struct amqp_properties_t amqp_properties_t;
 #endif
 
 #ifndef LIBAMQP_AMQP_CONNECTIONS_TYPE_T
@@ -97,7 +107,6 @@ extern void amqp_connection_shutdown_confirm(amqp_context_t *context, amqp_conne
 
 extern void amqp_connection_shutdown(amqp_context_t *context, amqp_connection_t *connection);
 
-extern void amqp_connection_write(amqp_context_t *context, amqp_connection_t *connection, amqp_buffer_t *buffer);
 extern void amqp_connection_read(amqp_context_t *context, amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required);
 
 inline static int amqp_connection_is(const amqp_connection_t *connection, int flags)
@@ -146,6 +155,14 @@ inline static void amqp_connection_failure_flag_clear(amqp_connection_t *connect
 }
 
 extern const char *amqp_connection_target_host(amqp_connection_t *connection);
+
+inline static void amqp_connection_write_buffer(amqp_connection_t *connection, amqp_buffer_t *buffer)
+{
+    if (buffer)
+    {
+        connection->state.writer.write(connection, buffer);
+    }
+}
 
 #ifdef __cplusplus
 }

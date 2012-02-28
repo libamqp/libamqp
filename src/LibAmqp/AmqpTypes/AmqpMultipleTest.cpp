@@ -15,35 +15,35 @@
  */
 
 #include <TestHarness.h>
-#include "AmqpTypes/AmqpTypesTestSupport.h"
+#include "AmqpTypes/AmqpTypesTestFixture.h"
 
 #include "AmqpTypes/AmqpMultiple.h"
 
 SUITE(AmqpTypes)
 {
-    class AmqpMultiplesFixture  : public AmqpTypesFixture
+    class AmqpMultiplesTestFixture  : public AmqpTypesTestFixture
     {
     public:
-        AmqpMultiplesFixture();
-        ~AmqpMultiplesFixture();
+        AmqpMultiplesTestFixture();
+        ~AmqpMultiplesTestFixture();
 
     public:
         amqp_multiple_symbol_t multiple_ref;
         amqp_multiple_symbol_t *multiple;
     };
 
-    AmqpMultiplesFixture::AmqpMultiplesFixture() : multiple(0)
+    AmqpMultiplesTestFixture::AmqpMultiplesTestFixture() : multiple(0)
     {
         memset(&multiple_ref, '\0', sizeof(amqp_multiple_symbol_t));
     }
 
-    AmqpMultiplesFixture::~AmqpMultiplesFixture()
+    AmqpMultiplesTestFixture::~AmqpMultiplesTestFixture()
     {
         amqp_multiple_symbol_cleanup(context, &multiple_ref);
         amqp_multiple_symbol_cleanup(context, multiple);
     }
 
-    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_one_value)
+    TEST_FIXTURE(AmqpMultiplesTestFixture, multiple_symbol_one_value)
     {
         test_data::multiple_symbol_one_value.transfer_to(buffer);
         type = amqp_decode(context, buffer);
@@ -65,7 +65,7 @@ SUITE(AmqpTypes)
         CHECK(amqp_symbol_compare_with_cstr(symbol, "PLAIN") == 0);
     }
 
-    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_total_length)
+    TEST_FIXTURE(AmqpMultiplesTestFixture, multiple_symbol_total_length)
     {
         test_data::multiple_symbol_many_values.transfer_to(buffer);
         type = amqp_decode(context, buffer);
@@ -76,7 +76,7 @@ SUITE(AmqpTypes)
         CHECK_EQUAL(11, amqp_multiple_symbol_total_length(multiple));
     }
 
-    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_to_string)
+    TEST_FIXTURE(AmqpMultiplesTestFixture, multiple_symbol_to_string)
     {
         test_data::multiple_symbol_many_values.transfer_to(buffer);
         type = amqp_decode(context, buffer);
@@ -89,7 +89,7 @@ SUITE(AmqpTypes)
         CHECK_EQUAL("PLAIN, Foo, Fum", (char *) buffer);
     }
 
-    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_to_string_with_small_buffer)
+    TEST_FIXTURE(AmqpMultiplesTestFixture, multiple_symbol_to_string_with_small_buffer)
     {
         test_data::multiple_symbol_many_values.transfer_to(buffer);
         type = amqp_decode(context, buffer);
@@ -102,7 +102,7 @@ SUITE(AmqpTypes)
         CHECK_EQUAL("PLAI", (char *) buffer);
     }
 
-    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_empty_array)
+    TEST_FIXTURE(AmqpMultiplesTestFixture, multiple_symbol_empty_array)
     {
         test_data::empty_array_of_symbols.transfer_to(buffer);
         type = amqp_decode(context, buffer);
@@ -119,7 +119,7 @@ SUITE(AmqpTypes)
         CHECK_EQUAL(0, multiple_ref.size);
     }
 
-    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_null)
+    TEST_FIXTURE(AmqpMultiplesTestFixture, multiple_symbol_null)
     {
         test_data::multiple_symbol_null.transfer_to(buffer);
         type = amqp_decode(context, buffer);
@@ -132,7 +132,7 @@ SUITE(AmqpTypes)
         CHECK_EQUAL(0, multiple_ref.size);
     }
 
-    TEST_FIXTURE(AmqpMultiplesFixture, multiple_symbol_many_values)
+    TEST_FIXTURE(AmqpMultiplesTestFixture, multiple_symbol_many_values)
     {
         test_data::multiple_symbol_many_values.transfer_to(buffer);
         type = amqp_decode(context, buffer);

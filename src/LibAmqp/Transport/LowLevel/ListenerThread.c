@@ -26,7 +26,7 @@
 #include "Transport/LowLevel/Socket.h"
 #include "Transport/LowLevel/ListenerThread.h"
 
-#include "Transport/Connection/Connections.h" /* TODO - circular dependency :( */
+#include "Transport/Connection/AcceptedConnections.h" /* TODO - circular dependency :( */
 #include "Transport/Connection/ConnectionTestHook.h"
 
 #include "debug_helper.h"

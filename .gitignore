@@ -2,6 +2,7 @@
 .hg
 .hgtags
 .hgignore
+.com.apple.timemachine.supported
 
 .idea
 .project
@@ -50,3 +51,6 @@ Release
 *.gcov
 *.gcno
 *.gcda
+
+
+WorkInProgress.cpp

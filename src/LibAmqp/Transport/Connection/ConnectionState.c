@@ -14,29 +14,16 @@
    limitations under the License.
  */
 
-#include "Context/Context.h"
-#include "Transport/Connection/Connections.h"
-#include "Transport/Connection/Connection.h"
-#include "Transport/Connection/ConnectionTrace.h"
-#include "debug_helper.h"
+#include "Transport/Connection/ConnectionStateMachine.h"
 
 const ev_tstamp write_complete_time = 0.5;       // TODO - consider scaling according to amount of data being written
 const ev_tstamp input_drain_time = 1.0;
 
-#ifdef LIBAMQP_TRACE_CONNECT_STATE
-#define save_old_state()  const char* old_state_name = connection->state.connection.name
-#define trace_transition(old_state_name) amqp_connection_trace_transition(connection, AMQP_TRACE_CONNECTION, old_state_name, connection->state.connection.name)
-#else
-#define save_old_state()
-#define trace_transition(old_state_name)
-#endif
-
-static void transition_to_failed(amqp_connection_t *connection);
-static void transition_to_stopped(amqp_connection_t *connection);
-static void transition_to_stopping(amqp_connection_t *connection);
-static void transition_to_stopping_output(amqp_connection_t *connection);
-static void transition_to_draining_input(amqp_connection_t *connection);
-static void transition_to_timeout(amqp_connection_t *connection, const char *state_name);
+DECLARE_TRANSITION_FUNCTION(failed);
+DECLARE_TRANSITION_FUNCTION(stopped);
+DECLARE_TRANSITION_FUNCTION(stopping);
+DECLARE_TRANSITION_FUNCTION(stopping_output);
+DECLARE_TRANSITION_FUNCTION(draining_input);
 
 static void timer_expiry_handler(amqp_context_t *context, amqp_timer_t *timer)
 {
@@ -49,7 +36,6 @@ void amqp_connection_state_initialize(amqp_connection_t *connection)
     assert(connection->context && connection->context->thread_event_loop);
 
     connection->buffer.read = amqp_allocate_buffer(connection->context);
-    connection->buffer.write = amqp_allocate_buffer(connection->context);
 
     amqp_connection_writer_initialize(connection);
     amqp_connection_reader_initialize( connection);
@@ -75,7 +61,7 @@ void amqp_connection_state_cleanup(amqp_connection_t *connection)
     amqp_connection_writer_cleanup(connection);
     amqp_connection_socket_cleanup(connection);
 
-    amqp_deallocate_buffer(connection->context, connection->buffer.write);
+//    amqp_deallocate_buffer(connection->context, connection->buffer.write);
     amqp_deallocate_buffer(connection->context, connection->buffer.read);
     
     AMQP_FREE(connection->context, connection->amqp.connection.local_container_id);
@@ -133,13 +119,23 @@ static void connection_halt(amqp_connection_t *connection)
     call_stopped_hook(connection);
 }
 
-static void handle_timeout(amqp_connection_t *connection, const char *state_name)
+static void do_nothing(amqp_connection_t *connection)
 {
-    transition_to_timeout(connection, state_name);
-    stop_activity(connection);
+}
+static void done_or_fail_while_timeout(amqp_connection_t *connection)
+{
+    transition_to_state(connection, failed);
+    connection_halt(connection);
+}
+DEFINE_TRANSITION_TO_TIMEOUT_STATE()
+{
+    connection->state.connection.done = done_or_fail_while_timeout;
+    connection->state.connection.fail = done_or_fail_while_timeout;
+    connection->state.shutdown.drain = do_nothing;
+    connection->state.connection.shutdown = do_nothing;
 }
 
-static void action_complete_callback(amqp_connection_t *connection)
+static void writer_stop_complete_callback(amqp_connection_t *connection)
 {
     connection->state.connection.done(connection);
 }
@@ -151,18 +147,20 @@ static void read_complete_callback(amqp_connection_t *connection, amqp_buffer_t 
 
 static void shutdown_connection(amqp_connection_t *connection, amqp_cs_shutdown_mode_t mode)
 {
+// TODO - remove
+connection->trace_flags = 0;
     switch (connection->data.shutdown.mode = mode)
     {
     case amqp_cs_complete_write_drain_input_and_close_socket:
     case amqp_cs_complete_write_and_close_socket:
         timer_start(connection, write_complete_time);
-        transition_to_stopping_output(connection);
-        connection->state.writer.stop(connection, action_complete_callback);
+        transition_to_state(connection, stopping_output);
+        connection->state.writer.stop(connection, writer_stop_complete_callback);
         break;
 
     case amqp_cs_close_socket:
     case amqp_cs_abort_socket:
-        transition_to_stopping(connection);
+        transition_to_state(connection, stopping);
         connection->state.writer.abort(connection);
         connection->state.reader.stop(connection);
         connection->state.socket.shutdown(connection);
@@ -179,14 +177,14 @@ static void done_while_stopping_output(amqp_connection_t *connection)
     {
     case amqp_cs_complete_write_drain_input_and_close_socket:
         timer_start(connection, input_drain_time);
-        transition_to_draining_input(connection);
+        transition_to_state(connection, draining_input);
         amqp_buffer_reset(connection->buffer.read);
         connection->state.reader.reset(connection);
         connection->state.reader.commence_read(connection, connection->buffer.read, amqp_buffer_capacity(connection->buffer.read), read_complete_callback);
         break;
 
     case amqp_cs_complete_write_and_close_socket:
-        transition_to_stopping(connection);
+        transition_to_state(connection, stopping);
         connection->state.reader.stop(connection);
         connection->state.socket.shutdown(connection);
         break;
@@ -198,15 +196,14 @@ static void done_while_stopping_output(amqp_connection_t *connection)
 static void timeout_while_stopping_output(amqp_connection_t *connection)
 {
     amqp_connection_error(connection, AMQP_ERROR_WRITE_DISCHARGE_TIMEOUT, "Did not complete last write");
-    handle_timeout(connection, "TimeoutStoppingOutput");
+    transition_to_timeout(connection, timeout_stopping_output);
+    stop_activity(connection);
 }
-static void transition_to_stopping_output(amqp_connection_t *connection)
+
+DEFINE_TRANSITION_TO_STATE(stopping_output)
 {
-    save_old_state();
-    amqp__connection_default_state_initialization(connection, "StoppingOutput");
     connection->state.connection.done = done_while_stopping_output;
     connection->state.connection.timeout = timeout_while_stopping_output;
-    trace_transition(old_state_name);
 }
 
 static void read_done_while_draining_input(amqp_connection_t *connection, amqp_buffer_t *buffer, int amount)
@@ -215,13 +212,13 @@ static void read_done_while_draining_input(amqp_connection_t *connection, amqp_b
 
     if (amount > 0)
     {
-        transition_to_draining_input(connection);   // TODO - transition to same state here, useful for trace
+        transition_to_state(connection, draining_input);   // TODO - transition to same state here, useful for trace
         amqp_buffer_reset(connection->buffer.read);
         connection->state.reader.commence_read(connection, connection->buffer.read, amqp_buffer_capacity(connection->buffer.read), read_complete_callback);
     }
     else
     {
-        transition_to_stopping(connection);
+        transition_to_state(connection, stopping);
         connection->state.reader.stop(connection);
         connection->state.socket.shutdown(connection);
     }
@@ -230,15 +227,13 @@ static void timeout_while_draining_input(amqp_connection_t *connection)
 {
     // TODO - distinguish between peer sending forever and peer sending nothing.
     amqp_connection_error(connection, AMQP_ERROR_INPUT_DRAIN_TIMEOUT, "Timeout while draining input");
-    handle_timeout(connection, "TimeoutDrainingInput");
+    transition_to_timeout(connection, timeout_draining_input);
+    stop_activity(connection);
 }
-static void transition_to_draining_input(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(draining_input)
 {
-    save_old_state();
-    amqp__connection_default_state_initialization(connection, "DrainingInput");
     connection->state.connection.read_done = read_done_while_draining_input;
     connection->state.connection.timeout = timeout_while_draining_input;
-    trace_transition(old_state_name);
 }
 
 static void done_while_stopping(amqp_connection_t *connection)
@@ -248,12 +243,12 @@ static void done_while_stopping(amqp_connection_t *connection)
     case amqp_cs_complete_write_drain_input_and_close_socket:
     case amqp_cs_complete_write_and_close_socket:
     case amqp_cs_close_socket:
-        transition_to_stopped(connection);
+        transition_to_state(connection, stopped);
 
         break;
 
     case amqp_cs_abort_socket:
-        transition_to_failed(connection);
+        transition_to_state(connection, failed);
         break;
 
     default:
@@ -264,53 +259,26 @@ static void done_while_stopping(amqp_connection_t *connection)
 }
 static void fail_while_stopping(amqp_connection_t *connection)
 {
-    transition_to_failed(connection);
+    transition_to_state(connection, failed);
     connection_halt(connection);
 }
-static void transition_to_stopping(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(stopping)
 {
     // Socket shutdown is immediate unless connecting.
-    save_old_state();
-    amqp__connection_default_state_initialization(connection, "Stopping");
     connection->state.connection.done = done_while_stopping;
     connection->state.connection.fail = fail_while_stopping;
-    trace_transition(old_state_name);
 }
 
-static void do_nothing(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(stopped)
 {
-}
-static void done_or_fail_while_timeout(amqp_connection_t *connection)
-{
-    transition_to_failed(connection);
-    connection_halt(connection);
-}
-static void transition_to_timeout(amqp_connection_t *connection, const char *state_name)
-{
-    save_old_state();
-    amqp__connection_default_state_initialization(connection, state_name);
-    connection->state.connection.done = done_or_fail_while_timeout;
-    connection->state.connection.fail = done_or_fail_while_timeout;
     connection->state.shutdown.drain = do_nothing;
     connection->state.connection.shutdown = do_nothing;
-    trace_transition(old_state_name);
-}
-static void transition_to_stopped(amqp_connection_t *connection)
-{
-    save_old_state();
-    amqp__connection_default_state_initialization(connection, "Stopped");
-    connection->state.shutdown.drain = do_nothing;
-    connection->state.connection.shutdown = do_nothing;
-    trace_transition(old_state_name);
 }
 
-static void transition_to_failed(amqp_connection_t *connection)
+DEFINE_TRANSITION_TO_STATE(failed)
 {
-    save_old_state();
-    amqp__connection_default_state_initialization(connection, "Failed");
     connection->state.shutdown.drain = do_nothing;
     connection->state.connection.shutdown = do_nothing;
-    trace_transition(old_state_name);
 }
 /**********************************************
  Default states
@@ -370,8 +338,6 @@ static void default_timeout(amqp_connection_t *connection)
 
 void amqp__connection_default_state_initialization(amqp_connection_t *connection, const char *new_state_name)
 {
-    connection->state.connection.name = new_state_name;
-
     connection->state.shutdown.drain = default_drain;
     connection->state.shutdown.close = default_close;
 
@@ -390,5 +356,18 @@ void amqp__connection_default_state_initialization(amqp_connection_t *connection
 
     connection->state.connection.done = default_done;
     connection->state.connection.timeout = default_timeout;
+
+    connection->state.connection.name = new_state_name;
+}
+
+static void default_state_initialization(amqp_connection_t *connection, const char *state_name, void (*action_initializer)(amqp_connection_t *connection) LIBAMQP_TRACE_STATE_ARGS_DECL)
+{
+    save_old_state(connection->state.connection.name);
+
+    amqp__connection_default_state_initialization(connection, state_name);
+
+    action_initializer(connection);
+
+    trace_state_transition(AMQP_TRACE_CONNECTION, connection->state.connection.name);
 }
 

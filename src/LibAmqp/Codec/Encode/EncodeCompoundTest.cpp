@@ -18,7 +18,9 @@
 
 #include "Context/ErrorHandling.h"
 
-#include "Codec/CodecTestSupport.h"
+#include "Context/TestSupport/BufferHolder.h"
+#include "Codec/CodecTestFixture.h"
+
 #include "Codec/Decode/Decode.h"
 #include "Codec/Type/Type.h"
 #include "Codec/Type/TypePrint.h"
@@ -28,11 +30,12 @@
 
 SUITE(CompoundEncoding)
 {
-    class EncodeFixture : public SuiteCodec::CodecFixture
+    class EncodeTestFixture : public SuiteCodec::CodecTestFixture,
+            public virtual TestSupport::BufferHolder
     {
     public:
-        EncodeFixture() : result(0) {}
-        ~EncodeFixture()
+        EncodeTestFixture() : result(0) {}
+        ~EncodeTestFixture()
         {
             AMQP_FREE(context, result);
         }
@@ -41,7 +44,7 @@ SUITE(CompoundEncoding)
         char *result;
     };
     
-    TEST_FIXTURE(EncodeFixture, single_element_array)
+    TEST_FIXTURE(EncodeTestFixture, single_element_array)
     {
         amqp_type_t *t;
 
@@ -69,7 +72,7 @@ SUITE(CompoundEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::single_element_array);
     }
 
-    TEST_FIXTURE(EncodeFixture, short_array)
+    TEST_FIXTURE(EncodeTestFixture, short_array)
     {
         type = amqp_encode_array_8(context, buffer);
         CHECK_NOT_NULL(type);
@@ -98,7 +101,7 @@ SUITE(CompoundEncoding)
     }
 
     // mixing elements will mark the type as invalid and will leave the buffer in an undefined state.
-    TEST_FIXTURE(EncodeFixture, invalid_array_with_mixed_types)
+    TEST_FIXTURE(EncodeTestFixture, invalid_array_with_mixed_types)
     {
         type = amqp_encode_array_8(context, buffer);
 
@@ -119,7 +122,7 @@ SUITE(CompoundEncoding)
     }
 
     // mixing elements will mark the type as invalid and will leave the buffer in an undefined state.
-    TEST_FIXTURE(EncodeFixture, array_of_strings)
+    TEST_FIXTURE(EncodeTestFixture, array_of_strings)
     {
         type = amqp_encode_array_8(context, buffer);
         ASSERT_INVALID(type);
@@ -146,7 +149,7 @@ SUITE(CompoundEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::string_array);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_list_8_of_shorts)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_list_8_of_shorts)
     {
         type = amqp_encode_list_8(context, buffer);
         ASSERT_INVALID(type);
@@ -170,7 +173,7 @@ SUITE(CompoundEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::list_of_shorts);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_list_32)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_list_32)
     {
         amqp_type_t *l;
 
@@ -204,7 +207,7 @@ SUITE(CompoundEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::list);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_map_8)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_map_8)
     {
         amqp_type_t *l;
 
@@ -252,7 +255,7 @@ SUITE(CompoundEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::map);
     }
 
-    TEST_FIXTURE(EncodeFixture, empty_map)
+    TEST_FIXTURE(EncodeTestFixture, empty_map)
     {
         type = amqp_encode_map_8(context, buffer);
         ASSERT_INVALID(type);
@@ -267,7 +270,7 @@ SUITE(CompoundEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::empty_map);
     }
 
-    TEST_FIXTURE(EncodeFixture, empty_list)
+    TEST_FIXTURE(EncodeTestFixture, empty_list)
     {
         type = amqp_encode_list_8(context, buffer);
         ASSERT_INVALID(type);
@@ -301,7 +304,7 @@ SUITE(CompoundEncoding)
         return result;
     }
 
-    TEST_FIXTURE(EncodeFixture, described_list)
+    TEST_FIXTURE(EncodeTestFixture, described_list)
     {
         type = encode_described_list(context, buffer);
 
@@ -309,7 +312,7 @@ SUITE(CompoundEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::described_list);
     }
 
-    TEST_FIXTURE(EncodeFixture, described_list_structure)
+    TEST_FIXTURE(EncodeTestFixture, described_list_structure)
     {
         type = encode_described_list(context, buffer);
 
@@ -360,7 +363,7 @@ SUITE(CompoundEncoding)
         return result;
     }
 
-    TEST_FIXTURE(EncodeFixture, array_of_lists)
+    TEST_FIXTURE(EncodeTestFixture, array_of_lists)
     {
         type = amqp_encode_array_8(context, buffer);
             encode_list_of_one_short(context, buffer, 7);
@@ -379,7 +382,7 @@ SUITE(CompoundEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::array_of_lists);
     }
 
-    TEST_FIXTURE(EncodeFixture, array_of_lists_one_empty)
+    TEST_FIXTURE(EncodeTestFixture, array_of_lists_one_empty)
     {
         type = amqp_encode_array_8(context, buffer);
             encode_list_of_one_short(context, buffer, 7);
@@ -399,7 +402,7 @@ SUITE(CompoundEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::array_of_lists_one_empty);
     }
 
-    TEST_FIXTURE(EncodeFixture, array_of_single_empty_list)
+    TEST_FIXTURE(EncodeTestFixture, array_of_single_empty_list)
     {
         type = amqp_encode_array_8(context, buffer);
             encode_an_empty_list(context, buffer);

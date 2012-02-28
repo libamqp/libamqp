@@ -17,7 +17,8 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/CodecTestSupport.h"
+#include "Context/TestSupport/BufferHolder.h"
+#include "Codec/CodecTestFixture.h"
 #include "Codec/Encode/Encode.h"
 
 #include "Codec/Type/Type.h"
@@ -27,11 +28,12 @@ SUITE(VariableTypesEncoding)
     const unsigned char *binary = (unsigned char *) "binary array";
     const unsigned char *big_binary = (unsigned char *) "big binary array";
 
-    class EncodeFixture : public SuiteCodec::CodecFixture
+    class EncodeTestFixture : public SuiteCodec::CodecTestFixture,
+            public virtual TestSupport::BufferHolder
     {
     public:
-        EncodeFixture() : result(0) {}
-        ~EncodeFixture()
+        EncodeTestFixture() : result(0) {}
+        ~EncodeTestFixture()
         {
             AMQP_FREE(context, result);
             deallocate_type(result);
@@ -41,7 +43,7 @@ SUITE(VariableTypesEncoding)
         amqp_type_t *result;
     };
     
-    TEST_FIXTURE(EncodeFixture, amqp_encode_string_str_utf8)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_string_str_utf8)
     {
         type = amqp_encode_string(context, buffer, "Hello World");
 
@@ -52,7 +54,7 @@ SUITE(VariableTypesEncoding)
         CHECK_EQUAL((size_t) 0x0b, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_string)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_string)
     {
         type = amqp_encode_string(context, buffer, "Hello World");
 
@@ -63,7 +65,7 @@ SUITE(VariableTypesEncoding)
         CHECK_EQUAL((size_t) 0x0b, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_string_str32_utf8)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_string_str32_utf8)
     {
         CHECK_EQUAL((size_t) 257, strlen(test_data::lorem_ipsum));
 
@@ -78,7 +80,7 @@ SUITE(VariableTypesEncoding)
         CHECK_EQUAL((size_t) 257, type->position.size);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_binary)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_binary)
     {
         type = amqp_encode_binary(context, buffer, binary, strlen((const char *) binary));
 
@@ -88,7 +90,7 @@ SUITE(VariableTypesEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::bin_8);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_binary_bin8)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_binary_bin8)
     {
         type = amqp_encode_binary_vbin8(context, buffer, binary, strlen((const char *) binary));
 
@@ -98,7 +100,7 @@ SUITE(VariableTypesEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::bin_8);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_binary_bin32)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_binary_bin32)
     {
         type = amqp_encode_binary_vbin32(context, buffer, big_binary, strlen((const char *) big_binary));
 
@@ -109,7 +111,7 @@ SUITE(VariableTypesEncoding)
     }
 
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_symbol)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_symbol)
     {
         type = amqp_encode_symbol(context, buffer, "Foo");
 
@@ -119,7 +121,7 @@ SUITE(VariableTypesEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_symbol_sym8)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_symbol_sym8)
     {
         type = amqp_encode_symbol_sym8(context, buffer, "Foo");
 
@@ -129,7 +131,7 @@ SUITE(VariableTypesEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_symbol_sym32)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_symbol_sym32)
     {
         type = amqp_encode_symbol_sym32(context, buffer, "FooBar");
 
@@ -139,7 +141,7 @@ SUITE(VariableTypesEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::foo_bar_symbol_32);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_symboln)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_symboln)
     {
         type = amqp_encode_symboln(context, buffer, "Foo", 3);
 
@@ -149,7 +151,7 @@ SUITE(VariableTypesEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_symbol_sym8n)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_symbol_sym8n)
     {
         type = amqp_encode_symbol_sym8n(context, buffer, "Foo", 3);
 
@@ -159,7 +161,7 @@ SUITE(VariableTypesEncoding)
         CHECK_BUFFERS_MATCH(buffer, test_data::foo_symbol_8);
     }
 
-    TEST_FIXTURE(EncodeFixture, amqp_encode_symbol_sym32n)
+    TEST_FIXTURE(EncodeTestFixture, amqp_encode_symbol_sym32n)
     {
         type = amqp_encode_symbol_sym32n(context, buffer, "FooBar", 6);
 

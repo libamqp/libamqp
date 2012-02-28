@@ -14,8 +14,8 @@
    limitations under the License.
  */
 
-#ifndef LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_H
-#define LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_H
+#ifndef LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_STATE_H
+#define LIBAMQP_TRANSPORT_CONNECTION_CONNECTION_STATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,15 +26,18 @@ extern "C" {
 #include "Transport/LowLevel/Timer.h"
 #include "Context/SaslIdentity.h"
 #include "Transport/Connection/ConnectionTrace.h"
-#include "Transport/Connection/ConnectionRead.h"
-#include "Transport/Connection/ConnectionSocket.h"
-#include "Transport/Connection/ConnectionWrite.h"
+#include "Transport/Connection/IO/ConnectionSocket.h"
+#include "Transport/Connection/IO/ConnectionRead.h"
+#include "Transport/Connection/IO/ConnectionWrite.h"
 #include "Transport/Connection/ConnectionNegotiation.h"
 #include "Transport/Connection/ConnectionTls.h"
 #include "Transport/Connection/ConnectionSasl.h"
 #include "Transport/Connection/ConnectionAmqpTunnel.h"
 #include "Transport/Connection/ConnectionAmqp.h"
-#include "Transport/Connection/ConnectionFrame.h"
+#include "Transport/Connection/ConnectionFrameReader.h"
+
+#include "Transport/Connection/Session.h"
+
 
 #ifndef LIBAMQP_BUFFER_T_TYPE
 #define LIBAMQP_BUFFER_T_TYPE
@@ -71,6 +74,7 @@ typedef struct amqp_frame_t amqp_frame_t;
 typedef struct amqp_sasl_plugin_t amqp_sasl_plugin_t;
 #endif
 
+#define AMQP_WRITE_QUEUE_SIZE   3
 
 enum amqp_connection_protocols
 {
@@ -87,7 +91,7 @@ typedef void (*amqp_connection_read_callback_f)(amqp_connection_t *connection, a
 typedef void (*amqp_connection_connect_f)(amqp_connection_t *connection, const char *hostname, int port);
 typedef void (*amqp_connection_accept_f)(amqp_connection_t *connection, int fd, struct sockaddr_storage *client_address, socklen_t address_size);
 typedef void (*amqp_connection_error_f)(amqp_connection_t *connection, int error_code);
-typedef void (*amqp_connection_write_f)(amqp_connection_t *connection, amqp_buffer_t *buffer, amqp_connection_action_f done_callback);
+typedef void (*amqp_connection_write_f)(amqp_connection_t *connection, amqp_buffer_t *buffer);
 typedef void (*amqp_connection_read_f)(amqp_connection_t *connection, amqp_buffer_t *buffer, size_t required, amqp_connection_read_callback_f done_callback);
 
 typedef void (*amqp_connection_frame_available_f)(amqp_connection_t *connection, amqp_buffer_t *buffer);
@@ -96,7 +100,7 @@ typedef struct amqp_connection_writer_state_t
 {
     const char *name;
     amqp_connection_action_f enable;
-    amqp_connection_write_f commence_write;
+    amqp_connection_write_f write;
     amqp_connection_action_f continue_write;
     void (*stop)(amqp_connection_t *connection, amqp_connection_action_f done_callback);
     amqp_connection_error_f fail;
@@ -190,9 +194,11 @@ typedef struct amqp_connection_amqp_tunnel_state_t
 typedef struct amqp_connection_amqp_state_t
 {
     const char *name;
-    amqp_connection_action_f done;
+//    amqp_connection_action_f done;
     amqp_connection_action_f send_open;
     amqp_connection_action_f wait_on_open;
+    amqp_session_t *(*create_session)(amqp_connection_t *connection);
+
     struct {
         amqp_message_dispatch_t open;
         amqp_message_dispatch_t begin;
@@ -273,6 +279,13 @@ typedef enum amqp_cs_shutdown_mode_t {
     amqp_cs_abort_socket
 } amqp_cs_shutdown_mode_t;
 
+typedef struct amqp_connection_limits_t
+{
+    uint32_t max_frame_size;
+    uint16_t channel_max;
+    uint32_t idle_time_out;
+} amqp_connection_limits_t;
+
 struct amqp_connection_t
 {
     // TODO - record error code
@@ -316,13 +329,15 @@ struct amqp_connection_t
     } data;
     struct {
         amqp_buffer_t *read;
-        amqp_buffer_t *write;
     } buffer;
     struct {
         struct {
-            amqp_connection_action_f done_callback;
-            amqp_buffer_t *buffer;
             amqp_io_event_watcher_t *watcher;
+            amqp_buffer_t *buffer_queue[AMQP_WRITE_QUEUE_SIZE];
+            int start;
+            int end;
+            amqp_connection_action_f stopped_callback;
+            ev_tstamp last_write_time;
         } write;
         struct {
             amqp_connection_read_callback_f read_callback;
@@ -330,6 +345,7 @@ struct amqp_connection_t
             size_t n_required;
             size_t satisfied;
             amqp_io_event_watcher_t *watcher;
+            ev_tstamp last_read_time;
         } read;
         struct {
             amqp_buffer_t *buffer;
@@ -344,17 +360,20 @@ struct amqp_connection_t
         amqp_sasl_plugin_t *plugin;
     } sasl;
     struct {
-        struct {
+        struct { // TODO -  reduce nesting
             const char *local_container_id;
             const char *remote_container_id;
             const char *hostname;
+            amqp_connection_limits_t limits;
+            amqp_connection_limits_t remote_limits;
             struct {
-                uint32_t max_frame_size;
-                uint16_t channel_max;
-                uint32_t idle_time_out;
-            } limits;
+                ev_tstamp local;
+                ev_tstamp remote;
+                ev_tstamp period;
+            } timeout;
         } connection;
     } amqp;
+    amqp_sessions_table_t sessions;
 };
 
 extern void amqp_connection_state_initialize(amqp_connection_t *connection);

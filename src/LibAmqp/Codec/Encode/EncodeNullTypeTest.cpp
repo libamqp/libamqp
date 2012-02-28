@@ -17,12 +17,11 @@
 #include <TestHarness.h>
 #include "Context/ErrorHandling.h"
 
-#include "Codec/Encode/EncodeTestSupport.h"
-
+#include "Codec/Encode/EncodeTestFixture.h"
 
 SUITE(CodecEncode)
 {
-    TEST_FIXTURE(EncodeFixture, EncodeNullValue)
+    TEST_FIXTURE(EncodeTestFixture, EncodeNullValue)
     {
         type = amqp_encode_null(context, buffer);
         CHECK_NOT_NULL(type);

@@ -17,13 +17,17 @@
 #include <TestHarness.h>
 #include "Plugin/SaslAnonymous/SaslAnonymous.h"
 
-#include "Context/ContextTestSupport.h"
+#include "Context/TestSupport/ContextHolder.h"
+#include "Context/TestSupport/BufferHolder.h"
 #include "Context/Context.h"
 
 
 SUITE(PluginSaslAnonymous)
 {
-    class PluginSaslAnonymousFixture : public SuiteContext::ContextFixture
+    class PluginSaslAnonymousFixture :
+        public virtual TestSupport::ContextHolder,
+        public virtual TestSupport::BufferHolder
+
     {
     public:
         PluginSaslAnonymousFixture();
@@ -59,7 +63,7 @@ SUITE(PluginSaslAnonymous)
 
     TEST_FIXTURE(PluginSaslAnonymousFixture, encode_initial_response)
     {
-        type = amqp_sasl_plugin_initial_response_encode(context, instance, &identity_hooks, decode_buffer);
+        type = amqp_sasl_plugin_initial_response_encode(context, instance, &identity_hooks, buffer);
         CHECK(amqp_type_is_binary(type));
         size_t expected_size = strlen(provide_email(context));
 

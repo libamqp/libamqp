@@ -8,8 +8,8 @@ SET(AMQP_SOURCES
 SET(AMQP_TEST_SOURCES
   ContextTest.cpp
   ErrorHandlingTest.cpp
-  ContextTestSupport.cpp
-  ContextTestSupport.h
+  ContextTestFixture.cpp
+  ContextTestFixture.h
 )
 
 # $Id: CMakeLists.txt,v 1.14 2011/03/16 12:33:34 erk Exp $
