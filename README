@@ -29,6 +29,14 @@ Details on the licensing of SuperFastHast are in: 3rd-party/PaulHsieh/LICENSE.
 
 See src/?? for usage.
 
+Building:
+Use gmake:
+
+  $ cd src
+  $ make
+
+The CMake build has been broken and will be fixed over the next few days.
+
 Authors:
 Eamon Walshe <eamon.walshe@stormmq.com>
 
