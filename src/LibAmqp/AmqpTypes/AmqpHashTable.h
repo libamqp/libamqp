@@ -23,10 +23,6 @@ extern "C" {
 #include "AmqpTypes/AmqpLeader.h"
 #include "AmqpTypes/AmqpEntry.h"
 
-//typedef uint32_t (*amqp_hash_fn_t)(const void *key);
-//typedef int (*amqp_compare_fn_t)(const void *lhs, const void *rhs);
-//typedef void (*amqp_free_callback_t)(amqp_context_t *context, const void *key, const void *data);
-
 struct amqp_hash_table_t
 {
     amqp_leader_t leader;
@@ -41,8 +37,7 @@ struct amqp_hash_table_t
 
 extern void amqp_hash_table_initialize(amqp_context_t *context, amqp_hash_table_t *map, int initial_capacity, amqp_hash_fn_t hash, amqp_compare_fn_t compare);
 extern amqp_hash_table_t *amqp_hash_table_create(amqp_context_t *context, int initial_capacity, amqp_hash_fn_t hash, amqp_compare_fn_t compare);
-extern void amqp_hash_table_cleanup(amqp_context_t *context, amqp_hash_table_t *map);
-extern void amqp_hash_table_cleanup_with_callback(amqp_context_t *context, amqp_hash_table_t *map, amqp_free_callback_t callback);
+extern void amqp_hash_table_cleanup(amqp_context_t *context, amqp_hash_table_t *map, amqp_free_callback_t callback);
 
 extern int amqp_hash_table_put(amqp_context_t *context, amqp_hash_table_t *map, const void *key, const void *data);
 extern const void *amqp_hash_table_get(amqp_hash_table_t *map, const void *key);

@@ -29,6 +29,7 @@
 #include "Context/SaslIdentity.h"
 #include "Messaging/MessagingPlugin.h"
 #include "Thread/Thread.h"
+#include "AmqpTypes/AmqpDescriptor.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -227,6 +228,12 @@ typedef struct amqp_sasl_plugin_node_t amqp_sasl_plugin_node_t;
 
     extern void amqp_outputter_lock(amqp_context_t *context);
     extern void amqp_outputter_unlock(amqp_context_t *context);
+
+    static inline
+    amqp_descriptor_t *amqp_context_descriptor_lookup(amqp_context_t *context, amqp_symbol_t *symbol)
+    {
+        return amqp_descriptor_lookup(context->reference.amqp_descriptors, symbol);
+    }
 
 #ifdef __cplusplus
 }

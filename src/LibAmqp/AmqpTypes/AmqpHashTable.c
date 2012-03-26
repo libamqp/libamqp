@@ -44,7 +44,7 @@ amqp_hash_table_t *amqp_hash_table_create(amqp_context_t *context, int initial_c
     return result;
 }
 
-void amqp_hash_table_cleanup_with_callback(amqp_context_t *context, amqp_hash_table_t *map, amqp_free_callback_t callback)
+void amqp_hash_table_cleanup(amqp_context_t *context, amqp_hash_table_t *map, amqp_free_callback_t callback)
 {
     if (map)
     {
@@ -69,11 +69,6 @@ void amqp_hash_table_cleanup_with_callback(amqp_context_t *context, amqp_hash_ta
             AMQP_FREE(context, map);
         }
     }
-}
-
-void amqp_hash_table_cleanup(amqp_context_t *context, amqp_hash_table_t *map)
-{
-    amqp_hash_table_cleanup_with_callback(context, map, 0);
 }
 
 static amqp_entry_t *add_entry(amqp_context_t *context, amqp_hash_table_t *map, int index, const void *key, const void *data)

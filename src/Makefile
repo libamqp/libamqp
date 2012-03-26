@@ -32,10 +32,7 @@ TEST_SRC :=
 TEST_HARNESS_SRC :=
 TEST_HARNESS_INCLUDES :=
 TEST_RUNNER_ARGS := --exclude SlowRunning WorkInProgress
-#TEST_RUNNER_ARGS := BasicDecode CodecDecode IntegerDecode NumericDecode VariableTypeDecoder CompoundTypeDecode BadDataDecoder  CodecEncode CompoundEncoding VariableTypesEncoding
-#TEST_RUNNER_ARGS := WorkInProgress
-TEST_RUNNER_ARGS := Session
-TEST_RUNNER_ARGS :=  Frame Connection
+TEST_RUNNER_ARGS := BasicDecode CodecDecode IntegerDecode NumericDecode VariableTypeDecoder CompoundTypeDecode BadDataDecoder CodecEncode CompoundEncoding VariableTypesEncoding AmqpTypes Context
 JENKINS_BUILD_OPTIONS :=
 
 SAMPLE_SRC :=

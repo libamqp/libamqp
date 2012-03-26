@@ -41,7 +41,7 @@ SUITE(AmqpTypes)
 
     AmqpMapTestFixture::~AmqpMapTestFixture()
     {
-        amqp_hash_table_cleanup(context, &map);
+        amqp_hash_table_cleanup(context, &map, 0);
     }
 
     int AmqpMapTestFixture::load_map()

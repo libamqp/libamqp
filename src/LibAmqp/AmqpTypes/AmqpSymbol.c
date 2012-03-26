@@ -114,17 +114,6 @@ amqp_hash_table_t *amqp_symbol_hash_table_create(amqp_context_t *context, int in
     return amqp_hash_table_create(context, initial_capacity, (amqp_hash_fn_t) amqp_symbol_hash, (amqp_compare_fn_t) amqp_symbol_compare);
 }
 
-static void cleanup_callback(amqp_context_t *context, const void *key, const void *data)
-{
-    amqp_symbol_t *symbol = (amqp_symbol_t *) key;
-    amqp_symbol_cleanup(context, symbol);
-}
-
-void amqp_symbol_hash_table_cleanup(amqp_context_t *context, amqp_hash_table_t *map)
-{
-    amqp_hash_table_cleanup_with_callback(context, map, cleanup_callback);
-}
-
 int amqp_symbol_to_bytes(amqp_symbol_t *symbol, uint8_t *buffer, size_t buffer_size)
 {
     return amqp_variable_to_bytes(&symbol->v, buffer, buffer_size);

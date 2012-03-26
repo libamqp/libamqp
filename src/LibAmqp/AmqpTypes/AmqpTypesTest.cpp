@@ -49,12 +49,12 @@ SUITE(AmqpTypes)
     }
     TEST_FIXTURE(AmqpTypesTestFixture, frames)
     {
-        CHECK_EQUAL(288U, sizeof(amqp_transport_open_t));
+        CHECK_EQUAL(296U, sizeof(amqp_transport_open_t));
         CHECK_EQUAL(128U, sizeof(amqp_transport_begin_t));
-        CHECK_EQUAL(304U, sizeof(amqp_transport_attach_t));
-        CHECK_EQUAL(88U, sizeof(amqp_transport_flow_t));
-        CHECK_EQUAL(152U, sizeof(amqp_transport_transfer_t));
-        CHECK_EQUAL(72U, sizeof(amqp_transport_disposition_t));
+        CHECK_EQUAL(328U, sizeof(amqp_transport_attach_t));
+        CHECK_EQUAL(104U, sizeof(amqp_transport_flow_t));
+        CHECK_EQUAL(168U, sizeof(amqp_transport_transfer_t));
+        CHECK_EQUAL(80U, sizeof(amqp_transport_disposition_t));
         CHECK_EQUAL(168U, sizeof(amqp_transport_detach_t));
         CHECK_EQUAL(152U, sizeof(amqp_transport_end_t));
         CHECK_EQUAL(152U, sizeof(amqp_transport_close_t));
@@ -69,8 +69,8 @@ SUITE(AmqpTypes)
     }
     TEST_FIXTURE(AmqpTypesTestFixture, messaging_addressing)
     {
-        CHECK_EQUAL(256U, sizeof(amqp_addressing_source_t));
-        CHECK_EQUAL(120U, sizeof(amqp_addressing_target_t));
+        CHECK_EQUAL(264U, sizeof(amqp_addressing_source_t));
+        CHECK_EQUAL(128U, sizeof(amqp_addressing_target_t));
         CHECK_EQUAL(16U, sizeof(amqp_addressing_delete_on_close_t));
         CHECK_EQUAL(16U, sizeof(amqp_addressing_delete_on_no_links_t));
         CHECK_EQUAL(16U, sizeof(amqp_addressing_delete_on_no_messages_t));
@@ -82,11 +82,11 @@ SUITE(AmqpTypes)
         CHECK_EQUAL(16U, sizeof(amqp_delivery_state_accepted_t));
         CHECK_EQUAL(152U, sizeof(amqp_delivery_state_rejected_t));
         CHECK_EQUAL(16U, sizeof(amqp_delivery_state_released_t));
-        CHECK_EQUAL(40U, sizeof(amqp_delivery_state_modified_t));
+        CHECK_EQUAL(48U, sizeof(amqp_delivery_state_modified_t));
     }
     TEST_FIXTURE(AmqpTypesTestFixture, messaging)
     {
-        CHECK_EQUAL(20U, sizeof(amqp_messaging_header_t));
+        CHECK_EQUAL(40U, sizeof(amqp_messaging_header_t));
         CHECK_EQUAL(32U, sizeof(amqp_messaging_delivery_annotations_t));
         CHECK_EQUAL(32U, sizeof(amqp_messaging_message_annotations_t));
         CHECK_EQUAL(520U, sizeof(amqp_messaging_properties_t));

@@ -85,6 +85,7 @@ amqp_hash_table_t *amqp_load_descriptors(amqp_context_t *context)
 {
     int i = 0;
     amqp_hash_table_t *result = amqp_symbol_hash_table_create(context, map_size());
+
     while (descriptors[i].symbolic)
     {
         amqp_symbol_t *symbol = amqp_symbol_create(context, descriptors[i].symbolic, strlen(descriptors[i].symbolic));
@@ -94,9 +95,15 @@ amqp_hash_table_t *amqp_load_descriptors(amqp_context_t *context)
     return result;
 }
 
+static void cleanup_callback(amqp_context_t *context, const void *key, const void *data)
+{
+    amqp_symbol_t *symbol = (amqp_symbol_t *) key;
+    amqp_symbol_cleanup(context, symbol);
+}
+
 void amqp_descriptors_cleanup(amqp_context_t *context, amqp_hash_table_t *map)
 {
-    amqp_symbol_hash_table_cleanup(context, map);
+    amqp_hash_table_cleanup(context, map, cleanup_callback);
 }
 
 amqp_descriptor_t *amqp_descriptor_lookup(amqp_hash_table_t *map, amqp_symbol_t *symbol)

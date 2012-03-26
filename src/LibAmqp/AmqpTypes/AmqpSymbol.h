@@ -62,7 +62,6 @@ void amqp_symbol_cleanup(amqp_context_t *context, amqp_symbol_t *symbol)
 
 extern void amqp_symbol_hash_table_initialize(amqp_context_t *context, amqp_hash_table_t *map, int initial_capacity);
 extern amqp_hash_table_t *amqp_symbol_hash_table_create(amqp_context_t *context, int initial_capacity);
-extern void amqp_symbol_hash_table_cleanup(amqp_context_t *context, amqp_hash_table_t *map);
 
 static inline
 int amqp_symbol_hash_table_put(amqp_context_t *context, amqp_hash_table_t *map, const amqp_symbol_t *key, const void *data)

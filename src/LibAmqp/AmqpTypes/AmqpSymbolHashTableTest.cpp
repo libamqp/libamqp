@@ -24,6 +24,7 @@ SUITE(AmqpTypes)
     public:
         AmqpSymbolMapTestFixture();
         ~AmqpSymbolMapTestFixture();
+        static void cleanup_callback(amqp_context_t *context, const void *key, const void *data);
 
     public:
         amqp_hash_table_t map;
@@ -37,6 +38,11 @@ SUITE(AmqpTypes)
     {
     }
 
+    void AmqpSymbolMapTestFixture::cleanup_callback(amqp_context_t *context, const void *key, const void *data)
+    {
+        amqp_symbol_cleanup(context, (amqp_symbol_t *) key);
+    }
+
     TEST_FIXTURE(AmqpSymbolMapTestFixture, symbol_map_should_not_trigger_allocation_errors)
     {
         amqp_symbol_hash_table_initialize(context, &map, 63);
@@ -45,7 +51,7 @@ SUITE(AmqpTypes)
             amqp_symbol_t *symbol = amqp_symbol_create(context, keys[i], strlen(keys[i]));
             amqp_hash_table_put(context, &map, symbol, data[i]);
         }
-        amqp_symbol_hash_table_cleanup(context, &map);
+        amqp_hash_table_cleanup(context, &map, cleanup_callback);
     }
 
     TEST_FIXTURE(AmqpSymbolMapTestFixture, symbol_map_put_and_get_are_nothing_special)
@@ -54,6 +60,6 @@ SUITE(AmqpTypes)
         amqp_symbol_t *symbol = amqp_symbol_create(context, keys[6], strlen(keys[6]));
         CHECK(amqp_hash_table_put(context, &map, symbol, data[6]));
         CHECK(amqp_hash_table_put(context, &map, symbol, data[6]) == 0);
-        amqp_symbol_hash_table_cleanup(context, &map);
+        amqp_hash_table_cleanup(context, &map, cleanup_callback);
     }
 }

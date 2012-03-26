@@ -104,16 +104,12 @@ typedef struct amqp_symbolic_descriptor_t
     amqp_descriptor_t descriptor;
 } amqp_symbolic_descriptor_t;
 
+
 extern amqp_hash_table_t *amqp_load_descriptors(amqp_context_t *context);
 extern void amqp_descriptors_cleanup(amqp_context_t *context, amqp_hash_table_t *map);
 extern amqp_descriptor_t *amqp_descriptor_lookup(amqp_hash_table_t *map, amqp_symbol_t *symbol);
 extern const char *amqp_descriptor_id_to_cstr(uint32_t id);
 
-static inline
-amqp_descriptor_t *amqp_context_descriptor_lookup(amqp_context_t *context, amqp_symbol_t *symbol)
-{
-    return amqp_descriptor_lookup(context->reference.amqp_descriptors, symbol);
-}
 
 #ifdef __cplusplus
 }
