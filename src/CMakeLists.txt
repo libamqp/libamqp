@@ -22,6 +22,7 @@ ADD_LIBRARY(LibAmqp
   ${LibAmqp_SOURCES}
 )
 
+IF(UNITTEST++_FOUND)
 AMQP_MODULE(Test)
 
 ADD_EXECUTABLE(Test
@@ -35,5 +36,6 @@ TARGET_LINK_LIBRARIES(Test
 )
 
 ADD_TEST(UnitTest++ Test --xml=../output/test-result.xml)
+ENDIF(UNITTEST++_FOUND)
 
 # $Id: CMakeLists.txt,v 1.14 2011/03/16 12:33:34 erk Exp $
